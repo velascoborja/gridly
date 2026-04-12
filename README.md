@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Buddy — Personal Finance Tracker
+
+Buddy is a personal finance tracking app that helps you monitor your income, expenses, savings, and balance across months and years. You configure your expected salary, fixed costs, and investment targets once per year, then record actual figures each month to see how you're tracking.
+
+**What it does:**
+- Track monthly income (payslip, bonuses, additional payslips, interest, and one-off items)
+- Track monthly expenses (home, personal budget, investments, and one-off items)
+- Compute savings and running balance automatically
+- Visualise annual balance and savings trends with charts
+- Export year data
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- A running PostgreSQL instance (connection string goes in `.env`)
+
+### Setup
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Copy the example env file and fill in your database URL:
+
+```bash
+cp .env.example .env
+```
+
+3. Push the database schema:
+
+```bash
+npm run db:push
+```
+
+4. Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### First use
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Create a year — enter your starting balance, estimated salary, monthly investment target, home expense, personal budget, and interest rate.
+2. The app pre-fills all 12 months with your estimates.
+3. Each month, open the month view and update the actual figures (payslip received, real home costs, etc.).
+4. Use the annual overview to see your balance chart and KPIs for the full year.
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+  app/          # Next.js pages and API routes
+  components/   # UI components (annual view, monthly view, layout)
+  db/           # Database schema and client
+  lib/          # Shared types, calculations, and export utilities
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Tech Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Next.js](https://nextjs.org) — framework
+- [Drizzle ORM](https://orm.drizzle.team) — database access
+- [shadcn/ui](https://ui.shadcn.com) — component primitives
+- [Recharts](https://recharts.org) — charts
