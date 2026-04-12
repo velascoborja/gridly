@@ -39,3 +39,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# drizzle
+/drizzle/meta/
+*.db
+*.db-shm
+*.db-wal
+
+# editor
+.idea/
+.vscode/
+*.swp
+*.swo
