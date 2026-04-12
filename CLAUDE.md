@@ -1,6 +1,6 @@
 @AGENTS.md
 
-# Project: Buddy (internal name: Gridly)
+# Project: Gridly
 
 Personal finance tracker built with Next.js 16 (App Router), React 19, Drizzle ORM, and Neon (serverless PostgreSQL).
 

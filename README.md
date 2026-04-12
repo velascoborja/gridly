@@ -1,6 +1,6 @@
-# Buddy — Personal Finance Tracker
+# Gridly — Personal Finance Tracker
 
-Buddy is a personal finance tracking app that helps you monitor your income, expenses, savings, and balance across months and years. You configure your expected salary, fixed costs, and investment targets once per year, then record actual figures each month to see how you're tracking.
+Gridly is a personal finance tracking app that helps you monitor your income, expenses, savings, and balance across months and years. You configure your expected salary, fixed costs, and investment targets once per year, then record actual figures each month to see how you're tracking.
 
 **What it does:**
 - Track monthly income (payslip, bonuses, additional payslips, interest, and one-off items)
