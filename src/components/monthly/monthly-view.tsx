@@ -19,9 +19,9 @@ export function MonthlyView({ yearData: initialYearData, monthNumber }: Props) {
 
   const month = months.find((m) => m.month === monthNumber);
 
-  const recompute = (updated: MonthData[]) => {
+  const recompute = useCallback((updated: MonthData[]) => {
     return computeMonthChain(updated, config.startingBalance);
-  };
+  }, [config.startingBalance]);
 
   const handleFixedUpdate = useCallback(async (field: string, value: number) => {
     if (!month) return;
@@ -38,7 +38,7 @@ export function MonthlyView({ yearData: initialYearData, monthNumber }: Props) {
       );
       return recompute(updated);
     });
-  }, [month]);
+  }, [month, recompute]);
 
   const handleEntriesChange = useCallback((type: "income" | "expense", entries: AdditionalEntry[]) => {
     if (!month) return;
@@ -50,7 +50,7 @@ export function MonthlyView({ yearData: initialYearData, monthNumber }: Props) {
       });
       return recompute(updated);
     });
-  }, [month]);
+  }, [month, recompute]);
 
   if (!month) {
     return (

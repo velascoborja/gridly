@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { MONTH_NAMES } from "@/lib/utils";
 
 interface Props {
@@ -42,19 +43,19 @@ export function NavSelectors({ currentYear, currentMonth, view, years }: Props) 
         </select>
 
         {/* Main tabs */}
-        <div className="flex gap-1">
+        <div className="flex flex-wrap gap-1">
           {mainTabs.map((tab) => (
-            <button
+            <Link
               key={tab.key}
-              onClick={() => router.push(tab.href)}
-              className={`px-3 py-1.5 text-xs rounded-md transition-colors cursor-pointer ${
+              href={tab.href}
+              className={`px-3 py-1.5 text-xs rounded-md transition-colors cursor-pointer block ${
                 view === tab.key
                   ? "bg-primary text-primary-foreground font-medium"
                   : "text-muted-foreground hover:bg-muted"
               }`}
             >
               {tab.label}
-            </button>
+            </Link>
           ))}
         </div>
       </div>
@@ -66,17 +67,17 @@ export function NavSelectors({ currentYear, currentMonth, view, years }: Props) 
             const m = i + 1;
             const active = currentMonth === m;
             return (
-              <button
+              <Link
                 key={m}
-                onClick={() => router.push(`/${currentYear}/${m}`)}
-                className={`px-2 py-1 text-xs rounded-md transition-colors cursor-pointer ${
+                href={`/${currentYear}/${m}`}
+                className={`px-2 py-1 text-xs rounded-md transition-colors cursor-pointer block ${
                   active
                     ? "bg-primary text-primary-foreground font-medium"
                     : "text-muted-foreground hover:bg-muted"
                 }`}
               >
                 {name.slice(0, 3)}
-              </button>
+              </Link>
             );
           })}
         </div>
