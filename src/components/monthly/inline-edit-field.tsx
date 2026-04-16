@@ -18,7 +18,8 @@ export function InlineEditField({ label, value, onSave, disabled, className }: I
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const suppressBlurSaveRef = useRef(false);
+  const cancelButtonRef = useRef<HTMLButtonElement>(null);
+  const discardIntentRef = useRef(false);
 
   useEffect(() => {
     if (editing) {
@@ -47,14 +48,18 @@ export function InlineEditField({ label, value, onSave, disabled, className }: I
   };
 
   const discardEdits = () => {
-    suppressBlurSaveRef.current = true;
+    discardIntentRef.current = true;
     setEditing(false);
     setError(false);
   };
 
-  const handleBlur = () => {
-    if (suppressBlurSaveRef.current) {
-      suppressBlurSaveRef.current = false;
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (discardIntentRef.current) {
+      discardIntentRef.current = false;
+      return;
+    }
+
+    if (e.relatedTarget === cancelButtonRef.current) {
       return;
     }
 
@@ -64,6 +69,7 @@ export function InlineEditField({ label, value, onSave, disabled, className }: I
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") handleSave();
     if (e.key === "Escape") {
+      discardIntentRef.current = true;
       setEditing(false);
       setError(false);
     }
@@ -86,13 +92,10 @@ export function InlineEditField({ label, value, onSave, disabled, className }: I
             inputMode="decimal"
           />
           <Button
+            ref={cancelButtonRef}
             size="sm"
             variant="ghost"
             className="h-9 px-3 text-muted-foreground"
-            onMouseDown={(e) => {
-              suppressBlurSaveRef.current = true;
-              e.preventDefault();
-            }}
             onClick={discardEdits}
             type="button"
           >
