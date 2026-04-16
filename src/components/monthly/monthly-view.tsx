@@ -61,9 +61,9 @@ export function MonthlyView({ yearData: initialYearData, monthNumber }: Props) {
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(20rem,22rem)] lg:items-start">
       {/* Expenses column */}
-      <div className="space-y-4">
+      <div className="space-y-5">
         <FixedExpensesCard month={month} onUpdate={handleFixedUpdate} />
         <AdditionalEntriesCard
           monthId={month.id}
@@ -75,7 +75,7 @@ export function MonthlyView({ yearData: initialYearData, monthNumber }: Props) {
       </div>
 
       {/* Income column */}
-      <div className="space-y-4">
+      <div className="space-y-5">
         <IncomeCard month={month} onUpdate={handleFixedUpdate} />
         <AdditionalEntriesCard
           monthId={month.id}
@@ -87,7 +87,7 @@ export function MonthlyView({ yearData: initialYearData, monthNumber }: Props) {
       </div>
 
       {/* Summary column */}
-      <div className="md:col-span-2 lg:col-span-1">
+      <div className="lg:sticky lg:top-6">
         <SummaryCard month={month} />
       </div>
     </div>

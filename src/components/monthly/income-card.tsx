@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { InlineEditField } from "./inline-edit-field";
 import type { MonthData } from "@/lib/types";
 
@@ -14,11 +14,14 @@ export function IncomeCard({ month, onUpdate }: Props) {
   const isJuly = month.month === 7;
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
+    <Card className="border-border/70 bg-card/95 shadow-sm shadow-black/5">
+      <CardHeader className="pb-3">
         <CardTitle className="text-sm font-medium">Ingresos fijos</CardTitle>
+        <CardDescription>
+          Entradas base del mes, incluyendo pagas extra y complementos cuando aplican.
+        </CardDescription>
       </CardHeader>
-      <CardContent className="divide-y divide-border/50">
+      <CardContent className="space-y-1.5">
         <InlineEditField
           label="Nómina"
           value={month.payslip}

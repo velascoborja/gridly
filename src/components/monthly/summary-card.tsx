@@ -12,8 +12,8 @@ function SummaryRow({ label, value, highlight, positive }: { label: string; valu
     : "";
 
   return (
-    <div className={`flex justify-between items-center py-2 ${highlight ? "border-t border-border mt-1 pt-3" : ""}`}>
-      <span className={`text-sm ${highlight ? "font-semibold" : "text-muted-foreground"}`}>{label}</span>
+    <div className={`flex items-center justify-between py-2 ${highlight ? "mt-1 border-t border-border/70 pt-3" : ""}`}>
+      <span className={`text-sm ${highlight ? "font-semibold text-foreground" : "text-muted-foreground"}`}>{label}</span>
       <span className={`text-sm font-medium tabular-nums ${color} ${highlight ? "text-base font-bold" : ""}`}>
         {formatCurrency(value)}
       </span>
@@ -23,11 +23,14 @@ function SummaryRow({ label, value, highlight, positive }: { label: string; valu
 
 export function SummaryCard({ month }: Props) {
   return (
-    <Card className="border-2">
-      <CardHeader className="pb-2">
+    <Card className="border-border/80 bg-gradient-to-b from-background to-muted/30 shadow-md shadow-black/5">
+      <CardHeader className="pb-3">
         <CardTitle className="text-sm font-medium">Resumen del mes</CardTitle>
+        <p className="text-xs text-muted-foreground">
+          Lectura final del mes con saldo, gasto y ahorro neto.
+        </p>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-0">
         <SummaryRow label="Saldo inicial" value={month.startingBalance} />
         <SummaryRow label="Total ingresos" value={month.totalIncome} />
         <SummaryRow label="Total gastos" value={month.totalExpenses} />

@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2, Plus } from "lucide-react";
+import { Pencil, Plus, Trash2, X } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import type { AdditionalEntry } from "@/lib/types";
 
@@ -24,6 +24,18 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
   const [editLabel, setEditLabel] = useState("");
   const [editAmount, setEditAmount] = useState("");
 
+  const closeAddForm = () => {
+    setAdding(false);
+    setNewLabel("");
+    setNewAmount("");
+  };
+
+  const openEditForm = (entry: AdditionalEntry) => {
+    setEditingId(entry.id);
+    setEditLabel(entry.label);
+    setEditAmount(String(entry.amount));
+  };
+
   const handleAdd = async () => {
     const amount = parseFloat(newAmount.replace(",", "."));
     if (!newLabel.trim() || isNaN(amount)) return;
@@ -36,9 +48,7 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
     if (!res.ok) return;
     const entry = await res.json();
     onEntriesChange([...entries, { ...entry, amount: parseFloat(entry.amount) }]);
-    setNewLabel("");
-    setNewAmount("");
-    setAdding(false);
+    closeAddForm();
   };
 
   const handleDelete = async (id: number) => {
@@ -61,82 +71,126 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
   };
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
+    <Card className="border-border/70 bg-card/95 shadow-sm shadow-black/5">
+      <CardHeader className="pb-3">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        <CardDescription>
+          Movimientos puntuales con edición rápida y eliminaciones explícitas.
+        </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-1">
+      <CardContent className="space-y-3">
         {entries.length === 0 && !adding && (
-          <p className="text-xs text-muted-foreground py-1">Sin entradas</p>
+          <div className="rounded-xl border border-dashed border-border/70 bg-muted/20 px-3 py-4 text-sm text-muted-foreground">
+            Sin entradas todavía.
+          </div>
         )}
         {entries.map((entry) =>
           editingId === entry.id ? (
-            <div key={entry.id} className="flex gap-2">
-              <Input
-                className="h-7 text-sm flex-1"
-                value={editLabel}
-                onChange={(e) => setEditLabel(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") handleEdit(entry.id); if (e.key === "Escape") setEditingId(null); }}
-                autoFocus
-              />
-              <Input
-                className="h-7 text-sm w-24 text-right"
-                value={editAmount}
-                onChange={(e) => setEditAmount(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") handleEdit(entry.id); if (e.key === "Escape") setEditingId(null); }}
-                inputMode="decimal"
-              />
-              <Button size="sm" variant="ghost" className="h-7 px-2" onClick={() => handleEdit(entry.id)}>✓</Button>
-              <Button size="sm" variant="ghost" className="h-7 px-2" onClick={() => setEditingId(null)}>✕</Button>
+            <div key={entry.id} className="rounded-xl border border-border/70 bg-muted/20 p-2">
+              <div className="flex gap-2">
+                <Input
+                  className="h-9 flex-1 text-sm"
+                  value={editLabel}
+                  onChange={(e) => setEditLabel(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleEdit(entry.id);
+                    if (e.key === "Escape") setEditingId(null);
+                  }}
+                  autoFocus
+                />
+                <Input
+                  className="h-9 w-28 text-right text-sm"
+                  value={editAmount}
+                  onChange={(e) => setEditAmount(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleEdit(entry.id);
+                    if (e.key === "Escape") setEditingId(null);
+                  }}
+                  inputMode="decimal"
+                />
+                <Button size="sm" className="h-9 px-3" onClick={() => handleEdit(entry.id)}>
+                  Guardar
+                </Button>
+                <Button size="sm" variant="ghost" className="h-9 px-3" onClick={() => setEditingId(null)}>
+                  Cancelar
+                </Button>
+              </div>
             </div>
           ) : (
-            <div key={entry.id} className="flex items-center justify-between py-1 group">
+            <div key={entry.id} className="group flex items-center justify-between rounded-xl border border-transparent px-2 py-2 transition-colors hover:border-border/70 hover:bg-muted/40">
               <button
-                className="text-sm text-left flex-1 hover:text-primary cursor-pointer"
-                onClick={() => { setEditingId(entry.id); setEditLabel(entry.label); setEditAmount(String(entry.amount)); }}
+                className="flex-1 text-left text-sm font-medium text-foreground transition-colors hover:text-primary"
+                onClick={() => openEditForm(entry)}
+                type="button"
+                aria-label={`Editar ${entry.label}`}
               >
                 {entry.label}
               </button>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium tabular-nums">{formatCurrency(entry.amount)}</span>
-                <button
-                  className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-opacity"
-                  onClick={() => handleDelete(entry.id)}
+              <div className="flex items-center gap-1.5">
+                <span className="text-sm font-semibold tabular-nums">{formatCurrency(entry.amount)}</span>
+                <Button
+                  size="icon-xs"
+                  variant="ghost"
+                  className="opacity-0 transition-opacity group-hover:opacity-100"
+                  onClick={() => openEditForm(entry)}
+                  aria-label={`Editar ${entry.label}`}
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
+                  <Pencil className="h-3 w-3" />
+                </Button>
+                <Button
+                  size="icon-xs"
+                  variant="ghost"
+                  className="opacity-0 transition-opacity group-hover:opacity-100 hover:text-destructive"
+                  onClick={() => handleDelete(entry.id)}
+                  aria-label={`Eliminar ${entry.label}`}
+                >
+                  <Trash2 className="h-3 w-3" />
+                </Button>
               </div>
             </div>
           )
         )}
 
         {adding ? (
-          <div className="flex gap-2 pt-1">
-            <Input
-              className="h-7 text-sm flex-1"
-              placeholder="Descripción"
-              value={newLabel}
-              onChange={(e) => setNewLabel(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") handleAdd(); if (e.key === "Escape") setAdding(false); }}
-              autoFocus
-            />
-            <Input
-              className="h-7 text-sm w-24 text-right"
-              placeholder="0.00"
-              value={newAmount}
-              onChange={(e) => setNewAmount(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") handleAdd(); if (e.key === "Escape") setAdding(false); }}
-              inputMode="decimal"
-            />
-            <Button size="sm" variant="ghost" className="h-7 px-2" onClick={handleAdd}>✓</Button>
-            <Button size="sm" variant="ghost" className="h-7 px-2" onClick={() => setAdding(false)}>✕</Button>
+          <div className="rounded-xl border border-border/70 bg-muted/20 p-2">
+            <div className="flex gap-2">
+              <Input
+                className="h-9 flex-1 text-sm"
+                placeholder="Descripción"
+                value={newLabel}
+                onChange={(e) => setNewLabel(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleAdd();
+                  if (e.key === "Escape") closeAddForm();
+                }}
+                autoFocus
+              />
+              <Input
+                className="h-9 w-28 text-right text-sm"
+                placeholder="0.00"
+                value={newAmount}
+                onChange={(e) => setNewAmount(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleAdd();
+                  if (e.key === "Escape") closeAddForm();
+                }}
+                inputMode="decimal"
+              />
+              <Button size="sm" className="h-9 px-3" onClick={handleAdd}>
+                Añadir
+              </Button>
+              <Button size="sm" variant="ghost" className="h-9 px-3" onClick={closeAddForm}>
+                <X className="h-3.5 w-3.5" />
+              </Button>
+            </div>
           </div>
         ) : (
           <button
-            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary pt-1 cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-md text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             onClick={() => setAdding(true)}
+            type="button"
           >
-            <Plus className="h-3 w-3" /> Añadir
+            <Plus className="h-3.5 w-3.5" /> Añadir entrada
           </button>
         )}
       </CardContent>

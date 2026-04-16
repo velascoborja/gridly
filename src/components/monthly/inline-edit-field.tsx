@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
 
 interface InlineEditFieldProps {
@@ -53,23 +54,37 @@ export function InlineEditField({ label, value, onSave, disabled, className }: I
   };
 
   return (
-    <div className={`flex items-center justify-between py-1.5 ${className ?? ""}`}>
-      <span className="text-sm text-muted-foreground">{label}</span>
+    <div className={`flex items-center justify-between gap-3 rounded-xl px-2 py-2 transition-colors hover:bg-muted/30 ${className ?? ""}`}>
+      <span className="text-sm font-medium text-muted-foreground">{label}</span>
       {editing ? (
-        <input
-          ref={inputRef}
-          className={`w-32 text-right text-sm border rounded px-2 py-0.5 outline-none focus:ring-1 focus:ring-primary ${error ? "border-destructive" : "border-border"}`}
-          value={inputVal}
-          onChange={(e) => { setInputVal(e.target.value); setError(false); }}
-          onBlur={handleSave}
-          onKeyDown={handleKeyDown}
-          disabled={saving}
-          type="text"
-          inputMode="decimal"
-        />
+        <div className="flex items-center gap-2">
+          <input
+            ref={inputRef}
+            className={`h-9 w-32 rounded-md border bg-background px-2.5 text-right text-sm outline-none transition-colors focus:ring-4 focus:ring-ring/20 ${error ? "border-destructive" : "border-border"}`}
+            value={inputVal}
+            onChange={(e) => { setInputVal(e.target.value); setError(false); }}
+            onBlur={handleSave}
+            onKeyDown={handleKeyDown}
+            disabled={saving}
+            type="text"
+            inputMode="decimal"
+          />
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-9 px-3 text-muted-foreground"
+            onClick={() => {
+              setEditing(false);
+              setError(false);
+            }}
+            type="button"
+          >
+            Cancelar
+          </Button>
+        </div>
       ) : (
         <button
-          className={`text-sm font-medium tabular-nums hover:text-primary hover:underline cursor-pointer disabled:cursor-default disabled:opacity-50 ${error ? "text-destructive" : ""}`}
+          className={`rounded-md px-2 py-1 text-sm font-semibold tabular-nums transition-colors hover:bg-background hover:text-primary disabled:cursor-default disabled:opacity-50 ${error ? "text-destructive" : "text-foreground"}`}
           onClick={() => !disabled && setEditing(true)}
           disabled={disabled}
           type="button"
