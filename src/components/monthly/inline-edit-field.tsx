@@ -18,6 +18,7 @@ export function InlineEditField({ label, value, onSave, disabled, className }: I
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const suppressBlurSaveRef = useRef(false);
 
   useEffect(() => {
     if (editing) {
@@ -45,6 +46,21 @@ export function InlineEditField({ label, value, onSave, disabled, className }: I
     }
   };
 
+  const discardEdits = () => {
+    suppressBlurSaveRef.current = true;
+    setEditing(false);
+    setError(false);
+  };
+
+  const handleBlur = () => {
+    if (suppressBlurSaveRef.current) {
+      suppressBlurSaveRef.current = false;
+      return;
+    }
+
+    void handleSave();
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") handleSave();
     if (e.key === "Escape") {
@@ -63,7 +79,7 @@ export function InlineEditField({ label, value, onSave, disabled, className }: I
             className={`h-9 w-32 rounded-md border bg-background px-2.5 text-right text-sm outline-none transition-colors focus:ring-4 focus:ring-ring/20 ${error ? "border-destructive" : "border-border"}`}
             value={inputVal}
             onChange={(e) => { setInputVal(e.target.value); setError(false); }}
-            onBlur={handleSave}
+            onBlur={handleBlur}
             onKeyDown={handleKeyDown}
             disabled={saving}
             type="text"
@@ -73,10 +89,11 @@ export function InlineEditField({ label, value, onSave, disabled, className }: I
             size="sm"
             variant="ghost"
             className="h-9 px-3 text-muted-foreground"
-            onClick={() => {
-              setEditing(false);
-              setError(false);
+            onMouseDown={(e) => {
+              suppressBlurSaveRef.current = true;
+              e.preventDefault();
             }}
+            onClick={discardEdits}
             type="button"
           >
             Cancelar
