@@ -17,10 +17,8 @@ export function getDatabase() {
 }
 
 // For convenience, export as `db` getter — but use getDatabase() in route handlers
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const db = new Proxy({} as ReturnType<typeof getDb>, {
-  get(_target, prop) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (getDatabase() as any)[prop];
+  get(_target, prop: keyof ReturnType<typeof getDb>) {
+    return getDatabase()[prop];
   },
 });

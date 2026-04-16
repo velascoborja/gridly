@@ -1,5 +1,5 @@
 import ExcelJS from "exceljs";
-import type { YearData, MonthData } from "./types";
+import type { YearData } from "./types";
 import { MONTH_NAMES } from "./utils";
 
 function styleHeader(ws: ExcelJS.Worksheet, cell: string, text: string) {
