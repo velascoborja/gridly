@@ -87,9 +87,9 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
         {entries.map((entry) =>
           editingId === entry.id ? (
             <div key={entry.id} className="rounded-xl border border-border/70 bg-muted/20 p-2">
-              <div className="flex gap-2">
+              <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto] sm:items-center">
                 <Input
-                  className="h-9 flex-1 text-sm"
+                  className="h-9 min-w-0 text-sm"
                   value={editLabel}
                   onChange={(e) => setEditLabel(e.target.value)}
                   onKeyDown={(e) => {
@@ -99,7 +99,7 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
                   autoFocus
                 />
                 <Input
-                  className="h-9 w-28 text-right text-sm"
+                  className="h-9 w-full text-right text-sm sm:w-28"
                   value={editAmount}
                   onChange={(e) => setEditAmount(e.target.value)}
                   onKeyDown={(e) => {
@@ -108,44 +108,46 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
                   }}
                   inputMode="decimal"
                 />
-                <Button size="sm" className="h-9 px-3" onClick={() => handleEdit(entry.id)}>
+                <Button size="sm" className="h-9 px-3 sm:w-auto" onClick={() => handleEdit(entry.id)}>
                   Guardar
                 </Button>
-                <Button size="sm" variant="ghost" className="h-9 px-3" onClick={() => setEditingId(null)}>
+                <Button size="sm" variant="ghost" className="h-9 px-3 sm:w-auto" onClick={() => setEditingId(null)}>
                   Cancelar
                 </Button>
               </div>
             </div>
           ) : (
-            <div key={entry.id} className="group flex items-center justify-between rounded-xl border border-transparent px-2 py-2 transition-colors hover:border-border/70 hover:bg-muted/40">
-              <button
-                className="flex-1 text-left text-sm font-medium text-foreground transition-colors hover:text-primary"
-                onClick={() => openEditForm(entry)}
-                type="button"
-                aria-label={`Editar ${entry.label}`}
-              >
-                {entry.label}
-              </button>
-              <div className="flex items-center gap-1.5">
-                <span className="text-sm font-semibold tabular-nums">{formatCurrency(entry.amount)}</span>
-                <Button
-                  size="icon-xs"
-                  variant="ghost"
-                  className="opacity-0 transition-opacity group-hover:opacity-100"
+            <div key={entry.id} className="rounded-xl border border-transparent px-2 py-2 transition-colors hover:border-border/70 hover:bg-muted/40">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <button
+                  className="min-w-0 flex-1 text-left text-sm font-medium text-foreground transition-colors hover:text-primary focus-visible:text-primary"
                   onClick={() => openEditForm(entry)}
+                  type="button"
                   aria-label={`Editar ${entry.label}`}
                 >
-                  <Pencil className="h-3 w-3" />
-                </Button>
-                <Button
-                  size="icon-xs"
-                  variant="ghost"
-                  className="opacity-0 transition-opacity group-hover:opacity-100 hover:text-destructive"
-                  onClick={() => handleDelete(entry.id)}
-                  aria-label={`Eliminar ${entry.label}`}
-                >
-                  <Trash2 className="h-3 w-3" />
-                </Button>
+                  {entry.label}
+                </button>
+                <div className="flex items-center gap-1.5 sm:shrink-0">
+                  <span className="text-sm font-semibold tabular-nums">{formatCurrency(entry.amount)}</span>
+                  <Button
+                    size="icon-xs"
+                    variant="ghost"
+                    className="text-muted-foreground hover:text-foreground"
+                    onClick={() => openEditForm(entry)}
+                    aria-label={`Editar ${entry.label}`}
+                  >
+                    <Pencil className="h-3 w-3" />
+                  </Button>
+                  <Button
+                    size="icon-xs"
+                    variant="ghost"
+                    className="text-muted-foreground hover:text-destructive"
+                    onClick={() => handleDelete(entry.id)}
+                    aria-label={`Eliminar ${entry.label}`}
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                </div>
               </div>
             </div>
           )
@@ -153,9 +155,9 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
 
         {adding ? (
           <div className="rounded-xl border border-border/70 bg-muted/20 p-2">
-            <div className="flex gap-2">
+            <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto] sm:items-center">
               <Input
-                className="h-9 flex-1 text-sm"
+                className="h-9 min-w-0 text-sm"
                 placeholder="Descripción"
                 value={newLabel}
                 onChange={(e) => setNewLabel(e.target.value)}
@@ -166,7 +168,7 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
                 autoFocus
               />
               <Input
-                className="h-9 w-28 text-right text-sm"
+                className="h-9 w-full text-right text-sm sm:w-28"
                 placeholder="0.00"
                 value={newAmount}
                 onChange={(e) => setNewAmount(e.target.value)}
@@ -176,10 +178,10 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
                 }}
                 inputMode="decimal"
               />
-              <Button size="sm" className="h-9 px-3" onClick={handleAdd}>
+              <Button size="sm" className="h-9 px-3 sm:w-auto" onClick={handleAdd}>
                 Añadir
               </Button>
-              <Button size="sm" variant="ghost" className="h-9 px-3" onClick={closeAddForm}>
+              <Button size="sm" variant="ghost" className="h-9 px-3 sm:w-auto" onClick={closeAddForm}>
                 <X className="h-3.5 w-3.5" />
               </Button>
             </div>
