@@ -188,12 +188,12 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
             {month.additionalExpenses.length > 0 ? (
               <div className="space-y-1.5">
                 {month.additionalExpenses.map((entry) => (
-                  <div key={entry.id} className="group flex items-center justify-between rounded-lg px-2 py-1.5 transition-colors hover:bg-muted/60">
+                  <div key={entry.id} className="flex items-center justify-between rounded-lg px-2 py-1.5 transition-colors hover:bg-muted/60">
                     <span className="text-sm text-muted-foreground">{entry.label}</span>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium tabular-nums">{formatCurrency(entry.amount)}</span>
                       <button
-                        className="rounded-md p-1 text-muted-foreground opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100"
+                        className="rounded-md p-1 text-muted-foreground transition-colors hover:text-destructive focus-visible:text-destructive"
                         onClick={() => handleEntryDelete("expense", entry.id)}
                         aria-label={`Eliminar gasto ${entry.label}`}
                       >
@@ -237,12 +237,12 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
             {month.additionalIncomes.length > 0 ? (
               <div className="space-y-1.5">
                 {month.additionalIncomes.map((entry) => (
-                  <div key={entry.id} className="group flex items-center justify-between rounded-lg px-2 py-1.5 transition-colors hover:bg-muted/60">
+                  <div key={entry.id} className="flex items-center justify-between rounded-lg px-2 py-1.5 transition-colors hover:bg-muted/60">
                     <span className="text-sm text-muted-foreground">{entry.label}</span>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium tabular-nums">{formatCurrency(entry.amount)}</span>
                       <button
-                        className="rounded-md p-1 text-muted-foreground opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100"
+                        className="rounded-md p-1 text-muted-foreground transition-colors hover:text-destructive focus-visible:text-destructive"
                         onClick={() => handleEntryDelete("income", entry.id)}
                         aria-label={`Eliminar ingreso ${entry.label}`}
                       >

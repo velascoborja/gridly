@@ -87,7 +87,7 @@ export function MonthlyView({ yearData: initialYearData, monthNumber }: Props) {
       </div>
 
       {/* Summary column */}
-      <div className="lg:sticky lg:top-6">
+      <div className="lg:sticky lg:top-28">
         <SummaryCard month={month} />
       </div>
     </div>
