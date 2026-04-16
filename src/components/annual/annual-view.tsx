@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { KpiCards } from "./kpi-cards";
 import { BalanceChart } from "./balance-chart";
@@ -16,16 +16,44 @@ interface Props {
 export function AnnualView({ yearData: initial }: Props) {
   const [config, setConfig] = useState<YearConfig>(initial.config);
   const [prefilling, setPrefilling] = useState(false);
+  const [savingConfig, setSavingConfig] = useState(false);
+  const pendingSaveCountRef = useRef(0);
+  const pendingSavesRef = useRef(new Set<Promise<void>>());
+
+  const trackPendingSave = (savePromise: Promise<void>) => {
+    pendingSaveCountRef.current += 1;
+    pendingSavesRef.current.add(savePromise);
+    setSavingConfig(true);
+
+    void savePromise.finally(() => {
+      pendingSavesRef.current.delete(savePromise);
+      pendingSaveCountRef.current = Math.max(0, pendingSaveCountRef.current - 1);
+      if (pendingSaveCountRef.current === 0) {
+        setSavingConfig(false);
+      }
+    });
+  };
+
+  const waitForPendingSaves = async () => {
+    while (pendingSavesRef.current.size > 0) {
+      await Promise.allSettled(Array.from(pendingSavesRef.current));
+    }
+  };
 
   const handlePrefill = async () => {
     if (!confirm("Esto sobreescribirá todos los meses con los valores estimados de la configuración. ¿Continuar?")) return;
     setPrefilling(true);
-    await fetch(`/api/years/${config.year}/prefill`, { method: "POST" });
-    setPrefilling(false);
-    window.location.reload();
+    try {
+      await waitForPendingSaves();
+      await fetch(`/api/years/${config.year}/prefill`, { method: "POST" });
+      window.location.reload();
+    } finally {
+      setPrefilling(false);
+    }
   };
 
-  const handleExport = () => {
+  const handleExport = async () => {
+    await waitForPendingSaves();
     window.open(`/api/years/${config.year}/export`, "_blank");
   };
 
@@ -49,24 +77,27 @@ export function AnnualView({ yearData: initial }: Props) {
                 variant="outline"
                 size="sm"
                 onClick={handlePrefill}
-                disabled={prefilling}
+                disabled={prefilling || savingConfig}
                 className="border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white"
               >
                 <RefreshCw className="mr-2 h-4 w-4" />
-                {prefilling ? "Rellenando…" : "Rellenar estimaciones"}
+                {prefilling ? "Rellenando…" : savingConfig ? "Guardando…" : "Rellenar estimaciones"}
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleExport}
+                disabled={savingConfig}
                 className="border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white"
               >
                 <Download className="mr-2 h-4 w-4" />
-                Exportar Excel
+                {savingConfig ? "Guardando…" : "Exportar Excel"}
               </Button>
             </div>
             <p className="text-xs leading-5 text-slate-400">
-              El relleno sobrescribe los 12 meses con la configuración actual del año.
+              {savingConfig
+                ? "Se están guardando cambios en la configuración antes de lanzar acciones del año."
+                : "El relleno sobrescribe los 12 meses con la configuración actual del año."}
             </p>
           </div>
         </div>
@@ -79,7 +110,7 @@ export function AnnualView({ yearData: initial }: Props) {
         <SavingsChart months={initial.months} />
       </div>
 
-      <YearConfigForm config={config} onConfigChange={setConfig} />
+      <YearConfigForm config={config} onConfigChange={setConfig} onPendingSave={trackPendingSave} />
     </div>
   );
 }

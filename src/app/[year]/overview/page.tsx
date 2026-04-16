@@ -38,7 +38,7 @@ export default async function OverviewPage({
   const currentMonth = now.getFullYear() === year ? now.getMonth() + 1 : 1;
 
   return (
-    <AppShell currentYear={year} currentMonth={null} view="overview" years={years.length > 0 ? years : [year]}>
+    <AppShell currentYear={year} currentMonth={currentMonth} view="overview" years={years.length > 0 ? years : [year]}>
       <div className="mb-8 max-w-3xl">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
           Mes en foco

@@ -1,23 +1,30 @@
 "use client";
 
+import type { Dispatch, SetStateAction } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InlineEditField } from "@/components/monthly/inline-edit-field";
 import type { YearConfig } from "@/lib/types";
 
 interface Props {
   config: YearConfig;
-  onConfigChange: (updated: YearConfig) => void;
+  onConfigChange: Dispatch<SetStateAction<YearConfig>>;
+  onPendingSave?: (savePromise: Promise<void>) => void;
 }
 
-export function YearConfigForm({ config, onConfigChange }: Props) {
+export function YearConfigForm({ config, onConfigChange, onPendingSave }: Props) {
   const handleSave = async (field: keyof YearConfig, value: number) => {
-    const res = await fetch(`/api/years/${config.year}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ [field]: value }),
-    });
-    if (!res.ok) throw new Error("Failed to update");
-    onConfigChange({ ...config, [field]: value });
+    const savePromise = (async () => {
+      const res = await fetch(`/api/years/${config.year}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ [field]: value }),
+      });
+      if (!res.ok) throw new Error("Failed to update");
+      onConfigChange((current) => ({ ...current, [field]: value }));
+    })();
+
+    onPendingSave?.(savePromise);
+    await savePromise;
   };
 
   return (
@@ -74,7 +81,7 @@ export function YearConfigForm({ config, onConfigChange }: Props) {
                   const v = prompt("Tipo de interés anual (%)", String(config.interestRate * 100));
                   if (v === null) return;
                   const num = parseFloat(v.replace(",", "."));
-                  if (!isNaN(num)) handleSave("interestRate", num / 100);
+                  if (!isNaN(num)) void handleSave("interestRate", num / 100);
                 }}
               >
                 {(config.interestRate * 100).toFixed(2)}%
