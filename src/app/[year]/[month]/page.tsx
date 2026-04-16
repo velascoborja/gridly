@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { AppShell } from "@/components/layout/app-shell";
 import { MonthlyView } from "@/components/monthly/monthly-view";
 import { MONTH_NAMES } from "@/lib/utils";
@@ -34,24 +35,34 @@ export default async function MonthPage({
 
   if (!yearData) {
     return (
-      <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.12),transparent_34%),linear-gradient(180deg,rgba(248,250,252,0.95),rgba(255,255,255,1))] px-4 py-10">
-        <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-4xl items-center">
-          <div className="relative overflow-hidden rounded-[2rem] border border-border/70 bg-background/85 p-8 shadow-[0_30px_80px_-40px_rgba(15,23,42,0.45)] backdrop-blur-xl sm:p-10">
-            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(59,130,246,0.08),transparent_40%,rgba(16,185,129,0.08))]" />
-            <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(280px,0.8fr)] lg:items-center">
-              <div className="space-y-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-                  Año sin configuración
-                </p>
-                <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-                  Sin datos para {year}
-                </h1>
-                <p className="max-w-xl text-sm leading-6 text-muted-foreground sm:text-base">
-                  Crea el año y configura las estimaciones para empezar a revisar ingresos, gastos y ahorro de este mes.
-                </p>
+      <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(64,148,255,0.12),transparent_32%),radial-gradient(circle_at_top_right,rgba(16,185,129,0.08),transparent_28%),linear-gradient(180deg,rgba(248,250,252,0.96),rgba(255,255,255,1))] px-4 py-8 text-foreground sm:px-6 lg:px-8">
+        <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-6xl items-center">
+          <div className="relative overflow-hidden rounded-[2rem] border border-border/70 bg-background/90 p-6 shadow-[0_30px_80px_-44px_rgba(15,23,42,0.45)] backdrop-blur-xl sm:p-8 lg:p-10">
+            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(64,148,255,0.08),transparent_40%,rgba(16,185,129,0.08))]" />
+            <div className="pointer-events-none absolute -left-24 bottom-0 size-56 rounded-full bg-primary/10 blur-3xl" />
+            <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1.18fr)_minmax(280px,0.82fr)] lg:items-center">
+              <div className="space-y-6">
+                <div className="inline-flex items-center gap-3 rounded-full border border-border/70 bg-background/75 px-4 py-2 text-sm text-muted-foreground shadow-sm">
+                  <span className="flex size-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
+                    G
+                  </span>
+                  Año sin configurar
+                </div>
+                <div className="space-y-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+                    Falta el arranque del ejercicio
+                  </p>
+                  <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+                    Sin datos para {year}
+                  </h1>
+                  <p className="max-w-xl text-sm leading-6 text-muted-foreground sm:text-base">
+                    Crea el año y configura las estimaciones para empezar a revisar ingresos, gastos y ahorro de este mes.
+                  </p>
+                </div>
               </div>
-              <div className="rounded-[1.5rem] border border-border/60 bg-muted/30 p-6">
-                <p className="text-sm font-medium text-foreground">Siguiente paso</p>
+
+              <div className="rounded-[1.5rem] border border-border/70 bg-muted/25 p-5 sm:p-6">
+                <p className="text-sm font-semibold text-foreground">Siguiente paso</p>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
                   Inicializa {year} para abrir el detalle mensual y completar la planificación.
                 </p>
@@ -83,14 +94,14 @@ export default async function MonthPage({
 
 function CreateYearForm({ year, month }: { year: number; month: number }) {
   return (
-    <form action={`/api/years`} method="POST">
+    <form action={`/api/years`} method="POST" className="flex">
       <input type="hidden" name="year" value={year} />
-      <a
+      <Link
         href={`/setup/${year}?redirect=/${year}/${month}`}
-        className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+        className="inline-flex min-h-11 flex-1 items-center justify-center rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
       >
-        Crear {year}
-      </a>
+        Configurar {year}
+      </Link>
     </form>
   );
 }
