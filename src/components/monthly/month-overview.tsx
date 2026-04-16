@@ -5,7 +5,7 @@ import type { KeyboardEvent } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Trash2, ArrowRight } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { formatCurrency, MONTH_NAMES } from "@/lib/utils";
 import { computeMonthChain } from "@/lib/calculations";
 import type { MonthData, YearData, AdditionalEntry } from "@/lib/types";
@@ -157,7 +157,7 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
               </div>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
               <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
                 <p className="text-xs uppercase tracking-[0.16em] text-white/50">Ingresos</p>
                 <p className="mt-2 text-xl font-semibold tabular-nums text-emerald-300">{formatCurrency(month.totalIncome)}</p>
@@ -165,13 +165,6 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
               <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
                 <p className="text-xs uppercase tracking-[0.16em] text-white/50">Gastos</p>
                 <p className="mt-2 text-xl font-semibold tabular-nums text-rose-300">{formatCurrency(month.totalExpenses)}</p>
-              </div>
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <p className="text-xs uppercase tracking-[0.16em] text-white/50">Movimiento neto</p>
-                <div className="mt-2 flex items-center gap-2">
-                  <ArrowRight className="h-4 w-4 text-white/35" />
-                  <p className="text-xl font-semibold tabular-nums">{formatCurrency(month.savings)}</p>
-                </div>
               </div>
             </div>
           </div>
