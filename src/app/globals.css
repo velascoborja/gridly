@@ -226,10 +226,6 @@
     @apply underline-offset-4 transition-colors;
   }
 
-  a:hover {
-    @apply text-primary;
-  }
-
   ::selection {
     background: color-mix(in oklch, var(--primary) 26%, transparent);
     color: var(--foreground);
