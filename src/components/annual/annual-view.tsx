@@ -7,7 +7,15 @@ import { BalanceChart } from "./balance-chart";
 import { SavingsChart } from "./savings-chart";
 import { YearConfigForm } from "./year-config-form";
 import type { YearData, YearConfig } from "@/lib/types";
-import { Download, RefreshCw } from "lucide-react";
+import { Download, RefreshCw, Settings } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface Props {
   yearData: YearData;
@@ -65,7 +73,36 @@ export function AnnualView({ yearData: initial }: Props) {
             <div className="inline-flex rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.2em] text-white/70">
               Resumen anual
             </div>
-            <h1 className="mt-4 text-3xl font-semibold tracking-tight">Ejercicio {config.year}</h1>
+            <div className="mt-4 flex items-center gap-3">
+              <h1 className="text-3xl font-semibold tracking-tight">Ejercicio {config.year}</h1>
+              <Dialog>
+                <DialogTrigger
+                  render={
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 rounded-full text-white/70 hover:bg-white/10 hover:text-white"
+                    >
+                      <Settings className="h-4 w-4" />
+                      <span className="sr-only">Configuración del año</span>
+                    </Button>
+                  }
+                />
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Configuración del año</DialogTitle>
+                    <DialogDescription>
+                      Ajusta los supuestos base que alimentan el cálculo de los 12 meses y la proyección final.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <YearConfigForm
+                    config={config}
+                    onConfigChange={setConfig}
+                    onPendingSave={trackPendingSave}
+                  />
+                </DialogContent>
+              </Dialog>
+            </div>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
               Panorama del año con métricas clave, evolución del saldo y controles de configuración en una sola vista.
             </p>
@@ -109,8 +146,6 @@ export function AnnualView({ yearData: initial }: Props) {
         <BalanceChart months={initial.months} />
         <SavingsChart months={initial.months} />
       </div>
-
-      <YearConfigForm config={config} onConfigChange={setConfig} onPendingSave={trackPendingSave} />
     </div>
   );
 }

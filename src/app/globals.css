@@ -213,7 +213,6 @@
   h4,
   h5,
   h6 {
-    @apply text-foreground;
     letter-spacing: -0.04em;
     line-height: 1.05;
   }

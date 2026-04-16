@@ -39,14 +39,6 @@ export default async function OverviewPage({
 
   return (
     <AppShell currentYear={year} currentMonth={currentMonth} view="overview" years={years.length > 0 ? years : [year]}>
-      <div className="mb-8 max-w-3xl">
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-          Mes en foco
-        </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-          {MONTH_NAMES[currentMonth - 1]} {year}
-        </h1>
-      </div>
       <MonthOverview yearData={yearData} monthNumber={currentMonth} />
     </AppShell>
   );
