@@ -20,6 +20,13 @@ Personal finance tracker built with Next.js 16 (App Router), React 19, Drizzle O
 | Charts | Recharts v3 |
 | Export | ExcelJS |
 
+## Design & Visual Identity
+
+Gridly follows a premium, fintech-inspired visual system (Stripe-like) documented in `DESIGN.md`.
+- **Primary Color:** Stripe Purple (`#533afd`).
+- **Typography:** Geist Sans with specific tracking and weight roles.
+- **Surfaces:** Layered depth system using ambient and elevated shadows.
+
 ## Environment & Setup
 
 - **Environment:** Copy `.env.example` or `.env.local.example` to `.env`. Only `DATABASE_URL` is required.
@@ -47,5 +54,5 @@ Personal finance tracker built with Next.js 16 (App Router), React 19, Drizzle O
 
 - **Localization:** UI strings are in Spanish. **Do not translate to English.**
 - **Data Access:** Client components use `fetch()` to internal APIs; server components use Drizzle directly.
-- **Styling:** Adhere to Tailwind CSS v4 conventions (v4 configuration differs from v3).
+- **Styling:** Adhere to Tailwind CSS v4 and the visual tokens defined in `src/app/globals.css`. Refer to `DESIGN.md` for spacing, elevation, and interactive states.
 - **Numeric Handling:** Convert DB strings to `number` immediately after reading and back to `string` for DB operations.

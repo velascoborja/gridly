@@ -1,13 +1,13 @@
 # Gridly — Personal Finance Tracker
 
-Gridly is a personal finance tracking app that helps you monitor your income, expenses, savings, and balance across months and years. You configure your expected salary, fixed costs, and investment targets once per year, then record actual figures each month to see how you're tracking.
+Gridly is a premium personal finance tracking app that helps you monitor your income, expenses, savings, and balance across months and years. Designed with a high-fidelity fintech aesthetic, it provides clear, actionable insights into your financial health.
 
 **What it does:**
-- Track monthly income (payslip, bonuses, additional payslips, interest, and one-off items)
-- Track monthly expenses (home, personal budget, investments, and one-off items)
-- Compute savings and running balance automatically
-- Visualise annual balance and savings trends with charts
-- Export year data
+- **Cockpit Overview:** A dedicated "current-month" dashboard with KPIs, balance tracking, and quick-add actions.
+- **Monthly Detail:** Deep-dive into fixed and additional movements with real-time inline editing.
+- **Annual Insights:** Visualise trends with high-quality charts and KPI summaries.
+- **Guided Setup:** Onboarding experience to configure your year, salary, and investment targets in seconds.
+- **Export:** Take your data with you via Excel export.
 
 ## Getting Started
 
@@ -63,7 +63,11 @@ src/
 
 ## Tech Stack
 
-- [Next.js](https://nextjs.org) — framework
-- [Drizzle ORM](https://orm.drizzle.team) — database access
-- [shadcn/ui](https://ui.shadcn.com) — component primitives
-- [Recharts](https://recharts.org) — charts
+- **Framework:** [Next.js 16](https://nextjs.org) (App Router)
+- **State/UI:** [React 19](https://react.dev), [Tailwind CSS v4](https://tailwindcss.com), [shadcn/ui](https://ui.shadcn.com)
+- **Database:** [Drizzle ORM](https://orm.drizzle.team) + [Neon](https://neon.tech) (PostgreSQL)
+- **Charts:** [Recharts v3](https://recharts.org)
+
+## Design System
+
+Gridly uses a custom design system inspired by Stripe's visual language. All design tokens, principles, and component guidelines are documented in [DESIGN.md](./DESIGN.md).
