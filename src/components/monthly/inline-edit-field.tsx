@@ -23,6 +23,7 @@ export function InlineEditField({ label, value, onSave, disabled, className }: I
 
   useEffect(() => {
     if (editing) {
+      discardIntentRef.current = false;
       setInputVal(String(value));
       inputRef.current?.focus();
       inputRef.current?.select();
