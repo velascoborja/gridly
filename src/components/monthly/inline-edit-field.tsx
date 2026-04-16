@@ -77,13 +77,13 @@ export function InlineEditField({ label, value, onSave, disabled, className }: I
   };
 
   return (
-    <div className={`flex items-center justify-between gap-3 rounded-xl px-2 py-2 transition-colors hover:bg-muted/30 ${className ?? ""}`}>
-      <span className="text-sm font-medium text-muted-foreground">{label}</span>
+    <div className={`flex flex-col gap-2 rounded-xl px-2 py-2 transition-colors hover:bg-muted/30 sm:flex-row sm:items-center sm:justify-between ${className ?? ""}`}>
+      <span className="min-w-0 text-sm font-medium text-muted-foreground break-words">{label}</span>
       {editing ? (
-        <div className="flex items-center gap-2">
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
           <input
             ref={inputRef}
-            className={`h-9 w-32 rounded-md border bg-background px-2.5 text-right text-sm outline-none transition-colors focus:ring-4 focus:ring-ring/20 ${error ? "border-destructive" : "border-border"}`}
+            className={`h-9 w-full rounded-md border bg-background px-2.5 text-right text-sm outline-none transition-colors focus:ring-4 focus:ring-ring/20 sm:w-32 ${error ? "border-destructive" : "border-border"}`}
             value={inputVal}
             onChange={(e) => { setInputVal(e.target.value); setError(false); }}
             onBlur={handleBlur}
@@ -96,7 +96,7 @@ export function InlineEditField({ label, value, onSave, disabled, className }: I
             ref={cancelButtonRef}
             size="sm"
             variant="ghost"
-            className="h-9 px-3 text-muted-foreground"
+            className="h-9 w-full px-3 text-muted-foreground sm:w-auto"
             onClick={discardEdits}
             type="button"
           >
