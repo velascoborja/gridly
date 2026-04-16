@@ -3,6 +3,13 @@
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { MONTH_NAMES } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Props {
   currentYear: number;
@@ -15,8 +22,9 @@ export function NavSelectors({ currentYear, currentMonth, view, years }: Props) 
   const router = useRouter();
   const detailMonth = currentMonth ?? new Date().getMonth() + 1;
 
-  const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const y = parseInt(e.target.value, 10);
+  const handleYearChange = (val: string | null) => {
+    if (!val) return;
+    const y = parseInt(val, 10);
     if (view === "overview") router.push(`/${y}/overview`);
     else if (view === "summary") router.push(`/${y}/summary`);
     else router.push(`/${y}/${detailMonth}`);
@@ -31,20 +39,21 @@ export function NavSelectors({ currentYear, currentMonth, view, years }: Props) 
   return (
     <div className="flex flex-col gap-3 xl:items-end">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <label className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
           <span className="sr-only sm:not-sr-only">Año</span>
-          <select
-            className="rounded-full border border-border/70 bg-background/90 px-4 py-2 text-sm font-medium text-foreground shadow-sm outline-none ring-0 transition focus:border-primary focus-visible:ring-2 focus-visible:ring-primary/20"
-            value={currentYear}
-            onChange={handleYearChange}
-          >
-            {years.map((y) => (
-              <option key={y} value={y}>
-                {y}
-              </option>
-            ))}
-          </select>
-        </label>
+          <Select value={String(currentYear)} onValueChange={handleYearChange}>
+            <SelectTrigger className="h-9 rounded-full border-border/70 bg-background/90 pl-4 pr-4 font-medium text-foreground shadow-sm focus:border-primary focus:ring-primary/20">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {years.map((y) => (
+                <SelectItem key={y} value={String(y)}>
+                  {y}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
         <div className="rounded-[1.25rem] border border-border/70 bg-muted/40 p-1 shadow-sm">
           <div className="flex flex-wrap gap-1">
