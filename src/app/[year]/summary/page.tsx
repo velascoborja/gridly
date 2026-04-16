@@ -32,8 +32,13 @@ export default async function SummaryPage({
 
   return (
     <AppShell currentYear={year} currentMonth={null} view="summary" years={years.length > 0 ? years : [year]}>
-      <div className="mb-6">
-        <h1 className="text-xl font-semibold">Resumen {year}</h1>
+      <div className="mb-8 max-w-3xl">
+        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+          Cierre anual
+        </p>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+          Resumen {year}
+        </h1>
       </div>
       <AnnualView yearData={yearData} />
     </AppShell>
