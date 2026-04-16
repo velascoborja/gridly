@@ -13,8 +13,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Gridly",
-  description: "Personal finance tracker",
+  applicationName: "Gridly",
+  title: {
+    default: "Gridly",
+    template: "%s · Gridly",
+  },
+  description: "Controla ingresos, gastos y ahorro con balances mensuales claros.",
+  keywords: ["finanzas personales", "ahorro", "gastos", "ingresos", "nóminas"],
+  referrer: "origin-when-cross-origin",
+  creator: "Gridly",
+  publisher: "Gridly",
 };
 
 export default function RootLayout({
@@ -24,11 +32,11 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="es"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-dvh bg-background text-foreground">{children}</body>
     </html>
   );
 }
