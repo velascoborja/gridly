@@ -61,7 +61,7 @@ export function NavSelectors({ currentYear, currentMonth, view, years }: Props) 
     <div className="flex flex-col items-center gap-3 md:items-end">
       <div className="flex flex-col items-center gap-3 md:flex-row">
         <div className="flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-          <span className="sr-only md:not-sr-only">Año</span>
+          <span className="sr-only md:not-sr-only">{t("yearLabel")}</span>
           <Select value={String(currentYear)} onValueChange={handleYearChange}>
             <SelectTrigger className="h-9 rounded-md border-border/70 bg-background/90 pl-4 pr-4 font-medium text-foreground shadow-sm focus:border-primary focus:ring-primary/20">
               <SelectValue />

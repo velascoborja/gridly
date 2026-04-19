@@ -170,6 +170,8 @@
     "currentMonth": "Mes actual",
     "annualSummary": "Resumen anual",
     "monthlyDetail": "Detalle mensual",
-    "createYear": "Crear {year}"
+    "yearLabel": "Año",
+    "createYear": "Crear año {year}"
+
   }
 }

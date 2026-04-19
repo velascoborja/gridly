@@ -168,8 +168,10 @@
   },
   "Nav": {
     "currentMonth": "Current month",
-    "annualSummary": "Annual summary",
-    "monthlyDetail": "Monthly detail",
+    "annualSummary": "Annual Summary",
+    "monthlyDetail": "Monthly Detail",
+    "yearLabel": "Year",
     "createYear": "Create {year}"
+
   }
 }
