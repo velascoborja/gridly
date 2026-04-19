@@ -128,43 +128,51 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
 
   return (
     <div className="space-y-6">
-      <Card className="overflow-hidden border-border/60 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white shadow-xl shadow-slate-950/20">
+      <Card className="overflow-hidden border-white/10 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white shadow-[0_30px_60px_-30px_rgba(50,50,93,0.45),0_18px_36px_-18px_rgba(0,0,0,0.2)]">
         <CardContent className="p-6 md:p-8">
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)] lg:items-end">
-            <div>
+          <div className="space-y-6">
+            <div className="flex flex-wrap items-center gap-3">
               <div className="inline-flex rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.2em] text-white/70">
                 Mes activo
               </div>
-              <h2 className="mt-4 text-3xl font-semibold tracking-tight">{MONTH_NAMES[month.month - 1]}</h2>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
-                Panel de control del mes seleccionado con saldo, flujo y accesos rápidos para registrar movimientos sin perder la cadena de cálculo.
-              </p>
-              <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-xs uppercase tracking-[0.16em] text-white/50">Saldo inicial</p>
-                  <p className="mt-2 text-lg font-semibold tabular-nums">{formatCurrency(month.startingBalance)}</p>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-xs uppercase tracking-[0.16em] text-white/50">Saldo final</p>
-                  <p className="mt-2 text-lg font-semibold tabular-nums">{formatCurrency(month.endingBalance)}</p>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-xs uppercase tracking-[0.16em] text-white/50">Ahorro</p>
-                  <p className={`mt-2 text-lg font-semibold tabular-nums ${savingsPositive ? "text-emerald-300" : "text-rose-300"}`}>
-                    {formatCurrency(month.savings)}
-                  </p>
-                </div>
+              <h2 className="text-3xl font-semibold tracking-tight">{MONTH_NAMES[month.month - 1]}</h2>
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-stretch">
+              <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-white/5 p-5 md:p-6">
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                <p className="text-xs uppercase tracking-[0.18em] text-white/50">Ahorro del mes</p>
+                <p className={`mt-3 text-5xl font-semibold tracking-tight tabular-nums md:text-6xl ${savingsPositive ? "text-emerald-300" : "text-rose-300"}`}>
+                  {formatCurrency(month.savings)}
+                </p>
+                <p className="mt-3 max-w-md text-sm leading-6 text-slate-300">
+                  Resultado neto del mes seleccionado, después de sumar ingresos y descontar gastos.
+                </p>
+              </div>
+
+              <div className="rounded-[24px] border border-white/10 bg-white/[0.07] p-5 md:p-6">
+                <p className="text-xs uppercase tracking-[0.18em] text-white/50">Saldo final</p>
+                <p className="mt-3 text-3xl font-semibold tracking-tight tabular-nums md:text-4xl">
+                  {formatCurrency(month.endingBalance)}
+                </p>
+                <p className="mt-3 text-sm leading-6 text-slate-300">
+                  Cierre del mes seleccionado, listo para convertirse en el punto de partida del siguiente.
+                </p>
               </div>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+            <div className="grid gap-3 sm:grid-cols-3">
               <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <p className="text-xs uppercase tracking-[0.16em] text-white/50">Ingresos</p>
-                <p className="mt-2 text-xl font-semibold tabular-nums text-emerald-300">{formatCurrency(month.totalIncome)}</p>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-white/50">Saldo inicial</p>
+                <p className="mt-2 text-lg font-semibold tabular-nums text-white">{formatCurrency(month.startingBalance)}</p>
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <p className="text-xs uppercase tracking-[0.16em] text-white/50">Gastos</p>
-                <p className="mt-2 text-xl font-semibold tabular-nums text-rose-300">{formatCurrency(month.totalExpenses)}</p>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-white/50">Ingresos</p>
+                <p className="mt-2 text-lg font-semibold tabular-nums text-emerald-300">{formatCurrency(month.totalIncome)}</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-white/50">Gastos</p>
+                <p className="mt-2 text-lg font-semibold tabular-nums text-rose-300">{formatCurrency(month.totalExpenses)}</p>
               </div>
             </div>
           </div>
