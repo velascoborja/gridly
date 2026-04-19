@@ -1,10 +1,17 @@
 import { db } from "@/db";
 import { additionalEntries } from "@/db/schema";
+import { getSessionUser } from "@/lib/server/session";
+import { getOwnedMonth } from "@/lib/server/ownership";
 
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ monthId: string }> }
 ) {
+  const user = await getSessionUser();
+  if (!user?.id) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { monthId } = await params;
   const id = parseInt(monthId, 10);
   const body = await request.json();
@@ -17,8 +24,13 @@ export async function POST(
     return Response.json({ error: "type must be 'income' or 'expense'" }, { status: 400 });
   }
 
+  const ownedMonth = await getOwnedMonth(user.id, id);
+  if (!ownedMonth) {
+    return Response.json({ error: "Month not found" }, { status: 404 });
+  }
+
   const [entry] = await db.insert(additionalEntries).values({
-    monthId: id,
+    monthId: ownedMonth.id,
     type,
     label,
     amount: String(amount),

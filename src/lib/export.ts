@@ -20,115 +20,121 @@ function label(ws: ExcelJS.Worksheet, cell: string, text: string) {
   ws.getCell(cell).value = text;
 }
 
+function writeMonthSection(
+  ws: ExcelJS.Worksheet,
+  year: number,
+  month: YearData["months"][number],
+  startRow: number,
+) {
+  const sheetName = MONTH_NAMES[month.month - 1];
+
+  ws.mergeCells(`A${startRow}:E${startRow}`);
+  const title = ws.getCell(`A${startRow}`);
+  title.value = `${sheetName} ${year}`;
+  title.font = { bold: true, size: 13 };
+  title.alignment = { horizontal: "center" };
+
+  const headerRow = startRow + 2;
+  styleHeader(ws, `A${headerRow}`, "GASTOS");
+  styleHeader(ws, `D${headerRow}`, "INGRESOS");
+
+  let expRow = headerRow + 1;
+  const addExpRow = (text: string, value: number) => {
+    label(ws, `A${expRow}`, text);
+    money(ws, `B${expRow}`, value);
+    expRow++;
+  };
+
+  addExpRow("Casa (mes siguiente)", month.homeExpense);
+  addExpRow("Gastos propios", month.personalExpense);
+  addExpRow("Inversión", month.investment);
+  for (const entry of month.additionalExpenses) {
+    addExpRow(entry.label, entry.amount);
+  }
+
+  let incRow = headerRow + 1;
+  const addIncRow = (text: string, value: number) => {
+    label(ws, `D${incRow}`, text);
+    money(ws, `E${incRow}`, value);
+    incRow++;
+  };
+
+  addIncRow("Nómina", month.payslip);
+  if (month.additionalPayslip > 0) addIncRow("Paga extra", month.additionalPayslip);
+  if (month.bonus > 0) addIncRow("Bonus", month.bonus);
+  addIncRow("Intereses", month.interests);
+  addIncRow("Sobrante propios", month.personalRemaining);
+  for (const entry of month.additionalIncomes) {
+    addIncRow(entry.label, entry.amount);
+  }
+
+  const totalRow = Math.max(expRow, incRow) + 1;
+  styleHeader(ws, `A${totalRow}`, "Total gastos");
+  money(ws, `B${totalRow}`, month.totalExpenses);
+  styleHeader(ws, `D${totalRow}`, "Total ingresos");
+  money(ws, `E${totalRow}`, month.totalIncome);
+
+  const summaryRow = totalRow + 2;
+  label(ws, `A${summaryRow}`, "Saldo inicial");
+  money(ws, `B${summaryRow}`, month.startingBalance);
+
+  label(ws, `A${summaryRow + 1}`, "Ahorro del mes");
+  const savingsCell = ws.getCell(`B${summaryRow + 1}`);
+  savingsCell.value = month.savings;
+  savingsCell.numFmt = "#,##0.00€";
+  savingsCell.font = { color: { argb: month.savings >= 0 ? "FF1E8449" : "FFC0392B" } };
+
+  label(ws, `A${summaryRow + 2}`, "Saldo final");
+  const endCell = ws.getCell(`B${summaryRow + 2}`);
+  endCell.value = month.endingBalance;
+  endCell.numFmt = "#,##0.00€";
+  endCell.font = { bold: true };
+
+  return summaryRow + 2;
+}
+
 export async function buildWorkbook(yearData: YearData): Promise<Buffer> {
   const wb = new ExcelJS.Workbook();
   wb.creator = "Gridly";
 
-  // Month sheets
-  for (const m of yearData.months) {
-    const sheetName = MONTH_NAMES[m.month - 1];
-    const ws = wb.addWorksheet(sheetName);
-    ws.columns = [
-      { width: 28 },
-      { width: 14 },
-      { width: 4 },
-      { width: 28 },
-      { width: 14 },
-    ];
+  const ws = wb.addWorksheet(String(yearData.config.year));
+  ws.columns = [
+    { width: 28 },
+    { width: 14 },
+    { width: 4 },
+    { width: 28 },
+    { width: 14 },
+    { width: 14 },
+  ];
 
-    // Title
-    ws.mergeCells("A1:E1");
-    const title = ws.getCell("A1");
-    title.value = `${sheetName} ${yearData.config.year}`;
-    title.font = { bold: true, size: 13 };
-    title.alignment = { horizontal: "center" };
-
-    // Headers row 3
-    styleHeader(ws, "A3", "GASTOS");
-    styleHeader(ws, "D3", "INGRESOS");
-
-    let expRow = 4;
-    const addExpRow = (lbl: string, val: number) => {
-      label(ws, `A${expRow}`, lbl);
-      money(ws, `B${expRow}`, val);
-      expRow++;
-    };
-
-    addExpRow("Casa (mes siguiente)", m.homeExpense);
-    addExpRow("Gastos propios", m.personalExpense);
-    addExpRow("Inversión", m.investment);
-    for (const e of m.additionalExpenses) {
-      addExpRow(e.label, e.amount);
-    }
-
-    let incRow = 4;
-    const addIncRow = (lbl: string, val: number) => {
-      label(ws, `D${incRow}`, lbl);
-      money(ws, `E${incRow}`, val);
-      incRow++;
-    };
-
-    addIncRow("Nómina", m.payslip);
-    if (m.additionalPayslip > 0) addIncRow("Paga extra", m.additionalPayslip);
-    if (m.bonus > 0) addIncRow("Bonus", m.bonus);
-    addIncRow("Intereses", m.interests);
-    addIncRow("Sobrante propios", m.personalRemaining);
-    for (const e of m.additionalIncomes) {
-      addIncRow(e.label, e.amount);
-    }
-
-    // Totals
-    const totalRow = Math.max(expRow, incRow) + 1;
-    styleHeader(ws, `A${totalRow}`, "Total gastos");
-    money(ws, `B${totalRow}`, m.totalExpenses);
-    styleHeader(ws, `D${totalRow}`, "Total ingresos");
-    money(ws, `E${totalRow}`, m.totalIncome);
-
-    // Summary block
-    const sumRow = totalRow + 2;
-    label(ws, `A${sumRow}`, "Saldo inicial");
-    money(ws, `B${sumRow}`, m.startingBalance);
-
-    label(ws, `A${sumRow + 1}`, "Ahorro del mes");
-    const savingsCell = ws.getCell(`B${sumRow + 1}`);
-    savingsCell.value = m.savings;
-    savingsCell.numFmt = "#,##0.00€";
-    savingsCell.font = { color: { argb: m.savings >= 0 ? "FF1E8449" : "FFC0392B" } };
-
-    label(ws, `A${sumRow + 2}`, "Saldo final");
-    const endCell = ws.getCell(`B${sumRow + 2}`);
-    endCell.value = m.endingBalance;
-    endCell.numFmt = "#,##0.00€";
-    endCell.font = { bold: true };
+  let currentRow = 1;
+  for (const month of yearData.months) {
+    currentRow = writeMonthSection(ws, yearData.config.year, month, currentRow) + 3;
   }
 
-  // Annual summary sheet
-  const ws = wb.addWorksheet("Resumen Anual");
-  ws.columns = [{ width: 16 }, { width: 14 }, { width: 14 }, { width: 14 }, { width: 14 }, { width: 14 }];
+  styleHeader(ws, `A${currentRow}`, "Mes");
+  styleHeader(ws, `B${currentRow}`, "Saldo inicial");
+  styleHeader(ws, `C${currentRow}`, "Ingresos");
+  styleHeader(ws, `D${currentRow}`, "Gastos");
+  styleHeader(ws, `E${currentRow}`, "Ahorro");
+  styleHeader(ws, `F${currentRow}`, "Saldo final");
 
-  styleHeader(ws, "A1", "Mes");
-  styleHeader(ws, "B1", "Saldo inicial");
-  styleHeader(ws, "C1", "Ingresos");
-  styleHeader(ws, "D1", "Gastos");
-  styleHeader(ws, "E1", "Ahorro");
-  styleHeader(ws, "F1", "Saldo final");
-
-  yearData.months.forEach((m, i) => {
-    const r = i + 2;
-    ws.getCell(`A${r}`).value = MONTH_NAMES[m.month - 1];
-    money(ws, `B${r}`, m.startingBalance);
-    money(ws, `C${r}`, m.totalIncome);
-    money(ws, `D${r}`, m.totalExpenses);
-    const sc = ws.getCell(`E${r}`);
-    sc.value = m.savings;
-    sc.numFmt = "#,##0.00€";
-    sc.font = { color: { argb: m.savings >= 0 ? "FF1E8449" : "FFC0392B" } };
-    money(ws, `F${r}`, m.endingBalance);
+  yearData.months.forEach((month, index) => {
+    const row = currentRow + 1 + index;
+    ws.getCell(`A${row}`).value = MONTH_NAMES[month.month - 1];
+    money(ws, `B${row}`, month.startingBalance);
+    money(ws, `C${row}`, month.totalIncome);
+    money(ws, `D${row}`, month.totalExpenses);
+    const savingsCell = ws.getCell(`E${row}`);
+    savingsCell.value = month.savings;
+    savingsCell.numFmt = "#,##0.00€";
+    savingsCell.font = { color: { argb: month.savings >= 0 ? "FF1E8449" : "FFC0392B" } };
+    money(ws, `F${row}`, month.endingBalance);
   });
 
-  // Config block
-  const configRow = 15;
+  const configRow = currentRow + yearData.months.length + 2;
   styleHeader(ws, `A${configRow}`, "Configuración");
+
   const cfg = yearData.config;
   const cfgItems = [
     ["Salario estimado", cfg.estimatedSalary],
@@ -138,9 +144,9 @@ export async function buildWorkbook(yearData: YearData): Promise<Buffer> {
     ["Tipo interés", cfg.interestRate],
   ] as [string, number][];
 
-  cfgItems.forEach(([lbl, val], i) => {
-    ws.getCell(`A${configRow + 1 + i}`).value = lbl;
-    money(ws, `B${configRow + 1 + i}`, val);
+  cfgItems.forEach(([text, value], index) => {
+    ws.getCell(`A${configRow + 1 + index}`).value = text;
+    money(ws, `B${configRow + 1 + index}`, value);
   });
 
   const buf = await wb.xlsx.writeBuffer();

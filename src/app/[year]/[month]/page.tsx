@@ -3,7 +3,8 @@ import Link from "next/link";
 import { AppShell } from "@/components/layout/app-shell";
 import { MonthlyView } from "@/components/monthly/monthly-view";
 import { MONTH_NAMES } from "@/lib/utils";
-import { getYearData, getYears } from "@/lib/server/year-data";
+import { getYearData, getYearsForUser } from "@/lib/server/year-data";
+import { requireSessionUser } from "@/lib/server/session";
 
 export default async function MonthPage({
   params,
@@ -16,9 +17,14 @@ export default async function MonthPage({
 
   if (isNaN(year) || isNaN(month) || month < 1 || month > 12) notFound();
 
-  const [yearData, years] = await Promise.all([getYearData(year), getYears()]);
+  const user = await requireSessionUser();
+  const [yearData, years] = await Promise.all([getYearData(user.id, year), getYearsForUser(user.id)]);
 
   if (!yearData) {
+    if (years.length === 0) {
+      notFound();
+    }
+
     return (
       <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(64,148,255,0.12),transparent_32%),radial-gradient(circle_at_top_right,rgba(16,185,129,0.08),transparent_28%),linear-gradient(180deg,rgba(248,250,252,0.96),rgba(255,255,255,1))] px-4 py-8 text-foreground sm:px-6 lg:px-8">
         <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-6xl items-center">
@@ -63,7 +69,7 @@ export default async function MonthPage({
   }
 
   return (
-    <AppShell currentYear={year} currentMonth={month} view="detail" years={years.length > 0 ? years : [year]}>
+    <AppShell currentYear={year} currentMonth={month} view="detail" years={years.length > 0 ? years : [year]} user={user}>
       <div className="mb-8 max-w-3xl">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
           Detalle mensual

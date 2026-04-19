@@ -1,15 +1,20 @@
 import Link from "next/link";
 import { NavSelectors } from "./nav-selectors";
+import { UserMenu } from "@/components/auth/user-menu";
 
 interface Props {
   currentYear: number;
   currentMonth: number | null;
   view: "overview" | "summary" | "detail";
   years: number[];
+  user: {
+    email?: string | null;
+    name?: string | null;
+  };
   children: React.ReactNode;
 }
 
-export function AppShell({ currentYear, currentMonth, view, years, children }: Props) {
+export function AppShell({ currentYear, currentMonth, view, years, user, children }: Props) {
   return (
     <div className="relative min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(64,148,255,0.12),transparent_32%),radial-gradient(circle_at_top_right,rgba(16,185,129,0.08),transparent_28%),linear-gradient(180deg,rgba(248,250,252,0.96),rgba(255,255,255,1))] text-foreground">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[linear-gradient(180deg,rgba(255,255,255,0.75),transparent)]" />
@@ -24,7 +29,10 @@ export function AppShell({ currentYear, currentMonth, view, years, children }: P
               <span className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Panorama financiero</span>
             </span>
           </Link>
-          <NavSelectors currentYear={currentYear} currentMonth={currentMonth} view={view} years={years} />
+          <div className="flex flex-col gap-3 xl:items-end">
+            <UserMenu email={user.email} name={user.name} />
+            <NavSelectors currentYear={currentYear} currentMonth={currentMonth} view={view} years={years} />
+          </div>
         </div>
       </header>
       <main className="relative mx-auto w-full max-w-7xl px-4 pb-10 pt-8 sm:px-6 lg:px-8">

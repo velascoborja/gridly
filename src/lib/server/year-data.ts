@@ -1,11 +1,20 @@
-import { asc, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import { db } from "@/db";
 import { additionalEntries, months, years } from "@/db/schema";
 import { computeMonthChain } from "@/lib/calculations";
 import type { YearData } from "@/lib/types";
 
-export async function getYearData(year: number): Promise<YearData | null> {
-  const yearRow = await db.query.years.findFirst({ where: eq(years.year, year) });
+export function pickDefaultYear(availableYears: number[], currentYear: number) {
+  if (availableYears.includes(currentYear)) return currentYear;
+
+  const sortedYears = [...availableYears].sort((a, b) => b - a);
+  return sortedYears[0] ?? currentYear;
+}
+
+export async function getYearData(userId: string, year: number): Promise<YearData | null> {
+  const yearRow = await db.query.years.findFirst({
+    where: and(eq(years.userId, userId), eq(years.year, year)),
+  });
   if (!yearRow) return null;
 
   const monthRows = await db
@@ -80,6 +89,24 @@ export async function getYearData(year: number): Promise<YearData | null> {
 }
 
 export async function getYears(): Promise<number[]> {
-  const rows = await db.select({ year: years.year }).from(years).orderBy(asc(years.year));
+  throw new Error("getYears(userId) must be used with an authenticated user");
+}
+
+export async function getYearsForUser(userId: string): Promise<number[]> {
+  const rows = await db
+    .select({ year: years.year })
+    .from(years)
+    .where(eq(years.userId, userId))
+    .orderBy(asc(years.year));
   return rows.map((row) => row.year);
+}
+
+export async function getAppRedirectPath(userId: string, currentYear: number) {
+  const userYears = await getYearsForUser(userId);
+  if (userYears.length === 0) {
+    return `/setup/${currentYear}`;
+  }
+
+  const targetYear = pickDefaultYear(userYears, currentYear);
+  return `/${targetYear}/overview`;
 }

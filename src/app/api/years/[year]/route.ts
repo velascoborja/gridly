@@ -2,14 +2,21 @@ import { db } from "@/db";
 import { years } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getYearData } from "@/lib/server/year-data";
+import { getSessionUser } from "@/lib/server/session";
+import { getOwnedYear } from "@/lib/server/ownership";
 
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ year: string }> }
 ) {
+  const user = await getSessionUser();
+  if (!user?.id) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { year } = await params;
   const yearNum = parseInt(year, 10);
-  const yearData = await getYearData(yearNum);
+  const yearData = await getYearData(user.id, yearNum);
   if (!yearData) return Response.json({ error: "Year not found" }, { status: 404 });
   return Response.json(yearData);
 }
@@ -18,11 +25,16 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ year: string }> }
 ) {
+  const user = await getSessionUser();
+  if (!user?.id) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { year } = await params;
   const yearNum = parseInt(year, 10);
   const body = await request.json();
 
-  const yearRow = await db.query.years.findFirst({ where: eq(years.year, yearNum) });
+  const yearRow = await getOwnedYear(user.id, yearNum);
   if (!yearRow) return Response.json({ error: "Year not found" }, { status: 404 });
 
   const updates: Partial<typeof years.$inferInsert> = {};

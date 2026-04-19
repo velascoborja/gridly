@@ -1,17 +1,24 @@
 import { db } from "@/db";
-import { years, months } from "@/db/schema";
+import { months } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { estimatedMonthData } from "@/lib/calculations";
 import type { YearConfig } from "@/lib/types";
+import { getSessionUser } from "@/lib/server/session";
+import { getOwnedYear } from "@/lib/server/ownership";
 
 export async function POST(
   _req: Request,
   { params }: { params: Promise<{ year: string }> }
 ) {
+  const user = await getSessionUser();
+  if (!user?.id) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { year } = await params;
   const yearNum = parseInt(year, 10);
 
-  const yearRow = await db.query.years.findFirst({ where: eq(years.year, yearNum) });
+  const yearRow = await getOwnedYear(user.id, yearNum);
   if (!yearRow) return Response.json({ error: "Year not found" }, { status: 404 });
 
   const config: YearConfig = {

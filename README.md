@@ -44,6 +44,14 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
+### Authentication
+
+Gridly now uses Google sign-in for all private financial data.
+
+- Set `AUTH_SECRET`, `AUTH_GOOGLE_ID`, and `AUTH_GOOGLE_SECRET` in your local environment.
+- Existing legacy data is assigned to `velascoborja@gmail.com`.
+- New users start with an empty account and configure their own year on first access.
+
 ### First use
 
 1. Create a year — enter your starting balance, estimated salary, monthly investment target, home expense, personal budget, and interest rate.

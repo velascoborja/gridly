@@ -1,12 +1,20 @@
 import { db } from "@/db";
 import { additionalEntries } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { getSessionUser } from "@/lib/server/session";
+import { getOwnedEntry, getOwnedMonth } from "@/lib/server/ownership";
 
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ monthId: string; entryId: string }> }
 ) {
-  const { entryId } = await params;
+  const user = await getSessionUser();
+  if (!user?.id) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { monthId, entryId } = await params;
+  const month = await getOwnedMonth(user.id, parseInt(monthId, 10));
   const id = parseInt(entryId, 10);
   const body = await request.json();
 
@@ -14,8 +22,10 @@ export async function PATCH(
   if (body.label !== undefined) updates.label = body.label;
   if (body.amount !== undefined) updates.amount = String(body.amount);
 
-  const [updated] = await db.update(additionalEntries).set(updates).where(eq(additionalEntries.id, id)).returning();
-  if (!updated) return Response.json({ error: "Entry not found" }, { status: 404 });
+  const entry = await getOwnedEntry(user.id, id);
+  if (!month || !entry || entry.monthId !== month.id) return Response.json({ error: "Entry not found" }, { status: 404 });
+
+  const [updated] = await db.update(additionalEntries).set(updates).where(eq(additionalEntries.id, entry.id)).returning();
 
   return Response.json(updated);
 }
@@ -24,9 +34,18 @@ export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ monthId: string; entryId: string }> }
 ) {
-  const { entryId } = await params;
+  const user = await getSessionUser();
+  if (!user?.id) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { monthId, entryId } = await params;
+  const month = await getOwnedMonth(user.id, parseInt(monthId, 10));
   const id = parseInt(entryId, 10);
 
-  await db.delete(additionalEntries).where(eq(additionalEntries.id, id));
+  const entry = await getOwnedEntry(user.id, id);
+  if (!month || !entry || entry.monthId !== month.id) return Response.json({ error: "Entry not found" }, { status: 404 });
+
+  await db.delete(additionalEntries).where(eq(additionalEntries.id, entry.id));
   return new Response(null, { status: 204 });
 }
