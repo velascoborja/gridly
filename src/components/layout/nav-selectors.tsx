@@ -63,7 +63,7 @@ export function NavSelectors({ currentYear, currentMonth, view, years }: Props) 
         <div className="flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
           <span className="sr-only md:not-sr-only">Año</span>
           <Select value={String(currentYear)} onValueChange={handleYearChange}>
-            <SelectTrigger className="h-9 rounded-full border-border/70 bg-background/90 pl-4 pr-4 font-medium text-foreground shadow-sm focus:border-primary focus:ring-primary/20">
+            <SelectTrigger className="h-9 rounded-md border-border/70 bg-background/90 pl-4 pr-4 font-medium text-foreground shadow-sm focus:border-primary focus:ring-primary/20">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -80,14 +80,14 @@ export function NavSelectors({ currentYear, currentMonth, view, years }: Props) 
             aria-label={t("createYear", { year: nextCreatableYear })}
             className={cn(
               buttonVariants({ variant: "outline", size: "icon-sm" }),
-              "size-9 rounded-full border-border/70 bg-background/90 text-primary shadow-sm hover:border-primary/40 hover:bg-primary/[0.06]"
+              "size-9 rounded-md border-border/70 bg-background/90 text-primary shadow-sm hover:border-primary/40 hover:bg-primary/[0.06]"
             )}
           >
             <Plus className="size-4" />
           </Link>
         </div>
 
-        <div className="rounded-[1.25rem] border border-border/70 bg-muted/40 p-1 shadow-sm">
+        <div className="rounded-lg border border-border/70 bg-muted/40 p-1 shadow-sm">
           <div className="flex flex-wrap justify-center gap-1">
             {mainTabs.map((tab) => {
               const active = view === tab.key;
@@ -96,7 +96,7 @@ export function NavSelectors({ currentYear, currentMonth, view, years }: Props) 
                   key={tab.key}
                   href={tab.href}
                   aria-current={active ? "page" : undefined}
-                  className={`inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                  className={`inline-flex items-center rounded-md px-4 py-2 text-sm font-medium transition-all ${
                     active
                       ? "bg-primary text-primary-foreground shadow-sm"
                       : "text-muted-foreground hover:bg-background/70 hover:text-foreground"
@@ -111,10 +111,10 @@ export function NavSelectors({ currentYear, currentMonth, view, years }: Props) 
       </div>
 
       {view === "detail" && (
-        <div className="w-full rounded-[1.15rem] border border-border/60 bg-background/80 p-1 shadow-sm md:w-auto">
+        <div className="w-full rounded-lg border border-border/60 bg-background/80 p-1 shadow-sm md:w-auto">
           <div
             ref={scrollContainerRef}
-            className="flex snap-x snap-mandatory scrollbar-hide justify-start gap-1 overflow-x-auto px-4 pb-1 md:justify-center md:px-0 md:pb-0"
+            className="flex snap-x snap-mandatory scroll-px-4 scrollbar-hide justify-start gap-1 overflow-x-auto px-4 pb-1 md:justify-center md:snap-none md:px-0 md:pb-0"
           >
             {MONTH_NAMES.map((name, i) => {
               const m = i + 1;
@@ -126,7 +126,7 @@ export function NavSelectors({ currentYear, currentMonth, view, years }: Props) 
                   href={`/${currentYear}/${m}`}
                   aria-current={active ? "page" : undefined}
                   aria-label={isCurrentMonth ? `${name}, mes actual` : name}
-                  className={`inline-flex shrink-0 snap-center items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-all ${
+                  className={`inline-flex shrink-0 snap-center items-center gap-2 rounded-md border px-3 py-1.5 text-xs font-medium transition-all ${
                     active
                       ? "border-primary bg-primary text-primary-foreground shadow-sm"
                       : isCurrentMonth
