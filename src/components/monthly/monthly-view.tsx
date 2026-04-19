@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState, useCallback } from "react";
 import { FixedExpensesCard } from "./fixed-expenses-card";
 import { IncomeCard } from "./income-card";
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export function MonthlyView({ yearData: initialYearData, monthNumber }: Props) {
+  const t = useTranslations("Monthly");
   const [months, setMonths] = useState<MonthData[]>(initialYearData.months);
   const config = initialYearData.config;
 
@@ -55,7 +57,7 @@ export function MonthlyView({ yearData: initialYearData, monthNumber }: Props) {
   if (!month) {
     return (
       <div className="flex items-center justify-center h-48 text-muted-foreground">
-        No hay datos para este mes
+        {t("noData")}
       </div>
     );
   }
@@ -70,7 +72,7 @@ export function MonthlyView({ yearData: initialYearData, monthNumber }: Props) {
           type="expense"
           entries={month.additionalExpenses}
           onEntriesChange={(entries) => handleEntriesChange("expense", entries)}
-          title="Gastos adicionales"
+          title={t("additionalEntries.titleExpense")}
         />
       </div>
 
@@ -82,7 +84,7 @@ export function MonthlyView({ yearData: initialYearData, monthNumber }: Props) {
           type="income"
           entries={month.additionalIncomes}
           onEntriesChange={(entries) => handleEntriesChange("income", entries)}
-          title="Ingresos adicionales"
+          title={t("additionalEntries.titleIncome")}
         />
       </div>
 

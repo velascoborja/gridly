@@ -1,0 +1,172 @@
+{
+  "Common": {
+    "settings": "Settings",
+    "logout": "Log out",
+    "deleteAccount": "Delete account",
+    "account": "Account",
+    "save": "Save",
+    "yearNotConfigured": "Year not configured",
+    "noDataForYear": "No data for {year}",
+    "missingYearStart": "Missing year start",
+    "missingYearDescription": "Only the next available exercise can be created to keep the balance chain connected.",
+    "nextStep": "Next step",
+    "nextStepDescription": "Initialize {nextCreatableYear} to open the monthly detail and complete the planning.",
+    "createYearButton": "Create {year}"
+  },
+  "Settings": {
+    "title": "Settings",
+    "language": "Language",
+    "spanish": "Spanish",
+    "english": "English",
+    "dangerZone": "Danger Zone",
+    "deleteAccountConfirm": "Are you sure you want to delete your account? This action cannot be undone.",
+    "todoDeleteAccount": "Delete account functionality coming soon."
+  },
+  "Annual": {
+    "title": "Annual Summary",
+    "yearLabel": "Exercise {year}",
+    "configButton": "Year Configuration",
+    "configTitle": "Year Configuration",
+    "configDescription": "Adjust the base assumptions that feed the 12-month calculation and final projection.",
+    "description": "Panorama of the year with key metrics, balance evolution, and configuration controls in a single view.",
+    "exportExcel": "Export Excel",
+    "exporting": "Exporting...",
+    "saving": "Saving...",
+    "exportDescription": "Export the full year in Excel with the latest configuration.",
+    "savingDescription": "Configuration changes are being saved before launching year actions.",
+    "kpis": {
+      "totalSavings": "Total savings",
+      "totalSavingsNote": "Sum of months with activity",
+      "avgSavings": "Average savings",
+      "avgSavingsNote": "Average over months with flow",
+      "bestMonth": "Best month",
+      "bestMonthNote": "Highest monthly savings recorded",
+      "estimatedBalance": "Estimated final balance",
+      "estimatedBalanceNote": "Projected closure of the exercise"
+    },
+    "charts": {
+      "balanceTitle": "Balance Evolution",
+      "balanceDescription": "How the final balance progresses month by month throughout the year.",
+      "savingsTitle": "Monthly Savings",
+      "savingsDescription": "Comparison of savings generated in each period.",
+      "balanceLabel": "Balance",
+      "savingsLabel": "Savings"
+    },
+    "config": {
+      "startingBalanceLabel": "Linked starting balance",
+      "startingBalanceDescription": "Automatically updated with the projected closure of the previous exercise.",
+      "estimatedSalary": "Estimated monthly salary",
+      "monthlyInvestment": "Monthly investment",
+      "monthlyHomeExpense": "Monthly home expense",
+      "monthlyPersonalBudget": "Personal budget",
+      "interestRate": "Annual interest rate (%)"
+    }
+  },
+  "Setup": {
+    "title": "Configure {year}",
+    "subtitle": "Financial year kickoff",
+    "guidedConfig": "Guided Configuration",
+    "mainHeading": "Prepare {year} in a single screen",
+    "descriptionEditable": "Define the starting point of the year, estimated salary, and fixed expenses. Gridly automatically fills the months and keeps the monthly flow connected.",
+    "descriptionFixed": "Only the next available exercise can be created. Gridly starts {year} with the closing forecast of {previousYear}.",
+    "stepCounter": "Step 1 of 1",
+    "formDescriptionEditable": "Enter the estimates for the year. You can adjust them at any time.",
+    "formDescriptionFixed": "Starting balance linked to {previousYear}: {balance}.",
+    "startingBalanceLabel": "Opening balance of the year (€)",
+    "startingBalanceDerived": "Derived starting balance",
+    "startingBalanceNote": "Only the next exercise can be created and its starting balance is automatically calculated from {previousYear}.",
+    "startingBalanceReal": "Start with real context",
+    "extraPaysLabel": "Extra pays",
+    "extraPaysNote": "June and December adjust themselves",
+    "redirectionLabel": "Redirection",
+    "redirectionNote": "Return to the flow where you were",
+    "estimatedSalary": "Estimated monthly salary (€)",
+    "monthlyHomeExpense": "Monthly home expense (€)",
+    "monthlyPersonalBudget": "Monthly personal budget (€)",
+    "monthlyInvestment": "Monthly investment (€)",
+    "interestRate": "Annual interest rate (%)",
+    "errorOnlyNextYear": "Only the next available exercise can be created.",
+    "errorGeneric": "Could not create the year. Please check the data and try again.",
+    "errorConnection": "Could not create the year. Please check the connection and try again.",
+    "submitting": "Creating...",
+    "submit": "Create and fill estimates"
+  },
+  "Landing": {
+    "heroTitle": "Control income, expenses, and savings with a vision that fits.",
+    "heroDescription": "Gridly converts your financial year into a coherent chain: from the starting balance to the monthly close, with an annual summary, quick editing, and Excel export.",
+    "features": {
+      "monthly": {
+        "title": "Monthly Control",
+        "description": "Track income, fixed expenses, and additional movements without losing the balance thread."
+      },
+      "chained": {
+        "title": "Chained Savings",
+        "description": "Each month starts where the previous one ended so the annual balance is coherent."
+      },
+      "annual": {
+        "title": "Annual Summary",
+        "description": "Visualize the complete exercise and export the history whenever you need it."
+      }
+    },
+    "preview": {
+      "title": "Preview",
+      "yearLabel": "Exercise 2026",
+      "privateAccount": "Private account",
+      "annualBalance": "Annual balance",
+      "avgSavings": "Average savings",
+      "extraPays": "Extra pays",
+      "currentMonth": "Current month",
+      "connectedBalance": "Balance connected with the previous close",
+      "monthName": "April",
+      "totalIncome": "Total income",
+      "totalExpenses": "Total expenses",
+      "monthlySavings": "Monthly savings"
+    }
+  },
+  "Monthly": {
+    "noData": "No data for this month",
+    "income": {
+      "title": "Fixed Income",
+      "description": "Base income for the month, including extra pays and bonuses when applicable.",
+      "payslip": "Salary",
+      "additionalPayslip": "Extra pay",
+      "bonus": "Bonus",
+      "interests": "Interests",
+      "personalRemaining": "Personal surplus"
+    },
+    "fixedExpenses": {
+      "title": "Fixed Expenses",
+      "description": "Budgets for recurring expenses and investments.",
+      "homeExpense": "Home expenses",
+      "personalExpense": "Personal expenses",
+      "investment": "Investment"
+    },
+    "additionalEntries": {
+      "titleIncome": "Additional income",
+      "titleExpense": "Additional expenses",
+      "description": "Specific movements with quick editing and explicit deletions.",
+      "addEntry": "Add entry",
+      "noEntries": "No entries yet.",
+      "descriptionPlaceholder": "Description",
+      "add": "Add",
+      "cancel": "Cancel",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "summary": {
+      "title": "Summary",
+      "description": "Final monthly reading with balance, spending, and net savings.",
+      "startingBalance": "Starting balance",
+      "totalIncome": "Total income",
+      "totalExpenses": "Total expenses",
+      "netSavings": "Savings",
+      "endingBalance": "Ending balance"
+    }
+  },
+  "Nav": {
+    "currentMonth": "Current month",
+    "annualSummary": "Annual summary",
+    "monthlyDetail": "Monthly detail",
+    "createYear": "Create {year}"
+  }
+}

@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
 import type { MonthData } from "@/lib/types";
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export function KpiCards({ months, startingBalance }: Props) {
+  const t = useTranslations("Annual.kpis");
   const populated = months.filter((m) => m.totalIncome > 0 || m.totalExpenses > 0);
   const totalSavings = populated.reduce((s, m) => s + m.savings, 0);
   const avgSavings = populated.length > 0 ? totalSavings / populated.length : 0;
@@ -16,28 +18,28 @@ export function KpiCards({ months, startingBalance }: Props) {
 
   const kpis = [
     {
-      label: "Ahorro total",
+      label: t("totalSavings"),
       value: totalSavings,
       positive: totalSavings >= 0,
-      note: "Suma de los meses con actividad",
+      note: t("totalSavingsNote"),
     },
     {
-      label: "Ahorro medio",
+      label: t("avgSavings"),
       value: avgSavings,
       positive: avgSavings >= 0,
-      note: "Promedio sobre meses con flujo",
+      note: t("avgSavingsNote"),
     },
     {
-      label: "Mejor mes",
+      label: t("bestMonth"),
       value: maxSavings,
       positive: true,
-      note: "Mayor ahorro mensual registrado",
+      note: t("bestMonthNote"),
     },
     {
-      label: "Saldo final estimado",
+      label: t("estimatedBalance"),
       value: endingBalance,
       positive: endingBalance > startingBalance,
-      note: "Cierre proyectado del ejercicio",
+      note: t("estimatedBalanceNote"),
     },
   ];
 

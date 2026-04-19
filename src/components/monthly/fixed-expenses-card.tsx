@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { InlineEditField } from "./inline-edit-field";
 import type { MonthData } from "@/lib/types";
@@ -10,27 +11,29 @@ interface Props {
 }
 
 export function FixedExpensesCard({ month, onUpdate }: Props) {
+  const t = useTranslations("Monthly.fixedExpenses");
+
   return (
     <Card className="border-border/70 bg-card/95 shadow-sm shadow-black/5">
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-medium">Gastos fijos</CardTitle>
+        <CardTitle className="text-sm font-medium">{t("title")}</CardTitle>
         <CardDescription>
-          Conceptos recurrentes del mes que alimentan el cálculo del ahorro.
+          {t("description")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-1.5">
         <InlineEditField
-          label="Casa (mes siguiente)"
+          label={t("homeExpense")}
           value={month.homeExpense}
           onSave={(v) => onUpdate("homeExpense", v)}
         />
         <InlineEditField
-          label="Gastos propios"
+          label={t("personalExpense")}
           value={month.personalExpense}
           onSave={(v) => onUpdate("personalExpense", v)}
         />
         <InlineEditField
-          label="Inversión"
+          label={t("investment")}
           value={month.investment}
           onSave={(v) => onUpdate("investment", v)}
         />

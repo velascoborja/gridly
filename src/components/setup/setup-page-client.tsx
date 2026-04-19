@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,14 +14,6 @@ interface Field {
   defaultValue: string;
 }
 
-const FIELDS: Field[] = [
-  { key: "estimatedSalary", label: "Salario mensual estimado (€)", defaultValue: "0" },
-  { key: "monthlyHomeExpense", label: "Gasto hogar mensual (€)", defaultValue: "0" },
-  { key: "monthlyPersonalBudget", label: "Presupuesto personal mensual (€)", defaultValue: "0" },
-  { key: "monthlyInvestment", label: "Inversión mensual (€)", defaultValue: "0" },
-  { key: "interestRate", label: "Tipo de interés anual (%)", defaultValue: "0" },
-];
-
 interface Props {
   year: number;
   derivedStartingBalance: number;
@@ -29,9 +22,18 @@ interface Props {
 }
 
 export function SetupPageClient({ year, derivedStartingBalance, previousYear, startingBalanceEditable }: Props) {
+  const t = useTranslations("Setup");
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") ?? `/${year}/${new Date().getMonth() + 1}`;
   const router = useRouter();
+
+  const FIELDS: Field[] = [
+    { key: "estimatedSalary", label: t("estimatedSalary"), defaultValue: "0" },
+    { key: "monthlyHomeExpense", label: t("monthlyHomeExpense"), defaultValue: "0" },
+    { key: "monthlyPersonalBudget", label: t("monthlyPersonalBudget"), defaultValue: "0" },
+    { key: "monthlyInvestment", label: t("monthlyInvestment"), defaultValue: "0" },
+    { key: "interestRate", label: t("interestRate"), defaultValue: "0" },
+  ];
 
   const [values, setValues] = useState<Record<string, string>>(
     Object.fromEntries([
@@ -64,8 +66,8 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
         const payload = await res.json().catch(() => null);
         setError(
           payload?.error === "Only the next year can be created"
-            ? "Solo puedes crear el siguiente ejercicio disponible."
-            : "No se ha podido crear el año. Revisa los datos e inténtalo de nuevo."
+            ? t("errorOnlyNextYear")
+            : t("errorGeneric")
         );
         setSubmitting(false);
         return;
@@ -74,7 +76,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
       await fetch(`/api/years/${year}/prefill`, { method: "POST" });
       router.push(redirectTo);
     } catch {
-      setError("No se ha podido crear el año. Revisa la conexión e inténtalo de nuevo.");
+      setError(t("errorConnection"));
       setSubmitting(false);
     }
   };
@@ -95,38 +97,38 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
                   <p className="text-xs font-semibold uppercase tracking-[0.26em] text-white/70">
                     Gridly
                   </p>
-                  <p className="text-sm text-white/70">Arranque del año financiero</p>
+                  <p className="text-sm text-white/70">{t("subtitle")}</p>
                 </div>
               </div>
               <div className="max-w-xl space-y-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.28em] text-white/65">
-                  Configuración guiada
+                  {t("guidedConfig")}
                 </p>
                 <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-                  Prepara {year} con una sola pantalla
+                  {t("mainHeading", { year })}
                 </h1>
                 <p className="max-w-lg text-sm leading-6 text-white/75 sm:text-base">
                   {startingBalanceEditable
-                    ? "Define el punto de partida del año, el salario estimado y los gastos fijos. Gridly rellena automáticamente los meses y mantiene el flujo mensual conectado."
-                    : `Solo puedes crear el siguiente ejercicio disponible. Gridly arranca ${year} con la previsión de cierre de ${previousYear}.`}
+                    ? t("descriptionEditable")
+                    : t("descriptionFixed", { year, previousYear: previousYear ?? "" })}
                 </p>
               </div>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-3">
               <div className="rounded-2xl border border-white/10 bg-white/8 p-4 backdrop-blur-sm">
-                <p className="text-xs uppercase tracking-[0.22em] text-white/55">Saldo inicial</p>
+                <p className="text-xs uppercase tracking-[0.22em] text-white/55">{t("startingBalanceDerived")}</p>
                 <p className="mt-2 text-sm font-medium text-white">
-                  {startingBalanceEditable ? "Arranca con contexto real" : formatCurrency(derivedStartingBalance)}
+                  {startingBalanceEditable ? t("startingBalanceReal") : formatCurrency(derivedStartingBalance)}
                 </p>
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/8 p-4 backdrop-blur-sm">
-                <p className="text-xs uppercase tracking-[0.22em] text-white/55">Pagas extra</p>
-                <p className="mt-2 text-sm font-medium text-white">Junio y diciembre se ajustan solos</p>
+                <p className="text-xs uppercase tracking-[0.22em] text-white/55">{t("extraPaysLabel")}</p>
+                <p className="mt-2 text-sm font-medium text-white">{t("extraPaysNote")}</p>
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/8 p-4 backdrop-blur-sm">
-                <p className="text-xs uppercase tracking-[0.22em] text-white/55">Redirección</p>
-                <p className="mt-2 text-sm font-medium text-white">Vuelve al flujo donde estabas</p>
+                <p className="text-xs uppercase tracking-[0.22em] text-white/55">{t("redirectionLabel")}</p>
+                <p className="mt-2 text-sm font-medium text-white">{t("redirectionNote")}</p>
               </div>
             </div>
           </div>
@@ -135,20 +137,20 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
         <Card className="rounded-[2rem] border-border/70 bg-background/90 shadow-[0_30px_80px_-44px_rgba(15,23,42,0.45)] backdrop-blur-xl">
           <CardHeader className="gap-2 pb-0">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-              Paso 1 de 1
+              {t("stepCounter")}
             </p>
-            <CardTitle className="text-2xl sm:text-3xl">Configurar {year}</CardTitle>
+            <CardTitle className="text-2xl sm:text-3xl">{t("title", { year })}</CardTitle>
             <CardDescription className="text-sm leading-6 sm:text-base">
               {startingBalanceEditable
-                ? "Introduce las estimaciones para el año. Podrás ajustarlas en cualquier momento."
-                : `Saldo inicial enlazado a ${previousYear}: ${formatCurrency(derivedStartingBalance)}.`}
+                ? t("formDescriptionEditable")
+                : t("formDescriptionFixed", { previousYear: previousYear ?? "", balance: formatCurrency(derivedStartingBalance) })}
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-6">
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">
-                  {startingBalanceEditable ? "Saldo de apertura del año (€)" : "Saldo inicial derivado"}
+                  {startingBalanceEditable ? t("startingBalanceLabel") : t("startingBalanceDerived")}
                 </label>
                 <Input
                   type="text"
@@ -160,7 +162,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
                 />
                 {!startingBalanceEditable ? (
                   <p className="text-sm leading-6 text-muted-foreground">
-                    Solo puedes crear el siguiente ejercicio y su saldo inicial se calcula automáticamente desde {previousYear}.
+                    {t("startingBalanceNote", { previousYear: previousYear ?? "" })}
                   </p>
                 ) : null}
               </div>
@@ -189,7 +191,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
               ) : null}
 
               <Button type="submit" className="h-11 w-full rounded-xl text-sm font-semibold" disabled={submitting}>
-                {submitting ? "Creando…" : "Crear y rellenar estimaciones"}
+                {submitting ? t("submitting") : t("submit")}
               </Button>
             </form>
           </CardContent>

@@ -1,15 +1,5 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/auth";
-import { PublicHero } from "@/components/landing/public-hero";
-import { getAppRedirectPath } from "@/lib/server/year-data";
+import {redirect} from 'next/navigation';
 
-export default async function Home() {
-  const session = await auth();
-  const currentYear = new Date().getFullYear();
-
-  if (session?.user?.id) {
-    redirect(await getAppRedirectPath(session.user.id, currentYear));
-  }
-
-  return <PublicHero />;
+export default function RootPage() {
+  redirect('/es');
 }

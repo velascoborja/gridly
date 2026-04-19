@@ -1,12 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useRouter, Link } from "@/i18n/routing";
 import { buttonVariants } from "@/components/ui/button";
 import { getNextCreatableYear } from "@/lib/server/year-planning";
 import { MONTH_NAMES } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import {
   Select,
   SelectContent,
@@ -24,6 +24,7 @@ interface Props {
 
 export function NavSelectors({ currentYear, currentMonth, view, years }: Props) {
   const router = useRouter();
+  const t = useTranslations("Nav");
   const detailMonth = currentMonth ?? new Date().getMonth() + 1;
   const nextCreatableYear = getNextCreatableYear(years, currentYear);
   const today = new Date();
@@ -39,9 +40,9 @@ export function NavSelectors({ currentYear, currentMonth, view, years }: Props) 
   };
 
   const mainTabs = [
-    { label: "Mes actual", key: "overview" as const, href: `/${currentYear}/overview` },
-    { label: "Resumen anual", key: "summary" as const, href: `/${currentYear}/summary` },
-    { label: "Detalle mensual", key: "detail" as const, href: `/${currentYear}/${detailMonth}` },
+    { label: t("currentMonth"), key: "overview" as const, href: `/${currentYear}/overview` as const },
+    { label: t("annualSummary"), key: "summary" as const, href: `/${currentYear}/summary` as const },
+    { label: t("monthlyDetail"), key: "detail" as const, href: `/${currentYear}/${detailMonth}` as const },
   ];
 
   return (
@@ -64,7 +65,7 @@ export function NavSelectors({ currentYear, currentMonth, view, years }: Props) 
 
           <Link
             href={`/setup/${nextCreatableYear}`}
-            aria-label={`Crear ${nextCreatableYear}`}
+            aria-label={t("createYear", { year: nextCreatableYear })}
             className={cn(
               buttonVariants({ variant: "outline", size: "icon-sm" }),
               "size-9 rounded-full border-border/70 bg-background/90 text-primary shadow-sm hover:border-primary/40 hover:bg-primary/[0.06]"

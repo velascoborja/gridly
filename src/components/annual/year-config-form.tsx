@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import type { Dispatch, SetStateAction } from "react";
 import { InlineEditField } from "@/components/monthly/inline-edit-field";
 import type { YearConfig } from "@/lib/types";
@@ -12,6 +13,8 @@ interface Props {
 }
 
 export function YearConfigForm({ config, onConfigChange, onPendingSave }: Props) {
+  const t = useTranslations("Annual.config");
+
   const handleSave = async (field: keyof YearConfig, value: number) => {
     const savePromise = (async () => {
       const res = await fetch(`/api/years/${config.year}`, {
@@ -32,48 +35,48 @@ export function YearConfigForm({ config, onConfigChange, onPendingSave }: Props)
       <div className="grid gap-3">
         <div className="rounded-2xl border border-border/60 bg-muted/20 p-4">
           <div className="space-y-1">
-            <span className="text-sm text-muted-foreground">Saldo inicial vinculado</span>
+            <span className="text-sm text-muted-foreground">{t("startingBalanceLabel")}</span>
             <p className="text-sm font-medium text-foreground">{formatCurrency(config.startingBalance)}</p>
             <p className="text-sm leading-6 text-muted-foreground">
-              Se actualiza automáticamente con el cierre proyectado del ejercicio anterior.
+              {t("startingBalanceDescription")}
             </p>
           </div>
         </div>
         <div className="rounded-2xl border border-border/60 bg-muted/20 p-4">
           <InlineEditField
-            label="Salario estimado mensual"
+            label={t("estimatedSalary")}
             value={config.estimatedSalary}
             onSave={(v) => handleSave("estimatedSalary", v)}
           />
         </div>
         <div className="rounded-2xl border border-border/60 bg-muted/20 p-4">
           <InlineEditField
-            label="Inversión mensual"
+            label={t("monthlyInvestment")}
             value={config.monthlyInvestment}
             onSave={(v) => handleSave("monthlyInvestment", v)}
           />
         </div>
         <div className="rounded-2xl border border-border/60 bg-muted/20 p-4">
           <InlineEditField
-            label="Gasto hogar mensual"
+            label={t("monthlyHomeExpense")}
             value={config.monthlyHomeExpense}
             onSave={(v) => handleSave("monthlyHomeExpense", v)}
           />
         </div>
         <div className="rounded-2xl border border-border/60 bg-muted/20 p-4">
           <InlineEditField
-            label="Presupuesto personal"
+            label={t("monthlyPersonalBudget")}
             value={config.monthlyPersonalBudget}
             onSave={(v) => handleSave("monthlyPersonalBudget", v)}
           />
         </div>
         <div className="rounded-2xl border border-border/60 bg-muted/20 p-4">
           <div className="flex items-center justify-between gap-4">
-            <span className="text-sm text-muted-foreground">Tipo de interés anual (%)</span>
+            <span className="text-sm text-muted-foreground">{t("interestRate")}</span>
             <button
               className="rounded-md border border-transparent px-2 py-1 text-sm font-medium tabular-nums text-foreground transition-colors hover:border-border hover:bg-background hover:text-foreground cursor-pointer"
               onClick={() => {
-                const v = prompt("Tipo de interés anual (%)", String(config.interestRate * 100));
+                const v = prompt(t("interestRate"), String(config.interestRate * 100));
                 if (v === null) return;
                 const num = parseFloat(v.replace(",", "."));
                 if (!isNaN(num)) void handleSave("interestRate", num / 100);

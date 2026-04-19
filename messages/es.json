@@ -1,0 +1,172 @@
+{
+  "Common": {
+    "settings": "Ajustes",
+    "logout": "Cerrar sesión",
+    "deleteAccount": "Eliminar cuenta",
+    "account": "Cuenta",
+    "save": "Guardar",
+    "yearNotConfigured": "Año sin configurar",
+    "noDataForYear": "Sin datos para {year}",
+    "missingYearStart": "Falta el arranque del ejercicio",
+    "missingYearDescription": "Solo puedes crear el siguiente ejercicio disponible para mantener la cadena de saldos conectada.",
+    "nextStep": "Siguiente paso",
+    "nextStepDescription": "Inicializa {nextCreatableYear} para abrir el detalle mensual y completar la planificación.",
+    "createYearButton": "Crear {year}"
+  },
+  "Settings": {
+    "title": "Ajustes",
+    "language": "Idioma",
+    "spanish": "Español",
+    "english": "Inglés",
+    "dangerZone": "Zona de peligro",
+    "deleteAccountConfirm": "¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.",
+    "todoDeleteAccount": "Funcionalidad de eliminación de cuenta próximamente."
+  },
+  "Annual": {
+    "title": "Resumen anual",
+    "yearLabel": "Ejercicio {year}",
+    "configButton": "Configuración del año",
+    "configTitle": "Configuración del año",
+    "configDescription": "Ajusta los supuestos base que alimentan el cálculo de los 12 meses y la proyección final.",
+    "description": "Panorama del año con métricas clave, evolución del saldo y controles de configuración en una sola vista.",
+    "exportExcel": "Exportar Excel",
+    "exporting": "Exportando...",
+    "saving": "Guardando...",
+    "exportDescription": "Exporta el año completo en Excel con la configuración más reciente.",
+    "savingDescription": "Se están guardando cambios en la configuración antes de lanzar acciones del año.",
+    "kpis": {
+      "totalSavings": "Ahorro total",
+      "totalSavingsNote": "Suma de los meses con actividad",
+      "avgSavings": "Ahorro medio",
+      "avgSavingsNote": "Promedio sobre meses con flujo",
+      "bestMonth": "Mejor mes",
+      "bestMonthNote": "Mayor ahorro mensual registrado",
+      "estimatedBalance": "Saldo final estimado",
+      "estimatedBalanceNote": "Cierre proyectado del ejercicio"
+    },
+    "charts": {
+      "balanceTitle": "Evolución del saldo",
+      "balanceDescription": "Cómo progresa el saldo final mes a mes a lo largo del ejercicio.",
+      "savingsTitle": "Ahorro mensual",
+      "savingsDescription": "Comparativa de ahorro generado en cada periodo.",
+      "balanceLabel": "Saldo",
+      "savingsLabel": "Ahorro"
+    },
+    "config": {
+      "startingBalanceLabel": "Saldo inicial vinculado",
+      "startingBalanceDescription": "Se actualiza automáticamente con el cierre proyectado del ejercicio anterior.",
+      "estimatedSalary": "Salario estimado mensual",
+      "monthlyInvestment": "Inversión mensual",
+      "monthlyHomeExpense": "Gasto hogar mensual",
+      "monthlyPersonalBudget": "Presupuesto personal",
+      "interestRate": "Tipo de interés anual (%)"
+    }
+  },
+  "Setup": {
+    "title": "Configurar {year}",
+    "subtitle": "Arranque del año financiero",
+    "guidedConfig": "Configuración guiada",
+    "mainHeading": "Prepara {year} con una sola pantalla",
+    "descriptionEditable": "Define el punto de partida del año, el salario estimado y los gastos fijos. Gridly rellena automáticamente los meses y mantiene el flujo mensual conectado.",
+    "descriptionFixed": "Solo puedes crear el siguiente ejercicio disponible. Gridly arranca {year} con la previsión de cierre de {previousYear}.",
+    "stepCounter": "Paso 1 de 1",
+    "formDescriptionEditable": "Introduce las estimaciones para el año. Podrás ajustarlas en cualquier momento.",
+    "formDescriptionFixed": "Saldo inicial enlazado a {previousYear}: {balance}.",
+    "startingBalanceLabel": "Saldo de apertura del año (€)",
+    "startingBalanceDerived": "Saldo inicial derivado",
+    "startingBalanceNote": "Solo puedes crear el siguiente ejercicio y su saldo inicial se calcula automáticamente desde {previousYear}.",
+    "startingBalanceReal": "Arranca con contexto real",
+    "extraPaysLabel": "Pagas extra",
+    "extraPaysNote": "Junio y diciembre se ajustan solos",
+    "redirectionLabel": "Redirección",
+    "redirectionNote": "Vuelve al flujo donde estabas",
+    "estimatedSalary": "Salario mensual estimado (€)",
+    "monthlyHomeExpense": "Gasto hogar mensual (€)",
+    "monthlyPersonalBudget": "Presupuesto personal mensual (€)",
+    "monthlyInvestment": "Inversión mensual (€)",
+    "interestRate": "Tipo de interés anual (%)",
+    "errorOnlyNextYear": "Solo puedes crear el siguiente ejercicio disponible.",
+    "errorGeneric": "No se ha podido crear el año. Revisa los datos e inténtalo de nuevo.",
+    "errorConnection": "No se ha podido crear el año. Revisa la conexión e inténtalo de nuevo.",
+    "submitting": "Creando...",
+    "submit": "Crear y rellenar estimaciones"
+  },
+  "Landing": {
+    "heroTitle": "Controla ingresos, gastos y ahorro con una visión que sí encaja.",
+    "heroDescription": "Gridly convierte tu año financiero en una cadena coherente: desde el saldo inicial hasta el cierre mensual, con resumen anual, edición rápida y exportación a Excel.",
+    "features": {
+      "monthly": {
+        "title": "Control mensual",
+        "description": "Sigue ingresos, gastos fijos y movimientos adicionales sin perder el hilo del saldo."
+      },
+      "chained": {
+        "title": "Ahorro encadenado",
+        "description": "Cada mes arranca donde terminó el anterior para que el balance anual sea coherente."
+      },
+      "annual": {
+        "title": "Resumen anual",
+        "description": "Visualiza el ejercicio completo y exporta el histórico cuando lo necesites."
+      }
+    },
+    "preview": {
+      "title": "Vista previa",
+      "yearLabel": "Ejercicio 2026",
+      "privateAccount": "Cuenta privada",
+      "annualBalance": "Saldo anual",
+      "avgSavings": "Ahorro medio",
+      "extraPays": "Pagas extra",
+      "currentMonth": "Mes actual",
+      "connectedBalance": "Balance conectado con el cierre anterior",
+      "monthName": "Abril",
+      "totalIncome": "Ingresos totales",
+      "totalExpenses": "Gastos totales",
+      "monthlySavings": "Ahorro del mes"
+    }
+  },
+  "Monthly": {
+    "noData": "No hay datos para este mes",
+    "income": {
+      "title": "Ingresos fijos",
+      "description": "Entradas base del mes, incluyendo pagas extra y complementos cuando aplican.",
+      "payslip": "Nómina",
+      "additionalPayslip": "Paga extra",
+      "bonus": "Bonus",
+      "interests": "Intereses cuenta",
+      "personalRemaining": "Sobrante propios"
+    },
+    "fixedExpenses": {
+      "title": "Gastos fijos",
+      "description": "Presupuestos para gastos recurrentes e inversión.",
+      "homeExpense": "Casa (mes siguiente)",
+      "personalExpense": "Gastos propios",
+      "investment": "Inversión"
+    },
+    "additionalEntries": {
+      "titleIncome": "Ingresos adicionales",
+      "titleExpense": "Gastos adicionales",
+      "description": "Movimientos puntuales con edición rápida y eliminaciones explícitas.",
+      "addEntry": "Añadir entrada",
+      "noEntries": "Sin entradas todavía.",
+      "descriptionPlaceholder": "Descripción",
+      "add": "Añadir",
+      "cancel": "Cancelar",
+      "edit": "Editar",
+      "delete": "Eliminar"
+    },
+    "summary": {
+      "title": "Resumen",
+      "description": "Lectura final del mes con saldo, gasto y ahorro neto.",
+      "startingBalance": "Saldo inicial",
+      "totalIncome": "Total ingresos",
+      "totalExpenses": "Total gastos",
+      "netSavings": "Ahorro",
+      "endingBalance": "Saldo final"
+    }
+  },
+  "Nav": {
+    "currentMonth": "Mes actual",
+    "annualSummary": "Resumen anual",
+    "monthlyDetail": "Detalle mensual",
+    "createYear": "Crear {year}"
+  }
+}

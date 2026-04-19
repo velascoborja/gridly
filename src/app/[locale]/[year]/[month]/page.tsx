@@ -1,18 +1,21 @@
+import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { AppShell } from "@/components/layout/app-shell";
 import { MonthlyView } from "@/components/monthly/monthly-view";
 import { getNextCreatableYear } from "@/lib/server/year-planning";
-import { MONTH_NAMES } from "@/lib/utils";
 import { getYearData, getYearsForUser } from "@/lib/server/year-data";
 import { requireSessionUser } from "@/lib/server/session";
 
 export default async function MonthPage({
   params,
 }: {
-  params: Promise<{ year: string; month: string }>;
+  params: Promise<{ year: string; month: string; locale: string }>;
 }) {
-  const { year: yearStr, month: monthStr } = await params;
+  const { year: yearStr, month: monthStr, locale } = await params;
+  const tCommon = await getTranslations("Common");
+  const tNav = await getTranslations("Nav");
+  
   const year = parseInt(yearStr, 10);
   const month = parseInt(monthStr, 10);
 
@@ -40,25 +43,25 @@ export default async function MonthPage({
                   <span className="flex size-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
                     G
                   </span>
-                  Año sin configurar
+                  {tCommon("yearNotConfigured")}
                 </div>
                 <div className="space-y-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-                    Falta el arranque del ejercicio
+                    {tCommon("missingYearStart")}
                   </p>
                   <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-                    Sin datos para {year}
+                    {tCommon("noDataForYear", { year })}
                   </h1>
                   <p className="max-w-xl text-sm leading-6 text-muted-foreground sm:text-base">
-                    Solo puedes crear el siguiente ejercicio disponible para mantener la cadena de saldos conectada.
+                    {tCommon("missingYearDescription")}
                   </p>
                 </div>
               </div>
 
               <div className="rounded-[1.5rem] border border-border/70 bg-muted/25 p-5 sm:p-6">
-                <p className="text-sm font-semibold text-foreground">Siguiente paso</p>
+                <p className="text-sm font-semibold text-foreground">{tCommon("nextStep")}</p>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  Inicializa {nextCreatableYear} para abrir el detalle mensual y completar la planificación.
+                  {tCommon("nextStepDescription", { nextCreatableYear })}
                 </p>
                 <div className="mt-6">
                   <CreateYearForm nextCreatableYear={nextCreatableYear} month={month} />
@@ -71,14 +74,17 @@ export default async function MonthPage({
     );
   }
 
+  const date = new Date(year, month - 1, 1);
+  const monthName = new Intl.DateTimeFormat(locale, { month: "long" }).format(date);
+
   return (
     <AppShell currentYear={year} currentMonth={month} view="detail" years={years.length > 0 ? years : [year]} user={user}>
       <div className="mb-8 max-w-3xl">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-          Detalle mensual
+          {tNav("monthlyDetail")}
         </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-          {MONTH_NAMES[month - 1]} {year}
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl capitalize">
+          {monthName} {year}
         </h1>
       </div>
       <MonthlyView yearData={yearData} monthNumber={month} />
@@ -93,8 +99,13 @@ function CreateYearForm({ nextCreatableYear, month }: { nextCreatableYear: numbe
         href={`/setup/${nextCreatableYear}?redirect=/${nextCreatableYear}/${month}`}
         className="inline-flex min-h-11 flex-1 items-center justify-center rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
       >
-        Crear {nextCreatableYear}
+        <CreateYearButtonText nextCreatableYear={nextCreatableYear} />
       </Link>
     </div>
   );
+}
+
+async function CreateYearButtonText({ nextCreatableYear }: { nextCreatableYear: number }) {
+  const t = await getTranslations("Common");
+  return t("createYearButton", { year: nextCreatableYear });
 }

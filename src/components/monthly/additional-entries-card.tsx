@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,8 @@ interface Props {
 }
 
 export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange, title }: Props) {
+  const t = useTranslations("Monthly.additionalEntries");
+  const common = useTranslations("Common");
   const [adding, setAdding] = useState(false);
   const [newLabel, setNewLabel] = useState("");
   const [newAmount, setNewAmount] = useState("");
@@ -75,13 +78,13 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         <CardDescription>
-          Movimientos puntuales con edición rápida y eliminaciones explícitas.
+          {t("description")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
         {entries.length === 0 && !adding && (
           <div className="rounded-xl border border-dashed border-border/70 bg-muted/20 px-3 py-4 text-sm text-muted-foreground">
-            Sin entradas todavía.
+            {t("noEntries")}
           </div>
         )}
         {entries.map((entry) =>
@@ -109,10 +112,10 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
                   inputMode="decimal"
                 />
                 <Button size="sm" className="h-9 px-3 sm:w-auto" onClick={() => handleEdit(entry.id)}>
-                  Guardar
+                  {common("save")}
                 </Button>
                 <Button size="sm" variant="ghost" className="h-9 px-3 sm:w-auto" onClick={() => setEditingId(null)}>
-                  Cancelar
+                  {t("cancel")}
                 </Button>
               </div>
             </div>
@@ -123,7 +126,7 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
                   className="min-w-0 flex-1 text-left text-sm font-medium text-foreground transition-colors hover:text-primary focus-visible:text-primary"
                   onClick={() => openEditForm(entry)}
                   type="button"
-                  aria-label={`Editar ${entry.label}`}
+                  aria-label={`${t("edit")} ${entry.label}`}
                 >
                   {entry.label}
                 </button>
@@ -134,7 +137,7 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
                     variant="ghost"
                     className="text-muted-foreground hover:text-foreground"
                     onClick={() => openEditForm(entry)}
-                    aria-label={`Editar ${entry.label}`}
+                    aria-label={`${t("edit")} ${entry.label}`}
                   >
                     <Pencil className="h-3 w-3" />
                   </Button>
@@ -143,7 +146,7 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
                     variant="ghost"
                     className="text-muted-foreground hover:text-destructive"
                     onClick={() => handleDelete(entry.id)}
-                    aria-label={`Eliminar ${entry.label}`}
+                    aria-label={`${t("delete")} ${entry.label}`}
                   >
                     <Trash2 className="h-3 w-3" />
                   </Button>
@@ -158,7 +161,7 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
             <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto] sm:items-center">
               <Input
                 className="h-9 min-w-0 text-sm"
-                placeholder="Descripción"
+                placeholder={t("descriptionPlaceholder")}
                 value={newLabel}
                 onChange={(e) => setNewLabel(e.target.value)}
                 onKeyDown={(e) => {
@@ -179,7 +182,7 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
                 inputMode="decimal"
               />
               <Button size="sm" className="h-9 px-3 sm:w-auto" onClick={handleAdd}>
-                Añadir
+                {t("add")}
               </Button>
               <Button size="sm" variant="ghost" className="h-9 px-3 sm:w-auto" onClick={closeAddForm}>
                 <X className="h-3.5 w-3.5" />
@@ -192,7 +195,7 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
             onClick={() => setAdding(true)}
             type="button"
           >
-            <Plus className="h-3.5 w-3.5" /> Añadir entrada
+            <Plus className="h-3.5 w-3.5" /> {t("addEntry")}
           </button>
         )}
       </CardContent>

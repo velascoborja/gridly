@@ -1,27 +1,30 @@
-import Link from "next/link";
-import { ArrowRight, ChartColumnBig, PiggyBank, Wallet } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/routing";
+import { ChartColumnBig, PiggyBank, Wallet } from "lucide-react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 import { Card, CardContent } from "@/components/ui/card";
 
-const FEATURES = [
-  {
-    icon: Wallet,
-    title: "Control mensual",
-    description: "Sigue ingresos, gastos fijos y movimientos adicionales sin perder el hilo del saldo.",
-  },
-  {
-    icon: PiggyBank,
-    title: "Ahorro encadenado",
-    description: "Cada mes arranca donde terminó el anterior para que el balance anual sea coherente.",
-  },
-  {
-    icon: ChartColumnBig,
-    title: "Resumen anual",
-    description: "Visualiza el ejercicio completo y exporta el histórico cuando lo necesites.",
-  },
-];
-
 export function PublicHero() {
+  const t = useTranslations("Landing");
+
+  const FEATURES = [
+    {
+      icon: Wallet,
+      title: t("features.monthly.title"),
+      description: t("features.monthly.description"),
+    },
+    {
+      icon: PiggyBank,
+      title: t("features.chained.title"),
+      description: t("features.chained.description"),
+    },
+    {
+      icon: ChartColumnBig,
+      title: t("features.annual.title"),
+      description: t("features.annual.description"),
+    },
+  ];
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(83,58,253,0.18),transparent_28%),radial-gradient(circle_at_top_right,rgba(249,107,238,0.12),transparent_24%),linear-gradient(180deg,#fbfcff_0%,#f6f8fc_42%,#f2f5fb_100%)] text-foreground">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[linear-gradient(180deg,rgba(255,255,255,0.88),transparent)]" />
@@ -39,19 +42,13 @@ export function PublicHero() {
         <section className="space-y-8">
           <div className="max-w-2xl space-y-5">
             <h1 className="max-w-3xl text-[clamp(2.8rem,7vw,5.1rem)] font-light tracking-[-0.05em] text-[#061b31]">
-              Controla ingresos, gastos y ahorro con una visión que sí encaja.
+              {t("heroTitle")}
             </h1>
             <p className="max-w-xl text-base leading-7 text-[#64748d] sm:text-lg">
-              Gridly convierte tu año financiero en una cadena coherente: desde el saldo inicial hasta el cierre mensual, con resumen anual, edición rápida y exportación a Excel.
+              {t("heroDescription")}
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
-            <p className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-              Accede con tu cuenta de Google
-              <ArrowRight className="size-4" />
-            </p>
-            <GoogleSignInButton />
-          </div>
+
           <div className="grid gap-3 sm:grid-cols-3">
             {FEATURES.map(({ icon: Icon, title, description }) => (
               <Card key={title} className="rounded-[1.5rem] border-border/70 bg-white/82 shadow-[0_24px_50px_-38px_rgba(50,50,93,0.3)] backdrop-blur-sm">
@@ -76,25 +73,25 @@ export function PublicHero() {
             <CardContent className="space-y-6 p-6 sm:p-8">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.26em] text-muted-foreground">Vista previa</p>
-                  <h2 className="mt-2 text-2xl font-light tracking-tight text-[#061b31]">Ejercicio 2026</h2>
+                  <p className="text-xs font-semibold uppercase tracking-[0.26em] text-muted-foreground">{t("preview.title")}</p>
+                  <h2 className="mt-2 text-2xl font-light tracking-tight text-[#061b31]">{t("preview.yearLabel")}</h2>
                 </div>
                 <div className="rounded-full border border-border/70 bg-muted/50 px-3 py-1 text-xs font-medium text-muted-foreground">
-                  Cuenta privada
+                  {t("preview.privateAccount")}
                 </div>
               </div>
 
               <div className="grid gap-3 sm:grid-cols-3">
                 <div className="rounded-2xl border border-border/70 bg-[linear-gradient(180deg,rgba(83,58,253,0.08),rgba(255,255,255,0.9))] p-4">
-                  <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">Saldo anual</p>
+                  <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">{t("preview.annualBalance")}</p>
                   <p className="mt-3 finance-number text-2xl font-semibold tracking-tight text-[#061b31]">€18.420</p>
                 </div>
                 <div className="rounded-2xl border border-border/70 bg-white p-4">
-                  <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">Ahorro medio</p>
+                  <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">{t("preview.avgSavings")}</p>
                   <p className="mt-3 finance-number text-2xl font-semibold tracking-tight text-[#061b31]">€1.245</p>
                 </div>
                 <div className="rounded-2xl border border-border/70 bg-white p-4">
-                  <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">Pagas extra</p>
+                  <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">{t("preview.extraPays")}</p>
                   <p className="mt-3 finance-number text-2xl font-semibold tracking-tight text-[#061b31]">2</p>
                 </div>
               </div>
@@ -102,24 +99,24 @@ export function PublicHero() {
               <div className="rounded-[1.5rem] border border-border/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(246,248,252,0.92))] p-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-[#061b31]">Mes actual</p>
-                    <p className="mt-1 text-sm text-muted-foreground">Balance conectado con el cierre anterior</p>
+                    <p className="text-sm font-medium text-[#061b31]">{t("preview.currentMonth")}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">{t("preview.connectedBalance")}</p>
                   </div>
                   <div className="rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground">
-                    Abril
+                    {t("preview.monthName")}
                   </div>
                 </div>
                 <div className="mt-5 space-y-4">
                   <div className="grid grid-cols-[1fr_auto] items-center gap-3">
-                    <p className="text-sm text-muted-foreground">Ingresos totales</p>
+                    <p className="text-sm text-muted-foreground">{t("preview.totalIncome")}</p>
                     <p className="finance-number text-sm font-semibold text-[#061b31]">€3.450</p>
                   </div>
                   <div className="grid grid-cols-[1fr_auto] items-center gap-3">
-                    <p className="text-sm text-muted-foreground">Gastos totales</p>
+                    <p className="text-sm text-muted-foreground">{t("preview.totalExpenses")}</p>
                     <p className="finance-number text-sm font-semibold text-[#061b31]">€2.185</p>
                   </div>
                   <div className="grid grid-cols-[1fr_auto] items-center gap-3 border-t border-border/70 pt-4">
-                    <p className="text-sm font-medium text-[#061b31]">Ahorro del mes</p>
+                    <p className="text-sm font-medium text-[#061b31]">{t("preview.monthlySavings")}</p>
                     <p className="finance-number text-base font-semibold text-primary">€1.265</p>
                   </div>
                 </div>

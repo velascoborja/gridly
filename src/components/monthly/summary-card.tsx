@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
 import type { MonthData } from "@/lib/types";
@@ -22,25 +23,27 @@ function SummaryRow({ label, value, highlight, positive }: { label: string; valu
 }
 
 export function SummaryCard({ month }: Props) {
+  const t = useTranslations("Monthly.summary");
+
   return (
     <Card className="border-border/80 bg-gradient-to-b from-background to-muted/30 shadow-md shadow-black/5">
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-medium">Resumen del mes</CardTitle>
+        <CardTitle className="text-sm font-medium">{t("title")}</CardTitle>
         <p className="text-xs text-muted-foreground">
-          Lectura final del mes con saldo, gasto y ahorro neto.
+          {t("description")}
         </p>
       </CardHeader>
       <CardContent className="space-y-0">
-        <SummaryRow label="Saldo inicial" value={month.startingBalance} />
-        <SummaryRow label="Total ingresos" value={month.totalIncome} />
-        <SummaryRow label="Total gastos" value={month.totalExpenses} />
+        <SummaryRow label={t("startingBalance")} value={month.startingBalance} />
+        <SummaryRow label={t("totalIncome")} value={month.totalIncome} />
+        <SummaryRow label={t("totalExpenses")} value={month.totalExpenses} />
         <SummaryRow
-          label="Ahorro"
+          label={t("netSavings")}
           value={month.savings}
           positive={month.savings >= 0}
         />
         <SummaryRow
-          label="Saldo final"
+          label={t("endingBalance")}
           value={month.endingBalance}
           highlight
         />

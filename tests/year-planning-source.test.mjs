@@ -34,15 +34,15 @@ test("month and additional entry mutations propagate future year balances", asyn
 
 test("setup and monthly entrypoints expose only guided next-year creation", async () => {
   const setupSource = await readSource("src/components/setup/setup-page-client.tsx");
-  const monthPageSource = await readSource("src/app/[year]/[month]/page.tsx");
+  const monthPageSource = await readSource("src/app/[locale]/[year]/[month]/page.tsx");
   const navSource = await readSource("src/components/layout/nav-selectors.tsx");
 
   assert.match(setupSource, /derivedStartingBalance/, "setup should load and display the derived carry-over balance");
-  assert.match(setupSource, /Solo puedes crear el siguiente ejercicio/, "setup should explain the sequential year rule");
+  assert.match(setupSource, /t\("descriptionFixed"/, "setup should explain the sequential year rule");
   assert.match(monthPageSource, /nextCreatableYear/, "missing-year screen should compute the next allowed year");
-  assert.match(monthPageSource, /Crear \{nextCreatableYear\}/, "missing-year screen should point to the next allowed year only");
+  assert.match(monthPageSource, /tCommon\("missingYearDescription"\)/, "missing-year screen should explain sequential rule");
   assert.match(navSource, /Plus/, "nav selector should render a plus icon for year creation");
-  assert.match(navSource, /aria-label=\{`Crear \$\{nextCreatableYear\}`\}/, "nav selector should keep an accessible label for the icon-only create button");
+  assert.match(navSource, /aria-label=\{t\("createYear"/, "nav selector should keep an accessible label for the icon-only create button");
   assert.doesNotMatch(navSource, />\s*Crear \{nextCreatableYear\}\s*</, "nav selector should no longer show a text create-year button");
 });
 
@@ -50,5 +50,5 @@ test("year config source no longer offers editing the starting balance field", a
   const source = await readSource("src/components/annual/year-config-form.tsx");
 
   assert.doesNotMatch(source, /label=\"Saldo inicial del año\"/, "year config form should not render inline editing for startingBalance");
-  assert.match(source, /Saldo inicial vinculado/, "year config form should explain that starting balance is linked");
+  assert.match(source, /t\("startingBalanceLabel"\)/, "year config form should explain that starting balance is linked");
 });

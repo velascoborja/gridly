@@ -17,6 +17,6 @@ test("annual summary source no longer exposes the prefill action", async () => {
 test("setup source keeps the create-and-prefill onboarding flow", async () => {
   const source = await readSource("src/components/setup/setup-page-client.tsx");
 
-  assert.match(source, /Crear y rellenar estimaciones/, "setup should keep the onboarding CTA");
+  assert.match(source, /t\("submit"\)/, "setup should keep the onboarding CTA");
   assert.match(source, /\/api\/years\/\$\{year\}\/prefill/, "setup should still call the prefill endpoint");
 });
