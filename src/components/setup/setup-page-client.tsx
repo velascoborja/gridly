@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -90,11 +91,15 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
           <div className="relative flex h-full flex-col justify-between gap-10">
             <div className="space-y-6">
               <div className="flex items-center gap-3">
-                <span className="flex size-11 items-center justify-center rounded-2xl bg-white text-sm font-semibold text-slate-950 shadow-[0_14px_30px_-18px_rgba(255,255,255,0.55)]">
-                  G
-                </span>
+                <Image
+                  src="/logo-v2.png"
+                  alt="Gridly"
+                  width={48}
+                  height={48}
+                  className="rounded-2xl shadow-[0_14px_30px_-18px_rgba(255,255,255,0.55)]"
+                />
                 <div className="space-y-0.5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.26em] text-white/70">
+                  <p className="text-sm font-semibold uppercase tracking-[0.26em] text-white/70">
                     Gridly
                   </p>
                   <p className="text-sm text-white/70">{t("subtitle")}</p>

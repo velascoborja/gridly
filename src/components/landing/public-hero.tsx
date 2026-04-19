@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 import { Link } from "@/i18n/routing";
 import { ChartColumnBig, PiggyBank, Wallet } from "lucide-react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
@@ -30,10 +31,14 @@ export function PublicHero() {
       <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[linear-gradient(180deg,rgba(255,255,255,0.88),transparent)]" />
       <header className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
         <Link href="/" className="group inline-flex items-center gap-3">
-          <span className="flex size-11 items-center justify-center rounded-2xl bg-primary text-sm font-semibold text-primary-foreground shadow-[0_18px_36px_-22px_rgba(83,58,253,0.8)] transition-transform duration-200 group-hover:-translate-y-0.5">
-            G
-          </span>
-          <span className="text-lg font-semibold tracking-tight leading-none text-[#061b31]">Gridly</span>
+          <Image
+            src="/logo-v2.png"
+            alt="Gridly"
+            width={48}
+            height={48}
+            className="rounded-2xl shadow-[0_18px_36px_-22px_rgba(83,58,253,0.8)] transition-transform duration-200 group-hover:-translate-y-0.5"
+          />
+          <span className="text-xl font-semibold tracking-tight leading-none text-[#061b31]">Gridly</span>
         </Link>
         <GoogleSignInButton />
       </header>

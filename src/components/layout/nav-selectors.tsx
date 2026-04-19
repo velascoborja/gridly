@@ -18,7 +18,7 @@ import {
 interface Props {
   currentYear: number;
   currentMonth: number | null;
-  view: "overview" | "summary" | "detail";
+  view: "overview" | "summary" | "detail" | "settings";
   years: number[];
 }
 

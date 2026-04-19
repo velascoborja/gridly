@@ -16,7 +16,7 @@ export default async function SettingsPage() {
     <AppShell 
       currentYear={defaultYear} 
       currentMonth={currentMonth} 
-      view="overview" 
+      view="settings" 
       years={years.length > 0 ? years : [defaultYear]} 
       user={user}
     >
