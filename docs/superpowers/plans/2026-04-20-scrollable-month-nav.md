@@ -79,24 +79,33 @@ git add src/components/layout/nav-selectors.tsx
 git commit -m "style: add snap-scrolling and hide scrollbar for month nav"
 ```
 
-### Task 3: Desktop Refinement
+### Task 3: Desktop Refinement & Design Alignment
 
 **Files:**
 - Modify: `src/components/layout/nav-selectors.tsx`
 
-- [ ] **Step 1: Ensure desktop view doesn't have unnecessary padding or snap behavior if months fit**
+- [ ] **Step 1: Refactor "pill-shaped" elements to follow DESIGN.md**
+
+```tsx
+// Replace rounded-full with rounded-lg or rounded-md (6px-8px)
+// Affected: SelectTrigger, createYear Link, mainTabs Links, Month Links
+```
+
+- [ ] **Step 2: Add scroll-px-4 and refine desktop view**
 
 ```tsx
 // Adjust container classes:
-// <div 
-//   ref={scrollContainerRef}
-//   className="flex justify-start gap-1 overflow-x-auto pb-1 md:pb-0 snap-x snap-mandatory scrollbar-hide px-8 sm:px-12 md:justify-center md:px-0 md:snap-none"
-// >
+// Add scroll-px-4 for better edge snapping on mobile
+// Ensure md:snap-none and md:px-0 for desktop
+<div 
+  ref={scrollContainerRef}
+  className="flex justify-start gap-1 overflow-x-auto pb-1 md:pb-0 snap-x snap-mandatory scrollbar-hide px-8 sm:px-12 scroll-px-4 md:justify-center md:px-0 md:snap-none"
+>
 ```
 
-- [ ] **Step 2: Commit final refinements**
+- [ ] **Step 3: Commit final refinements**
 
 ```bash
 git add src/components/layout/nav-selectors.tsx
-git commit -m "style: refine month nav desktop alignment"
+git commit -m "style: align navigation with DESIGN.md and refine desktop view"
 ```
