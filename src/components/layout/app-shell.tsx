@@ -1,4 +1,7 @@
-import Link from "next/link";
+"use client";
+
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/routing";
 import { NavSelectors } from "./nav-selectors";
 import { UserMenu } from "@/components/auth/user-menu";
 
@@ -15,6 +18,7 @@ interface Props {
 }
 
 export function AppShell({ currentYear, currentMonth, view, years, user, children }: Props) {
+  const t = useTranslations("Common");
   return (
     <div className="relative min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(64,148,255,0.12),transparent_32%),radial-gradient(circle_at_top_right,rgba(16,185,129,0.08),transparent_28%),linear-gradient(180deg,rgba(248,250,252,0.96),rgba(255,255,255,1))] text-foreground">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[linear-gradient(180deg,rgba(255,255,255,0.75),transparent)]" />
@@ -24,13 +28,12 @@ export function AppShell({ currentYear, currentMonth, view, years, user, childre
             <span className="flex size-11 items-center justify-center rounded-2xl bg-primary text-sm font-semibold text-primary-foreground shadow-[0_14px_30px_-18px_rgba(15,23,42,0.6)] transition-transform duration-200 group-hover:-translate-y-0.5">
               G
             </span>
-            <span className="flex flex-col leading-none">
-              <span className="text-lg font-semibold tracking-tight">Gridly</span>
-              <span className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Panorama financiero</span>
-            </span>
+            <span className="text-lg font-semibold tracking-tight leading-none">Gridly</span>
           </Link>
           <div className="flex flex-col gap-3 xl:items-end">
-            <UserMenu email={user.email} name={user.name} />
+            <div className="flex items-center justify-end gap-3">
+              <UserMenu email={user.email} name={user.name} />
+            </div>
             <NavSelectors currentYear={currentYear} currentMonth={currentMonth} view={view} years={years} />
           </div>
         </div>
