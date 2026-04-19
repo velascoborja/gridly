@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
@@ -52,6 +53,9 @@ export default async function RootLayout({
         <NextIntlClientProvider messages={messages}>
           {children}
         </NextIntlClientProvider>
+        <Script id="ios-active-states" strategy="afterInteractive">
+          {`document.addEventListener('touchstart', function() {}, true);`}
+        </Script>
       </body>
     </html>
   );
