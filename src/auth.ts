@@ -16,17 +16,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     authenticatorsTable: authenticators,
   }),
   providers: [Google],
-  callbacks: {
-    async signIn({ user }) {
+  events: {
+    async createUser({ user }) {
       if (user.id) {
         await claimLegacyYearsForUser(user.id, user.email);
       }
-
-      return true;
     },
-    session({ session, user }) {
-      if (session.user) {
+  },
+  callbacks: {
+    async session({ session, user }) {
+      if (session.user && user.id) {
         session.user.id = user.id;
+        await claimLegacyYearsForUser(user.id, user.email);
       }
 
       return session;
