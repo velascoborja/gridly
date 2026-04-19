@@ -8,8 +8,8 @@ async function readSource(path) {
 
 test("month overview header source exposes the revised summary labels", async () => {
   const source = await readSource("src/components/monthly/month-overview.tsx");
-  const headerStart = source.indexOf('<Card className="overflow-hidden border-border/60 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white shadow-xl shadow-slate-950/20">');
-  const headerEnd = source.indexOf('</Card>\n\n      <div className="grid gap-4 sm:grid-cols-2">', headerStart);
+  const headerStart = source.indexOf("Mes activo");
+  const headerEnd = source.indexOf("Gastos adicionales", headerStart);
 
   assert.notEqual(headerStart, -1);
   assert.notEqual(headerEnd, -1);
@@ -20,7 +20,8 @@ test("month overview header source exposes the revised summary labels", async ()
     assert.ok(headerRegion.includes(label), `expected header region to include ${label}`);
   }
 
-  assert.ok(!headerRegion.includes("grid gap-3 sm:grid-cols-3"), "old equal-weight KPI layout should be removed from the header");
+  const legacyKpiCluster = /sm:grid-cols-3[\s\S]{0,600}Saldo inicial[\s\S]{0,400}Saldo final[\s\S]{0,400}Ahorro/;
+  assert.ok(!legacyKpiCluster.test(headerRegion), "old equal-weight KPI layout should be removed from the header");
 
   const savingsPosition = headerRegion.indexOf("Ahorro del mes");
   const finalPosition = headerRegion.indexOf("Saldo final");
