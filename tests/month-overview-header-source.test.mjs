@@ -151,7 +151,7 @@ test("month overview header source exposes the revised summary labels", async ()
   const headerCard = cardCandidates.find((card) => {
     const texts = [];
     collectJsxTexts(card, sourceFile, texts);
-    return texts.includes("Saldo inicial") && texts.includes("Saldo final");
+    return texts.includes("Inicial") && texts.includes("Saldo Final");
   });
 
   assert.ok(headerCard, "expected to find the summary Card in the main return tree");
@@ -159,19 +159,19 @@ test("month overview header source exposes the revised summary labels", async ()
   const texts = [];
   collectJsxTexts(headerCard, sourceFile, texts);
 
-  for (const label of ["Ahorro del mes", "Saldo final", "Saldo inicial", "Ingresos", "Gastos"]) {
+  for (const label of ["Ahorro Neto", "Saldo Final", "Inicial", "Ingresos", "Gastos"]) {
     assert.ok(texts.includes(label), `expected header card to include ${label}`);
   }
 
   assert.ok(!hasLegacyPeerCluster(headerCard, sourceFile), "old equal-weight KPI layout should be removed from the header card");
 
-  const savingsPosition = texts.indexOf("Ahorro del mes");
-  const finalPosition = texts.indexOf("Saldo final");
-  const initialPosition = texts.indexOf("Saldo inicial");
+  const savingsPosition = texts.indexOf("Ahorro Neto");
+  const finalPosition = texts.indexOf("Saldo Final");
+  const initialPosition = texts.indexOf("Inicial");
 
   assert.notEqual(savingsPosition, -1);
   assert.notEqual(finalPosition, -1);
   assert.notEqual(initialPosition, -1);
-  assert.ok(savingsPosition < initialPosition, "Ahorro del mes should appear before Saldo inicial");
-  assert.ok(finalPosition < initialPosition, "Saldo final should appear before Saldo inicial");
+  assert.ok(savingsPosition < initialPosition, "Ahorro Neto should appear before Inicial");
+  assert.ok(finalPosition < initialPosition, "Saldo Final should appear before Inicial");
 });
