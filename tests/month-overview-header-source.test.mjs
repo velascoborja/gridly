@@ -20,7 +20,7 @@ test("month overview header source exposes the revised summary labels", async ()
     assert.ok(headerRegion.includes(label), `expected header region to include ${label}`);
   }
 
-  assert.ok(!headerRegion.includes(">Ahorro</p>"), "old standalone Ahorro label should be removed from the header");
+  assert.ok(!headerRegion.includes("sm:grid-cols-3"), "old equal-weight KPI layout should be removed from the header");
 
   const savingsPosition = headerRegion.indexOf("Ahorro del mes");
   const finalPosition = headerRegion.indexOf("Saldo final");
