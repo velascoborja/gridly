@@ -114,7 +114,7 @@ export function NavSelectors({ currentYear, currentMonth, view, years }: Props) 
         <div className="w-full rounded-[1.15rem] border border-border/60 bg-background/80 p-1 shadow-sm md:w-auto">
           <div
             ref={scrollContainerRef}
-            className="flex justify-center gap-1 overflow-x-auto pb-1 md:pb-0"
+            className="flex snap-x snap-mandatory scrollbar-hide justify-start gap-1 overflow-x-auto px-4 pb-1 md:justify-center md:px-0 md:pb-0"
           >
             {MONTH_NAMES.map((name, i) => {
               const m = i + 1;
@@ -126,7 +126,7 @@ export function NavSelectors({ currentYear, currentMonth, view, years }: Props) 
                   href={`/${currentYear}/${m}`}
                   aria-current={active ? "page" : undefined}
                   aria-label={isCurrentMonth ? `${name}, mes actual` : name}
-                  className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-all ${
+                  className={`inline-flex shrink-0 snap-center items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-all ${
                     active
                       ? "border-primary bg-primary text-primary-foreground shadow-sm"
                       : isCurrentMonth
