@@ -21,6 +21,9 @@ interface Props {
 export function NavSelectors({ currentYear, currentMonth, view, years }: Props) {
   const router = useRouter();
   const detailMonth = currentMonth ?? new Date().getMonth() + 1;
+  const today = new Date();
+  const calendarYear = today.getFullYear();
+  const calendarMonth = today.getMonth() + 1;
 
   const handleYearChange = (val: string | null) => {
     if (!val) return;
@@ -84,18 +87,30 @@ export function NavSelectors({ currentYear, currentMonth, view, years }: Props) 
             {MONTH_NAMES.map((name, i) => {
               const m = i + 1;
               const active = currentMonth === m;
+              const isCurrentMonth = currentYear === calendarYear && m === calendarMonth;
               return (
                 <Link
                   key={m}
                   href={`/${currentYear}/${m}`}
                   aria-current={active ? "page" : undefined}
-                  className={`inline-flex shrink-0 items-center rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
+                  aria-label={isCurrentMonth ? `${name}, mes actual` : name}
+                  className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-all ${
                     active
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                      : isCurrentMonth
+                        ? "border-primary/30 bg-primary/[0.08] text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.55)] hover:border-primary/45 hover:bg-primary/[0.12]"
+                        : "border-transparent text-muted-foreground hover:bg-muted hover:text-foreground"
                   }`}
                 >
                   {name.slice(0, 3)}
+                  {isCurrentMonth && (
+                    <span
+                      aria-hidden="true"
+                      className={`size-1.5 rounded-full ${
+                        active ? "bg-primary-foreground/90" : "bg-primary"
+                      }`}
+                    />
+                  )}
                 </Link>
               );
             })}

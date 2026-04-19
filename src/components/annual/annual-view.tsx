@@ -7,7 +7,7 @@ import { BalanceChart } from "./balance-chart";
 import { SavingsChart } from "./savings-chart";
 import { YearConfigForm } from "./year-config-form";
 import type { YearData, YearConfig } from "@/lib/types";
-import { Download, RefreshCw, Settings } from "lucide-react";
+import { Download, Settings } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -23,7 +23,6 @@ interface Props {
 
 export function AnnualView({ yearData: initial }: Props) {
   const [config, setConfig] = useState<YearConfig>(initial.config);
-  const [prefilling, setPrefilling] = useState(false);
   const [savingConfig, setSavingConfig] = useState(false);
   const pendingSaveCountRef = useRef(0);
   const pendingSavesRef = useRef(new Set<Promise<void>>());
@@ -45,18 +44,6 @@ export function AnnualView({ yearData: initial }: Props) {
   const waitForPendingSaves = async () => {
     while (pendingSavesRef.current.size > 0) {
       await Promise.allSettled(Array.from(pendingSavesRef.current));
-    }
-  };
-
-  const handlePrefill = async () => {
-    if (!confirm("Esto sobreescribirá todos los meses con los valores estimados de la configuración. ¿Continuar?")) return;
-    setPrefilling(true);
-    try {
-      await waitForPendingSaves();
-      await fetch(`/api/years/${config.year}/prefill`, { method: "POST" });
-      window.location.reload();
-    } finally {
-      setPrefilling(false);
     }
   };
 
@@ -113,16 +100,6 @@ export function AnnualView({ yearData: initial }: Props) {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={handlePrefill}
-                disabled={prefilling || savingConfig}
-                className="border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white"
-              >
-                <RefreshCw className="mr-2 h-4 w-4" />
-                {prefilling ? "Rellenando…" : savingConfig ? "Guardando…" : "Rellenar estimaciones"}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
                 onClick={handleExport}
                 disabled={savingConfig}
                 className="border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white"
@@ -134,7 +111,7 @@ export function AnnualView({ yearData: initial }: Props) {
             <p className="text-xs leading-5 text-slate-400">
               {savingConfig
                 ? "Se están guardando cambios en la configuración antes de lanzar acciones del año."
-                : "El relleno sobrescribe los 12 meses con la configuración actual del año."}
+                : "Exporta el año completo en Excel con la configuración más reciente."}
             </p>
           </div>
         </div>
