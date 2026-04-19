@@ -30,19 +30,13 @@ export function PublicHero() {
           <span className="flex size-11 items-center justify-center rounded-2xl bg-primary text-sm font-semibold text-primary-foreground shadow-[0_18px_36px_-22px_rgba(83,58,253,0.8)] transition-transform duration-200 group-hover:-translate-y-0.5">
             G
           </span>
-          <span className="flex flex-col leading-none">
-            <span className="text-lg font-semibold tracking-tight text-[#061b31]">Gridly</span>
-            <span className="text-xs uppercase tracking-[0.24em] text-muted-foreground">Panorama financiero</span>
-          </span>
+          <span className="text-lg font-semibold tracking-tight leading-none text-[#061b31]">Gridly</span>
         </Link>
         <GoogleSignInButton />
       </header>
 
       <main className="relative z-10 mx-auto grid w-full max-w-7xl gap-12 px-4 pb-14 pt-10 sm:px-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(22rem,0.95fr)] lg:items-center lg:px-8 lg:pt-16">
         <section className="space-y-8">
-          <div className="inline-flex items-center rounded-full border border-primary/10 bg-white/75 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-primary shadow-[0_18px_40px_-32px_rgba(50,50,93,0.3)] backdrop-blur">
-            Finanzas personales con vista anual y mensual
-          </div>
           <div className="max-w-2xl space-y-5">
             <h1 className="max-w-3xl text-[clamp(2.8rem,7vw,5.1rem)] font-light tracking-[-0.05em] text-[#061b31]">
               Controla ingresos, gastos y ahorro con una visión que sí encaja.
@@ -51,12 +45,12 @@ export function PublicHero() {
               Gridly convierte tu año financiero en una cadena coherente: desde el saldo inicial hasta el cierre mensual, con resumen anual, edición rápida y exportación a Excel.
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-4">
-            <GoogleSignInButton />
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
             <p className="inline-flex items-center gap-2 text-sm text-muted-foreground">
               Accede con tu cuenta de Google
               <ArrowRight className="size-4" />
             </p>
+            <GoogleSignInButton />
           </div>
           <div className="grid gap-3 sm:grid-cols-3">
             {FEATURES.map(({ icon: Icon, title, description }) => (
