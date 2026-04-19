@@ -11,7 +11,10 @@
     "missingYearDescription": "Only the next available exercise can be created to keep the balance chain connected.",
     "nextStep": "Next step",
     "nextStepDescription": "Initialize {nextCreatableYear} to open the monthly detail and complete the planning.",
-    "createYearButton": "Create {year}"
+    "createYearButton": "Create {year}",
+    "logout_confirm_title": "Log out?",
+    "logout_confirm_description": "Are you sure you want to log out? You will need to sign in again to access your data.",
+    "cancel": "Cancel"
   },
   "Settings": {
     "title": "Settings",

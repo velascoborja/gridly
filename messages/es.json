@@ -11,7 +11,10 @@
     "missingYearDescription": "Solo puedes crear el siguiente ejercicio disponible para mantener la cadena de saldos conectada.",
     "nextStep": "Siguiente paso",
     "nextStepDescription": "Inicializa {nextCreatableYear} para abrir el detalle mensual y completar la planificación.",
-    "createYearButton": "Crear {year}"
+    "createYearButton": "Crear {year}",
+    "logout_confirm_title": "¿Cerrar sesión?",
+    "logout_confirm_description": "¿Estás seguro de que quieres salir? Tendrás que volver a identificarte para acceder a tus datos.",
+    "cancel": "Cancelar"
   },
   "Settings": {
     "title": "Ajustes",
