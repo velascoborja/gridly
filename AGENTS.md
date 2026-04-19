@@ -23,6 +23,7 @@ Personal finance tracker built with Next.js 16 (App Router), React 19, Drizzle O
 ## Design & Visual Identity
 
 Gridly follows a premium, fintech-inspired visual system (Stripe-like) documented in `DESIGN.md`.
+- **UI Authority:** Treat `DESIGN.md` as the source of truth for any UI, layout, typography, color, spacing, shadow, elevation, and component styling changes. Before modifying the UI, review the relevant sections in `DESIGN.md` and keep new work aligned with that spec.
 - **Primary Color:** Stripe Purple (`#533afd`).
 - **Typography:** Geist Sans with specific tracking and weight roles.
 - **Surfaces:** Layered depth system using ambient and elevated shadows.
@@ -54,5 +55,5 @@ Gridly follows a premium, fintech-inspired visual system (Stripe-like) documente
 
 - **Localization:** UI strings are in Spanish. **Do not translate to English.**
 - **Data Access:** Client components use `fetch()` to internal APIs; server components use Drizzle directly.
-- **Styling:** Adhere to Tailwind CSS v4 and the visual tokens defined in `src/app/globals.css`. Refer to `DESIGN.md` for spacing, elevation, and interactive states.
+- **Styling:** Adhere to Tailwind CSS v4 and the visual tokens defined in `src/app/globals.css`. For any UI modification, consult `DESIGN.md` first and follow its rules for spacing, elevation, typography, colors, interactive states, and component styling.
 - **Numeric Handling:** Convert DB strings to `number` immediately after reading and back to `string` for DB operations.
