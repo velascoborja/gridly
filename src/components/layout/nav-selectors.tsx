@@ -4,7 +4,6 @@ import { useRef, useEffect } from "react";
 import { useRouter, Link } from "@/i18n/routing";
 import { buttonVariants } from "@/components/ui/button";
 import { getNextCreatableYear } from "@/lib/server/year-planning";
-import { MONTH_NAMES } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -42,6 +41,12 @@ export function NavSelectors({ currentYear, currentMonth, view, years }: Props) 
   const today = new Date();
   const calendarYear = today.getFullYear();
   const calendarMonth = today.getMonth() + 1;
+
+  // Generate localized month names
+  const monthNames = Array.from({ length: 12 }, (_, i) => {
+    const date = new Date(2024, i, 1);
+    return new Intl.DateTimeFormat(undefined, { month: "long" }).format(date);
+  });
 
   const handleYearChange = (val: string | null) => {
     if (!val) return;
@@ -116,7 +121,7 @@ export function NavSelectors({ currentYear, currentMonth, view, years }: Props) 
             ref={scrollContainerRef}
             className="flex snap-x snap-mandatory scroll-px-4 scrollbar-hide justify-start gap-1 overflow-x-auto px-4 pb-1 md:justify-center md:snap-none md:px-0 md:pb-0"
           >
-            {MONTH_NAMES.map((name, i) => {
+            {monthNames.map((name, i) => {
               const m = i + 1;
               const active = currentMonth === m;
               const isCurrentMonth = currentYear === calendarYear && m === calendarMonth;
@@ -125,7 +130,7 @@ export function NavSelectors({ currentYear, currentMonth, view, years }: Props) 
                   key={m}
                   href={`/${currentYear}/${m}`}
                   aria-current={active ? "page" : undefined}
-                  aria-label={isCurrentMonth ? `${name}, mes actual` : name}
+                  aria-label={isCurrentMonth ? `${name}, ${t("currentMonthLabel")}` : name}
                   className={`inline-flex shrink-0 snap-center items-center gap-2 rounded-md border px-3 py-1.5 text-xs font-medium transition-all ${
                     active
                       ? "border-primary bg-primary text-primary-foreground shadow-sm"

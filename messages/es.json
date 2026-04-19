@@ -171,6 +171,7 @@
     "annualSummary": "Resumen anual",
     "monthlyDetail": "Detalle mensual",
     "yearLabel": "Año",
+    "currentMonthLabel": "mes actual",
     "createYear": "Crear año {year}"
 
   }

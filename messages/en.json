@@ -171,6 +171,7 @@
     "annualSummary": "Annual Summary",
     "monthlyDetail": "Monthly Detail",
     "yearLabel": "Year",
+    "currentMonthLabel": "current month",
     "createYear": "Create {year}"
 
   }
