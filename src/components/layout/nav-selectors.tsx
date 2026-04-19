@@ -46,10 +46,10 @@ export function NavSelectors({ currentYear, currentMonth, view, years }: Props) 
   ];
 
   return (
-    <div className="flex flex-col gap-3 xl:items-end">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-          <span className="sr-only sm:not-sr-only">Año</span>
+    <div className="flex flex-col items-center gap-3 md:items-end">
+      <div className="flex flex-col items-center gap-3 md:flex-row">
+        <div className="flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+          <span className="sr-only md:not-sr-only">Año</span>
           <Select value={String(currentYear)} onValueChange={handleYearChange}>
             <SelectTrigger className="h-9 rounded-full border-border/70 bg-background/90 pl-4 pr-4 font-medium text-foreground shadow-sm focus:border-primary focus:ring-primary/20">
               <SelectValue />
@@ -76,7 +76,7 @@ export function NavSelectors({ currentYear, currentMonth, view, years }: Props) 
         </div>
 
         <div className="rounded-[1.25rem] border border-border/70 bg-muted/40 p-1 shadow-sm">
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap justify-center gap-1">
             {mainTabs.map((tab) => {
               const active = view === tab.key;
               return (
@@ -99,8 +99,8 @@ export function NavSelectors({ currentYear, currentMonth, view, years }: Props) 
       </div>
 
       {view === "detail" && (
-        <div className="rounded-[1.15rem] border border-border/60 bg-background/80 p-1 shadow-sm">
-          <div className="flex gap-1 overflow-x-auto">
+        <div className="w-full rounded-[1.15rem] border border-border/60 bg-background/80 p-1 shadow-sm md:w-auto">
+          <div className="flex justify-center gap-1 overflow-x-auto pb-1 md:pb-0">
             {MONTH_NAMES.map((name, i) => {
               const m = i + 1;
               const active = currentMonth === m;

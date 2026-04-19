@@ -81,123 +81,127 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
           {t("description")}
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3">
-        {entries.length === 0 && !adding && (
-          <div className="rounded-xl border border-dashed border-border/70 bg-muted/20 px-3 py-4 text-sm text-muted-foreground">
-            {t("noEntries")}
-          </div>
-        )}
-        {entries.map((entry) =>
-          editingId === entry.id ? (
-            <div key={entry.id} className="rounded-xl border border-border/70 bg-muted/20 p-2">
+      <CardContent className="flex flex-col gap-3">
+        <div className="order-first md:order-last">
+          {adding ? (
+            <div className="rounded-xl border border-border/70 bg-muted/20 p-2">
               <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto] sm:items-center">
                 <Input
                   className="h-9 min-w-0 text-sm"
-                  value={editLabel}
-                  onChange={(e) => setEditLabel(e.target.value)}
+                  placeholder={t("descriptionPlaceholder")}
+                  value={newLabel}
+                  onChange={(e) => setNewLabel(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") handleEdit(entry.id);
-                    if (e.key === "Escape") setEditingId(null);
+                    if (e.key === "Enter") handleAdd();
+                    if (e.key === "Escape") closeAddForm();
                   }}
                   autoFocus
                 />
                 <Input
                   className="h-9 w-full text-right text-sm sm:w-28"
-                  value={editAmount}
-                  onChange={(e) => setEditAmount(e.target.value)}
+                  placeholder="0.00"
+                  value={newAmount}
+                  onChange={(e) => setNewAmount(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") handleEdit(entry.id);
-                    if (e.key === "Escape") setEditingId(null);
+                    if (e.key === "Enter") handleAdd();
+                    if (e.key === "Escape") closeAddForm();
                   }}
                   inputMode="decimal"
                 />
-                <Button size="sm" className="h-9 px-3 sm:w-auto" onClick={() => handleEdit(entry.id)}>
-                  {common("save")}
+                <Button size="sm" className="h-9 px-3 sm:w-auto" onClick={handleAdd}>
+                  {t("add")}
                 </Button>
-                <Button size="sm" variant="ghost" className="h-9 px-3 sm:w-auto" onClick={() => setEditingId(null)}>
-                  {t("cancel")}
+                <Button size="sm" variant="ghost" className="h-9 px-3 sm:w-auto" onClick={closeAddForm}>
+                  <X className="h-3.5 w-3.5" />
                 </Button>
               </div>
             </div>
           ) : (
-            <div key={entry.id} className="rounded-xl border border-transparent px-2 py-2 transition-colors hover:border-border/70 hover:bg-muted/40">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <button
-                  className="min-w-0 flex-1 text-left text-sm font-medium text-foreground transition-colors hover:text-primary focus-visible:text-primary"
-                  onClick={() => openEditForm(entry)}
-                  type="button"
-                  aria-label={`${t("edit")} ${entry.label}`}
-                >
-                  {entry.label}
-                </button>
-                <div className="flex items-center gap-1.5 sm:shrink-0">
-                  <span className="text-sm font-semibold tabular-nums">{formatCurrency(entry.amount)}</span>
-                  <Button
-                    size="icon-xs"
-                    variant="ghost"
-                    className="text-muted-foreground hover:text-foreground"
-                    onClick={() => openEditForm(entry)}
-                    aria-label={`${t("edit")} ${entry.label}`}
-                  >
-                    <Pencil className="h-3 w-3" />
+            <button
+              className="inline-flex items-center gap-2 rounded-md text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              onClick={() => setAdding(true)}
+              type="button"
+            >
+              <Plus className="h-3.5 w-3.5" /> {t("addEntry")}
+            </button>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-3 order-last md:order-first">
+          {entries.length === 0 && !adding && (
+            <div className="rounded-xl border border-dashed border-border/70 bg-muted/20 px-3 py-4 text-sm text-muted-foreground">
+              {t("noEntries")}
+            </div>
+          )}
+          {entries.map((entry) =>
+            editingId === entry.id ? (
+              <div key={entry.id} className="rounded-xl border border-border/70 bg-muted/20 p-2">
+                <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto] sm:items-center">
+                  <Input
+                    className="h-9 min-w-0 text-sm"
+                    value={editLabel}
+                    onChange={(e) => setEditLabel(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleEdit(entry.id);
+                      if (e.key === "Escape") setEditingId(null);
+                    }}
+                    autoFocus
+                  />
+                  <Input
+                    className="h-9 w-full text-right text-sm sm:w-28"
+                    value={editAmount}
+                    onChange={(e) => setEditAmount(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleEdit(entry.id);
+                      if (e.key === "Escape") setEditingId(null);
+                    }}
+                    inputMode="decimal"
+                  />
+                  <Button size="sm" className="h-9 px-3 sm:w-auto" onClick={() => handleEdit(entry.id)}>
+                    {common("save")}
                   </Button>
-                  <Button
-                    size="icon-xs"
-                    variant="ghost"
-                    className="text-muted-foreground hover:text-destructive"
-                    onClick={() => handleDelete(entry.id)}
-                    aria-label={`${t("delete")} ${entry.label}`}
-                  >
-                    <Trash2 className="h-3 w-3" />
+                  <Button size="sm" variant="ghost" className="h-9 px-3 sm:w-auto" onClick={() => setEditingId(null)}>
+                    {t("cancel")}
                   </Button>
                 </div>
               </div>
-            </div>
-          )
-        )}
-
-        {adding ? (
-          <div className="rounded-xl border border-border/70 bg-muted/20 p-2">
-            <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto] sm:items-center">
-              <Input
-                className="h-9 min-w-0 text-sm"
-                placeholder={t("descriptionPlaceholder")}
-                value={newLabel}
-                onChange={(e) => setNewLabel(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleAdd();
-                  if (e.key === "Escape") closeAddForm();
-                }}
-                autoFocus
-              />
-              <Input
-                className="h-9 w-full text-right text-sm sm:w-28"
-                placeholder="0.00"
-                value={newAmount}
-                onChange={(e) => setNewAmount(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleAdd();
-                  if (e.key === "Escape") closeAddForm();
-                }}
-                inputMode="decimal"
-              />
-              <Button size="sm" className="h-9 px-3 sm:w-auto" onClick={handleAdd}>
-                {t("add")}
-              </Button>
-              <Button size="sm" variant="ghost" className="h-9 px-3 sm:w-auto" onClick={closeAddForm}>
-                <X className="h-3.5 w-3.5" />
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <button
-            className="inline-flex items-center gap-2 rounded-md text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-            onClick={() => setAdding(true)}
-            type="button"
-          >
-            <Plus className="h-3.5 w-3.5" /> {t("addEntry")}
-          </button>
-        )}
+            ) : (
+              <div key={entry.id} className="rounded-xl border border-transparent px-2 py-2 transition-colors hover:border-border/70 hover:bg-muted/40">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <button
+                    className="min-w-0 flex-1 text-left text-sm font-medium text-foreground transition-colors hover:text-primary focus-visible:text-primary"
+                    onClick={() => openEditForm(entry)}
+                    type="button"
+                    aria-label={`${t("edit")} ${entry.label}`}
+                  >
+                    {entry.label}
+                  </button>
+                  <div className="flex items-center gap-1.5 sm:shrink-0">
+                    <span className="text-sm font-semibold tabular-nums">{formatCurrency(entry.amount)}</span>
+                    <Button
+                      size="icon-xs"
+                      variant="ghost"
+                      className="text-muted-foreground hover:text-foreground"
+                      onClick={() => openEditForm(entry)}
+                      aria-label={`${t("edit")} ${entry.label}`}
+                    >
+                      <Pencil className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      size="icon-xs"
+                      variant="ghost"
+                      className="text-muted-foreground hover:text-destructive"
+                      onClick={() => handleDelete(entry.id)}
+                      aria-label={`${t("delete")} ${entry.label}`}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )
+          )}
+        </div>
       </CardContent>
     </Card>
   );

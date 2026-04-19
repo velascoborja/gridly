@@ -130,9 +130,9 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
     <div className="space-y-6">
       <Card className="overflow-hidden border-white/10 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white shadow-xl">
         <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+          <div className="flex flex-col items-center gap-8 text-center md:flex-row md:items-center md:justify-between md:text-left">
             {/* Left: Identification */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
+            <div className="flex flex-col items-center gap-4 sm:gap-8 md:flex-row">
               <div>
                 <h2 className="text-2xl font-bold tracking-tight capitalize">
                   {MONTH_NAMES[month.month - 1]} {config.year}
@@ -143,7 +143,7 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
                 </div>
               </div>
               
-              <div className="h-12 w-px bg-white/10 hidden sm:block" />
+              <div className="hidden h-12 w-px bg-white/10 md:block" />
 
               {/* Center: Primary KPIs */}
               <div className="flex gap-8">
@@ -163,7 +163,7 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
             </div>
 
             {/* Right: Secondary Stats */}
-            <div className="flex gap-6 pt-4 border-t border-white/10 md:pt-0 md:border-t-0 md:border-l md:pl-8">
+            <div className="flex w-full justify-center gap-6 border-t border-white/10 pt-4 md:w-auto md:border-l md:border-t-0 md:pl-8 md:pt-0">
               <div className="space-y-1 md:text-right">
                 <p className="text-xs uppercase tracking-widest text-white/30 font-bold">Inicial</p>
                 <p className="text-base font-medium tabular-nums text-white/80">{formatCurrency(month.startingBalance)}</p>
@@ -187,47 +187,51 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
             <CardTitle className="text-sm font-medium">Gastos adicionales</CardTitle>
             <p className="text-xs text-muted-foreground">Movimientos puntuales que reducen el ahorro del mes.</p>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {month.additionalExpenses.length > 0 ? (
-              <div className="space-y-1.5">
-                {month.additionalExpenses.map((entry) => (
-                  <div key={entry.id} className="flex items-center justify-between rounded-lg px-2 py-1.5 transition-colors hover:bg-muted/60">
-                    <span className="text-sm text-muted-foreground">{entry.label}</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium tabular-nums">{formatCurrency(entry.amount)}</span>
-                      <button
-                        className="rounded-md p-1 text-muted-foreground transition-colors hover:text-destructive focus-visible:text-destructive"
-                        onClick={() => handleEntryDelete("expense", entry.id)}
-                        aria-label={`Eliminar gasto ${entry.label}`}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="rounded-xl border border-dashed border-border/70 bg-muted/20 px-3 py-4 text-sm text-muted-foreground">
-                No hay gastos adicionales todavía. Añade uno si este mes tiene un ajuste puntual.
-              </div>
-            )}
+          <CardContent className="flex flex-col gap-3">
+            <div className="order-first md:order-last">
+              {addingType === "expense" ? (
+                <QuickAddForm
+                  monthId={month.id}
+                  type="expense"
+                  onAdd={(e) => handleEntryAdded("expense", e)}
+                  onCancel={() => setAddingType(null)}
+                />
+              ) : (
+                <button
+                  className="inline-flex items-center gap-2 rounded-md text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  onClick={() => setAddingType("expense")}
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Añadir gasto extra
+                </button>
+              )}
+            </div>
 
-            {addingType === "expense" ? (
-              <QuickAddForm
-                monthId={month.id}
-                type="expense"
-                onAdd={(e) => handleEntryAdded("expense", e)}
-                onCancel={() => setAddingType(null)}
-              />
-            ) : (
-              <button
-                className="inline-flex items-center gap-2 rounded-md text-sm text-muted-foreground transition-colors hover:text-foreground"
-                onClick={() => setAddingType("expense")}
-              >
-                <Plus className="h-3.5 w-3.5" />
-                Añadir gasto extra
-              </button>
-            )}
+            <div className="order-last md:order-first">
+              {month.additionalExpenses.length > 0 ? (
+                <div className="space-y-1.5">
+                  {month.additionalExpenses.map((entry) => (
+                    <div key={entry.id} className="flex items-center justify-between rounded-lg px-2 py-1.5 transition-colors hover:bg-muted/60">
+                      <span className="text-sm text-muted-foreground">{entry.label}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium tabular-nums">{formatCurrency(entry.amount)}</span>
+                        <button
+                          className="rounded-md p-1 text-muted-foreground transition-colors hover:text-destructive focus-visible:text-destructive"
+                          onClick={() => handleEntryDelete("expense", entry.id)}
+                          aria-label={`Eliminar gasto ${entry.label}`}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-xl border border-dashed border-border/70 bg-muted/20 px-3 py-4 text-sm text-muted-foreground">
+                  No hay gastos adicionales todavía. Añade uno si este mes tiene un ajuste puntual.
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
 
@@ -236,47 +240,51 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
             <CardTitle className="text-sm font-medium">Ingresos adicionales</CardTitle>
             <p className="text-xs text-muted-foreground">Entradas extraordinarias que mejoran el saldo final.</p>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {month.additionalIncomes.length > 0 ? (
-              <div className="space-y-1.5">
-                {month.additionalIncomes.map((entry) => (
-                  <div key={entry.id} className="flex items-center justify-between rounded-lg px-2 py-1.5 transition-colors hover:bg-muted/60">
-                    <span className="text-sm text-muted-foreground">{entry.label}</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium tabular-nums">{formatCurrency(entry.amount)}</span>
-                      <button
-                        className="rounded-md p-1 text-muted-foreground transition-colors hover:text-destructive focus-visible:text-destructive"
-                        onClick={() => handleEntryDelete("income", entry.id)}
-                        aria-label={`Eliminar ingreso ${entry.label}`}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="rounded-xl border border-dashed border-border/70 bg-muted/20 px-3 py-4 text-sm text-muted-foreground">
-                No hay ingresos adicionales todavía. Registra una entrada puntual si corresponde.
-              </div>
-            )}
+          <CardContent className="flex flex-col gap-3">
+            <div className="order-first md:order-last">
+              {addingType === "income" ? (
+                <QuickAddForm
+                  monthId={month.id}
+                  type="income"
+                  onAdd={(e) => handleEntryAdded("income", e)}
+                  onCancel={() => setAddingType(null)}
+                />
+              ) : (
+                <button
+                  className="inline-flex items-center gap-2 rounded-md text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  onClick={() => setAddingType("income")}
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Añadir ingreso extra
+                </button>
+              )}
+            </div>
 
-            {addingType === "income" ? (
-              <QuickAddForm
-                monthId={month.id}
-                type="income"
-                onAdd={(e) => handleEntryAdded("income", e)}
-                onCancel={() => setAddingType(null)}
-              />
-            ) : (
-              <button
-                className="inline-flex items-center gap-2 rounded-md text-sm text-muted-foreground transition-colors hover:text-foreground"
-                onClick={() => setAddingType("income")}
-              >
-                <Plus className="h-3.5 w-3.5" />
-                Añadir ingreso extra
-              </button>
-            )}
+            <div className="order-last md:order-first">
+              {month.additionalIncomes.length > 0 ? (
+                <div className="space-y-1.5">
+                  {month.additionalIncomes.map((entry) => (
+                    <div key={entry.id} className="flex items-center justify-between rounded-lg px-2 py-1.5 transition-colors hover:bg-muted/60">
+                      <span className="text-sm text-muted-foreground">{entry.label}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium tabular-nums">{formatCurrency(entry.amount)}</span>
+                        <button
+                          className="rounded-md p-1 text-muted-foreground transition-colors hover:text-destructive focus-visible:text-destructive"
+                          onClick={() => handleEntryDelete("income", entry.id)}
+                          aria-label={`Eliminar ingreso ${entry.label}`}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-xl border border-dashed border-border/70 bg-muted/20 px-3 py-4 text-sm text-muted-foreground">
+                  No hay ingresos adicionales todavía. Registra una entrada puntual si corresponde.
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
       </div>

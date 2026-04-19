@@ -33,8 +33,8 @@ export function AppShell({ currentYear, currentMonth, view, years, user, childre
             />
             <span className="text-xl font-semibold tracking-tight leading-none">Gridly</span>
           </Link>
-          <div className="flex flex-col gap-3 xl:items-end">
-            <div className="flex items-center justify-end gap-3">
+          <div className="flex flex-col items-center gap-3 md:items-end">
+            <div className="flex w-full items-center justify-center gap-3 md:justify-end">
               <UserMenu email={user.email} name={user.name} active={view === "settings"} />
             </div>
             <NavSelectors currentYear={currentYear} currentMonth={currentMonth} view={view} years={years} />

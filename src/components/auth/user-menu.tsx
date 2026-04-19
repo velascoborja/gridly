@@ -21,10 +21,60 @@ interface Props {
   email?: string | null;
   name?: string | null;
   active?: boolean;
+  variant?: "header" | "footer";
 }
 
-export function UserMenu({ email, name, active }: Props) {
+export function UserMenu({ email, name, active, variant = "header" }: Props) {
   const t = useTranslations("Common");
+
+  if (variant === "footer") {
+    return (
+      <div className="flex w-full max-w-sm flex-col gap-3 items-center">
+        <div className="mb-2 text-center">
+          <p className="text-sm font-medium text-foreground">{name ?? t("account")}</p>
+          <p className="text-xs text-muted-foreground">{email}</p>
+        </div>
+        <Link
+          href="/settings"
+          className={cn(
+            "flex w-full items-center justify-center gap-2 rounded-lg border transition-all duration-200",
+            active
+              ? "border-primary bg-primary text-primary-foreground"
+              : "border-border/70 bg-background/85 text-muted-foreground hover:bg-muted hover:text-foreground"
+          )}
+        >
+          <Settings className="size-4.5" />
+          {t("settings")}
+        </Link>
+        
+        <Dialog>
+          <DialogTrigger render={
+            <Button variant="outline" className="w-full border-destructive/20 text-destructive hover:bg-destructive/10 hover:text-destructive">
+              {t("logout")}
+            </Button>
+          } />
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{t("logout_confirm_title")}</DialogTitle>
+              <DialogDescription>
+                {t("logout_confirm_description")}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter showCloseButton={false}>
+              <DialogClose render={<Button variant="outline" className="w-full sm:w-auto" />}>
+                {t("cancel")}
+              </DialogClose>
+              <form action={signOut}>
+                <Button type="submit" variant="destructive" className="w-full sm:w-auto">
+                  {t("logout")}
+                </Button>
+              </form>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center gap-3">

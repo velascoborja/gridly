@@ -58,7 +58,7 @@ export function AnnualView({ yearData: initial }: Props) {
     <div className="space-y-6">
       <section className="overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white shadow-xl shadow-slate-950/20">
         <div className="grid gap-6 px-6 py-7 md:px-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,0.85fr)] lg:items-end">
-          <div>
+          <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
             <div className="inline-flex rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.2em] text-white/70">
               {t("title")}
             </div>
@@ -99,8 +99,8 @@ export function AnnualView({ yearData: initial }: Props) {
             </p>
           </div>
 
-          <div className="space-y-3">
-            <div className="flex flex-wrap gap-2">
+          <div className="flex flex-col items-center space-y-3 lg:items-start">
+            <div className="flex flex-wrap justify-center gap-2 lg:justify-start">
               <Button
                 variant="outline"
                 size="sm"
@@ -112,7 +112,7 @@ export function AnnualView({ yearData: initial }: Props) {
                 {savingConfig ? t("saving") : t("exportExcel")}
               </Button>
             </div>
-            <p className="text-xs leading-5 text-slate-400">
+            <p className="text-center text-xs leading-5 text-slate-400 lg:text-left">
               {savingConfig
                 ? t("savingDescription")
                 : t("exportDescription")}
