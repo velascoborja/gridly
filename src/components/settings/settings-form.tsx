@@ -58,7 +58,7 @@ export function SettingsForm() {
             {t("language")}
           </CardDescription>
         </CardHeader>
-        <CardContent className="pb-8">
+        <CardContent>
           <div className="max-w-xs">
             <Select 
               value={locale} 
@@ -87,7 +87,7 @@ export function SettingsForm() {
             {t("deleteAccountConfirm")}
           </CardDescription>
         </CardHeader>
-        <CardContent className="pb-8">
+        <CardContent>
           <Button 
             variant="destructive" 
             onClick={handleDeleteAccount}
