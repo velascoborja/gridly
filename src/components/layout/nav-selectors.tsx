@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useEffect } from "react";
 import { useRouter, Link } from "@/i18n/routing";
 import { buttonVariants } from "@/components/ui/button";
 import { getNextCreatableYear } from "@/lib/server/year-planning";
@@ -25,6 +26,17 @@ interface Props {
 export function NavSelectors({ currentYear, currentMonth, view, years }: Props) {
   const router = useRouter();
   const t = useTranslations("Nav");
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (view === "detail" && scrollContainerRef.current) {
+      const activeItem = scrollContainerRef.current.querySelector('[aria-current="page"]');
+      if (activeItem) {
+        activeItem.scrollIntoView({ behavior: "instant", block: "nearest", inline: "center" });
+      }
+    }
+  }, [currentMonth, view]);
+
   const detailMonth = currentMonth ?? new Date().getMonth() + 1;
   const nextCreatableYear = getNextCreatableYear(years, currentYear);
   const today = new Date();
@@ -100,7 +112,10 @@ export function NavSelectors({ currentYear, currentMonth, view, years }: Props) 
 
       {view === "detail" && (
         <div className="w-full rounded-[1.15rem] border border-border/60 bg-background/80 p-1 shadow-sm md:w-auto">
-          <div className="flex justify-center gap-1 overflow-x-auto pb-1 md:pb-0">
+          <div
+            ref={scrollContainerRef}
+            className="flex justify-center gap-1 overflow-x-auto pb-1 md:pb-0"
+          >
             {MONTH_NAMES.map((name, i) => {
               const m = i + 1;
               const active = currentMonth === m;
