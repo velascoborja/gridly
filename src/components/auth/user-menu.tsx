@@ -8,6 +8,7 @@ import { Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -58,6 +59,9 @@ export function UserMenu({ email, name, active }: Props) {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter showCloseButton={false}>
+            <DialogClose render={<Button variant="outline" className="w-full sm:w-auto" />}>
+              {t("cancel")}
+            </DialogClose>
             <form action={signOut}>
               <Button type="submit" variant="destructive" className="w-full sm:w-auto">
                 {t("logout")}
