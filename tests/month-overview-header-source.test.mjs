@@ -8,19 +8,23 @@ async function readSource(path) {
 
 test("month overview header source exposes the revised summary labels", async () => {
   const source = await readSource("src/components/monthly/month-overview.tsx");
+  const headerStart = source.indexOf('<Card className="overflow-hidden border-border/60 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white shadow-xl shadow-slate-950/20">');
+  const headerEnd = source.indexOf('</Card>\n\n      <div className="grid gap-4 sm:grid-cols-2">', headerStart);
+
+  assert.notEqual(headerStart, -1);
+  assert.notEqual(headerEnd, -1);
+
+  const headerRegion = source.slice(headerStart, headerEnd);
 
   for (const label of ["Ahorro del mes", "Saldo final", "Saldo inicial", "Ingresos", "Gastos"]) {
-    assert.match(source, new RegExp(label));
+    assert.ok(headerRegion.includes(label), `expected header region to include ${label}`);
   }
 
-  assert.ok(
-    !source.includes("Panel de control del mes seleccionado con saldo, flujo y accesos rápidos"),
-    "old descriptive copy should be removed",
-  );
+  assert.ok(!headerRegion.includes("grid gap-3 sm:grid-cols-3"), "old equal-weight KPI layout should be removed from the header");
 
-  const savingsPosition = source.indexOf("Ahorro del mes");
-  const finalPosition = source.indexOf("Saldo final");
-  const initialPosition = source.indexOf("Saldo inicial");
+  const savingsPosition = headerRegion.indexOf("Ahorro del mes");
+  const finalPosition = headerRegion.indexOf("Saldo final");
+  const initialPosition = headerRegion.indexOf("Saldo inicial");
 
   assert.notEqual(savingsPosition, -1);
   assert.notEqual(finalPosition, -1);
