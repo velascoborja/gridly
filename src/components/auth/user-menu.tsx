@@ -6,6 +6,15 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface Props {
   email?: string | null;
@@ -34,11 +43,29 @@ export function UserMenu({ email, name, active }: Props) {
       >
         <Settings className="size-4.5" />
       </Link>
-      <form action={signOut}>
-        <Button type="submit" variant="outline" size="sm" className="rounded-full border-border/70 bg-background/85">
-          {t("logout")}
-        </Button>
-      </form>
+      
+      <Dialog>
+        <DialogTrigger render={
+          <Button variant="outline" size="sm" className="rounded-full border-border/70 bg-background/85">
+            {t("logout")}
+          </Button>
+        } />
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("logout_confirm_title")}</DialogTitle>
+            <DialogDescription>
+              {t("logout_confirm_description")}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter showCloseButton={false}>
+            <form action={signOut}>
+              <Button type="submit" variant="destructive" className="w-full sm:w-auto">
+                {t("logout")}
+              </Button>
+            </form>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
