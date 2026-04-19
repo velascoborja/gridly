@@ -3,6 +3,7 @@
 import type { Dispatch, SetStateAction } from "react";
 import { InlineEditField } from "@/components/monthly/inline-edit-field";
 import type { YearConfig } from "@/lib/types";
+import { formatCurrency } from "@/lib/utils";
 
 interface Props {
   config: YearConfig;
@@ -30,11 +31,13 @@ export function YearConfigForm({ config, onConfigChange, onPendingSave }: Props)
     <div className="space-y-3 mt-6">
       <div className="grid gap-3">
         <div className="rounded-2xl border border-border/60 bg-muted/20 p-4">
-          <InlineEditField
-            label="Saldo inicial del año"
-            value={config.startingBalance}
-            onSave={(v) => handleSave("startingBalance", v)}
-          />
+          <div className="space-y-1">
+            <span className="text-sm text-muted-foreground">Saldo inicial vinculado</span>
+            <p className="text-sm font-medium text-foreground">{formatCurrency(config.startingBalance)}</p>
+            <p className="text-sm leading-6 text-muted-foreground">
+              Se actualiza automáticamente con el cierre proyectado del ejercicio anterior.
+            </p>
+          </div>
         </div>
         <div className="rounded-2xl border border-border/60 bg-muted/20 p-4">
           <InlineEditField

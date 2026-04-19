@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import { years } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getYearData } from "@/lib/server/year-data";
 import { getSessionUser } from "@/lib/server/session";
 import { getOwnedYear } from "@/lib/server/ownership";
@@ -38,7 +39,6 @@ export async function PATCH(
   if (!yearRow) return Response.json({ error: "Year not found" }, { status: 404 });
 
   const updates: Partial<typeof years.$inferInsert> = {};
-  if (body.startingBalance !== undefined) updates.startingBalance = String(body.startingBalance);
   if (body.estimatedSalary !== undefined) updates.estimatedSalary = String(body.estimatedSalary);
   if (body.monthlyInvestment !== undefined) updates.monthlyInvestment = String(body.monthlyInvestment);
   if (body.monthlyHomeExpense !== undefined) updates.monthlyHomeExpense = String(body.monthlyHomeExpense);
@@ -46,5 +46,6 @@ export async function PATCH(
   if (body.interestRate !== undefined) updates.interestRate = String(body.interestRate);
 
   const [updated] = await db.update(years).set(updates).where(eq(years.id, yearRow.id)).returning();
+  await propagateYearCarryOver(user.id, yearNum);
   return Response.json(updated);
 }

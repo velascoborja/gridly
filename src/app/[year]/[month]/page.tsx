@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { AppShell } from "@/components/layout/app-shell";
 import { MonthlyView } from "@/components/monthly/monthly-view";
+import { getNextCreatableYear } from "@/lib/server/year-planning";
 import { MONTH_NAMES } from "@/lib/utils";
 import { getYearData, getYearsForUser } from "@/lib/server/year-data";
 import { requireSessionUser } from "@/lib/server/session";
@@ -25,6 +26,8 @@ export default async function MonthPage({
       notFound();
     }
 
+    const nextCreatableYear = getNextCreatableYear(years, year);
+
     return (
       <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(64,148,255,0.12),transparent_32%),radial-gradient(circle_at_top_right,rgba(16,185,129,0.08),transparent_28%),linear-gradient(180deg,rgba(248,250,252,0.96),rgba(255,255,255,1))] px-4 py-8 text-foreground sm:px-6 lg:px-8">
         <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-6xl items-center">
@@ -47,7 +50,7 @@ export default async function MonthPage({
                     Sin datos para {year}
                   </h1>
                   <p className="max-w-xl text-sm leading-6 text-muted-foreground sm:text-base">
-                    Crea el año y configura las estimaciones para empezar a revisar ingresos, gastos y ahorro de este mes.
+                    Solo puedes crear el siguiente ejercicio disponible para mantener la cadena de saldos conectada.
                   </p>
                 </div>
               </div>
@@ -55,10 +58,10 @@ export default async function MonthPage({
               <div className="rounded-[1.5rem] border border-border/70 bg-muted/25 p-5 sm:p-6">
                 <p className="text-sm font-semibold text-foreground">Siguiente paso</p>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  Inicializa {year} para abrir el detalle mensual y completar la planificación.
+                  Inicializa {nextCreatableYear} para abrir el detalle mensual y completar la planificación.
                 </p>
                 <div className="mt-6">
-                  <CreateYearForm year={year} month={month} />
+                  <CreateYearForm nextCreatableYear={nextCreatableYear} month={month} />
                 </div>
               </div>
             </div>
@@ -83,16 +86,15 @@ export default async function MonthPage({
   );
 }
 
-function CreateYearForm({ year, month }: { year: number; month: number }) {
+function CreateYearForm({ nextCreatableYear, month }: { nextCreatableYear: number; month: number }) {
   return (
-    <form action={`/api/years`} method="POST" className="flex">
-      <input type="hidden" name="year" value={year} />
+    <div className="flex">
       <Link
-        href={`/setup/${year}?redirect=/${year}/${month}`}
+        href={`/setup/${nextCreatableYear}?redirect=/${nextCreatableYear}/${month}`}
         className="inline-flex min-h-11 flex-1 items-center justify-center rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
       >
-        Configurar {year}
+        Crear {nextCreatableYear}
       </Link>
-    </form>
+    </div>
   );
 }

@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import { months } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { getYearNumberForYearId, propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getSessionUser } from "@/lib/server/session";
 import { getOwnedMonth } from "@/lib/server/ownership";
 
@@ -37,6 +38,10 @@ export async function PATCH(
   if (!ownedMonth) return Response.json({ error: "Month not found" }, { status: 404 });
 
   const [updated] = await db.update(months).set(updates).where(eq(months.id, ownedMonth.id)).returning();
+  const yearNumber = await getYearNumberForYearId(ownedMonth.yearId);
+  if (yearNumber !== null) {
+    await propagateYearCarryOver(user.id, yearNumber);
+  }
 
   return Response.json(updated);
 }

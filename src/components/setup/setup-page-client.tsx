@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { formatCurrency } from "@/lib/utils";
 
 interface Field {
   key: string;
@@ -13,7 +14,6 @@ interface Field {
 }
 
 const FIELDS: Field[] = [
-  { key: "startingBalance", label: "Saldo inicial del año (€)", defaultValue: "0" },
   { key: "estimatedSalary", label: "Salario mensual estimado (€)", defaultValue: "0" },
   { key: "monthlyHomeExpense", label: "Gasto hogar mensual (€)", defaultValue: "0" },
   { key: "monthlyPersonalBudget", label: "Presupuesto personal mensual (€)", defaultValue: "0" },
@@ -23,15 +23,21 @@ const FIELDS: Field[] = [
 
 interface Props {
   year: number;
+  derivedStartingBalance: number;
+  previousYear: number | null;
+  startingBalanceEditable: boolean;
 }
 
-export function SetupPageClient({ year }: Props) {
+export function SetupPageClient({ year, derivedStartingBalance, previousYear, startingBalanceEditable }: Props) {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") ?? `/${year}/${new Date().getMonth() + 1}`;
   const router = useRouter();
 
   const [values, setValues] = useState<Record<string, string>>(
-    Object.fromEntries(FIELDS.map((f) => [f.key, f.defaultValue]))
+    Object.fromEntries([
+      ["startingBalance", String(derivedStartingBalance)],
+      ...FIELDS.map((f) => [f.key, f.defaultValue]),
+    ])
   );
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -55,7 +61,12 @@ export function SetupPageClient({ year }: Props) {
       });
 
       if (!res.ok) {
-        setError("No se ha podido crear el año. Revisa los datos e inténtalo de nuevo.");
+        const payload = await res.json().catch(() => null);
+        setError(
+          payload?.error === "Only the next year can be created"
+            ? "Solo puedes crear el siguiente ejercicio disponible."
+            : "No se ha podido crear el año. Revisa los datos e inténtalo de nuevo."
+        );
         setSubmitting(false);
         return;
       }
@@ -95,8 +106,9 @@ export function SetupPageClient({ year }: Props) {
                   Prepara {year} con una sola pantalla
                 </h1>
                 <p className="max-w-lg text-sm leading-6 text-white/75 sm:text-base">
-                  Define el punto de partida del año, el salario estimado y los gastos fijos.
-                  Gridly rellena automáticamente los meses y mantiene el flujo mensual conectado.
+                  {startingBalanceEditable
+                    ? "Define el punto de partida del año, el salario estimado y los gastos fijos. Gridly rellena automáticamente los meses y mantiene el flujo mensual conectado."
+                    : `Solo puedes crear el siguiente ejercicio disponible. Gridly arranca ${year} con la previsión de cierre de ${previousYear}.`}
                 </p>
               </div>
             </div>
@@ -104,7 +116,9 @@ export function SetupPageClient({ year }: Props) {
             <div className="grid gap-3 sm:grid-cols-3">
               <div className="rounded-2xl border border-white/10 bg-white/8 p-4 backdrop-blur-sm">
                 <p className="text-xs uppercase tracking-[0.22em] text-white/55">Saldo inicial</p>
-                <p className="mt-2 text-sm font-medium text-white">Arranca con contexto real</p>
+                <p className="mt-2 text-sm font-medium text-white">
+                  {startingBalanceEditable ? "Arranca con contexto real" : formatCurrency(derivedStartingBalance)}
+                </p>
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/8 p-4 backdrop-blur-sm">
                 <p className="text-xs uppercase tracking-[0.22em] text-white/55">Pagas extra</p>
@@ -125,11 +139,32 @@ export function SetupPageClient({ year }: Props) {
             </p>
             <CardTitle className="text-2xl sm:text-3xl">Configurar {year}</CardTitle>
             <CardDescription className="text-sm leading-6 sm:text-base">
-              Introduce las estimaciones para el año. Podrás ajustarlas en cualquier momento.
+              {startingBalanceEditable
+                ? "Introduce las estimaciones para el año. Podrás ajustarlas en cualquier momento."
+                : `Saldo inicial enlazado a ${previousYear}: ${formatCurrency(derivedStartingBalance)}.`}
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-6">
             <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">
+                  {startingBalanceEditable ? "Saldo de apertura del año (€)" : "Saldo inicial derivado"}
+                </label>
+                <Input
+                  type="text"
+                  inputMode="decimal"
+                  value={values.startingBalance}
+                  onChange={(e) => setValues((prev) => ({ ...prev, startingBalance: e.target.value }))}
+                  disabled={submitting || !startingBalanceEditable}
+                  className="h-11 rounded-xl px-4 text-sm"
+                />
+                {!startingBalanceEditable ? (
+                  <p className="text-sm leading-6 text-muted-foreground">
+                    Solo puedes crear el siguiente ejercicio y su saldo inicial se calcula automáticamente desde {previousYear}.
+                  </p>
+                ) : null}
+              </div>
+
               {FIELDS.map((f) => (
                 <div key={f.key} className="space-y-2">
                   <label className="text-sm font-medium text-foreground">{f.label}</label>

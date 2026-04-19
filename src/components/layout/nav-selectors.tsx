@@ -2,7 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
+import { getNextCreatableYear } from "@/lib/server/year-planning";
 import { MONTH_NAMES } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { Plus } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -21,6 +25,7 @@ interface Props {
 export function NavSelectors({ currentYear, currentMonth, view, years }: Props) {
   const router = useRouter();
   const detailMonth = currentMonth ?? new Date().getMonth() + 1;
+  const nextCreatableYear = getNextCreatableYear(years, currentYear);
   const today = new Date();
   const calendarYear = today.getFullYear();
   const calendarMonth = today.getMonth() + 1;
@@ -56,6 +61,17 @@ export function NavSelectors({ currentYear, currentMonth, view, years }: Props) 
               ))}
             </SelectContent>
           </Select>
+
+          <Link
+            href={`/setup/${nextCreatableYear}`}
+            aria-label={`Crear ${nextCreatableYear}`}
+            className={cn(
+              buttonVariants({ variant: "outline", size: "icon-sm" }),
+              "size-9 rounded-full border-border/70 bg-background/90 text-primary shadow-sm hover:border-primary/40 hover:bg-primary/[0.06]"
+            )}
+          >
+            <Plus className="size-4" />
+          </Link>
         </div>
 
         <div className="rounded-[1.25rem] border border-border/70 bg-muted/40 p-1 shadow-sm">

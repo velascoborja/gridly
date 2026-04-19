@@ -1,5 +1,6 @@
 import { db } from "@/db";
 import { additionalEntries } from "@/db/schema";
+import { getYearNumberForYearId, propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getSessionUser } from "@/lib/server/session";
 import { getOwnedMonth } from "@/lib/server/ownership";
 
@@ -35,6 +36,11 @@ export async function POST(
     label,
     amount: String(amount),
   }).returning();
+
+  const yearNumber = await getYearNumberForYearId(ownedMonth.yearId);
+  if (yearNumber !== null) {
+    await propagateYearCarryOver(user.id, yearNumber);
+  }
 
   return Response.json(entry, { status: 201 });
 }
