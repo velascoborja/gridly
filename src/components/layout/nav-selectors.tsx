@@ -17,27 +17,26 @@ import {
 interface Props {
   currentYear: number;
   currentMonth: number | null;
-  view: "overview" | "summary" | "detail" | "settings";
+  view: "overview" | "summary" | "settings";
   years: number[];
 }
 
 export function NavSelectors({ currentYear, currentMonth, view, years }: Props) {
   const router = useRouter();
   const t = useTranslations("Nav");
-  const detailMonth = currentMonth ?? new Date().getMonth() + 1;
+  const selectedMonth = currentMonth ?? new Date().getMonth() + 1;
   const nextCreatableYear = getNextCreatableYear(years, currentYear);
   const activeMainView = view === "summary" ? "summary" : view === "settings" ? null : "overview";
 
   const handleYearChange = (val: string | null) => {
     if (!val) return;
     const y = parseInt(val, 10);
-    if (view === "overview") router.push(`/${y}/overview?month=${detailMonth}`);
-    else if (view === "summary") router.push(`/${y}/summary`);
-    else router.push(`/${y}/${detailMonth}`);
+    if (view === "summary") router.push(`/${y}/summary`);
+    else router.push(`/${y}/overview?month=${selectedMonth}`);
   };
 
   const mainTabs = [
-    { label: t("months"), key: "overview" as const, href: `/${currentYear}/overview?month=${detailMonth}` },
+    { label: t("months"), key: "overview" as const, href: `/${currentYear}/overview?month=${selectedMonth}` },
     { label: t("annualSummary"), key: "summary" as const, href: `/${currentYear}/summary` as const },
   ];
 

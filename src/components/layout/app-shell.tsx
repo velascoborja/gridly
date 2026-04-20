@@ -8,7 +8,7 @@ import { UserMenu } from "@/components/auth/user-menu";
 interface Props {
   currentYear: number;
   currentMonth: number | null;
-  view: "overview" | "summary" | "detail" | "settings";
+  view: "overview" | "summary" | "settings";
   years: number[];
   user: {
     email?: string | null;

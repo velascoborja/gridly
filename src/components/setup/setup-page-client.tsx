@@ -26,7 +26,8 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
   const t = useTranslations("Setup");
   const locale = useLocale();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirect") ?? `/${year}/${new Date().getMonth() + 1}`;
+  const redirectTo =
+    searchParams.get("redirect") ?? `/${year}/overview?month=${new Date().getMonth() + 1}`;
   const router = useRouter();
 
   const FIELDS: Field[] = [

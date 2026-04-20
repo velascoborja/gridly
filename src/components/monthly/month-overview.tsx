@@ -1,12 +1,14 @@
 "use client";
 
-import { useCallback, useState } from "react";
-import { ChevronLeft, ChevronRight, SquarePen } from "lucide-react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight, Eye, EyeOff } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { AdditionalEntriesCard } from "./additional-entries-card";
+import { FixedExpensesCard } from "./fixed-expenses-card";
+import { IncomeCard } from "./income-card";
 import { sortAdditionalEntriesDesc } from "@/lib/additional-entries";
 import { cn, formatCurrency, formatMonthName } from "@/lib/utils";
 import { computeMonthChain } from "@/lib/calculations";
@@ -22,9 +24,69 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
   const tOverview = useTranslations("Monthly.overview");
   const locale = useLocale();
   const [months, setMonths] = useState<MonthData[]>(initialYearData.months);
+  const [showFixedEditors, setShowFixedEditors] = useState(false);
+  const [renderFixedEditors, setRenderFixedEditors] = useState(false);
+  const [fixedEditorsVisible, setFixedEditorsVisible] = useState(false);
+  const [fixedEditorsHeight, setFixedEditorsHeight] = useState<number | "auto">(0);
   const config = initialYearData.config;
   const today = new Date();
+  const fixedEditorsInnerRef = useRef<HTMLDivElement>(null);
+  const fixedEditorsFrameRef = useRef<number | null>(null);
   const sortedMonths = [...months].sort((a, b) => a.month - b.month);
+
+  useEffect(() => {
+    setMonths(initialYearData.months);
+  }, [initialYearData]);
+
+  useEffect(() => {
+    setShowFixedEditors(false);
+  }, [monthNumber]);
+
+  useEffect(() => {
+    if (showFixedEditors) {
+      setRenderFixedEditors(true);
+      return undefined;
+    }
+
+    setFixedEditorsVisible(false);
+    return undefined;
+  }, [showFixedEditors]);
+
+  useEffect(() => {
+    return () => {
+      if (fixedEditorsFrameRef.current !== null) {
+        window.cancelAnimationFrame(fixedEditorsFrameRef.current);
+      }
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    const panel = fixedEditorsInnerRef.current;
+    if (!renderFixedEditors || !panel) return;
+
+    if (fixedEditorsFrameRef.current !== null) {
+      window.cancelAnimationFrame(fixedEditorsFrameRef.current);
+      fixedEditorsFrameRef.current = null;
+    }
+
+    if (showFixedEditors) {
+      setFixedEditorsHeight(0);
+      setFixedEditorsVisible(false);
+      fixedEditorsFrameRef.current = window.requestAnimationFrame(() => {
+        setFixedEditorsVisible(true);
+        setFixedEditorsHeight(panel.scrollHeight);
+        fixedEditorsFrameRef.current = null;
+      });
+      return;
+    }
+
+    const currentHeight = panel.scrollHeight;
+    setFixedEditorsHeight(currentHeight);
+    fixedEditorsFrameRef.current = window.requestAnimationFrame(() => {
+      setFixedEditorsHeight(0);
+      fixedEditorsFrameRef.current = null;
+    });
+  }, [renderFixedEditors, showFixedEditors]);
 
   const month = sortedMonths.find((m) => m.month === monthNumber);
   const activeIndex = month ? sortedMonths.findIndex((item) => item.id === month.id) : -1;
@@ -34,6 +96,29 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
   const recompute = useCallback((updated: MonthData[]) => {
     return computeMonthChain(updated, config.startingBalance, config.interestRate);
   }, [config.interestRate, config.startingBalance]);
+
+  const handleFixedUpdate = useCallback(async (field: string, value: number) => {
+    if (!month) return;
+    const res = await fetch(`/api/months/${month.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ [field]: value }),
+    });
+    if (!res.ok) throw new Error("Failed to update");
+
+    setMonths((prev) => {
+      const updated = prev.map((m) =>
+        m.id === month.id
+          ? {
+              ...m,
+              [field]: value,
+              ...(field === "interests" ? { interestsManualOverride: true } : {}),
+            }
+          : m
+      );
+      return recompute(updated);
+    });
+  }, [month, recompute]);
 
   const handleEntriesChange = useCallback((type: "income" | "expense", entries: AdditionalEntry[]) => {
     setMonths((prev) => {
@@ -160,16 +245,19 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
                   {tOverview("activeMonth")}
                 </div>
                 <div className="mt-2">
-                  <Link
-                    href={`/${config.year}/${month.month}`}
+                  <button
+                    type="button"
+                    aria-expanded={showFixedEditors}
+                    aria-controls="month-fixed-editors"
                     className="inline-flex items-center gap-1 rounded-md border border-primary/20 bg-primary/[0.08] px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/[0.14]"
                     aria-label={tOverview("editMonthAria", {
                       month: formatMonthName(month.month, locale),
                     })}
+                    onClick={() => setShowFixedEditors((prev) => !prev)}
                   >
-                    <SquarePen className="size-3.5" />
-                    {tOverview("editMonth")}
-                  </Link>
+                    {showFixedEditors ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+                    {showFixedEditors ? tOverview("hideMonthEditor") : tOverview("editMonth")}
+                  </button>
                 </div>
               </div>
               
@@ -210,6 +298,42 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
           </div>
         </CardContent>
       </Card>
+
+      {renderFixedEditors ? (
+        <div
+          id="month-fixed-editors"
+          aria-hidden={!showFixedEditors}
+          className={cn(
+            "overflow-hidden transition-[height,opacity,transform,margin] duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-[height,opacity,transform]",
+            fixedEditorsVisible
+              ? "mt-0 opacity-100 translate-y-0"
+              : "-mt-2 opacity-0 -translate-y-1.5 pointer-events-none"
+          )}
+          style={{ height: fixedEditorsHeight === "auto" ? "auto" : `${fixedEditorsHeight}px` }}
+          onTransitionEnd={(event) => {
+            if (event.target !== event.currentTarget || event.propertyName !== "height") return;
+            if (showFixedEditors && fixedEditorsVisible) {
+              setFixedEditorsHeight("auto");
+              return;
+            }
+            setRenderFixedEditors(false);
+          }}
+        >
+          <div ref={fixedEditorsInnerRef} className="overflow-hidden">
+            <div
+              className={cn(
+                "grid gap-4 pt-1 pb-0.5 transition-[opacity,transform,filter] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] sm:grid-cols-2",
+                fixedEditorsVisible
+                  ? "opacity-100 translate-y-0 blur-0"
+                  : "opacity-0 translate-y-1.5 blur-[2px]"
+              )}
+            >
+              <FixedExpensesCard month={month} onUpdate={handleFixedUpdate} />
+              <IncomeCard month={month} onUpdate={handleFixedUpdate} />
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <AdditionalEntriesCard
