@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { computeMonthChain } from "@/lib/calculations";
 import { KpiCards } from "./kpi-cards";
 import { BalanceChart } from "./balance-chart";
 import { SavingsChart } from "./savings-chart";
@@ -20,14 +21,16 @@ import {
 
 interface Props {
   yearData: YearData;
+  startingBalanceEditable: boolean;
 }
 
-export function AnnualView({ yearData: initial }: Props) {
+export function AnnualView({ yearData: initial, startingBalanceEditable }: Props) {
   const t = useTranslations("Annual");
   const [config, setConfig] = useState<YearConfig>(initial.config);
   const [savingConfig, setSavingConfig] = useState(false);
   const pendingSaveCountRef = useRef(0);
   const pendingSavesRef = useRef(new Set<Promise<void>>());
+  const months = computeMonthChain(initial.months, config.startingBalance);
 
   const trackPendingSave = (savePromise: Promise<void>) => {
     pendingSaveCountRef.current += 1;
@@ -85,6 +88,7 @@ export function AnnualView({ yearData: initial }: Props) {
                   </DialogHeader>
                   <YearConfigForm
                     config={config}
+                    startingBalanceEditable={startingBalanceEditable}
                     onConfigChange={setConfig}
                     onPendingSave={trackPendingSave}
                   />
@@ -118,11 +122,11 @@ export function AnnualView({ yearData: initial }: Props) {
         </div>
       </section>
 
-      <KpiCards months={initial.months} startingBalance={config.startingBalance} />
+      <KpiCards months={months} startingBalance={config.startingBalance} />
 
       <div className="grid gap-6 md:grid-cols-2">
-        <BalanceChart months={initial.months} />
-        <SavingsChart months={initial.months} />
+        <BalanceChart months={months} />
+        <SavingsChart months={months} />
       </div>
     </div>
   );

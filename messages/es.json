@@ -57,7 +57,9 @@
     },
     "config": {
       "startingBalanceLabel": "Saldo inicial vinculado",
+      "startingBalanceEditableLabel": "Saldo inicial del año",
       "startingBalanceDescription": "Se actualiza automáticamente con el cierre proyectado del ejercicio anterior.",
+      "startingBalanceEditableDescription": "Puedes ajustarlo manualmente porque es el primer ejercicio disponible de tu cuenta.",
       "estimatedSalary": "Salario estimado mensual",
       "monthlyInvestment": "Inversión mensual",
       "monthlyHomeExpense": "Gasto hogar mensual",

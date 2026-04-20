@@ -4,15 +4,15 @@ import { useTranslations } from "next-intl";
 import type { Dispatch, SetStateAction } from "react";
 import { InlineEditField } from "@/components/monthly/inline-edit-field";
 import type { YearConfig } from "@/lib/types";
-import { formatCurrency } from "@/lib/utils";
 
 interface Props {
   config: YearConfig;
+  startingBalanceEditable: boolean;
   onConfigChange: Dispatch<SetStateAction<YearConfig>>;
   onPendingSave?: (savePromise: Promise<void>) => void;
 }
 
-export function YearConfigForm({ config, onConfigChange, onPendingSave }: Props) {
+export function YearConfigForm({ config, startingBalanceEditable, onConfigChange, onPendingSave }: Props) {
   const t = useTranslations("Annual.config");
 
   const handleSave = async (field: keyof YearConfig, value: number) => {
@@ -34,13 +34,15 @@ export function YearConfigForm({ config, onConfigChange, onPendingSave }: Props)
     <div className="space-y-3 mt-6">
       <div className="grid gap-3">
         <div className="rounded-2xl border border-border/60 bg-muted/20 p-4">
-          <div className="space-y-1">
-            <span className="text-sm text-muted-foreground">{t("startingBalanceLabel")}</span>
-            <p className="text-sm font-medium text-foreground">{formatCurrency(config.startingBalance)}</p>
-            <p className="text-sm leading-6 text-muted-foreground">
-              {t("startingBalanceDescription")}
-            </p>
-          </div>
+          <InlineEditField
+            label={t(startingBalanceEditable ? "startingBalanceEditableLabel" : "startingBalanceLabel")}
+            value={config.startingBalance}
+            onSave={(v) => handleSave("startingBalance", v)}
+            disabled={!startingBalanceEditable}
+          />
+          <p className="px-2 pt-1 text-sm leading-6 text-muted-foreground">
+            {t(startingBalanceEditable ? "startingBalanceEditableDescription" : "startingBalanceDescription")}
+          </p>
         </div>
         <div className="rounded-2xl border border-border/60 bg-muted/20 p-4">
           <InlineEditField

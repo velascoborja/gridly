@@ -2,7 +2,7 @@ import { db } from "@/db";
 import { years } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { propagateYearCarryOver } from "@/lib/server/year-carry-over";
-import { getYearData } from "@/lib/server/year-data";
+import { getYearData, getYearsForUser } from "@/lib/server/year-data";
 import { getSessionUser } from "@/lib/server/session";
 import { getOwnedYear } from "@/lib/server/ownership";
 
@@ -38,7 +38,20 @@ export async function PATCH(
   const yearRow = await getOwnedYear(user.id, yearNum);
   if (!yearRow) return Response.json({ error: "Year not found" }, { status: 404 });
 
+  if (body.startingBalance !== undefined) {
+    const userYears = await getYearsForUser(user.id);
+    const earliestYear = userYears[0];
+
+    if (earliestYear !== yearNum) {
+      return Response.json(
+        { error: "Starting balance can only be edited on the earliest year" },
+        { status: 400 }
+      );
+    }
+  }
+
   const updates: Partial<typeof years.$inferInsert> = {};
+  if (body.startingBalance !== undefined) updates.startingBalance = String(body.startingBalance);
   if (body.estimatedSalary !== undefined) updates.estimatedSalary = String(body.estimatedSalary);
   if (body.monthlyInvestment !== undefined) updates.monthlyInvestment = String(body.monthlyInvestment);
   if (body.monthlyHomeExpense !== undefined) updates.monthlyHomeExpense = String(body.monthlyHomeExpense);

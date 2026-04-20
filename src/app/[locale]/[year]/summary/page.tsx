@@ -16,10 +16,11 @@ export default async function SummaryPage({
   const user = await requireSessionUser();
   const [yearData, years] = await Promise.all([getYearData(user.id, year), getYearsForUser(user.id)]);
   if (!yearData) notFound();
+  const startingBalanceEditable = years[0] === year;
 
   return (
     <AppShell currentYear={year} currentMonth={null} view="summary" years={years.length > 0 ? years : [year]} user={user}>
-      <AnnualView yearData={yearData} />
+      <AnnualView yearData={yearData} startingBalanceEditable={startingBalanceEditable} />
     </AppShell>
   );
 }

@@ -57,7 +57,9 @@
     },
     "config": {
       "startingBalanceLabel": "Linked starting balance",
+      "startingBalanceEditableLabel": "Year starting balance",
       "startingBalanceDescription": "Automatically updated with the projected closure of the previous exercise.",
+      "startingBalanceEditableDescription": "You can adjust it manually because it is the first available exercise in your account.",
       "estimatedSalary": "Estimated monthly salary",
       "monthlyInvestment": "Monthly investment",
       "monthlyHomeExpense": "Monthly home expense",
