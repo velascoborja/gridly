@@ -23,8 +23,8 @@ export function MonthlyView({ yearData: initialYearData, monthNumber }: Props) {
   const month = months.find((m) => m.month === monthNumber);
 
   const recompute = useCallback((updated: MonthData[]) => {
-    return computeMonthChain(updated, config.startingBalance);
-  }, [config.startingBalance]);
+    return computeMonthChain(updated, config.startingBalance, config.interestRate);
+  }, [config.interestRate, config.startingBalance]);
 
   const handleFixedUpdate = useCallback(async (field: string, value: number) => {
     if (!month) return;
@@ -37,7 +37,13 @@ export function MonthlyView({ yearData: initialYearData, monthNumber }: Props) {
 
     setMonths((prev) => {
       const updated = prev.map((m) =>
-        m.id === month.id ? { ...m, [field]: value } : m
+        m.id === month.id
+          ? {
+              ...m,
+              [field]: value,
+              ...(field === "interests" ? { interestsManualOverride: true } : {}),
+            }
+          : m
       );
       return recompute(updated);
     });

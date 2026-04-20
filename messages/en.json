@@ -38,6 +38,10 @@
     "exportDescription": "Export the full year in Excel with the latest configuration.",
     "savingDescription": "Configuration changes are being saved before launching year actions.",
     "kpis": {
+      "heroEyebrow": "Financial summary",
+      "heroTitle": "Year-end balance and total savings take priority.",
+      "activityCount": "{count} active months",
+      "noActivity": "No recorded activity",
       "totalSavings": "Total savings",
       "totalSavingsNote": "Sum of months with activity",
       "avgSavings": "Average savings",

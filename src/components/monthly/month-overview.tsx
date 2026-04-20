@@ -94,7 +94,7 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
   const month = months.find((m) => m.month === monthNumber);
 
   const recompute = (updated: MonthData[]) =>
-    computeMonthChain(updated, config.startingBalance);
+    computeMonthChain(updated, config.startingBalance, config.interestRate);
 
   const handleEntryAdded = (type: "income" | "expense", entry: AdditionalEntry) => {
     if (!month) return;

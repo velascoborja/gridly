@@ -28,6 +28,7 @@ export interface MonthData {
   additionalPayslip: number;
   bonus: number;
   interests: number;
+  interestsManualOverride: boolean;
   personalRemaining: number;
   additionalExpenses: AdditionalEntry[];
   additionalIncomes: AdditionalEntry[];

@@ -30,7 +30,7 @@ export function AnnualView({ yearData: initial, startingBalanceEditable }: Props
   const [savingConfig, setSavingConfig] = useState(false);
   const pendingSaveCountRef = useRef(0);
   const pendingSavesRef = useRef(new Set<Promise<void>>());
-  const months = computeMonthChain(initial.months, config.startingBalance);
+  const months = computeMonthChain(initial.months, config.startingBalance, config.interestRate);
 
   const trackPendingSave = (savePromise: Promise<void>) => {
     pendingSaveCountRef.current += 1;

@@ -98,6 +98,7 @@ export const months = pgTable(
     additionalPayslip: numeric("additional_payslip", { precision: 12, scale: 2 }).notNull().default("0"),
     bonus: numeric("bonus", { precision: 12, scale: 2 }).notNull().default("0"),
     interests: numeric("interests", { precision: 12, scale: 2 }).notNull().default("0"),
+    interestsManualOverride: boolean("interests_manual_override").notNull().default(false),
     personalRemaining: numeric("personal_remaining", { precision: 12, scale: 2 }).notNull().default("0"),
     createdAt: timestamp("created_at").defaultNow(),
   },

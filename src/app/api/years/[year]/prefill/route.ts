@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { months } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { estimatedMonthData } from "@/lib/calculations";
+import { computeMonthChain, estimatedMonthData } from "@/lib/calculations";
 import type { YearConfig } from "@/lib/types";
 import { getSessionUser } from "@/lib/server/session";
 import { getOwnedYear } from "@/lib/server/ownership";
@@ -35,22 +35,29 @@ export async function POST(
   // Delete existing months and recreate
   await db.delete(months).where(eq(months.yearId, yearRow.id));
 
-  const values = Array.from({ length: 12 }, (_, i) => {
-    const m = i + 1;
-    const estimated = estimatedMonthData(m, config);
-    return {
+  const computedMonths = computeMonthChain(
+    Array.from({ length: 12 }, (_, i) => ({
+      id: 0,
       yearId: yearRow.id,
-      month: m,
-      homeExpense: String(estimated.homeExpense),
-      personalExpense: String(estimated.personalExpense),
-      investment: String(estimated.investment),
-      payslip: String(estimated.payslip),
-      additionalPayslip: String(estimated.additionalPayslip),
-      bonus: String(estimated.bonus),
-      interests: String(estimated.interests),
-      personalRemaining: String(estimated.personalRemaining),
-    };
-  });
+      ...estimatedMonthData(i + 1, config),
+    })),
+    config.startingBalance,
+    config.interestRate
+  );
+
+  const values = computedMonths.map((month) => ({
+    yearId: yearRow.id,
+    month: month.month,
+    homeExpense: String(month.homeExpense),
+    personalExpense: String(month.personalExpense),
+    investment: String(month.investment),
+    payslip: String(month.payslip),
+    additionalPayslip: String(month.additionalPayslip),
+    bonus: String(month.bonus),
+    interests: String(month.interests),
+    interestsManualOverride: month.interestsManualOverride,
+    personalRemaining: String(month.personalRemaining),
+  }));
 
   const inserted = await db.insert(months).values(values).returning();
   return Response.json(inserted, { status: 201 });

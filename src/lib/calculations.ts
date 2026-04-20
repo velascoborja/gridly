@@ -11,9 +11,14 @@ interface RawMonthData {
   additionalPayslip: number;
   bonus: number;
   interests: number;
+  interestsManualOverride: boolean;
   personalRemaining: number;
   additionalExpenses: AdditionalEntry[];
   additionalIncomes: AdditionalEntry[];
+}
+
+export function calculateMonthlyInterest(startingBalance: number, interestRate: number): number {
+  return round2((startingBalance * interestRate) / 12);
 }
 
 export function totalIncome(m: RawMonthData): number {
@@ -30,21 +35,32 @@ export function savings(m: RawMonthData): number {
   return totalIncome(m) - totalExpenses(m);
 }
 
-export function computeMonthChain(rawMonths: RawMonthData[], yearStartingBalance: number): MonthData[] {
+export function computeMonthChain(
+  rawMonths: RawMonthData[],
+  yearStartingBalance: number,
+  interestRate = 0
+): MonthData[] {
   // Sort by month number
   const sorted = [...rawMonths].sort((a, b) => a.month - b.month);
 
   let runningBalance = yearStartingBalance;
   return sorted.map((m) => {
-    const income = totalIncome(m);
-    const expenses = totalExpenses(m);
-    const monthSavings = income - expenses;
     const startingBalance = runningBalance;
+    const interests = m.interestsManualOverride
+      ? m.interests
+      : calculateMonthlyInterest(startingBalance, interestRate);
+    const monthWithInterest = {
+      ...m,
+      interests,
+    };
+    const income = totalIncome(monthWithInterest);
+    const expenses = totalExpenses(monthWithInterest);
+    const monthSavings = income - expenses;
     const endingBalance = startingBalance + monthSavings;
     runningBalance = endingBalance;
 
     return {
-      ...m,
+      ...monthWithInterest,
       totalIncome: income,
       totalExpenses: expenses,
       savings: monthSavings,
@@ -65,8 +81,8 @@ export function estimatedMonthData(month: number, config: YearConfig): Omit<RawM
     additionalPayslip: month === 6 || month === 12 ? config.estimatedSalary : 0,
     // July = 7 gets bonus (set to 0 — user fills in actual)
     bonus: 0,
-    // Estimate monthly interest: annual rate * balance / 12 — simplified, user updates actual
     interests: 0,
+    interestsManualOverride: false,
     personalRemaining: 0,
     additionalExpenses: [],
     additionalIncomes: [],

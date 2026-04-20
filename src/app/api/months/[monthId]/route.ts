@@ -29,6 +29,9 @@ export async function PATCH(
       (updates as Record<string, string>)[field] = String(body[field]);
     }
   }
+  if (body.interests !== undefined) {
+    updates.interestsManualOverride = true;
+  }
 
   if (Object.keys(updates).length === 0) {
     return Response.json({ error: "No fields to update" }, { status: 400 });

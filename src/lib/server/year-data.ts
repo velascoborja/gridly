@@ -52,6 +52,7 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
       additionalPayslip: parseFloat(month.additionalPayslip),
       bonus: parseFloat(month.bonus),
       interests: parseFloat(month.interests),
+      interestsManualOverride: month.interestsManualOverride,
       personalRemaining: parseFloat(month.personalRemaining),
       additionalExpenses: sortAdditionalEntriesDesc(
         entries
@@ -89,7 +90,11 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
       monthlyPersonalBudget: parseFloat(yearRow.monthlyPersonalBudget),
       interestRate: parseFloat(yearRow.interestRate),
     },
-    months: computeMonthChain(rawMonths, parseFloat(yearRow.startingBalance)),
+    months: computeMonthChain(
+      rawMonths,
+      parseFloat(yearRow.startingBalance),
+      parseFloat(yearRow.interestRate)
+    ),
   };
 }
 
