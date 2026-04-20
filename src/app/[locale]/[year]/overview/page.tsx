@@ -6,10 +6,13 @@ import { requireSessionUser } from "@/lib/server/session";
 
 export default async function OverviewPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ year: string }>;
+  searchParams: Promise<{ month?: string | string[] }>;
 }) {
   const { year: yearStr } = await params;
+  const { month: monthParam } = await searchParams;
   const year = parseInt(yearStr, 10);
   if (isNaN(year)) notFound();
 
@@ -25,7 +28,10 @@ export default async function OverviewPage({
   }
 
   const now = new Date();
-  const currentMonth = now.getFullYear() === year ? now.getMonth() + 1 : 1;
+  const defaultMonth = now.getFullYear() === year ? now.getMonth() + 1 : 1;
+  const selectedMonth = Array.isArray(monthParam) ? monthParam[0] : monthParam;
+  const parsedMonth = selectedMonth ? parseInt(selectedMonth, 10) : defaultMonth;
+  const currentMonth = parsedMonth >= 1 && parsedMonth <= 12 ? parsedMonth : defaultMonth;
 
   return (
     <AppShell currentYear={year} currentMonth={currentMonth} view="overview" years={years.length > 0 ? years : [year]} user={user}>

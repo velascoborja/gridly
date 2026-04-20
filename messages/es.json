@@ -135,12 +135,17 @@
   "Monthly": {
     "noData": "No hay datos para este mes",
     "overview": {
-      "activeMonth": "Mes activo",
+      "activeMonth": "Mes seleccionado",
       "netSavings": "Ahorro neto",
       "endingBalance": "Saldo final",
       "startingBalance": "Saldo inicial",
       "totalIncome": "Ingresos",
       "totalExpenses": "Gastos",
+      "currentMonthLabel": "mes actual",
+      "previousMonth": "Ir al mes anterior: {month}",
+      "nextMonth": "Ir al mes siguiente: {month}",
+      "editMonth": "Editar",
+      "editMonthAria": "Editar ingresos y gastos fijos de {month}",
       "additionalExpensesTitle": "Gastos adicionales",
       "additionalExpensesDescription": "Movimientos puntuales que reducen el ahorro del mes.",
       "addExtraExpense": "Añadir gasto extra",
@@ -191,11 +196,9 @@
     }
   },
   "Nav": {
-    "currentMonth": "Mes actual",
+    "months": "Meses",
     "annualSummary": "Resumen anual",
-    "monthlyDetail": "Detalle mensual",
     "yearLabel": "Año",
-    "currentMonthLabel": "mes actual",
     "createYear": "Crear año {year}"
 
   },
