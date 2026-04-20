@@ -6,6 +6,7 @@ import { FixedExpensesCard } from "./fixed-expenses-card";
 import { IncomeCard } from "./income-card";
 import { AdditionalEntriesCard } from "./additional-entries-card";
 import { SummaryCard } from "./summary-card";
+import { sortAdditionalEntriesDesc } from "@/lib/additional-entries";
 import { computeMonthChain } from "@/lib/calculations";
 import type { MonthData, YearData, AdditionalEntry } from "@/lib/types";
 
@@ -47,8 +48,8 @@ export function MonthlyView({ yearData: initialYearData, monthNumber }: Props) {
     setMonths((prev) => {
       const updated = prev.map((m) => {
         if (m.id !== month.id) return m;
-        if (type === "expense") return { ...m, additionalExpenses: entries };
-        return { ...m, additionalIncomes: entries };
+        if (type === "expense") return { ...m, additionalExpenses: sortAdditionalEntriesDesc(entries) };
+        return { ...m, additionalIncomes: sortAdditionalEntriesDesc(entries) };
       });
       return recompute(updated);
     });

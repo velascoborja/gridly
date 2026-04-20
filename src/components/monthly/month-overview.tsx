@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Trash2 } from "lucide-react";
+import { sortAdditionalEntriesDesc } from "@/lib/additional-entries";
 import { formatCurrency, formatMonthName } from "@/lib/utils";
 import { computeMonthChain } from "@/lib/calculations";
 import type { MonthData, YearData, AdditionalEntry } from "@/lib/types";
@@ -100,8 +101,10 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
     setMonths((prev) => {
       const updated = prev.map((m) => {
         if (m.id !== month.id) return m;
-        if (type === "expense") return { ...m, additionalExpenses: [...m.additionalExpenses, entry] };
-        return { ...m, additionalIncomes: [...m.additionalIncomes, entry] };
+        if (type === "expense") {
+          return { ...m, additionalExpenses: sortAdditionalEntriesDesc([...m.additionalExpenses, entry]) };
+        }
+        return { ...m, additionalIncomes: sortAdditionalEntriesDesc([...m.additionalIncomes, entry]) };
       });
       return recompute(updated);
     });
@@ -130,6 +133,8 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
   }
 
   const savingsPositive = month.savings >= 0;
+  const sortedAdditionalExpenses = sortAdditionalEntriesDesc(month.additionalExpenses);
+  const sortedAdditionalIncomes = sortAdditionalEntriesDesc(month.additionalIncomes);
 
   return (
     <div className="space-y-6">
@@ -213,9 +218,9 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
             </div>
 
             <div>
-              {month.additionalExpenses.length > 0 ? (
+              {sortedAdditionalExpenses.length > 0 ? (
                 <div className="space-y-1.5">
-                  {month.additionalExpenses.map((entry) => (
+                  {sortedAdditionalExpenses.map((entry) => (
                     <div key={entry.id} className="flex items-center justify-between rounded-lg px-2 py-1.5 transition-colors hover:bg-muted/60">
                       <span className="text-sm text-muted-foreground">{entry.label}</span>
                       <div className="flex items-center gap-2">
@@ -266,9 +271,9 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
             </div>
 
             <div>
-              {month.additionalIncomes.length > 0 ? (
+              {sortedAdditionalIncomes.length > 0 ? (
                 <div className="space-y-1.5">
-                  {month.additionalIncomes.map((entry) => (
+                  {sortedAdditionalIncomes.map((entry) => (
                     <div key={entry.id} className="flex items-center justify-between rounded-lg px-2 py-1.5 transition-colors hover:bg-muted/60">
                       <span className="text-sm text-muted-foreground">{entry.label}</span>
                       <div className="flex items-center gap-2">

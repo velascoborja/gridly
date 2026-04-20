@@ -1,6 +1,7 @@
 import { and, asc, eq, inArray } from "drizzle-orm";
 import { db } from "@/db";
 import { additionalEntries, months, years } from "@/db/schema";
+import { sortAdditionalEntriesDesc } from "@/lib/additional-entries";
 import { computeMonthChain } from "@/lib/calculations";
 import type { YearData } from "@/lib/types";
 
@@ -52,24 +53,28 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
       bonus: parseFloat(month.bonus),
       interests: parseFloat(month.interests),
       personalRemaining: parseFloat(month.personalRemaining),
-      additionalExpenses: entries
-        .filter((entry) => entry.type === "expense")
-        .map((entry) => ({
-          id: entry.id,
-          monthId: entry.monthId,
-          type: "expense" as const,
-          label: entry.label,
-          amount: parseFloat(entry.amount),
-        })),
-      additionalIncomes: entries
-        .filter((entry) => entry.type === "income")
-        .map((entry) => ({
-          id: entry.id,
-          monthId: entry.monthId,
-          type: "income" as const,
-          label: entry.label,
-          amount: parseFloat(entry.amount),
-        })),
+      additionalExpenses: sortAdditionalEntriesDesc(
+        entries
+          .filter((entry) => entry.type === "expense")
+          .map((entry) => ({
+            id: entry.id,
+            monthId: entry.monthId,
+            type: "expense" as const,
+            label: entry.label,
+            amount: parseFloat(entry.amount),
+          }))
+      ),
+      additionalIncomes: sortAdditionalEntriesDesc(
+        entries
+          .filter((entry) => entry.type === "income")
+          .map((entry) => ({
+            id: entry.id,
+            monthId: entry.monthId,
+            type: "income" as const,
+            label: entry.label,
+            amount: parseFloat(entry.amount),
+          }))
+      ),
     };
   });
 

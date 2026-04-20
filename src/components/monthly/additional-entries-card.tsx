@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Pencil, Plus, Trash2, X } from "lucide-react";
+import { sortAdditionalEntriesDesc } from "@/lib/additional-entries";
 import { formatCurrency } from "@/lib/utils";
 import type { AdditionalEntry } from "@/lib/types";
 
@@ -27,6 +28,7 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editLabel, setEditLabel] = useState("");
   const [editAmount, setEditAmount] = useState("");
+  const sortedEntries = sortAdditionalEntriesDesc(entries);
 
   const closeAddForm = () => {
     setAdding(false);
@@ -51,13 +53,13 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
     });
     if (!res.ok) return;
     const entry = await res.json();
-    onEntriesChange([...entries, { ...entry, amount: parseFloat(entry.amount) }]);
+    onEntriesChange(sortAdditionalEntriesDesc([...entries, { ...entry, amount: parseFloat(entry.amount) }]));
     closeAddForm();
   };
 
   const handleDelete = async (id: number) => {
     await fetch(`/api/months/${monthId}/entries/${id}`, { method: "DELETE" });
-    onEntriesChange(entries.filter((e) => e.id !== id));
+    onEntriesChange(sortAdditionalEntriesDesc(entries.filter((e) => e.id !== id)));
   };
 
   const handleEdit = async (id: number) => {
@@ -70,7 +72,11 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
     });
     if (!res.ok) return;
     const updated = await res.json();
-    onEntriesChange(entries.map((e) => e.id === id ? { ...updated, amount: parseFloat(updated.amount) } : e));
+    onEntriesChange(
+      sortAdditionalEntriesDesc(
+        entries.map((e) => e.id === id ? { ...updated, amount: parseFloat(updated.amount) } : e)
+      )
+    );
     setEditingId(null);
   };
 
@@ -129,12 +135,12 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
         </div>
 
         <div className="flex flex-col gap-2">
-          {entries.length === 0 && !adding && (
+          {sortedEntries.length === 0 && !adding && (
             <div className="rounded-xl border border-dashed border-border/70 bg-muted/20 px-3 py-3 text-[13px] text-muted-foreground">
               {t("noEntries")}
             </div>
           )}
-          {entries.map((entry) =>
+          {sortedEntries.map((entry) =>
             editingId === entry.id ? (
               <div key={entry.id} className="rounded-xl border border-border/70 bg-muted/20 p-1.5">
                 <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto] sm:items-center">
