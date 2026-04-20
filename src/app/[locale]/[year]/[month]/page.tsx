@@ -14,7 +14,6 @@ export default async function MonthPage({
 }) {
   const { year: yearStr, month: monthStr, locale } = await params;
   const tCommon = await getTranslations("Common");
-  const tNav = await getTranslations("Nav");
   
   const year = parseInt(yearStr, 10);
   const month = parseInt(monthStr, 10);
@@ -80,10 +79,7 @@ export default async function MonthPage({
   return (
     <AppShell currentYear={year} currentMonth={month} view="detail" years={years.length > 0 ? years : [year]} user={user}>
       <div className="mb-8 flex max-w-3xl flex-col items-center text-center md:items-start md:text-left">
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-          {tNav("monthlyDetail")}
-        </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl capitalize">
+        <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl capitalize">
           {monthName} {year}
         </h1>
       </div>

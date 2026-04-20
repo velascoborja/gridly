@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import type { KeyboardEvent } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Trash2 } from "lucide-react";
+import { FixedExpensesCard } from "./fixed-expenses-card";
+import { IncomeCard } from "./income-card";
 import { sortAdditionalEntriesDesc } from "@/lib/additional-entries";
 import { formatCurrency, formatMonthName } from "@/lib/utils";
 import { computeMonthChain } from "@/lib/calculations";
@@ -93,8 +95,32 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
 
   const month = months.find((m) => m.month === monthNumber);
 
-  const recompute = (updated: MonthData[]) =>
-    computeMonthChain(updated, config.startingBalance, config.interestRate);
+  const recompute = useCallback((updated: MonthData[]) => {
+    return computeMonthChain(updated, config.startingBalance, config.interestRate);
+  }, [config.interestRate, config.startingBalance]);
+
+  const handleFixedUpdate = useCallback(async (field: string, value: number) => {
+    if (!month) return;
+    const res = await fetch(`/api/months/${month.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ [field]: value }),
+    });
+    if (!res.ok) throw new Error("Failed to update");
+
+    setMonths((prev) => {
+      const updated = prev.map((m) =>
+        m.id === month.id
+          ? {
+              ...m,
+              [field]: value,
+              ...(field === "interests" ? { interestsManualOverride: true } : {}),
+            }
+          : m
+      );
+      return recompute(updated);
+    });
+  }, [month, recompute]);
 
   const handleEntryAdded = (type: "income" | "expense", entry: AdditionalEntry) => {
     if (!month) return;
@@ -190,6 +216,11 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
           </div>
         </CardContent>
       </Card>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <FixedExpensesCard month={month} onUpdate={handleFixedUpdate} />
+        <IncomeCard month={month} onUpdate={handleFixedUpdate} />
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Card className="border-border/60 bg-card/90 shadow-sm">
