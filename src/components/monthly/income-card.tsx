@@ -16,14 +16,14 @@ export function IncomeCard({ month, onUpdate }: Props) {
   const isJuly = month.month === 7;
 
   return (
-    <Card className="border-border/70 bg-card/95 shadow-sm shadow-black/5">
+    <Card size="sm" className="border-border/70 bg-card/95 shadow-sm shadow-black/5">
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-medium">{t("title")}</CardTitle>
         <CardDescription>
           {t("description")}
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-1.5">
+      <CardContent className="space-y-1">
         <InlineEditField
           label={t("payslip")}
           value={month.payslip}

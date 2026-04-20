@@ -74,17 +74,17 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
   };
 
   return (
-    <Card className="border-border/70 bg-card/95 shadow-sm shadow-black/5">
+    <Card size="sm" className="border-border/70 bg-card/95 shadow-sm shadow-black/5">
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         <CardDescription>
           {t("description")}
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-col gap-3">
+      <CardContent className="flex flex-col gap-2.5">
         <div className="order-first md:order-last">
           {adding ? (
-            <div className="rounded-xl border border-border/70 bg-muted/20 p-2">
+            <div className="rounded-xl border border-border/70 bg-muted/20 p-1.5">
               <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto] sm:items-center">
                 <Input
                   className="h-9 min-w-0 text-sm"
@@ -127,15 +127,15 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
           )}
         </div>
 
-        <div className="flex flex-col gap-3 order-last md:order-first">
+        <div className="order-last flex flex-col gap-2 md:order-first">
           {entries.length === 0 && !adding && (
-            <div className="rounded-xl border border-dashed border-border/70 bg-muted/20 px-3 py-4 text-sm text-muted-foreground">
+            <div className="rounded-xl border border-dashed border-border/70 bg-muted/20 px-3 py-3 text-sm text-muted-foreground">
               {t("noEntries")}
             </div>
           )}
           {entries.map((entry) =>
             editingId === entry.id ? (
-              <div key={entry.id} className="rounded-xl border border-border/70 bg-muted/20 p-2">
+              <div key={entry.id} className="rounded-xl border border-border/70 bg-muted/20 p-1.5">
                 <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto] sm:items-center">
                   <Input
                     className="h-9 min-w-0 text-sm"
@@ -166,8 +166,8 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
                 </div>
               </div>
             ) : (
-              <div key={entry.id} className="rounded-xl border border-transparent px-2 py-2 transition-colors hover:border-border/70 hover:bg-muted/40">
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div key={entry.id} className="rounded-xl border border-transparent px-2 py-1.5 transition-colors hover:border-border/70 hover:bg-muted/40">
+                <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
                   <button
                     className="min-w-0 flex-1 text-left text-sm font-medium text-foreground transition-colors hover:text-primary focus-visible:text-primary"
                     onClick={() => openEditForm(entry)}

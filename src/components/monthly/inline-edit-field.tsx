@@ -77,10 +77,10 @@ export function InlineEditField({ label, value, onSave, disabled, className }: I
   };
 
   return (
-    <div className={`flex flex-col gap-2 rounded-xl px-2 py-2 transition-colors hover:bg-muted/30 sm:flex-row sm:items-center sm:justify-between ${className ?? ""}`}>
+    <div className={`flex flex-col gap-1.5 rounded-xl px-2 py-1.5 transition-colors hover:bg-muted/30 sm:flex-row sm:items-center sm:justify-between ${className ?? ""}`}>
       <span className="min-w-0 text-sm font-medium text-muted-foreground break-words">{label}</span>
       {editing ? (
-        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+        <div className="flex w-full flex-col gap-1.5 sm:w-auto sm:flex-row sm:items-center">
           <input
             ref={inputRef}
             className={`h-9 w-full rounded-md border bg-background px-2.5 text-right text-sm outline-none transition-colors focus:ring-4 focus:ring-ring/20 sm:w-32 ${error ? "border-destructive" : "border-border"}`}
