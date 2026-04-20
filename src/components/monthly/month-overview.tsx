@@ -193,7 +193,7 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
             <p className="text-xs text-muted-foreground">{tOverview("additionalExpensesDescription")}</p>
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
-            <div className="order-first md:order-last">
+            <div>
               {addingType === "expense" ? (
                 <QuickAddForm
                   monthId={month.id}
@@ -212,7 +212,7 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
               )}
             </div>
 
-            <div className="order-last md:order-first">
+            <div>
               {month.additionalExpenses.length > 0 ? (
                 <div className="space-y-1.5">
                   {month.additionalExpenses.map((entry) => (
@@ -246,7 +246,7 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
             <p className="text-xs text-muted-foreground">{tOverview("additionalIncomeDescription")}</p>
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
-            <div className="order-first md:order-last">
+            <div>
               {addingType === "income" ? (
                 <QuickAddForm
                   monthId={month.id}
@@ -265,7 +265,7 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
               )}
             </div>
 
-            <div className="order-last md:order-first">
+            <div>
               {month.additionalIncomes.length > 0 ? (
                 <div className="space-y-1.5">
                   {month.additionalIncomes.map((entry) => (

@@ -83,7 +83,7 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-2.5">
-        <div className="order-first md:order-last">
+        <div>
           {adding ? (
             <div className="rounded-xl border border-border/70 bg-muted/20 p-1.5">
               <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto] sm:items-center">
@@ -128,7 +128,7 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
           )}
         </div>
 
-        <div className="order-last flex flex-col gap-2 md:order-first">
+        <div className="flex flex-col gap-2">
           {entries.length === 0 && !adding && (
             <div className="rounded-xl border border-dashed border-border/70 bg-muted/20 px-3 py-3 text-[13px] text-muted-foreground">
               {t("noEntries")}
