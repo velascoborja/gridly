@@ -130,6 +130,24 @@
   },
   "Monthly": {
     "noData": "No hay datos para este mes",
+    "overview": {
+      "activeMonth": "Mes activo",
+      "netSavings": "Ahorro neto",
+      "endingBalance": "Saldo final",
+      "startingBalance": "Saldo inicial",
+      "totalIncome": "Ingresos",
+      "totalExpenses": "Gastos",
+      "additionalExpensesTitle": "Gastos adicionales",
+      "additionalExpensesDescription": "Movimientos puntuales que reducen el ahorro del mes.",
+      "addExtraExpense": "Añadir gasto extra",
+      "deleteExpenseAria": "Eliminar gasto {label}",
+      "noAdditionalExpenses": "No hay gastos adicionales todavía. Añade uno si este mes tiene un ajuste puntual.",
+      "additionalIncomeTitle": "Ingresos adicionales",
+      "additionalIncomeDescription": "Entradas extraordinarias que mejoran el saldo final.",
+      "addExtraIncome": "Añadir ingreso extra",
+      "deleteIncomeAria": "Eliminar ingreso {label}",
+      "noAdditionalIncome": "No hay ingresos adicionales todavía. Registra una entrada puntual si corresponde."
+    },
     "income": {
       "title": "Ingresos fijos",
       "description": "Entradas base del mes, incluyendo pagas extra y complementos cuando aplican.",
@@ -176,5 +194,29 @@
     "currentMonthLabel": "mes actual",
     "createYear": "Crear año {year}"
 
+  },
+  "Export": {
+    "expenses": "GASTOS",
+    "income": "INGRESOS",
+    "totalExpenses": "Total gastos",
+    "totalIncome": "Total ingresos",
+    "month": "Mes",
+    "startingBalance": "Saldo inicial",
+    "savings": "Ahorro",
+    "endingBalance": "Saldo final",
+    "configuration": "Configuración",
+    "estimatedSalary": "Salario estimado",
+    "monthlyInvestment": "Inversión mensual",
+    "monthlyHomeExpense": "Gasto hogar mensual",
+    "monthlyPersonalBudget": "Presupuesto personal",
+    "interestRate": "Tipo interés",
+    "homeExpense": "Casa (mes siguiente)",
+    "personalExpense": "Gastos propios",
+    "investment": "Inversión",
+    "payslip": "Nómina",
+    "additionalPayslip": "Paga extra",
+    "bonus": "Bonus",
+    "interests": "Intereses",
+    "personalRemaining": "Sobrante propios"
   }
 }

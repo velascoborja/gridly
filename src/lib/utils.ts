@@ -5,16 +5,19 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("es-ES", {
+export function formatCurrency(amount: number, locale = "es"): string {
+  return new Intl.NumberFormat(locale, {
     style: "currency",
     currency: "EUR",
-    minimumFractionDigits: 2,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   }).format(amount);
 }
 
-export const MONTH_NAMES = [
-  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
-];
-
+export function formatMonthName(
+  month: number,
+  locale = "es",
+  format: "long" | "short" = "long",
+): string {
+  return new Intl.DateTimeFormat(locale, { month: format }).format(new Date(2024, month - 1, 1));
+}

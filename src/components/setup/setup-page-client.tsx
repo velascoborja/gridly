@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,6 +24,7 @@ interface Props {
 
 export function SetupPageClient({ year, derivedStartingBalance, previousYear, startingBalanceEditable }: Props) {
   const t = useTranslations("Setup");
+  const locale = useLocale();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") ?? `/${year}/${new Date().getMonth() + 1}`;
   const router = useRouter();
@@ -124,7 +125,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
               <div className="rounded-2xl border border-white/10 bg-white/8 p-4 backdrop-blur-sm">
                 <p className="text-xs uppercase tracking-[0.22em] text-white/55">{t("startingBalanceDerived")}</p>
                 <p className="mt-2 text-sm font-medium text-white">
-                  {startingBalanceEditable ? t("startingBalanceReal") : formatCurrency(derivedStartingBalance)}
+                  {startingBalanceEditable ? t("startingBalanceReal") : formatCurrency(derivedStartingBalance, locale)}
                 </p>
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/8 p-4 backdrop-blur-sm">
@@ -148,7 +149,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
             <CardDescription className="text-sm leading-6 sm:text-base">
               {startingBalanceEditable
                 ? t("formDescriptionEditable")
-                : t("formDescriptionFixed", { previousYear: previousYear ?? "", balance: formatCurrency(derivedStartingBalance) })}
+                : t("formDescriptionFixed", { previousYear: previousYear ?? "", balance: formatCurrency(derivedStartingBalance, locale) })}
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-6">

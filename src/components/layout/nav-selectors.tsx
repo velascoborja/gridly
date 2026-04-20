@@ -6,7 +6,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { getNextCreatableYear } from "@/lib/server/year-planning";
 import { cn } from "@/lib/utils";
 import { Plus } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Select,
   SelectContent,
@@ -25,6 +25,7 @@ interface Props {
 export function NavSelectors({ currentYear, currentMonth, view, years }: Props) {
   const router = useRouter();
   const t = useTranslations("Nav");
+  const locale = useLocale();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -45,7 +46,7 @@ export function NavSelectors({ currentYear, currentMonth, view, years }: Props) 
   // Generate localized month names
   const monthNames = Array.from({ length: 12 }, (_, i) => {
     const date = new Date(2024, i, 1);
-    return new Intl.DateTimeFormat(undefined, { month: "long" }).format(date);
+    return new Intl.DateTimeFormat(locale, { month: "long" }).format(date);
   });
 
   const handleYearChange = (val: string | null) => {

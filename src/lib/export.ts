@@ -1,6 +1,57 @@
 import ExcelJS from "exceljs";
 import type { YearData } from "./types";
-import { MONTH_NAMES } from "./utils";
+import { formatMonthName } from "./utils";
+
+const EXPORT_MESSAGES = {
+  en: {
+    expenses: "EXPENSES",
+    income: "INCOME",
+    totalExpenses: "Total expenses",
+    totalIncome: "Total income",
+    month: "Month",
+    startingBalance: "Starting balance",
+    savings: "Savings",
+    endingBalance: "Ending balance",
+    configuration: "Configuration",
+    estimatedSalary: "Estimated salary",
+    monthlyInvestment: "Monthly investment",
+    monthlyHomeExpense: "Monthly home expense",
+    monthlyPersonalBudget: "Personal budget",
+    interestRate: "Interest rate",
+    homeExpense: "Home expenses",
+    personalExpense: "Personal expenses",
+    investment: "Investment",
+    payslip: "Salary",
+    additionalPayslip: "Extra pay",
+    bonus: "Bonus",
+    interests: "Interests",
+    personalRemaining: "Personal surplus",
+  },
+  es: {
+    expenses: "GASTOS",
+    income: "INGRESOS",
+    totalExpenses: "Total gastos",
+    totalIncome: "Total ingresos",
+    month: "Mes",
+    startingBalance: "Saldo inicial",
+    savings: "Ahorro",
+    endingBalance: "Saldo final",
+    configuration: "Configuración",
+    estimatedSalary: "Salario estimado",
+    monthlyInvestment: "Inversión mensual",
+    monthlyHomeExpense: "Gasto hogar mensual",
+    monthlyPersonalBudget: "Presupuesto personal",
+    interestRate: "Tipo interés",
+    homeExpense: "Casa (mes siguiente)",
+    personalExpense: "Gastos propios",
+    investment: "Inversión",
+    payslip: "Nómina",
+    additionalPayslip: "Paga extra",
+    bonus: "Bonus",
+    interests: "Intereses",
+    personalRemaining: "Sobrante propios",
+  },
+} as const;
 
 function styleHeader(ws: ExcelJS.Worksheet, cell: string, text: string) {
   const c = ws.getCell(cell);
@@ -25,8 +76,10 @@ function writeMonthSection(
   year: number,
   month: YearData["months"][number],
   startRow: number,
+  locale: "en" | "es",
 ) {
-  const sheetName = MONTH_NAMES[month.month - 1];
+  const t = EXPORT_MESSAGES[locale];
+  const sheetName = formatMonthName(month.month, locale);
 
   ws.mergeCells(`A${startRow}:E${startRow}`);
   const title = ws.getCell(`A${startRow}`);
@@ -35,8 +88,8 @@ function writeMonthSection(
   title.alignment = { horizontal: "center" };
 
   const headerRow = startRow + 2;
-  styleHeader(ws, `A${headerRow}`, "GASTOS");
-  styleHeader(ws, `D${headerRow}`, "INGRESOS");
+  styleHeader(ws, `A${headerRow}`, t.expenses);
+  styleHeader(ws, `D${headerRow}`, t.income);
 
   let expRow = headerRow + 1;
   const addExpRow = (text: string, value: number) => {
@@ -45,9 +98,9 @@ function writeMonthSection(
     expRow++;
   };
 
-  addExpRow("Casa (mes siguiente)", month.homeExpense);
-  addExpRow("Gastos propios", month.personalExpense);
-  addExpRow("Inversión", month.investment);
+  addExpRow(t.homeExpense, month.homeExpense);
+  addExpRow(t.personalExpense, month.personalExpense);
+  addExpRow(t.investment, month.investment);
   for (const entry of month.additionalExpenses) {
     addExpRow(entry.label, entry.amount);
   }
@@ -59,32 +112,32 @@ function writeMonthSection(
     incRow++;
   };
 
-  addIncRow("Nómina", month.payslip);
-  if (month.additionalPayslip > 0) addIncRow("Paga extra", month.additionalPayslip);
-  if (month.bonus > 0) addIncRow("Bonus", month.bonus);
-  addIncRow("Intereses", month.interests);
-  addIncRow("Sobrante propios", month.personalRemaining);
+  addIncRow(t.payslip, month.payslip);
+  if (month.additionalPayslip > 0) addIncRow(t.additionalPayslip, month.additionalPayslip);
+  if (month.bonus > 0) addIncRow(t.bonus, month.bonus);
+  addIncRow(t.interests, month.interests);
+  addIncRow(t.personalRemaining, month.personalRemaining);
   for (const entry of month.additionalIncomes) {
     addIncRow(entry.label, entry.amount);
   }
 
   const totalRow = Math.max(expRow, incRow) + 1;
-  styleHeader(ws, `A${totalRow}`, "Total gastos");
+  styleHeader(ws, `A${totalRow}`, t.totalExpenses);
   money(ws, `B${totalRow}`, month.totalExpenses);
-  styleHeader(ws, `D${totalRow}`, "Total ingresos");
+  styleHeader(ws, `D${totalRow}`, t.totalIncome);
   money(ws, `E${totalRow}`, month.totalIncome);
 
   const summaryRow = totalRow + 2;
-  label(ws, `A${summaryRow}`, "Saldo inicial");
+  label(ws, `A${summaryRow}`, t.startingBalance);
   money(ws, `B${summaryRow}`, month.startingBalance);
 
-  label(ws, `A${summaryRow + 1}`, "Ahorro del mes");
+  label(ws, `A${summaryRow + 1}`, t.savings);
   const savingsCell = ws.getCell(`B${summaryRow + 1}`);
   savingsCell.value = month.savings;
   savingsCell.numFmt = "#,##0.00€";
   savingsCell.font = { color: { argb: month.savings >= 0 ? "FF1E8449" : "FFC0392B" } };
 
-  label(ws, `A${summaryRow + 2}`, "Saldo final");
+  label(ws, `A${summaryRow + 2}`, t.endingBalance);
   const endCell = ws.getCell(`B${summaryRow + 2}`);
   endCell.value = month.endingBalance;
   endCell.numFmt = "#,##0.00€";
@@ -93,9 +146,10 @@ function writeMonthSection(
   return summaryRow + 2;
 }
 
-export async function buildWorkbook(yearData: YearData): Promise<Buffer> {
+export async function buildWorkbook(yearData: YearData, locale: "en" | "es" = "es"): Promise<Buffer> {
   const wb = new ExcelJS.Workbook();
   wb.creator = "Gridly";
+  const t = EXPORT_MESSAGES[locale];
 
   const ws = wb.addWorksheet(String(yearData.config.year));
   ws.columns = [
@@ -109,19 +163,19 @@ export async function buildWorkbook(yearData: YearData): Promise<Buffer> {
 
   let currentRow = 1;
   for (const month of yearData.months) {
-    currentRow = writeMonthSection(ws, yearData.config.year, month, currentRow) + 3;
+    currentRow = writeMonthSection(ws, yearData.config.year, month, currentRow, locale) + 3;
   }
 
-  styleHeader(ws, `A${currentRow}`, "Mes");
-  styleHeader(ws, `B${currentRow}`, "Saldo inicial");
-  styleHeader(ws, `C${currentRow}`, "Ingresos");
-  styleHeader(ws, `D${currentRow}`, "Gastos");
-  styleHeader(ws, `E${currentRow}`, "Ahorro");
-  styleHeader(ws, `F${currentRow}`, "Saldo final");
+  styleHeader(ws, `A${currentRow}`, t.month);
+  styleHeader(ws, `B${currentRow}`, t.startingBalance);
+  styleHeader(ws, `C${currentRow}`, t.totalIncome);
+  styleHeader(ws, `D${currentRow}`, t.totalExpenses);
+  styleHeader(ws, `E${currentRow}`, t.savings);
+  styleHeader(ws, `F${currentRow}`, t.endingBalance);
 
   yearData.months.forEach((month, index) => {
     const row = currentRow + 1 + index;
-    ws.getCell(`A${row}`).value = MONTH_NAMES[month.month - 1];
+    ws.getCell(`A${row}`).value = formatMonthName(month.month, locale);
     money(ws, `B${row}`, month.startingBalance);
     money(ws, `C${row}`, month.totalIncome);
     money(ws, `D${row}`, month.totalExpenses);
@@ -133,15 +187,15 @@ export async function buildWorkbook(yearData: YearData): Promise<Buffer> {
   });
 
   const configRow = currentRow + yearData.months.length + 2;
-  styleHeader(ws, `A${configRow}`, "Configuración");
+  styleHeader(ws, `A${configRow}`, t.configuration);
 
   const cfg = yearData.config;
   const cfgItems = [
-    ["Salario estimado", cfg.estimatedSalary],
-    ["Inversión mensual", cfg.monthlyInvestment],
-    ["Gasto hogar mensual", cfg.monthlyHomeExpense],
-    ["Presupuesto personal", cfg.monthlyPersonalBudget],
-    ["Tipo interés", cfg.interestRate],
+    [t.estimatedSalary, cfg.estimatedSalary],
+    [t.monthlyInvestment, cfg.monthlyInvestment],
+    [t.monthlyHomeExpense, cfg.monthlyHomeExpense],
+    [t.monthlyPersonalBudget, cfg.monthlyPersonalBudget],
+    [t.interestRate, cfg.interestRate],
   ] as [string, number][];
 
   cfgItems.forEach(([text, value], index) => {

@@ -36,7 +36,7 @@ export function SavingsChart({ months }: Props) {
               <CartesianGrid strokeDasharray="3 3" className="stroke-border/80" />
               <XAxis dataKey="name" tick={{ fontSize: 11 }} />
               <YAxis tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} width={40} />
-              <Tooltip formatter={(v) => formatCurrency(Number(v))} />
+              <Tooltip formatter={(v) => formatCurrency(Number(v), locale)} />
               <Bar name={t("savingsLabel")} dataKey="ahorro" radius={[3, 3, 0, 0]}>
                 {data.map((entry, i) => (
                   <Cell

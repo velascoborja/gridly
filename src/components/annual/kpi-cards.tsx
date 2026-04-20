@@ -1,4 +1,4 @@
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
 import type { MonthData } from "@/lib/types";
@@ -10,6 +10,7 @@ interface Props {
 
 export function KpiCards({ months, startingBalance }: Props) {
   const t = useTranslations("Annual.kpis");
+  const locale = useLocale();
   const populated = months.filter((m) => m.totalIncome > 0 || m.totalExpenses > 0);
   const totalSavings = populated.reduce((s, m) => s + m.savings, 0);
   const avgSavings = populated.length > 0 ? totalSavings / populated.length : 0;
@@ -55,7 +56,7 @@ export function KpiCards({ months, startingBalance }: Props) {
           </CardHeader>
           <CardContent className="pt-0">
             <p className={`text-2xl font-semibold tabular-nums ${k.positive ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
-              {formatCurrency(k.value)}
+              {formatCurrency(k.value, locale)}
             </p>
             <p className="mt-2 text-xs leading-5 text-muted-foreground">{k.note}</p>
           </CardContent>

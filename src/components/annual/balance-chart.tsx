@@ -40,7 +40,7 @@ export function BalanceChart({ months }: Props) {
                 tick={{ fontSize: 11 }}
                 width={40}
               />
-              <Tooltip formatter={(v) => formatCurrency(Number(v))} labelClassName="font-medium" />
+              <Tooltip formatter={(v) => formatCurrency(Number(v), locale)} labelClassName="font-medium" />
               <Line
                 name={t("balanceLabel")}
                 type="monotone"

@@ -130,6 +130,24 @@
   },
   "Monthly": {
     "noData": "No data for this month",
+    "overview": {
+      "activeMonth": "Active month",
+      "netSavings": "Net savings",
+      "endingBalance": "Ending balance",
+      "startingBalance": "Starting balance",
+      "totalIncome": "Income",
+      "totalExpenses": "Expenses",
+      "additionalExpensesTitle": "Additional expenses",
+      "additionalExpensesDescription": "One-off movements that reduce the month's savings.",
+      "addExtraExpense": "Add extra expense",
+      "deleteExpenseAria": "Delete expense {label}",
+      "noAdditionalExpenses": "There are no additional expenses yet. Add one if this month has a one-off adjustment.",
+      "additionalIncomeTitle": "Additional income",
+      "additionalIncomeDescription": "Extraordinary income that improves the final balance.",
+      "addExtraIncome": "Add extra income",
+      "deleteIncomeAria": "Delete income {label}",
+      "noAdditionalIncome": "There is no additional income yet. Add one if applicable."
+    },
     "income": {
       "title": "Fixed Income",
       "description": "Base income for the month, including extra pays and bonuses when applicable.",
@@ -176,5 +194,29 @@
     "currentMonthLabel": "current month",
     "createYear": "Create {year}"
 
+  },
+  "Export": {
+    "expenses": "EXPENSES",
+    "income": "INCOME",
+    "totalExpenses": "Total expenses",
+    "totalIncome": "Total income",
+    "month": "Month",
+    "startingBalance": "Starting balance",
+    "savings": "Savings",
+    "endingBalance": "Ending balance",
+    "configuration": "Configuration",
+    "estimatedSalary": "Estimated salary",
+    "monthlyInvestment": "Monthly investment",
+    "monthlyHomeExpense": "Monthly home expense",
+    "monthlyPersonalBudget": "Personal budget",
+    "interestRate": "Interest rate",
+    "homeExpense": "Home expenses",
+    "personalExpense": "Personal expenses",
+    "investment": "Investment",
+    "payslip": "Salary",
+    "additionalPayslip": "Extra pay",
+    "bonus": "Bonus",
+    "interests": "Interests",
+    "personalRemaining": "Personal surplus"
   }
 }
