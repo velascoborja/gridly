@@ -12,12 +12,14 @@ function SummaryRow({
   value,
   locale,
   highlight,
+  emphasize,
   positive,
 }: {
   label: string;
   value: number;
   locale: string;
   highlight?: boolean;
+  emphasize?: boolean;
   positive?: boolean;
 }) {
   const color = positive !== undefined
@@ -27,7 +29,7 @@ function SummaryRow({
   return (
     <div className={`flex items-center justify-between py-2 ${highlight ? "mt-1 border-t border-border/70 pt-3" : ""}`}>
       <span className={`text-sm ${highlight ? "font-semibold text-foreground" : "text-muted-foreground"}`}>{label}</span>
-      <span className={`text-sm font-medium tabular-nums ${color} ${highlight ? "text-base font-bold" : ""}`}>
+      <span className={`text-sm tabular-nums ${color} ${emphasize ? "text-base font-bold text-foreground" : "font-medium"} ${highlight && !emphasize ? "text-base font-bold" : ""}`}>
         {formatCurrency(value, locale)}
       </span>
     </div>
@@ -61,6 +63,7 @@ export function SummaryCard({ month }: Props) {
           value={month.endingBalance}
           locale={locale}
           highlight
+          emphasize
         />
       </CardContent>
     </Card>
