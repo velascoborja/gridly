@@ -1,14 +1,9 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import type { KeyboardEvent } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Plus, Trash2 } from "lucide-react";
-import { FixedExpensesCard } from "./fixed-expenses-card";
-import { IncomeCard } from "./income-card";
+import { Card, CardContent } from "@/components/ui/card";
+import { AdditionalEntriesCard } from "./additional-entries-card";
 import { sortAdditionalEntriesDesc } from "@/lib/additional-entries";
 import { formatCurrency, formatMonthName } from "@/lib/utils";
 import { computeMonthChain } from "@/lib/calculations";
@@ -19,78 +14,11 @@ interface Props {
   monthNumber: number;
 }
 
-interface QuickAddFormProps {
-  monthId: number;
-  type: "income" | "expense";
-  onAdd: (entry: AdditionalEntry) => void;
-  onCancel: () => void;
-}
-
-function QuickAddForm({ monthId, type, onAdd, onCancel }: QuickAddFormProps) {
-  const t = useTranslations("Monthly.additionalEntries");
-  const [label, setLabel] = useState("");
-  const [amount, setAmount] = useState("");
-  const [saving, setSaving] = useState(false);
-
-  const handleSave = async () => {
-    const parsed = parseFloat(amount.replace(",", "."));
-    if (!label.trim() || isNaN(parsed)) return;
-
-    setSaving(true);
-    try {
-      const res = await fetch(`/api/months/${monthId}/entries`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, label: label.trim(), amount: parsed }),
-      });
-      if (!res.ok) return;
-
-      const entry = await res.json();
-      onAdd({ ...entry, amount: parseFloat(entry.amount) });
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") handleSave();
-    if (e.key === "Escape") onCancel();
-  };
-
-  return (
-    <div className="flex gap-2 items-center rounded-xl border border-border/60 bg-background/70 p-2">
-      <Input
-        className="h-9 flex-1 text-sm"
-        placeholder={t("descriptionPlaceholder")}
-        value={label}
-        onChange={(e) => setLabel(e.target.value)}
-        onKeyDown={handleKeyDown}
-        autoFocus
-      />
-      <Input
-        className="h-9 w-28 text-right text-sm"
-        placeholder="0.00"
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
-        onKeyDown={handleKeyDown}
-        inputMode="decimal"
-      />
-      <Button size="sm" variant="ghost" className="h-9 px-3 text-muted-foreground hover:text-foreground" onClick={handleSave} disabled={saving}>
-        ✓
-      </Button>
-      <Button size="sm" variant="ghost" className="h-9 px-3 text-muted-foreground hover:text-foreground" onClick={onCancel}>
-        ✕
-      </Button>
-    </div>
-  );
-}
-
 export function MonthOverview({ yearData: initialYearData, monthNumber }: Props) {
   const t = useTranslations("Monthly");
   const tOverview = useTranslations("Monthly.overview");
   const locale = useLocale();
   const [months, setMonths] = useState<MonthData[]>(initialYearData.months);
-  const [addingType, setAddingType] = useState<"income" | "expense" | null>(null);
   const config = initialYearData.config;
 
   const month = months.find((m) => m.month === monthNumber);
@@ -99,56 +27,17 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
     return computeMonthChain(updated, config.startingBalance, config.interestRate);
   }, [config.interestRate, config.startingBalance]);
 
-  const handleFixedUpdate = useCallback(async (field: string, value: number) => {
+  const handleEntriesChange = useCallback((type: "income" | "expense", entries: AdditionalEntry[]) => {
     if (!month) return;
-    const res = await fetch(`/api/months/${month.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ [field]: value }),
-    });
-    if (!res.ok) throw new Error("Failed to update");
-
     setMonths((prev) => {
-      const updated = prev.map((m) =>
-        m.id === month.id
-          ? {
-              ...m,
-              [field]: value,
-              ...(field === "interests" ? { interestsManualOverride: true } : {}),
-            }
-          : m
-      );
+      const updated = prev.map((m) => {
+        if (m.id !== month.id) return m;
+        if (type === "expense") return { ...m, additionalExpenses: sortAdditionalEntriesDesc(entries) };
+        return { ...m, additionalIncomes: sortAdditionalEntriesDesc(entries) };
+      });
       return recompute(updated);
     });
   }, [month, recompute]);
-
-  const handleEntryAdded = (type: "income" | "expense", entry: AdditionalEntry) => {
-    if (!month) return;
-    setMonths((prev) => {
-      const updated = prev.map((m) => {
-        if (m.id !== month.id) return m;
-        if (type === "expense") {
-          return { ...m, additionalExpenses: sortAdditionalEntriesDesc([...m.additionalExpenses, entry]) };
-        }
-        return { ...m, additionalIncomes: sortAdditionalEntriesDesc([...m.additionalIncomes, entry]) };
-      });
-      return recompute(updated);
-    });
-    setAddingType(null);
-  };
-
-  const handleEntryDelete = async (type: "income" | "expense", id: number) => {
-    if (!month) return;
-    await fetch(`/api/months/${month.id}/entries/${id}`, { method: "DELETE" });
-    setMonths((prev) => {
-      const updated = prev.map((m) => {
-        if (m.id !== month.id) return m;
-        if (type === "expense") return { ...m, additionalExpenses: m.additionalExpenses.filter((e) => e.id !== id) };
-        return { ...m, additionalIncomes: m.additionalIncomes.filter((e) => e.id !== id) };
-      });
-      return recompute(updated);
-    });
-  };
 
   if (!month) {
     return (
@@ -159,8 +48,6 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
   }
 
   const savingsPositive = month.savings >= 0;
-  const sortedAdditionalExpenses = sortAdditionalEntriesDesc(month.additionalExpenses);
-  const sortedAdditionalIncomes = sortAdditionalEntriesDesc(month.additionalIncomes);
 
   return (
     <div className="space-y-6">
@@ -217,117 +104,22 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <FixedExpensesCard month={month} onUpdate={handleFixedUpdate} />
-        <IncomeCard month={month} onUpdate={handleFixedUpdate} />
-      </div>
-
       <div className="grid gap-4 sm:grid-cols-2">
-        <Card className="border-border/60 bg-card/90 shadow-sm">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">{tOverview("additionalExpensesTitle")}</CardTitle>
-            <p className="text-xs text-muted-foreground">{tOverview("additionalExpensesDescription")}</p>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-3">
-            <div>
-              {addingType === "expense" ? (
-                <QuickAddForm
-                  monthId={month.id}
-                  type="expense"
-                  onAdd={(e) => handleEntryAdded("expense", e)}
-                  onCancel={() => setAddingType(null)}
-                />
-              ) : (
-                <button
-                  className="inline-flex items-center gap-2 rounded-md text-sm text-muted-foreground transition-colors hover:text-foreground"
-                  onClick={() => setAddingType("expense")}
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                  {tOverview("addExtraExpense")}
-                </button>
-              )}
-            </div>
+        <AdditionalEntriesCard
+          monthId={month.id}
+          type="expense"
+          entries={month.additionalExpenses}
+          onEntriesChange={(entries) => handleEntriesChange("expense", entries)}
+          title={tOverview("additionalExpensesTitle")}
+        />
 
-            <div>
-              {sortedAdditionalExpenses.length > 0 ? (
-                <div className="space-y-1.5">
-                  {sortedAdditionalExpenses.map((entry) => (
-                    <div key={entry.id} className="flex items-center justify-between rounded-lg px-2 py-1.5 transition-colors hover:bg-muted/60">
-                      <span className="text-sm text-muted-foreground">{entry.label}</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium tabular-nums">{formatCurrency(entry.amount, locale)}</span>
-                        <button
-                          className="rounded-md p-1 text-muted-foreground transition-colors hover:text-destructive focus-visible:text-destructive"
-                          onClick={() => handleEntryDelete("expense", entry.id)}
-                          aria-label={tOverview("deleteExpenseAria", { label: entry.label })}
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="rounded-xl border border-dashed border-border/70 bg-muted/20 px-3 py-4 text-sm text-muted-foreground">
-                  {tOverview("noAdditionalExpenses")}
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/60 bg-card/90 shadow-sm">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">{tOverview("additionalIncomeTitle")}</CardTitle>
-            <p className="text-xs text-muted-foreground">{tOverview("additionalIncomeDescription")}</p>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-3">
-            <div>
-              {addingType === "income" ? (
-                <QuickAddForm
-                  monthId={month.id}
-                  type="income"
-                  onAdd={(e) => handleEntryAdded("income", e)}
-                  onCancel={() => setAddingType(null)}
-                />
-              ) : (
-                <button
-                  className="inline-flex items-center gap-2 rounded-md text-sm text-muted-foreground transition-colors hover:text-foreground"
-                  onClick={() => setAddingType("income")}
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                  {tOverview("addExtraIncome")}
-                </button>
-              )}
-            </div>
-
-            <div>
-              {sortedAdditionalIncomes.length > 0 ? (
-                <div className="space-y-1.5">
-                  {sortedAdditionalIncomes.map((entry) => (
-                    <div key={entry.id} className="flex items-center justify-between rounded-lg px-2 py-1.5 transition-colors hover:bg-muted/60">
-                      <span className="text-sm text-muted-foreground">{entry.label}</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium tabular-nums">{formatCurrency(entry.amount, locale)}</span>
-                        <button
-                          className="rounded-md p-1 text-muted-foreground transition-colors hover:text-destructive focus-visible:text-destructive"
-                          onClick={() => handleEntryDelete("income", entry.id)}
-                          aria-label={tOverview("deleteIncomeAria", { label: entry.label })}
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="rounded-xl border border-dashed border-border/70 bg-muted/20 px-3 py-4 text-sm text-muted-foreground">
-                  {tOverview("noAdditionalIncome")}
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        <AdditionalEntriesCard
+          monthId={month.id}
+          type="income"
+          entries={month.additionalIncomes}
+          onEntriesChange={(entries) => handleEntriesChange("income", entries)}
+          title={tOverview("additionalIncomeTitle")}
+        />
       </div>
     </div>
   );
