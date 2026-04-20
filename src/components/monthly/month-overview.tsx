@@ -147,7 +147,7 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
         <div className="flex items-center gap-2 border-b border-border/70 px-3 py-3 sm:px-4">
           {previousMonth ? (
             <Link
-              href={`/${config.year}/overview?month=${previousMonth.month}`}
+              href={`/${config.year}/${previousMonth.month}`}
               aria-label={tOverview("previousMonth", {
                 month: formatMonthName(previousMonth.month, locale),
               })}
@@ -178,7 +178,7 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
                 return (
                   <div key={item.id} className="flex shrink-0 snap-center">
                     <Link
-                      href={`/${config.year}/overview?month=${item.month}`}
+                      href={`/${config.year}/${item.month}`}
                       aria-current={isActive ? "page" : undefined}
                       aria-label={isCurrentMonth ? `${monthLabel}, ${tOverview("currentMonthLabel")}` : monthLabel}
                       className={cn(
@@ -209,7 +209,7 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
 
           {nextMonth ? (
             <Link
-              href={`/${config.year}/overview?month=${nextMonth.month}`}
+              href={`/${config.year}/${nextMonth.month}`}
               aria-label={tOverview("nextMonth", {
                 month: formatMonthName(nextMonth.month, locale),
               })}

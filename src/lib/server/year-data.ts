@@ -118,5 +118,6 @@ export async function getAppRedirectPath(userId: string, currentYear: number) {
   }
 
   const targetYear = pickDefaultYear(userYears, currentYear);
-  return `/${targetYear}/overview`;
+  const defaultMonth = currentYear === targetYear ? new Date().getMonth() + 1 : 1;
+  return `/${targetYear}/${defaultMonth}`;
 }

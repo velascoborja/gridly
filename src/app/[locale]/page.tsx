@@ -9,7 +9,7 @@ export default async function Home() {
 
   if (session?.user?.id) {
     const path = await getAppRedirectPath(session.user.id, currentYear);
-    // path is something like "/2025/overview"
+    // path is something like "/2025/4"
     redirect(path);
   }
 

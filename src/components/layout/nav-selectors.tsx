@@ -32,11 +32,11 @@ export function NavSelectors({ currentYear, currentMonth, view, years }: Props) 
     if (!val) return;
     const y = parseInt(val, 10);
     if (view === "summary") router.push(`/${y}/summary`);
-    else router.push(`/${y}/overview?month=${selectedMonth}`);
+    else router.push(`/${y}/${selectedMonth}`);
   };
 
   const mainTabs = [
-    { label: t("months"), key: "overview" as const, href: `/${currentYear}/overview?month=${selectedMonth}` },
+    { label: t("months"), key: "overview" as const, href: `/${currentYear}/${selectedMonth}` },
     { label: t("annualSummary"), key: "summary" as const, href: `/${currentYear}/summary` as const },
   ];
 
