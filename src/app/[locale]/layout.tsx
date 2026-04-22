@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
@@ -68,9 +67,11 @@ export default async function RootLayout({
           <PinchZoomDisabler />
           {children}
         </NextIntlClientProvider>
-        <Script id="ios-active-states" strategy="afterInteractive">
-          {`document.addEventListener('touchstart', function() {}, true);`}
-        </Script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `document.addEventListener('touchstart', function() {}, {passive: true});`,
+          }}
+        />
       </body>
     </html>
   );
