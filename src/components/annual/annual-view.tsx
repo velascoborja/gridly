@@ -58,12 +58,12 @@ export function AnnualView({ yearData: initial, startingBalanceEditable }: Props
   };
 
   return (
-    <div className="space-y-6">
-      <section className="overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white shadow-xl shadow-slate-950/20">
-        <div className="grid gap-6 px-6 py-7 md:px-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,0.85fr)] lg:items-center">
-          <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
-            <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-semibold tracking-tight">
+    <div className="space-y-5">
+      <section className="overflow-hidden rounded-lg border border-white/10 bg-gradient-to-br from-[#1c1e54] via-[#0d253d] to-slate-950 text-white shadow-[0_30px_45px_-30px_rgba(50,50,93,0.45),0_18px_36px_-18px_rgba(0,0,0,0.22)]">
+        <div className="grid gap-5 px-5 py-5 md:px-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <h1 className="text-3xl font-light tracking-[-0.04em] text-white">
                 {t("yearLabel", { year: config.year })}
               </h1>
               <Dialog>
@@ -72,7 +72,7 @@ export function AnnualView({ yearData: initial, startingBalanceEditable }: Props
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 rounded-full text-white/70 hover:bg-white/10 hover:text-white"
+                      className="h-8 w-8 text-white/70 hover:bg-white/10 hover:text-white"
                     >
                       <Settings className="h-4 w-4" />
                       <span className="sr-only">{t("configButton")}</span>
@@ -95,25 +95,23 @@ export function AnnualView({ yearData: initial, startingBalanceEditable }: Props
                 </DialogContent>
               </Dialog>
             </div>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-white/70">
               {t("description")}
             </p>
           </div>
 
-          <div className="flex flex-col items-center space-y-3 lg:items-end">
-            <div className="flex flex-wrap justify-center gap-2 lg:justify-end">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleExport}
-                disabled={savingConfig}
-                className="border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white"
-              >
-                <Download className="mr-2 h-4 w-4" />
-                {savingConfig ? t("saving") : t("exportExcel")}
-              </Button>
-            </div>
-            <p className="text-center text-xs leading-5 text-slate-400 lg:text-right">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center lg:flex-col lg:items-end">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExport}
+              disabled={savingConfig}
+              className="w-fit border-white/15 bg-white/8 text-white hover:bg-white/14 hover:text-white"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              {savingConfig ? t("saving") : t("exportExcel")}
+            </Button>
+            <p className="max-w-sm text-xs leading-5 text-white/55 sm:max-w-md lg:text-right">
               {savingConfig
                 ? t("savingDescription")
                 : t("exportDescription")}

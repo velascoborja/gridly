@@ -17,7 +17,7 @@ export function IncomeCard({ month, onUpdate }: Props) {
 
   return (
     <Card size="sm" className="border-border/70 bg-card/95 shadow-sm shadow-black/5">
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-1">
         <CardTitle className="text-sm font-medium">{t("title")}</CardTitle>
         <CardDescription>
           {t("description")}

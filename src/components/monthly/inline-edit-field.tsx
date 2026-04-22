@@ -86,12 +86,12 @@ export function InlineEditField({ label, value, onSave, disabled, className }: I
         className,
       )}
     >
-      <span className="min-w-0 truncate whitespace-nowrap text-[13px] font-medium text-muted-foreground">{label}</span>
+      <span className="min-w-0 truncate whitespace-nowrap text-sm font-medium text-foreground">{label}</span>
       {editing ? (
         <div className="flex min-w-0 shrink-0 items-center justify-end gap-1.5">
           <input
             ref={inputRef}
-            className={`h-9 w-20 rounded-md border bg-background px-2.5 text-right text-[13px] outline-none transition-colors focus:ring-4 focus:ring-ring/20 sm:w-32 ${error ? "border-destructive" : "border-border"}`}
+            className={`h-9 w-20 rounded-md border bg-background px-2.5 text-right text-sm outline-none transition-colors focus:ring-4 focus:ring-ring/20 sm:w-32 ${error ? "border-destructive" : "border-border"}`}
             value={inputVal}
             onChange={(e) => { setInputVal(e.target.value); setError(false); }}
             onBlur={handleBlur}
@@ -113,7 +113,7 @@ export function InlineEditField({ label, value, onSave, disabled, className }: I
         </div>
       ) : (
         <button
-          className={`shrink-0 rounded-md px-2 py-1 text-[13px] font-semibold tabular-nums transition-colors hover:bg-background hover:text-primary disabled:cursor-default disabled:opacity-50 ${error ? "text-destructive" : "text-foreground"}`}
+          className={`shrink-0 rounded-md px-2 py-1 text-sm font-semibold tabular-nums transition-colors hover:bg-background hover:text-primary disabled:cursor-default disabled:opacity-50 ${error ? "text-destructive" : "text-foreground"}`}
           onClick={() => !disabled && setEditing(true)}
           disabled={disabled}
           type="button"

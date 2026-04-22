@@ -25,12 +25,12 @@ export function SavingsChart({ months }: Props) {
 
   return (
     <Card className="border-border/70 bg-card/90 shadow-sm">
-      <CardHeader className="space-y-1 pb-3">
-        <CardTitle className="text-sm font-medium">{t("savingsTitle")}</CardTitle>
-        <p className="text-xs text-muted-foreground">{t("savingsDescription")}</p>
+      <CardHeader className="space-y-1 pb-2">
+        <CardTitle className="text-base font-light tracking-[-0.02em]">{t("savingsTitle")}</CardTitle>
+        <p className="text-sm leading-5 text-muted-foreground">{t("savingsDescription")}</p>
       </CardHeader>
       <CardContent className="pt-0">
-        <div className="rounded-2xl border border-border/60 bg-muted/20 p-3">
+        <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={data} margin={{ top: 6, right: 8, bottom: 0, left: 8 }}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-border/80" />

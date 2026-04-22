@@ -5,7 +5,18 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Pencil, Plus, Trash2, X } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Plus, Trash2, X } from "lucide-react";
 import { sortAdditionalEntriesDesc } from "@/lib/additional-entries";
 import { formatCurrency } from "@/lib/utils";
 import type { AdditionalEntry } from "@/lib/types";
@@ -94,7 +105,7 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
             <div className="rounded-xl border border-border/70 bg-muted/20 p-1.5">
               <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto] sm:items-center">
                 <Input
-                  className="h-9 min-w-0 text-[13px]"
+                  className="h-9 min-w-0 text-sm"
                   placeholder={t("descriptionPlaceholder")}
                   value={newLabel}
                   onChange={(e) => setNewLabel(e.target.value)}
@@ -105,7 +116,7 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
                   autoFocus
                 />
                 <Input
-                  className="h-9 w-full text-right text-[13px] sm:w-28"
+                  className="h-9 w-full text-right text-sm sm:w-28"
                   placeholder="0.00"
                   value={newAmount}
                   onChange={(e) => setNewAmount(e.target.value)}
@@ -125,7 +136,7 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
             </div>
           ) : (
             <button
-              className="inline-flex items-center gap-2 rounded-md text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="inline-flex items-center gap-2 rounded-md text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               onClick={() => setAdding(true)}
               type="button"
             >
@@ -136,7 +147,7 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
 
         <div className="flex flex-col gap-2">
           {sortedEntries.length === 0 && !adding && (
-            <div className="rounded-xl border border-dashed border-border/70 bg-muted/20 px-3 py-3 text-[13px] text-muted-foreground">
+            <div className="rounded-xl border border-dashed border-border/70 bg-muted/20 px-3 py-3 text-sm text-muted-foreground">
               {t("noEntries")}
             </div>
           )}
@@ -145,7 +156,7 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
               <div key={entry.id} className="rounded-xl border border-border/70 bg-muted/20 p-1.5">
                 <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto] sm:items-center">
                   <Input
-                    className="h-9 min-w-0 text-[13px]"
+                    className="h-9 min-w-0 text-sm"
                     value={editLabel}
                     onChange={(e) => setEditLabel(e.target.value)}
                     onKeyDown={(e) => {
@@ -155,7 +166,7 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
                     autoFocus
                   />
                   <Input
-                    className="h-9 w-full text-right text-[13px] sm:w-28"
+                    className="h-9 w-full text-right text-sm sm:w-28"
                     value={editAmount}
                     onChange={(e) => setEditAmount(e.target.value)}
                     onKeyDown={(e) => {
@@ -176,7 +187,7 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
               <div key={entry.id} className="rounded-xl border border-transparent px-2 py-1.5 transition-colors hover:border-border/70 hover:bg-muted/40">
                 <div className="flex min-w-0 items-center justify-between gap-2">
                   <button
-                    className="min-w-0 flex-1 truncate text-left text-[13px] font-medium text-foreground transition-colors hover:text-primary focus-visible:text-primary"
+                    className="min-w-0 flex-1 truncate text-left text-sm font-medium text-foreground transition-colors hover:text-primary focus-visible:text-primary"
                     onClick={() => openEditForm(entry)}
                     type="button"
                     aria-label={`${t("edit")} ${entry.label}`}
@@ -185,25 +196,35 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
                     {entry.label}
                   </button>
                   <div className="flex shrink-0 items-center gap-1.5">
-                    <span className="whitespace-nowrap text-[13px] font-semibold tabular-nums">{formatCurrency(entry.amount, locale)}</span>
-                    <Button
-                      size="icon-xs"
-                      variant="ghost"
-                      className="text-muted-foreground hover:text-foreground"
-                      onClick={() => openEditForm(entry)}
-                      aria-label={`${t("edit")} ${entry.label}`}
-                    >
-                      <Pencil className="h-3 w-3" />
-                    </Button>
-                    <Button
-                      size="icon-xs"
-                      variant="ghost"
-                      className="text-muted-foreground hover:text-destructive"
-                      onClick={() => handleDelete(entry.id)}
-                      aria-label={`${t("delete")} ${entry.label}`}
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
+                    <span className="whitespace-nowrap text-sm font-semibold tabular-nums">{formatCurrency(entry.amount, locale)}</span>
+                    <AlertDialog>
+                      <AlertDialogTrigger
+                        render={
+                          <Button
+                            size="icon-xs"
+                            variant="ghost"
+                            className="text-muted-foreground hover:text-destructive"
+                            aria-label={`${t("delete")} ${entry.label}`}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        }
+                      />
+                      <AlertDialogContent size="sm">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>{t("confirmDeleteTitle")}</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            {t("confirmDeleteDescription", { label: entry.label })}
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel variant="ghost">{t("cancel")}</AlertDialogCancel>
+                          <AlertDialogAction variant="destructive" onClick={() => handleDelete(entry.id)}>
+                            {t("confirmDeleteAction")}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </div>
               </div>

@@ -31,3 +31,23 @@ test("additional entry display rows stay on one line on mobile", async () => {
   );
 });
 
+test("additional entry rows do not render a separate edit action", async () => {
+  const source = await readSource("src/components/monthly/additional-entries-card.tsx");
+
+  assert.match(
+    source,
+    /onClick=\{\(\) => openEditForm\(entry\)\}/,
+    "display rows should remain editable by clicking the row label",
+  );
+  assert.doesNotMatch(
+    source,
+    /Pencil/,
+    "display rows should not import or render the pencil edit icon",
+  );
+  const buttonBlocks = source.match(/<Button[\s\S]*?<\/Button>/g) ?? [];
+  assert.equal(
+    buttonBlocks.some((block) => block.includes("openEditForm(entry)")),
+    false,
+    "display rows should not expose a separate edit action button",
+  );
+});

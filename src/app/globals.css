@@ -232,6 +232,25 @@
 }
 
 @layer utilities {
+  .app-header-surface {
+    border-bottom: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
+    background: color-mix(in oklch, var(--background) 78%, transparent);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+  }
+
+  .app-header-surface::before {
+    content: "";
+    position: fixed;
+    inset-inline: 0;
+    top: 0;
+    height: env(safe-area-inset-top);
+    pointer-events: none;
+    background: color-mix(in oklch, var(--background) 78%, transparent);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+  }
+
   .surface-depth {
     background: var(--surface-1);
     box-shadow: var(--elevation-1);

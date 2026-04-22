@@ -244,7 +244,7 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
         </div>
       </div>
 
-      <Card className="overflow-hidden border-white/10 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white shadow-xl">
+      <Card className="overflow-hidden border-white/10 bg-gradient-to-br from-[#1c1e54] via-[#0d253d] to-slate-950 text-white shadow-[0_30px_45px_-30px_rgba(50,50,93,0.45),0_18px_36px_-18px_rgba(0,0,0,0.22)]">
         <CardContent className="px-6 py-3">
           <div className="flex flex-col items-center gap-8 text-center md:flex-row md:items-center md:justify-between md:text-left">
             {/* Left: Identification */}
@@ -262,7 +262,7 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
                     type="button"
                     aria-expanded={showFixedEditors}
                     aria-controls="month-fixed-editors"
-                    className="inline-flex items-center gap-1 rounded-md border border-primary/20 bg-primary/[0.08] px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/[0.14]"
+                    className="inline-flex items-center gap-1 rounded-md border border-white/18 bg-white/10 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:border-white/28 hover:bg-white/16"
                     aria-label={tOverview("editMonthAria", {
                       month: formatMonthName(month.month, locale),
                     })}

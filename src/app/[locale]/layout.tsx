@@ -22,6 +22,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  themeColor: "#e8edf3",
 };
 
 export const metadata: Metadata = {
@@ -35,6 +36,11 @@ export const metadata: Metadata = {
   referrer: "origin-when-cross-origin",
   creator: "Gridly",
   publisher: "Gridly",
+  appleWebApp: {
+    capable: true,
+    title: "Gridly",
+    statusBarStyle: "black-translucent",
+  },
 };
 
 export default async function RootLayout({
