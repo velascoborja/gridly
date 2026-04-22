@@ -232,7 +232,7 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
       </div>
 
       <Card className="overflow-hidden border-white/10 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white shadow-xl">
-        <CardContent className="p-6">
+        <CardContent className="px-6 py-3">
           <div className="flex flex-col items-center gap-8 text-center md:flex-row md:items-center md:justify-between md:text-left">
             {/* Left: Identification */}
             <div className="flex flex-col items-center gap-4 sm:gap-8 md:flex-row">

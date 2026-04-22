@@ -94,7 +94,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
             <div className="space-y-6">
               <div className="flex items-center gap-3">
                 <Image
-                  src="/logo-v2.png"
+                  src="/logo.svg"
                   alt="Gridly"
                   width={48}
                   height={48}

@@ -25,7 +25,7 @@ export function AppShell({ currentYear, currentMonth, view, years, user, childre
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
           <Link href="/" className="group inline-flex items-center gap-3 self-center">
             <Image
-              src="/logo-v2.png"
+              src="/logo.svg"
               alt="Gridly"
               width={48}
               height={48}

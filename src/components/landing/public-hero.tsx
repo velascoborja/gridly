@@ -32,7 +32,7 @@ export function PublicHero() {
       <header className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
         <Link href="/" className="group inline-flex items-center gap-3">
           <Image
-            src="/logo-v2.png"
+            src="/logo.svg"
             alt="Gridly"
             width={48}
             height={48}
