@@ -30,12 +30,12 @@ export function PublicHero() {
     <div className="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(83,58,253,0.18),transparent_28%),radial-gradient(circle_at_top_right,rgba(249,107,238,0.12),transparent_24%),linear-gradient(180deg,#fbfcff_0%,#f6f8fc_42%,#f2f5fb_100%)] text-foreground">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[linear-gradient(180deg,rgba(255,255,255,0.88),transparent)]" />
       <header className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
-        <Link href="/" className="group inline-flex items-center gap-3">
+        <Link href="/" className="group inline-flex items-center gap-2">
           <Image
             src="/logo.svg"
             alt="Gridly"
-            width={48}
-            height={48}
+            width={52}
+            height={52}
             className="rounded-2xl shadow-[0_18px_36px_-22px_rgba(83,58,253,0.8)] transition-transform duration-200 group-hover:-translate-y-0.5"
           />
           <span className="text-xl font-semibold tracking-tight leading-none text-[#061b31]">Gridly</span>

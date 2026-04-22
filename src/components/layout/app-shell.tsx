@@ -23,12 +23,12 @@ export function AppShell({ currentYear, currentMonth, view, years, user, childre
       <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[linear-gradient(180deg,rgba(255,255,255,0.75),transparent)]" />
       <header className="sticky top-0 z-40 border-b border-border/70 bg-background/75 backdrop-blur-xl">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
-          <Link href="/" className="group inline-flex items-center gap-3 self-center">
+          <Link href="/" className="group inline-flex items-center gap-2 self-center">
             <Image
               src="/logo.svg"
               alt="Gridly"
-              width={48}
-              height={48}
+              width={52}
+              height={52}
               className="rounded-2xl shadow-[0_14px_30px_-18px_rgba(15,23,42,0.6)] transition-transform duration-200 group-hover:-translate-y-0.5"
             />
             <span className="text-xl font-semibold tracking-tight leading-none">Gridly</span>
