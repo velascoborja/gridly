@@ -174,17 +174,18 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
               </div>
             ) : (
               <div key={entry.id} className="rounded-xl border border-transparent px-2 py-1.5 transition-colors hover:border-border/70 hover:bg-muted/40">
-                <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex min-w-0 items-center justify-between gap-2">
                   <button
-                    className="min-w-0 flex-1 text-left text-[13px] font-medium text-foreground transition-colors hover:text-primary focus-visible:text-primary"
+                    className="min-w-0 flex-1 truncate text-left text-[13px] font-medium text-foreground transition-colors hover:text-primary focus-visible:text-primary"
                     onClick={() => openEditForm(entry)}
                     type="button"
                     aria-label={`${t("edit")} ${entry.label}`}
+                    title={entry.label}
                   >
                     {entry.label}
                   </button>
-                  <div className="flex items-center gap-1.5 sm:shrink-0">
-                    <span className="text-[13px] font-semibold tabular-nums">{formatCurrency(entry.amount, locale)}</span>
+                  <div className="flex shrink-0 items-center gap-1.5">
+                    <span className="whitespace-nowrap text-[13px] font-semibold tabular-nums">{formatCurrency(entry.amount, locale)}</span>
                     <Button
                       size="icon-xs"
                       variant="ghost"
