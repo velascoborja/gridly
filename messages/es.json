@@ -142,6 +142,7 @@
     "noData": "No hay datos para este mes",
     "overview": {
       "activeMonth": "Mes seleccionado",
+      "currentMonth": "Mes en curso",
       "netSavings": "Ahorro neto",
       "endingBalance": "Saldo final",
       "startingBalance": "Saldo inicial",

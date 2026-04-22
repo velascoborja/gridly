@@ -149,6 +149,8 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
   }
 
   const savingsPositive = month.savings >= 0;
+  const isSelectedMonthCurrent =
+    config.year === today.getFullYear() && month.month === today.getMonth() + 1;
 
   return (
     <div className="space-y-6">
@@ -254,8 +256,15 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
                   {formatMonthName(month.month, locale)} {config.year}
                 </h2>
                 <div className="mt-1 inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-white/40">
-                  <span className="size-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]"></span>
-                  {tOverview("activeMonth")}
+                  <span
+                    className={cn(
+                      "size-1.5 rounded-full",
+                      isSelectedMonthCurrent
+                        ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]"
+                        : "bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.5)]"
+                    )}
+                  />
+                  {tOverview(isSelectedMonthCurrent ? "currentMonth" : "activeMonth")}
                 </div>
                 <div className="mt-2">
                   <button

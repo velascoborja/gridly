@@ -142,6 +142,7 @@
     "noData": "No data for this month",
     "overview": {
       "activeMonth": "Selected month",
+      "currentMonth": "Current month",
       "netSavings": "Net savings",
       "endingBalance": "Ending balance",
       "startingBalance": "Starting balance",
