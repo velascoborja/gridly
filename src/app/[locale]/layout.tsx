@@ -5,6 +5,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { routing } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
+import { StatusBarTheme } from "@/components/layout/status-bar-theme";
 import "../globals.css";
 
 const geistSans = Geist({
@@ -22,7 +23,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#e8edf3",
+  themeColor: "#ffffff",
 };
 
 export const metadata: Metadata = {
@@ -64,6 +65,7 @@ export default async function RootLayout({
     >
       <body className="min-h-dvh bg-background text-foreground">
         <NextIntlClientProvider messages={messages}>
+          <StatusBarTheme />
           {children}
         </NextIntlClientProvider>
         <Script id="ios-active-states" strategy="afterInteractive">
