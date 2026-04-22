@@ -182,6 +182,7 @@
       "titleExpense": "Gastos adicionales",
       "descriptionIncome": "Registra entradas puntuales que aumentan el saldo del mes.",
       "descriptionExpense": "Anota gastos puntuales para reflejar ajustes o compras no recurrentes.",
+      "total": "Total",
       "addEntry": "Añadir entrada",
       "noEntries": "Sin entradas todavía.",
       "descriptionPlaceholder": "Descripción",

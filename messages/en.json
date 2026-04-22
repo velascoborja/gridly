@@ -182,6 +182,7 @@
       "titleExpense": "Additional expenses",
       "descriptionIncome": "Register occasional income that increases this month's balance.",
       "descriptionExpense": "Track occasional expenses for adjustments or non-recurring purchases.",
+      "total": "Total",
       "addEntry": "Add entry",
       "noEntries": "No entries yet.",
       "descriptionPlaceholder": "Description",

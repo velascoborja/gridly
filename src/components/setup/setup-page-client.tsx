@@ -93,17 +93,17 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
           <div className="relative flex h-full flex-col justify-between gap-10">
             <div className="space-y-6">
               <div className="flex items-center gap-3">
-                <Image
-                  src="/logo.svg"
-                  alt="Gridly"
-                  width={48}
-                  height={48}
-                  className="rounded-2xl shadow-[0_14px_30px_-18px_rgba(255,255,255,0.55)]"
-                />
+                <div className="rounded-lg bg-white/94 px-3 py-2 shadow-[0_18px_36px_-24px_rgba(255,255,255,0.55)]">
+                  <Image
+                    src="/gridly-wordmark.svg"
+                    alt="Gridly"
+                    width={216}
+                    height={64}
+                    className="h-10 w-[135px]"
+                    priority
+                  />
+                </div>
                 <div className="space-y-0.5">
-                  <p className="text-sm font-semibold uppercase tracking-[0.26em] text-white/70">
-                    Gridly
-                  </p>
                   <p className="text-sm text-white/70">{t("subtitle")}</p>
                 </div>
               </div>

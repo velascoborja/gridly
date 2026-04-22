@@ -25,13 +25,13 @@ export function AppShell({ currentYear, currentMonth, view, years, user, childre
         <div className="mx-auto grid w-full max-w-7xl grid-cols-[1fr_auto] items-center gap-x-3 gap-y-2 px-4 py-2 sm:px-6 md:flex md:items-center md:justify-between md:gap-4 md:py-4 lg:px-8">
           <Link href="/" className="group inline-flex items-center gap-2 justify-self-start">
             <Image
-              src="/logo.svg"
+              src="/gridly-wordmark.svg"
               alt="Gridly"
-              width={52}
-              height={52}
-              className="size-9 rounded-xl shadow-[0_14px_30px_-18px_rgba(15,23,42,0.6)] transition-transform duration-200 group-hover:-translate-y-0.5 md:size-[52px] md:rounded-2xl"
+              width={216}
+              height={64}
+              className="h-10 w-[135px] transition-transform duration-200 group-hover:-translate-y-0.5 md:h-12 md:w-[162px]"
+              priority
             />
-            <span className="text-xl font-semibold tracking-tight leading-none">Gridly</span>
           </Link>
           <div className="contents md:flex md:flex-col md:items-end md:gap-3">
             <div className="flex items-center justify-end justify-self-end">

@@ -6,3 +6,7 @@ export function sortAdditionalEntriesDesc(entries: AdditionalEntry[]) {
     return amountDiff !== 0 ? amountDiff : b.id - a.id;
   });
 }
+
+export function sumAdditionalEntries(entries: AdditionalEntry[]) {
+  return entries.reduce((sum, entry) => sum + entry.amount, 0);
+}

@@ -32,13 +32,13 @@ export function PublicHero() {
       <header className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
         <Link href="/" className="group inline-flex items-center gap-2">
           <Image
-            src="/logo.svg"
+            src="/gridly-wordmark.svg"
             alt="Gridly"
-            width={52}
-            height={52}
-            className="rounded-2xl shadow-[0_18px_36px_-22px_rgba(83,58,253,0.8)] transition-transform duration-200 group-hover:-translate-y-0.5"
+            width={216}
+            height={64}
+            className="h-11 w-[149px] transition-transform duration-200 group-hover:-translate-y-0.5 sm:h-12 sm:w-[162px]"
+            priority
           />
-          <span className="text-xl font-semibold tracking-tight leading-none text-[#061b31]">Gridly</span>
         </Link>
         <GoogleSignInButton />
       </header>

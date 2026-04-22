@@ -17,7 +17,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Plus, Trash2, X } from "lucide-react";
-import { sortAdditionalEntriesDesc } from "@/lib/additional-entries";
+import { sortAdditionalEntriesDesc, sumAdditionalEntries } from "@/lib/additional-entries";
 import { formatCurrency } from "@/lib/utils";
 import type { AdditionalEntry } from "@/lib/types";
 
@@ -40,6 +40,7 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
   const [editLabel, setEditLabel] = useState("");
   const [editAmount, setEditAmount] = useState("");
   const sortedEntries = sortAdditionalEntriesDesc(entries);
+  const entriesTotal = sumAdditionalEntries(entries);
 
   const closeAddForm = () => {
     setAdding(false);
@@ -94,10 +95,22 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
   return (
     <Card size="sm" className="border-border/70 bg-card/95 shadow-sm shadow-black/5">
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        <CardDescription>
-          {t(type === "income" ? "descriptionIncome" : "descriptionExpense")}
-        </CardDescription>
+        <div className="flex min-w-0 items-start justify-between gap-3">
+          <div className="min-w-0">
+            <CardTitle className="text-sm font-medium">{title}</CardTitle>
+            <CardDescription>
+              {t(type === "income" ? "descriptionIncome" : "descriptionExpense")}
+            </CardDescription>
+          </div>
+          <div className="grid shrink-0 justify-items-center rounded-md border border-border/70 bg-background/80 px-2.5 py-1 text-center shadow-sm">
+            <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+              {t("total")}
+            </p>
+            <p className={`text-sm font-semibold tabular-nums ${type === "income" ? "text-emerald-600 dark:text-emerald-300" : "text-rose-600 dark:text-rose-300"}`}>
+              {formatCurrency(entriesTotal, locale)}
+            </p>
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-2.5">
         <div>
