@@ -30,6 +30,7 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
   const [fixedEditorsHeight, setFixedEditorsHeight] = useState<number | "auto">(0);
   const config = initialYearData.config;
   const today = new Date();
+  const activeMonthTabRef = useRef<HTMLDivElement>(null);
   const fixedEditorsInnerRef = useRef<HTMLDivElement>(null);
   const fixedEditorsFrameRef = useRef<number | null>(null);
   const sortedMonths = [...months].sort((a, b) => a.month - b.month);
@@ -87,6 +88,14 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
       fixedEditorsFrameRef.current = null;
     });
   }, [renderFixedEditors, showFixedEditors]);
+
+  useLayoutEffect(() => {
+    activeMonthTabRef.current?.scrollIntoView({
+      block: "nearest",
+      inline: "center",
+      behavior: "instant",
+    });
+  }, [monthNumber]);
 
   const month = sortedMonths.find((m) => m.month === monthNumber);
   const activeIndex = month ? sortedMonths.findIndex((item) => item.id === month.id) : -1;
@@ -167,8 +176,8 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
             </span>
           )}
 
-          <div className="min-w-0 flex-1 overflow-x-auto scrollbar-hide">
-            <div className="flex min-w-full justify-center gap-2 px-1 py-1">
+          <div className="min-w-0 flex-1 overflow-x-auto snap-x snap-mandatory scrollbar-hide">
+            <div className="mx-auto flex w-max min-w-max gap-2 px-1 py-1">
               {sortedMonths.map((item) => {
                 const isActive = item.month === month.month;
                 const isCurrentMonth =
@@ -176,7 +185,11 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
                 const monthLabel = formatMonthName(item.month, locale);
 
                 return (
-                  <div key={item.id} className="flex shrink-0 snap-center">
+                  <div
+                    key={item.id}
+                    ref={isActive ? activeMonthTabRef : null}
+                    className="flex shrink-0 snap-center"
+                  >
                     <Link
                       href={`/${config.year}/${item.month}`}
                       aria-current={isActive ? "page" : undefined}
