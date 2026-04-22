@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { InlineEditField } from "./inline-edit-field";
 import type { MonthData } from "@/lib/types";
 
@@ -12,11 +13,17 @@ interface Props {
 
 export function FixedExpensesCard({ month, onUpdate }: Props) {
   const t = useTranslations("Monthly.fixedExpenses");
+  const tFixed = useTranslations("Monthly.fixed");
 
   return (
-    <Card size="sm" className="border-border/70 bg-card/95 shadow-sm shadow-black/5">
+    <Card size="sm" className="relative border-border/70 bg-muted/40 shadow-sm shadow-black/5">
       <CardHeader className="pb-1">
-        <CardTitle className="text-sm font-medium">{t("title")}</CardTitle>
+        <div className="flex items-start justify-between">
+          <CardTitle className="text-sm font-medium">{t("title")}</CardTitle>
+          <Badge variant="outline" className="h-4.5 border-border/60 bg-background/50 px-1.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80">
+            {tFixed("badge")}
+          </Badge>
+        </div>
         <CardDescription>
           {t("description")}
         </CardDescription>

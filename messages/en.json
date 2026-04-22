@@ -165,6 +165,9 @@
       "deleteIncomeAria": "Delete income {label}",
       "noAdditionalIncome": "There is no additional income yet. Add one if applicable."
     },
+    "fixed": {
+      "badge": "Default"
+    },
     "income": {
       "title": "Fixed Income",
       "description": "Base income for the month, including extra pays and bonuses when applicable.",
