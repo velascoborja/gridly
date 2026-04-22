@@ -175,7 +175,8 @@
     "additionalEntries": {
       "titleIncome": "Additional income",
       "titleExpense": "Additional expenses",
-      "description": "Specific movements with quick editing and explicit deletions.",
+      "descriptionIncome": "Register occasional income that increases this month's balance.",
+      "descriptionExpense": "Track occasional expenses for adjustments or non-recurring purchases.",
       "addEntry": "Add entry",
       "noEntries": "No entries yet.",
       "descriptionPlaceholder": "Description",

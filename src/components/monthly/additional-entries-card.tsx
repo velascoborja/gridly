@@ -85,7 +85,7 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         <CardDescription>
-          {t("description")}
+          {t(type === "income" ? "descriptionIncome" : "descriptionExpense")}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-2.5">

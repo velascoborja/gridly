@@ -175,7 +175,8 @@
     "additionalEntries": {
       "titleIncome": "Ingresos adicionales",
       "titleExpense": "Gastos adicionales",
-      "description": "Movimientos puntuales con edición rápida y eliminaciones explícitas.",
+      "descriptionIncome": "Registra entradas puntuales que aumentan el saldo del mes.",
+      "descriptionExpense": "Anota gastos puntuales para reflejar ajustes o compras no recurrentes.",
       "addEntry": "Añadir entrada",
       "noEntries": "Sin entradas todavía.",
       "descriptionPlaceholder": "Descripción",
