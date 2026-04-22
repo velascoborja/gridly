@@ -90,7 +90,6 @@
   --financial-positive: oklch(0.55 0.16 155);
   --financial-negative: oklch(0.62 0.2 25);
   --financial-neutral: var(--muted-foreground);
-  --header-padding-y: 0.75rem;
 }
 
 .dark {
@@ -137,12 +136,6 @@
 }
 
 @layer base {
-  :root {
-    @media (min-width: 768px) {
-      --header-padding-y: 1.25rem;
-    }
-  }
-
   * {
     @apply border-border outline-ring/50;
   }
