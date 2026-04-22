@@ -16,7 +16,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Plus, Trash2, X } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { sortAdditionalEntriesDesc, sumAdditionalEntries } from "@/lib/additional-entries";
 import { formatCurrency } from "@/lib/utils";
 import type { AdditionalEntry } from "@/lib/types";
@@ -139,11 +139,11 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
                   }}
                   inputMode="decimal"
                 />
-                <Button size="sm" className="h-9 px-3 sm:w-auto" onClick={handleAdd}>
+                <Button size="sm" className="h-9 w-full px-3 sm:w-auto" onClick={handleAdd}>
                   {t("add")}
                 </Button>
-                <Button size="sm" variant="ghost" className="h-9 px-3 sm:w-auto" onClick={closeAddForm}>
-                  <X className="h-3.5 w-3.5" />
+                <Button size="sm" variant="ghost" className="h-9 w-full px-3 sm:w-auto" onClick={closeAddForm}>
+                  {t("cancel")}
                 </Button>
               </div>
             </div>
@@ -188,10 +188,10 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
                     }}
                     inputMode="decimal"
                   />
-                  <Button size="sm" className="h-9 px-3 sm:w-auto" onClick={() => handleEdit(entry.id)}>
+                  <Button size="sm" className="h-9 w-full px-3 sm:w-auto" onClick={() => handleEdit(entry.id)}>
                     {common("save")}
                   </Button>
-                  <Button size="sm" variant="ghost" className="h-9 px-3 sm:w-auto" onClick={() => setEditingId(null)}>
+                  <Button size="sm" variant="ghost" className="h-9 w-full px-3 sm:w-auto" onClick={() => setEditingId(null)}>
                     {t("cancel")}
                   </Button>
                 </div>

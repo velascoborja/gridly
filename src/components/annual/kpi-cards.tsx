@@ -168,7 +168,7 @@ export function KpiCards({ months, startingBalance }: Props) {
               return (
                 <div 
                   key={metric.label} 
-                  className={`flex items-center justify-between gap-4 ${
+                  className={`flex items-start justify-between gap-4 ${
                     index !== 0 ? "border-t border-border/40 pt-6" : ""
                   }`}
                 >
@@ -177,11 +177,11 @@ export function KpiCards({ months, startingBalance }: Props) {
                       <div className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border ${metric.tone.badgeClassName}`}>
                         <Icon className="h-4.5 w-4.5" />
                       </div>
-                      <p className="truncate text-base font-medium text-muted-foreground">
+                      <p className="text-base font-medium text-muted-foreground">
                         {metric.label}
                       </p>
                     </div>
-                    <p className="mt-2 truncate text-[13px] leading-5 text-muted-foreground/70">
+                    <p className="mt-2 text-[13px] leading-5 text-muted-foreground/70">
                       {metric.note}
                     </p>
                   </div>
