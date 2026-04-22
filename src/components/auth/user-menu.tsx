@@ -4,7 +4,7 @@ import { signOut } from "@/lib/server/actions/auth";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
-import { Settings } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Dialog,
@@ -97,8 +97,15 @@ export function UserMenu({ email, name, active, variant = "header" }: Props) {
       
       <Dialog>
         <DialogTrigger render={
-          <Button variant="outline" size="sm" className="rounded-full border-border/70 bg-background/85">
-            {t("logout")}
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-9 w-9 rounded-full border-border/70 bg-background/85 px-0 sm:h-7 sm:w-auto sm:px-2.5"
+            aria-label={t("logout")}
+            title={t("logout")}
+          >
+            <LogOut className="size-4 sm:hidden" />
+            <span className="hidden sm:inline">{t("logout")}</span>
           </Button>
         } />
         <DialogContent>
