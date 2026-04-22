@@ -6,6 +6,7 @@ import { getMessages } from 'next-intl/server';
 import { routing } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
 import "../globals.css";
+import { PinchZoomDisabler } from "@/components/layout/pinch-zoom-disabler";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -64,6 +65,7 @@ export default async function RootLayout({
     >
       <body className="min-h-dvh bg-background text-foreground">
         <NextIntlClientProvider messages={messages}>
+          <PinchZoomDisabler />
           {children}
         </NextIntlClientProvider>
         <Script id="ios-active-states" strategy="afterInteractive">

@@ -145,12 +145,9 @@
     color-scheme: light;
   }
 
-  html.dark {
-    color-scheme: dark;
-  }
-
   body {
     @apply bg-background text-foreground antialiased;
+    touch-action: pan-x pan-y;
     min-height: 100dvh;
     position: relative;
     isolation: isolate;
