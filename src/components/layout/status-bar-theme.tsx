@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
-const TOP_THEME_COLOR = "#ffffff";
+const TOP_THEME_COLOR = "#f8fafd";
 const SCROLLED_THEME_COLOR = "#e8edf3";
 const SCROLL_THRESHOLD = 8;
 

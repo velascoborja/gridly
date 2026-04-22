@@ -12,7 +12,7 @@ test("app header exposes a matching iOS status bar surface", async () => {
   const statusBarThemeSource = await readSource("src/components/layout/status-bar-theme.tsx");
   const globalsSource = await readSource("src/app/globals.css");
 
-  assert.match(layoutSource, /themeColor:\s*"#ffffff"/, "Safari should start with white browser chrome at the top");
+  assert.match(layoutSource, /themeColor:\s*"#f8fafd"/, "Safari should start with tinted browser chrome at the top");
   assert.match(layoutSource, /<StatusBarTheme\s*\/>/, "layout should install the scroll-aware theme-color updater");
   assert.match(layoutSource, /appleWebApp:\s*\{/, "installed iOS app metadata should be configured");
   assert.match(
@@ -21,7 +21,7 @@ test("app header exposes a matching iOS status bar surface", async () => {
     "standalone iOS should allow app content to extend behind the status bar",
   );
   assert.match(shellSource, /className="sticky top-0 z-40 app-header-surface"/, "app shell should use the shared header surface");
-  assert.match(statusBarThemeSource, /TOP_THEME_COLOR\s*=\s*"#ffffff"/, "top-of-page theme color should stay white");
+  assert.match(statusBarThemeSource, /TOP_THEME_COLOR\s*=\s*"#f8fafd"/, "top-of-page theme color should match the tinted background");
   assert.match(
     statusBarThemeSource,
     /SCROLLED_THEME_COLOR\s*=\s*"#e8edf3"/,
