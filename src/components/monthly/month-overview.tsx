@@ -176,8 +176,8 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
             </span>
           )}
 
-          <div className="min-w-0 flex-1 overflow-x-auto snap-x snap-mandatory scrollbar-hide">
-            <div className="mx-auto flex w-max min-w-max gap-2 px-1 py-1">
+          <div className="min-w-0 flex-1 overflow-x-auto scroll-px-3 snap-x snap-mandatory scrollbar-hide [mask-image:linear-gradient(to_right,transparent,black_12px,black_calc(100%-12px),transparent)] sm:scroll-px-1 sm:[mask-image:none]">
+            <div className="mx-auto flex w-max min-w-max gap-2 px-3 sm:px-1 py-1">
               {sortedMonths.map((item) => {
                 const isActive = item.month === month.month;
                 const isCurrentMonth =

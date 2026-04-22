@@ -30,3 +30,23 @@ test("month tab rail keeps earlier months reachable on mobile", async () => {
     "active month tab should be centered in the rail when possible",
   );
 });
+
+test("month tab rail reserves mobile edge space around arrow controls", async () => {
+  const source = await readSource("src/components/monthly/month-overview.tsx");
+
+  assert.match(
+    source,
+    /scroll-px-3/,
+    "month tab rail should use scroll padding so snapped tabs do not tuck beneath the arrow controls",
+  );
+  assert.match(
+    source,
+    /px-3 sm:px-1/,
+    "month tab list should include mobile-only horizontal inset space before the first and after the last tab",
+  );
+  assert.match(
+    source,
+    /mask-image:linear-gradient/,
+    "month tab rail should fade clipped edges instead of showing abruptly cropped tabs next to arrows",
+  );
+});
