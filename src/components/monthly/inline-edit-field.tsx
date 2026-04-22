@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import { formatCurrency } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 
 interface InlineEditFieldProps {
   label: string;
@@ -80,13 +80,18 @@ export function InlineEditField({ label, value, onSave, disabled, className }: I
   };
 
   return (
-    <div className={`flex flex-col gap-1.5 rounded-xl px-2 py-1.5 transition-colors hover:bg-muted/30 sm:flex-row sm:items-center sm:justify-between ${className ?? ""}`}>
-      <span className="min-w-0 text-[13px] font-medium text-muted-foreground break-words">{label}</span>
+    <div
+      className={cn(
+        "grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl px-2 py-1.5 transition-colors hover:bg-muted/30",
+        className,
+      )}
+    >
+      <span className="min-w-0 truncate whitespace-nowrap text-[13px] font-medium text-muted-foreground">{label}</span>
       {editing ? (
-        <div className="flex w-full flex-col gap-1.5 sm:w-auto sm:flex-row sm:items-center">
+        <div className="flex min-w-0 shrink-0 items-center justify-end gap-1.5">
           <input
             ref={inputRef}
-            className={`h-9 w-full rounded-md border bg-background px-2.5 text-right text-[13px] outline-none transition-colors focus:ring-4 focus:ring-ring/20 sm:w-32 ${error ? "border-destructive" : "border-border"}`}
+            className={`h-9 w-20 rounded-md border bg-background px-2.5 text-right text-[13px] outline-none transition-colors focus:ring-4 focus:ring-ring/20 sm:w-32 ${error ? "border-destructive" : "border-border"}`}
             value={inputVal}
             onChange={(e) => { setInputVal(e.target.value); setError(false); }}
             onBlur={handleBlur}
@@ -99,7 +104,7 @@ export function InlineEditField({ label, value, onSave, disabled, className }: I
             ref={cancelButtonRef}
             size="sm"
             variant="ghost"
-            className="h-9 w-full px-3 text-muted-foreground sm:w-auto"
+            className="h-9 shrink-0 px-2 text-muted-foreground sm:px-3"
             onClick={discardEdits}
             type="button"
           >
@@ -108,7 +113,7 @@ export function InlineEditField({ label, value, onSave, disabled, className }: I
         </div>
       ) : (
         <button
-          className={`rounded-md px-2 py-1 text-[13px] font-semibold tabular-nums transition-colors hover:bg-background hover:text-primary disabled:cursor-default disabled:opacity-50 ${error ? "text-destructive" : "text-foreground"}`}
+          className={`shrink-0 rounded-md px-2 py-1 text-[13px] font-semibold tabular-nums transition-colors hover:bg-background hover:text-primary disabled:cursor-default disabled:opacity-50 ${error ? "text-destructive" : "text-foreground"}`}
           onClick={() => !disabled && setEditing(true)}
           disabled={disabled}
           type="button"
