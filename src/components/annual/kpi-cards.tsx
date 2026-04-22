@@ -1,5 +1,5 @@
 import { useLocale, useTranslations } from "next-intl";
-import { ArrowDownRight, ArrowUpRight, Minus } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, Minus, PiggyBank, type LucideIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
 import type { MonthData } from "@/lib/types";
@@ -13,13 +13,21 @@ interface MetricTone {
   valueClassName: string;
   badgeClassName: string;
   label: string;
-  Icon: typeof ArrowUpRight;
+  Icon: LucideIcon;
 }
 
 interface ToneLabels {
   positive: string;
   negative: string;
   neutral: string;
+}
+
+interface KpiMetric {
+  label: string;
+  value: number;
+  note: string;
+  comparison?: string;
+  tone: MetricTone;
 }
 
 function getMetricTone(value: number, labels: ToneLabels): MetricTone {
@@ -54,6 +62,8 @@ export function KpiCards({ months, startingBalance }: Props) {
   const locale = useLocale();
   const populated = months.filter((m) => m.totalIncome > 0 || m.totalExpenses > 0);
   const totalSavings = populated.reduce((s, m) => s + m.savings, 0);
+  const totalInvestment = months.reduce((sum, month) => sum + month.investment, 0);
+  const investmentMonths = months.filter((month) => month.investment > 0).length;
   const avgSavings = populated.length > 0 ? totalSavings / populated.length : 0;
   const maxSavings = populated.length > 0 ? Math.max(...populated.map((m) => m.savings)) : 0;
   const endingBalance = months.length > 0 ? months[months.length - 1].endingBalance : startingBalance;
@@ -63,8 +73,14 @@ export function KpiCards({ months, startingBalance }: Props) {
     negative: t("negativeTrend"),
     neutral: t("neutralTrend"),
   };
+  const investmentTone = {
+    valueClassName: "text-primary",
+    badgeClassName: "border-primary/20 bg-primary/10 text-primary",
+    label: t("neutralTrend"),
+    Icon: PiggyBank,
+  };
 
-  const primaryMetrics = [
+  const primaryMetrics: KpiMetric[] = [
     {
       label: t("estimatedBalance"),
       value: endingBalance,
@@ -79,9 +95,16 @@ export function KpiCards({ months, startingBalance }: Props) {
       comparison: t("activeMonths", { count: populated.length }),
       tone: getMetricTone(totalSavings, toneLabels),
     },
+    {
+      label: t("totalInvestment"),
+      value: totalInvestment,
+      note: t("totalInvestmentNote"),
+      comparison: t("investmentMonths", { count: investmentMonths }),
+      tone: investmentTone,
+    },
   ];
 
-  const supportingMetrics = [
+  const supportingMetrics: KpiMetric[] = [
     {
       label: t("avgSavings"),
       value: avgSavings,
@@ -109,7 +132,7 @@ export function KpiCards({ months, startingBalance }: Props) {
             </h2>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-3">
             {primaryMetrics.map((metric) => {
               const { Icon } = metric.tone;
 
@@ -122,7 +145,7 @@ export function KpiCards({ months, startingBalance }: Props) {
                       {metric.tone.label}
                     </span>
                   </div>
-                  <p className={`mt-3 text-[2.35rem] font-light leading-none tracking-[-0.05em] finance-number md:text-5xl ${metric.tone.valueClassName}`}>
+                  <p className={`mt-3 text-[2.1rem] font-light leading-none tracking-[-0.05em] finance-number md:text-4xl ${metric.tone.valueClassName}`}>
                     {formatCurrency(metric.value, locale)}
                   </p>
                   <div className="mt-4 space-y-1 text-sm leading-5 text-muted-foreground">
@@ -136,19 +159,19 @@ export function KpiCards({ months, startingBalance }: Props) {
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+      <div className="grid gap-3">
         {supportingMetrics.map((metric) => {
           const { Icon } = metric.tone;
 
           return (
             <Card key={metric.label} className="border-border/70 bg-card/90 shadow-sm">
-              <CardContent className="px-5 py-5">
+              <CardContent className="px-4 py-4">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">
                       {metric.label}
                     </p>
-                    <p className={`mt-3 text-3xl font-light tracking-[-0.04em] finance-number ${metric.tone.valueClassName}`}>
+                    <p className={`mt-2 text-2xl font-light tracking-[-0.04em] finance-number md:text-3xl ${metric.tone.valueClassName}`}>
                       {formatCurrency(metric.value, locale)}
                     </p>
                   </div>
@@ -156,7 +179,12 @@ export function KpiCards({ months, startingBalance }: Props) {
                     <Icon className="h-4 w-4" />
                   </div>
                 </div>
-                <p className="mt-3 text-xs leading-5 text-muted-foreground">{metric.note}</p>
+                <div className="mt-2 space-y-1 text-xs leading-5 text-muted-foreground">
+                  <p>{metric.note}</p>
+                  {metric.comparison ? (
+                    <p className="finance-number text-muted-foreground/80">{metric.comparison}</p>
+                  ) : null}
+                </div>
               </CardContent>
             </Card>
           );
