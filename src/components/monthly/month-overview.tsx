@@ -151,6 +151,10 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
   const savingsPositive = month.savings >= 0;
   const isSelectedMonthCurrent =
     config.year === today.getFullYear() && month.month === today.getMonth() + 1;
+  const isPastMonth =
+    config.year < today.getFullYear() || (config.year === today.getFullYear() && month.month < today.getMonth() + 1);
+  const isFutureMonth =
+    config.year > today.getFullYear() || (config.year === today.getFullYear() && month.month > today.getMonth() + 1);
 
   return (
     <div className="space-y-6">
@@ -182,8 +186,10 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
             <div className="mx-auto flex w-max min-w-max gap-2 px-3 sm:px-1 py-1">
               {sortedMonths.map((item) => {
                 const isActive = item.month === month.month;
-                const isCurrentMonth =
+                const isItemCurrentMonth =
                   config.year === today.getFullYear() && item.month === today.getMonth() + 1;
+                const isItemPastMonth =
+                  config.year < today.getFullYear() || (config.year === today.getFullYear() && item.month < today.getMonth() + 1);
                 const monthLabel = formatMonthName(item.month, locale);
 
                 return (
@@ -195,18 +201,24 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
                     <Link
                       href={`/${config.year}/${item.month}`}
                       aria-current={isActive ? "page" : undefined}
-                      aria-label={isCurrentMonth ? `${monthLabel}, ${tOverview("currentMonthLabel")}` : monthLabel}
+                      aria-label={isItemCurrentMonth ? `${monthLabel}, ${tOverview("currentMonthLabel")}` : monthLabel}
                       className={cn(
                         "inline-flex min-w-20 items-center justify-center gap-2 rounded-md border px-3 py-2 text-xs font-medium capitalize transition-all",
                         isActive
-                          ? "border-primary bg-primary text-primary-foreground shadow-sm"
-                          : isCurrentMonth
+                          ? isItemPastMonth
+                            ? "border-slate-700 bg-slate-800 text-slate-100 shadow-sm"
+                            : isItemCurrentMonth
+                              ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                              : "border-indigo-600 bg-indigo-700 text-indigo-50 shadow-sm"
+                          : isItemCurrentMonth
                             ? "border-primary/25 bg-primary/[0.06] text-foreground hover:border-primary/40 hover:bg-primary/[0.1]"
-                            : "border-border/70 bg-background text-muted-foreground hover:border-border hover:bg-muted/50 hover:text-foreground"
+                            : isItemPastMonth
+                              ? "border-border/40 bg-muted/20 text-muted-foreground/60 hover:border-border/60 hover:bg-muted/40 hover:text-foreground/80"
+                              : "border-indigo-100/50 bg-indigo-50/30 text-indigo-700/60 hover:border-indigo-200/70 hover:bg-indigo-50/50 hover:text-indigo-800"
                       )}
                     >
                       <span>{formatMonthName(item.month, locale, "short")}</span>
-                      {isCurrentMonth && (
+                      {isItemCurrentMonth && (
                         <span
                           aria-hidden="true"
                           className={cn(
@@ -246,7 +258,16 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
         </div>
       </div>
 
-      <Card className="overflow-hidden border-white/10 bg-gradient-to-br from-[#1c1e54] via-[#0d253d] to-slate-950 text-white shadow-[0_30px_45px_-30px_rgba(50,50,93,0.45),0_18px_36px_-18px_rgba(0,0,0,0.22)]">
+      <Card
+        className={cn(
+          "overflow-hidden border-white/10 text-white shadow-[0_30px_45px_-30px_rgba(50,50,93,0.45),0_18px_36px_-18px_rgba(0,0,0,0.22)] transition-colors duration-500",
+          isPastMonth
+            ? "bg-gradient-to-br from-slate-900 via-[#0d253d] to-slate-950"
+            : isSelectedMonthCurrent
+              ? "bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e1b4b] shadow-[0_30px_60px_-15px_rgba(83,58,253,0.25)]"
+              : "bg-gradient-to-br from-[#1c1e54] via-[#0d253d] to-slate-950"
+        )}
+      >
         <CardContent className="px-6 py-3">
           <div className="flex flex-col items-center gap-8 text-center md:flex-row md:items-center md:justify-between md:text-left">
             {/* Left: Identification */}
@@ -261,10 +282,14 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
                       "size-1.5 rounded-full",
                       isSelectedMonthCurrent
                         ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]"
-                        : "bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.5)]"
+                        : isPastMonth
+                          ? "bg-slate-400 shadow-[0_0_8px_rgba(148,163,184,0.5)]"
+                          : "bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.5)]"
                     )}
                   />
-                  {tOverview(isSelectedMonthCurrent ? "currentMonth" : "activeMonth")}
+                  {tOverview(
+                    isSelectedMonthCurrent ? "currentMonth" : isPastMonth ? "pastMonth" : isFutureMonth ? "futureMonth" : "activeMonth"
+                  )}
                 </div>
                 <div className="mt-2">
                   <button

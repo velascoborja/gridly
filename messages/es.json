@@ -143,6 +143,8 @@
     "overview": {
       "activeMonth": "Mes seleccionado",
       "currentMonth": "Mes en curso",
+      "pastMonth": "Mes pasado",
+      "futureMonth": "Previsión",
       "netSavings": "Ahorro neto",
       "endingBalance": "Saldo final",
       "startingBalance": "Saldo inicial",

@@ -231,10 +231,10 @@
 
 @layer utilities {
   .app-header-surface {
-    border-bottom: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
-    background: color-mix(in oklch, var(--background) 78%, transparent);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
+    border-bottom: 1px solid color-mix(in oklch, var(--border) 60%, transparent);
+    background: color-mix(in oklch, var(--background) 60%, transparent);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
   }
 
   .surface-depth {
