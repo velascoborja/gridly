@@ -14,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Globe, Trash2, AlertCircle } from "lucide-react";
 
-export function SettingsForm() {
+export function SettingsForm({ initialLanguage }: { initialLanguage?: string | null }) {
   const t = useTranslations("Settings");
   const common = useTranslations("Common");
   const locale = useLocale();
@@ -24,20 +24,27 @@ export function SettingsForm() {
 
   function onLanguageChange(nextLocale: string | null) {
     if (!nextLocale) return;
+    if (nextLocale === locale) return;
+
     startTransition(async () => {
       // 1. Update DB
       try {
-        await fetch("/api/user/settings", {
+        const res = await fetch("/api/user/settings", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ language: nextLocale }),
         });
+        
+        if (!res.ok) {
+          throw new Error(`Failed to update settings: ${res.statusText}`);
+        }
+        
+        console.log("Language updated in DB successfully:", nextLocale);
       } catch (err) {
         console.error("Failed to update language in DB:", err);
       }
 
       // 2. Change locale in client (using next-intl router)
-      // We use router.replace(pathname, { locale: nextLocale }) to update the locale
       router.replace(pathname, { locale: nextLocale as (typeof routing.locales)[number] });
     });
   }

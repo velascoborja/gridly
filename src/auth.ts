@@ -27,6 +27,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async session({ session, user }) {
       if (session.user && user.id) {
         session.user.id = user.id;
+        session.user.language = (user as any).language;
         await claimLegacyYearsForUser(user.id, user.email);
       }
 
