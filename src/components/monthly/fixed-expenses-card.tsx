@@ -35,18 +35,21 @@ export function FixedExpensesCard({ month, onUpdate, readOnly = false }: Props) 
           value={month.homeExpense}
           onSave={(v) => onUpdate("homeExpense", v)}
           readOnly={readOnly}
+          activateOnRowPress
         />
         <InlineEditField
           label={t("personalExpense")}
           value={month.personalExpense}
           onSave={(v) => onUpdate("personalExpense", v)}
           readOnly={readOnly}
+          activateOnRowPress
         />
         <InlineEditField
           label={t("investment")}
           value={month.investment}
           onSave={(v) => onUpdate("investment", v)}
           readOnly={readOnly}
+          activateOnRowPress
         />
       </CardContent>
     </Card>

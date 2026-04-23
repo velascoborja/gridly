@@ -253,7 +253,21 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
                     </button>
                   )}
                   <div className="flex shrink-0 items-center gap-1.5">
-                    <span className="whitespace-nowrap text-sm font-semibold tabular-nums">{formatCurrency(entry.amount, locale)}</span>
+                    {readOnly ? (
+                      <span className="whitespace-nowrap text-sm font-semibold tabular-nums">
+                        {formatCurrency(entry.amount, locale)}
+                      </span>
+                    ) : (
+                      <button
+                        className="whitespace-nowrap rounded-md px-2 py-1 text-sm font-semibold tabular-nums text-foreground transition-colors hover:bg-background hover:text-primary"
+                        onClick={() => openEditForm(entry)}
+                        type="button"
+                        aria-label={`${t("edit")} ${entry.label}`}
+                        disabled={deletingId === entry.id}
+                      >
+                        {formatCurrency(entry.amount, locale)}
+                      </button>
+                    )}
                     {!readOnly ? (
                       <AlertDialog>
                         <AlertDialogTrigger

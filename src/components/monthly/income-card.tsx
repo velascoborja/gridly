@@ -37,6 +37,7 @@ export function IncomeCard({ month, onUpdate, readOnly = false }: Props) {
           value={month.payslip}
           onSave={(v) => onUpdate("payslip", v)}
           readOnly={readOnly}
+          activateOnRowPress
         />
         {isJuneOrDec && (
           <InlineEditField
@@ -44,6 +45,7 @@ export function IncomeCard({ month, onUpdate, readOnly = false }: Props) {
             value={month.additionalPayslip}
             onSave={(v) => onUpdate("additionalPayslip", v)}
             readOnly={readOnly}
+            activateOnRowPress
           />
         )}
         {isJuly && (
@@ -52,6 +54,7 @@ export function IncomeCard({ month, onUpdate, readOnly = false }: Props) {
             value={month.bonus}
             onSave={(v) => onUpdate("bonus", v)}
             readOnly={readOnly}
+            activateOnRowPress
           />
         )}
         <InlineEditField
@@ -59,12 +62,14 @@ export function IncomeCard({ month, onUpdate, readOnly = false }: Props) {
           value={month.interests}
           onSave={(v) => onUpdate("interests", v)}
           readOnly={readOnly}
+          activateOnRowPress
         />
         <InlineEditField
           label={t("personalRemaining")}
           value={month.personalRemaining}
           onSave={(v) => onUpdate("personalRemaining", v)}
           readOnly={readOnly}
+          activateOnRowPress
         />
       </CardContent>
     </Card>

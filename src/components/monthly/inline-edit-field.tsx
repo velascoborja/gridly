@@ -12,6 +12,7 @@ interface InlineEditFieldProps {
   disabled?: boolean;
   readOnly?: boolean;
   className?: string;
+  activateOnRowPress?: boolean;
 }
 
 export function InlineEditField({
@@ -21,6 +22,7 @@ export function InlineEditField({
   disabled,
   readOnly = false,
   className,
+  activateOnRowPress = false,
 }: InlineEditFieldProps) {
   const locale = useLocale();
   const tCommon = useTranslations("Common");
@@ -87,12 +89,34 @@ export function InlineEditField({
     }
   };
 
+  const startEditing = () => {
+    if (!disabled && !readOnly) {
+      setEditing(true);
+    }
+  };
+
+  const isRowInteractive = activateOnRowPress && !editing && !disabled && !readOnly;
+
   return (
     <div
       className={cn(
         "grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl px-2 py-1.5 transition-colors hover:bg-muted/30",
+        isRowInteractive && "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30",
         className,
       )}
+      onClick={isRowInteractive ? startEditing : undefined}
+      onKeyDown={
+        isRowInteractive
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                startEditing();
+              }
+            }
+          : undefined
+      }
+      role={isRowInteractive ? "button" : undefined}
+      tabIndex={isRowInteractive ? 0 : undefined}
     >
       <span className="min-w-0 truncate whitespace-nowrap text-sm font-medium text-foreground">{label}</span>
       {editing ? (
@@ -126,7 +150,7 @@ export function InlineEditField({
             error ? "text-destructive" : "text-foreground",
             readOnly && "cursor-default hover:bg-transparent hover:text-foreground"
           )}
-          onClick={() => !disabled && !readOnly && setEditing(true)}
+          onClick={startEditing}
           disabled={disabled}
           type="button"
         >
