@@ -1,6 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { AppShell } from "@/components/layout/app-shell";
-import { MonthOverview } from "@/components/monthly/month-overview";
+import { YearPageClient } from "@/components/year/year-page-client";
 import { getYearData, getYearsForUser } from "@/lib/server/year-data";
 import { requireSessionUser } from "@/lib/server/session";
 
@@ -27,8 +26,12 @@ export default async function MonthPage({
   }
 
   return (
-    <AppShell currentYear={year} currentMonth={month} view="overview" years={years.length > 0 ? years : [year]} user={user}>
-      <MonthOverview yearData={yearData} monthNumber={month} />
-    </AppShell>
+    <YearPageClient
+      yearData={yearData}
+      initialMonth={month}
+      initialView="overview"
+      years={years.length > 0 ? years : [year]}
+      user={user}
+    />
   );
 }

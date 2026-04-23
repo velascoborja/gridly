@@ -20,6 +20,7 @@ interface Props {
   readOnly?: boolean;
   monthPathPrefix?: string;
   currentMonthPathPrefix?: string;
+  onMonthSelect?: (month: number) => void;
 }
 
 export function MonthOverview({
@@ -28,6 +29,7 @@ export function MonthOverview({
   readOnly = false,
   monthPathPrefix,
   currentMonthPathPrefix,
+  onMonthSelect,
 }: Props) {
   const t = useTranslations("Monthly");
   const tOverview = useTranslations("Monthly.overview");
@@ -112,6 +114,16 @@ export function MonthOverview({
   const nextMonth = activeIndex >= 0 && activeIndex < sortedMonths.length - 1 ? sortedMonths[activeIndex + 1] : null;
   const monthBasePath = monthPathPrefix ?? `/${config.year}`;
   const currentMonthRoute = `${currentMonthPathPrefix ?? `/${today.getFullYear()}`}/${today.getMonth() + 1}`;
+  const canHandleCurrentMonthLocally = Boolean(onMonthSelect) && config.year === today.getFullYear();
+
+  const interceptMonthNavigation = useCallback(
+    (targetMonth: number) => (event: React.MouseEvent<HTMLAnchorElement>) => {
+      if (!onMonthSelect) return;
+      event.preventDefault();
+      onMonthSelect(targetMonth);
+    },
+    [onMonthSelect]
+  );
 
   const recompute = useCallback((updated: MonthData[]) => {
     return computeMonthChain(updated, config.startingBalance, config.interestRate);
@@ -174,6 +186,7 @@ export function MonthOverview({
           {previousMonth ? (
             <Link
               href={`${monthBasePath}/${previousMonth.month}`}
+              onClick={interceptMonthNavigation(previousMonth.month)}
               aria-label={tOverview("previousMonth", {
                 month: formatMonthName(previousMonth.month, locale),
               })}
@@ -211,6 +224,7 @@ export function MonthOverview({
                   >
                     <Link
                       href={`${monthBasePath}/${item.month}`}
+                      onClick={interceptMonthNavigation(item.month)}
                       aria-current={isActive ? "page" : undefined}
                       aria-label={isItemCurrentMonth ? `${monthLabel}, ${tOverview("currentMonthLabel")}` : monthLabel}
                       className={cn(
@@ -248,6 +262,7 @@ export function MonthOverview({
           {nextMonth ? (
             <Link
               href={`${monthBasePath}/${nextMonth.month}`}
+              onClick={interceptMonthNavigation(nextMonth.month)}
               aria-label={tOverview("nextMonth", {
                 month: formatMonthName(nextMonth.month, locale),
               })}
@@ -307,6 +322,7 @@ export function MonthOverview({
                       <span className="mx-1 opacity-40">•</span>
                       <Link
                         href={currentMonthRoute}
+                        onClick={canHandleCurrentMonthLocally ? interceptMonthNavigation(today.getMonth() + 1) : undefined}
                         className="group inline-flex items-center gap-1 rounded-sm transition-colors hover:text-white"
                       >
                         <ChevronLeft className="size-3 opacity-70 transition-transform group-hover:-translate-x-0.5" />

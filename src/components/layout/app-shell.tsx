@@ -14,10 +14,21 @@ interface Props {
     email?: string | null;
     name?: string | null;
   };
+  onMonthViewSelect?: () => void;
+  onSummaryViewSelect?: () => void;
   children: React.ReactNode;
 }
 
-export function AppShell({ currentYear, currentMonth, view, years, user, children }: Props) {
+export function AppShell({
+  currentYear,
+  currentMonth,
+  view,
+  years,
+  user,
+  onMonthViewSelect,
+  onSummaryViewSelect,
+  children,
+}: Props) {
   return (
     <div className="relative min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(64,148,255,0.12),transparent_32%),radial-gradient(circle_at_top_right,rgba(16,185,129,0.08),transparent_28%),linear-gradient(180deg,rgba(248,250,252,0.96),rgba(255,255,255,1))] text-foreground">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[linear-gradient(180deg,rgba(255,255,255,0.75),transparent)]" />
@@ -38,7 +49,14 @@ export function AppShell({ currentYear, currentMonth, view, years, user, childre
               <UserMenu email={user.email} name={user.name} active={view === "settings"} />
             </div>
             <div className="col-span-2 flex min-w-0 justify-center md:col-span-1 md:justify-end">
-              <NavSelectors currentYear={currentYear} currentMonth={currentMonth} view={view} years={years} />
+              <NavSelectors
+                currentYear={currentYear}
+                currentMonth={currentMonth}
+                view={view}
+                years={years}
+                onMonthViewSelect={onMonthViewSelect}
+                onSummaryViewSelect={onSummaryViewSelect}
+              />
             </div>
           </div>
         </div>

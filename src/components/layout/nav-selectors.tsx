@@ -23,6 +23,8 @@ interface Props {
   summaryPathPrefix?: string;
   hideCreateYear?: boolean;
   hideYearSelector?: boolean;
+  onMonthViewSelect?: () => void;
+  onSummaryViewSelect?: () => void;
 }
 
 function buildMonthHref(prefix: string | undefined, year: number, month: number) {
@@ -42,6 +44,8 @@ export function NavSelectors({
   summaryPathPrefix,
   hideCreateYear = false,
   hideYearSelector = false,
+  onMonthViewSelect,
+  onSummaryViewSelect,
 }: Props) {
   const router = useRouter();
   const t = useTranslations("Nav");
@@ -106,6 +110,13 @@ export function NavSelectors({
                 <Link
                   key={tab.key}
                   href={tab.href}
+                  onClick={
+                    tab.key === "overview"
+                      ? onMonthViewSelect
+                      : tab.key === "summary"
+                        ? onSummaryViewSelect
+                        : undefined
+                  }
                   aria-current={active ? "page" : undefined}
                   className={`inline-flex items-center rounded-md px-3 py-1.5 text-sm font-medium transition-all sm:px-4 sm:py-2 ${
                     active

@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
-import { AppShell } from "@/components/layout/app-shell";
-import { AnnualView } from "@/components/annual/annual-view";
+import { YearPageClient } from "@/components/year/year-page-client";
 import { getYearData, getYearsForUser } from "@/lib/server/year-data";
 import { requireSessionUser } from "@/lib/server/session";
 
@@ -19,8 +18,13 @@ export default async function SummaryPage({
   const startingBalanceEditable = years[0] === year;
 
   return (
-    <AppShell currentYear={year} currentMonth={null} view="summary" years={years.length > 0 ? years : [year]} user={user}>
-      <AnnualView yearData={yearData} startingBalanceEditable={startingBalanceEditable} />
-    </AppShell>
+    <YearPageClient
+      yearData={yearData}
+      initialMonth={new Date().getMonth() + 1}
+      initialView="summary"
+      years={years.length > 0 ? years : [year]}
+      startingBalanceEditable={startingBalanceEditable}
+      user={user}
+    />
   );
 }
