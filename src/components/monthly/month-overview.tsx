@@ -296,8 +296,9 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
                       <span className="mx-1 opacity-40">•</span>
                       <Link
                         href={`/${today.getFullYear()}/${today.getMonth() + 1}`}
-                        className="transition-colors hover:text-white"
+                        className="group inline-flex items-center gap-1 rounded-sm transition-colors hover:text-white"
                       >
+                        <ChevronLeft className="size-3 opacity-70 transition-transform group-hover:-translate-x-0.5" />
                         {tOverview("backToCurrentMonth")}
                       </Link>
                     </>
