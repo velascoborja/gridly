@@ -14,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Globe, Trash2, AlertCircle } from "lucide-react";
 
-export function SettingsForm({ initialLanguage }: { initialLanguage?: string | null }) {
+export function SettingsForm() {
   const t = useTranslations("Settings");
   const common = useTranslations("Common");
   const locale = useLocale();

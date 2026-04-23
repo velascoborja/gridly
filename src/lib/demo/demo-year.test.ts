@@ -6,7 +6,7 @@ import {
   getDemoYearData,
   DEMO_YEAR,
   DEMO_MONTH,
-} from "./demo-year";
+} from "./demo-year.ts";
 
 test("demo year data exposes the canonical public demo route", () => {
   assert.equal(DEMO_YEAR, 2026);
@@ -50,4 +50,3 @@ test("demo year data contains 12 chained months with extra pays in June and Dece
     { id: 902, monthId: 9, type: "expense", label: "Suscripción gimnasio", amount: 45 },
   ]);
   });
-
