@@ -151,6 +151,7 @@
       "totalIncome": "Ingresos",
       "totalExpenses": "Gastos",
       "currentMonthLabel": "mes actual",
+      "backToCurrentMonth": "Volver al mes actual",
       "previousMonth": "Ir al mes anterior: {month}",
       "nextMonth": "Ir al mes siguiente: {month}",
       "editMonth": "Mostrar valores fijos",

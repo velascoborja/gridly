@@ -290,6 +290,18 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
                   {tOverview(
                     isSelectedMonthCurrent ? "currentMonth" : isPastMonth ? "pastMonth" : isFutureMonth ? "futureMonth" : "activeMonth"
                   )}
+
+                  {!isSelectedMonthCurrent && (
+                    <>
+                      <span className="mx-1 opacity-40">•</span>
+                      <Link
+                        href={`/${today.getFullYear()}/${today.getMonth() + 1}`}
+                        className="transition-colors hover:text-white"
+                      >
+                        {tOverview("backToCurrentMonth")}
+                      </Link>
+                    </>
+                  )}
                 </div>
                 <div className="mt-2">
                   <button
