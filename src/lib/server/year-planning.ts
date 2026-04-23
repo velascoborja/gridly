@@ -23,5 +23,5 @@ export function deriveStartingBalance(previousYear: {
     throw new Error("Previous year is missing December data");
   }
 
-  return december.endingBalance;
+  return Math.round((december.endingBalance + Number.EPSILON) * 100) / 100;
 }
