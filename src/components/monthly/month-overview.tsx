@@ -33,7 +33,7 @@ export function MonthOverview({
   const tOverview = useTranslations("Monthly.overview");
   const locale = useLocale();
   const [months, setMonths] = useState<MonthData[]>(initialYearData.months);
-  const [showFixedEditors, setShowFixedEditors] = useState(false);
+  const [showFixedEditors, setShowFixedEditors] = useState(readOnly);
   const [renderFixedEditors, setRenderFixedEditors] = useState(false);
   const [fixedEditorsVisible, setFixedEditorsVisible] = useState(false);
   const [fixedEditorsHeight, setFixedEditorsHeight] = useState<number | "auto">(0);
@@ -49,8 +49,8 @@ export function MonthOverview({
   }, [initialYearData]);
 
   useEffect(() => {
-    setShowFixedEditors(false);
-  }, [monthNumber]);
+    setShowFixedEditors(readOnly);
+  }, [monthNumber, readOnly]);
 
   useEffect(() => {
     if (showFixedEditors) {
