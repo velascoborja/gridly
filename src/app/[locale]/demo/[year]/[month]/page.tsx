@@ -50,6 +50,7 @@ export default async function DemoMonthPage({
         monthPathPrefix="/demo"
         summaryPathPrefix="/demo"
         hideCreateYear
+        hideYearSelector
       />
       <MonthOverview
         yearData={getDemoYearData()}

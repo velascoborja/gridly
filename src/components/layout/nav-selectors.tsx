@@ -22,6 +22,7 @@ interface Props {
   monthPathPrefix?: string;
   summaryPathPrefix?: string;
   hideCreateYear?: boolean;
+  hideYearSelector?: boolean;
 }
 
 function buildMonthHref(prefix: string | undefined, year: number, month: number) {
@@ -40,6 +41,7 @@ export function NavSelectors({
   monthPathPrefix,
   summaryPathPrefix,
   hideCreateYear = false,
+  hideYearSelector = false,
 }: Props) {
   const router = useRouter();
   const t = useTranslations("Nav");
@@ -65,34 +67,36 @@ export function NavSelectors({
   return (
     <div className="flex w-full min-w-0 justify-center md:justify-end">
       <div className="flex max-w-full flex-wrap items-center justify-center gap-2 md:justify-end md:gap-3">
-        <div className="flex shrink-0 items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-          <span className="sr-only md:not-sr-only">{t("yearLabel")}</span>
-          <Select value={String(currentYear)} onValueChange={handleYearChange}>
-            <SelectTrigger className="h-8 rounded-md border-border/70 bg-background/90 pl-3 pr-3 font-medium text-foreground shadow-sm focus:border-primary focus:ring-primary/20 sm:h-9 sm:pl-4 sm:pr-4">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {years.map((y) => (
-                <SelectItem key={y} value={String(y)}>
-                  {y}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        {!hideYearSelector && (
+          <div className="flex shrink-0 items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+            <span className="sr-only md:not-sr-only">{t("yearLabel")}</span>
+            <Select value={String(currentYear)} onValueChange={handleYearChange}>
+              <SelectTrigger className="h-8 rounded-md border-border/70 bg-background/90 pl-3 pr-3 font-medium text-foreground shadow-sm focus:border-primary focus:ring-primary/20 sm:h-9 sm:pl-4 sm:pr-4">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {years.map((y) => (
+                  <SelectItem key={y} value={String(y)}>
+                    {y}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-          {!hideCreateYear && (
-            <Link
-              href={`/setup/${nextCreatableYear}`}
-              aria-label={t("createYear", { year: nextCreatableYear })}
-              className={cn(
-                buttonVariants({ variant: "outline", size: "icon-sm" }),
-                "size-8 rounded-md border-border/70 bg-background/90 text-primary shadow-sm hover:border-primary/40 hover:bg-primary/[0.06] sm:size-9"
-              )}
-            >
-              <Plus className="size-4" />
-            </Link>
-          )}
-        </div>
+            {!hideCreateYear && (
+              <Link
+                href={`/setup/${nextCreatableYear}`}
+                aria-label={t("createYear", { year: nextCreatableYear })}
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "icon-sm" }),
+                  "size-8 rounded-md border-border/70 bg-background/90 text-primary shadow-sm hover:border-primary/40 hover:bg-primary/[0.06] sm:size-9"
+                )}
+              >
+                <Plus className="size-4" />
+              </Link>
+            )}
+          </div>
+        )}
 
         <div className="min-w-0 rounded-lg border border-border/70 bg-muted/40 p-1 shadow-sm">
           <div className="flex flex-wrap justify-center gap-1">
