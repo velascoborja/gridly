@@ -210,9 +210,12 @@
       "noEntries": "No entries yet.",
       "descriptionPlaceholder": "Description",
       "add": "Add",
+      "adding": "Adding...",
       "cancel": "Cancel",
       "edit": "Edit",
       "delete": "Delete",
+      "saving": "Saving...",
+      "deleting": "Deleting...",
       "confirmDeleteTitle": "Delete this entry?",
       "confirmDeleteDescription": "\"{label}\" will be removed from the list. This action cannot be undone.",
       "confirmDeleteAction": "Delete"

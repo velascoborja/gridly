@@ -210,9 +210,12 @@
       "noEntries": "Sin entradas todavía.",
       "descriptionPlaceholder": "Descripción",
       "add": "Añadir",
+      "adding": "Añadiendo...",
       "cancel": "Cancelar",
       "edit": "Editar",
       "delete": "Eliminar",
+      "saving": "Guardando...",
+      "deleting": "Eliminando...",
       "confirmDeleteTitle": "¿Eliminar esta entrada?",
       "confirmDeleteDescription": "Se eliminará \"{label}\" de la lista. Esta acción no se puede deshacer.",
       "confirmDeleteAction": "Eliminar"
