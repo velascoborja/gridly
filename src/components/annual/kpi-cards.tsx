@@ -1,5 +1,6 @@
 import { useLocale, useTranslations } from "next-intl";
 import { ArrowDownRight, ArrowUpRight, Download, Minus, PiggyBank, Settings, type LucideIcon } from "lucide-react";
+import type { Dispatch, SetStateAction } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -21,7 +22,7 @@ interface Props {
   description: string;
   savingConfig: boolean;
   startingBalanceEditable: boolean;
-  onConfigChange: (config: YearConfig) => void;
+  onConfigChange: Dispatch<SetStateAction<YearConfig>>;
   onExport: () => void;
   onPendingSave: (savePromise: Promise<void>) => void;
 }
