@@ -9,9 +9,10 @@ import type { MonthData } from "@/lib/types";
 interface Props {
   month: MonthData;
   onUpdate: (field: string, value: number) => Promise<void>;
+  readOnly?: boolean;
 }
 
-export function FixedExpensesCard({ month, onUpdate }: Props) {
+export function FixedExpensesCard({ month, onUpdate, readOnly = false }: Props) {
   const t = useTranslations("Monthly.fixedExpenses");
   const tFixed = useTranslations("Monthly.fixed");
 
@@ -33,16 +34,19 @@ export function FixedExpensesCard({ month, onUpdate }: Props) {
           label={t("homeExpense")}
           value={month.homeExpense}
           onSave={(v) => onUpdate("homeExpense", v)}
+          readOnly={readOnly}
         />
         <InlineEditField
           label={t("personalExpense")}
           value={month.personalExpense}
           onSave={(v) => onUpdate("personalExpense", v)}
+          readOnly={readOnly}
         />
         <InlineEditField
           label={t("investment")}
           value={month.investment}
           onSave={(v) => onUpdate("investment", v)}
+          readOnly={readOnly}
         />
       </CardContent>
     </Card>

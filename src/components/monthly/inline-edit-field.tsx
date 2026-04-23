@@ -10,10 +10,18 @@ interface InlineEditFieldProps {
   value: number;
   onSave: (newValue: number) => Promise<void>;
   disabled?: boolean;
+  readOnly?: boolean;
   className?: string;
 }
 
-export function InlineEditField({ label, value, onSave, disabled, className }: InlineEditFieldProps) {
+export function InlineEditField({
+  label,
+  value,
+  onSave,
+  disabled,
+  readOnly = false,
+  className,
+}: InlineEditFieldProps) {
   const locale = useLocale();
   const tCommon = useTranslations("Common");
   const [editing, setEditing] = useState(false);
@@ -113,8 +121,12 @@ export function InlineEditField({ label, value, onSave, disabled, className }: I
         </div>
       ) : (
         <button
-          className={`shrink-0 rounded-md px-2 py-1 text-sm font-semibold tabular-nums transition-colors hover:bg-background hover:text-primary disabled:cursor-default disabled:opacity-50 ${error ? "text-destructive" : "text-foreground"}`}
-          onClick={() => !disabled && setEditing(true)}
+          className={cn(
+            "shrink-0 rounded-md px-2 py-1 text-sm font-semibold tabular-nums transition-colors hover:bg-background hover:text-primary disabled:cursor-default disabled:opacity-50",
+            error ? "text-destructive" : "text-foreground",
+            readOnly && "cursor-default hover:bg-transparent hover:text-foreground"
+          )}
+          onClick={() => !disabled && !readOnly && setEditing(true)}
           disabled={disabled}
           type="button"
         >

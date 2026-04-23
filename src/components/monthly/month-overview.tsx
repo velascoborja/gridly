@@ -17,9 +17,18 @@ import type { MonthData, YearData, AdditionalEntry } from "@/lib/types";
 interface Props {
   yearData: YearData;
   monthNumber: number;
+  readOnly?: boolean;
+  monthPathPrefix?: string;
+  currentMonthPathPrefix?: string;
 }
 
-export function MonthOverview({ yearData: initialYearData, monthNumber }: Props) {
+export function MonthOverview({
+  yearData: initialYearData,
+  monthNumber,
+  readOnly = false,
+  monthPathPrefix,
+  currentMonthPathPrefix,
+}: Props) {
   const t = useTranslations("Monthly");
   const tOverview = useTranslations("Monthly.overview");
   const locale = useLocale();
@@ -101,6 +110,8 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
   const activeIndex = month ? sortedMonths.findIndex((item) => item.id === month.id) : -1;
   const previousMonth = activeIndex > 0 ? sortedMonths[activeIndex - 1] : null;
   const nextMonth = activeIndex >= 0 && activeIndex < sortedMonths.length - 1 ? sortedMonths[activeIndex + 1] : null;
+  const monthBasePath = monthPathPrefix ?? `/${config.year}`;
+  const currentMonthRoute = `${currentMonthPathPrefix ?? `/${today.getFullYear()}`}/${today.getMonth() + 1}`;
 
   const recompute = useCallback((updated: MonthData[]) => {
     return computeMonthChain(updated, config.startingBalance, config.interestRate);
@@ -162,7 +173,7 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
         <div className="flex items-center gap-2 border-b border-border/70 px-3 py-3 sm:px-4">
           {previousMonth ? (
             <Link
-              href={`/${config.year}/${previousMonth.month}`}
+              href={`${monthBasePath}/${previousMonth.month}`}
               aria-label={tOverview("previousMonth", {
                 month: formatMonthName(previousMonth.month, locale),
               })}
@@ -199,7 +210,7 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
                     className="flex shrink-0 snap-center"
                   >
                     <Link
-                      href={`/${config.year}/${item.month}`}
+                      href={`${monthBasePath}/${item.month}`}
                       aria-current={isActive ? "page" : undefined}
                       aria-label={isItemCurrentMonth ? `${monthLabel}, ${tOverview("currentMonthLabel")}` : monthLabel}
                       className={cn(
@@ -236,7 +247,7 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
 
           {nextMonth ? (
             <Link
-              href={`/${config.year}/${nextMonth.month}`}
+              href={`${monthBasePath}/${nextMonth.month}`}
               aria-label={tOverview("nextMonth", {
                 month: formatMonthName(nextMonth.month, locale),
               })}
@@ -295,7 +306,7 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
                     <>
                       <span className="mx-1 opacity-40">•</span>
                       <Link
-                        href={`/${today.getFullYear()}/${today.getMonth() + 1}`}
+                        href={currentMonthRoute}
                         className="group inline-flex items-center gap-1 rounded-sm transition-colors hover:text-white"
                       >
                         <ChevronLeft className="size-3 opacity-70 transition-transform group-hover:-translate-x-0.5" />
@@ -310,7 +321,7 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
                     aria-expanded={showFixedEditors}
                     aria-controls="month-fixed-editors"
                     className="inline-flex items-center gap-1 rounded-md border border-white/18 bg-white/10 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:border-white/28 hover:bg-white/16"
-                    aria-label={tOverview("editMonthAria", {
+                    aria-label={tOverview(readOnly ? "viewMonthAria" : "editMonthAria", {
                       month: formatMonthName(month.month, locale),
                     })}
                     onClick={() => setShowFixedEditors((prev) => !prev)}
@@ -388,8 +399,8 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
                   : "opacity-0 translate-y-1.5 blur-[2px]"
               )}
             >
-              <FixedExpensesCard month={month} onUpdate={handleFixedUpdate} />
-              <IncomeCard month={month} onUpdate={handleFixedUpdate} />
+              <FixedExpensesCard month={month} onUpdate={handleFixedUpdate} readOnly={readOnly} />
+              <IncomeCard month={month} onUpdate={handleFixedUpdate} readOnly={readOnly} />
             </div>
           </div>
         </div>
@@ -401,6 +412,7 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
           type="expense"
           entries={month.additionalExpenses}
           onEntriesChange={(entries) => handleEntriesChange("expense", entries)}
+          readOnly={readOnly}
           title={tOverview("additionalExpensesTitle")}
         />
 
@@ -409,6 +421,7 @@ export function MonthOverview({ yearData: initialYearData, monthNumber }: Props)
           type="income"
           entries={month.additionalIncomes}
           onEntriesChange={(entries) => handleEntriesChange("income", entries)}
+          readOnly={readOnly}
           title={tOverview("additionalIncomeTitle")}
         />
       </div>

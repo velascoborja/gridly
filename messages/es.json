@@ -169,6 +169,7 @@
       "editMonth": "Mostrar valores fijos",
       "hideMonthEditor": "Ocultar valores fijos",
       "editMonthAria": "Editar ingresos y gastos fijos de {month}",
+      "viewMonthAria": "Consultar ingresos y gastos fijos de {month}",
       "additionalExpensesTitle": "Gastos adicionales",
       "additionalExpensesDescription": "Movimientos puntuales que reducen el ahorro del mes.",
       "addExtraExpense": "Añadir gasto extra",

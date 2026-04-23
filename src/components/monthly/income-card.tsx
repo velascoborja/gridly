@@ -9,9 +9,10 @@ import type { MonthData } from "@/lib/types";
 interface Props {
   month: MonthData;
   onUpdate: (field: string, value: number) => Promise<void>;
+  readOnly?: boolean;
 }
 
-export function IncomeCard({ month, onUpdate }: Props) {
+export function IncomeCard({ month, onUpdate, readOnly = false }: Props) {
   const t = useTranslations("Monthly.income");
   const tFixed = useTranslations("Monthly.fixed");
   const isJuneOrDec = month.month === 6 || month.month === 12;
@@ -35,12 +36,14 @@ export function IncomeCard({ month, onUpdate }: Props) {
           label={t("payslip")}
           value={month.payslip}
           onSave={(v) => onUpdate("payslip", v)}
+          readOnly={readOnly}
         />
         {isJuneOrDec && (
           <InlineEditField
             label={t("additionalPayslip")}
             value={month.additionalPayslip}
             onSave={(v) => onUpdate("additionalPayslip", v)}
+            readOnly={readOnly}
           />
         )}
         {isJuly && (
@@ -48,17 +51,20 @@ export function IncomeCard({ month, onUpdate }: Props) {
             label={t("bonus")}
             value={month.bonus}
             onSave={(v) => onUpdate("bonus", v)}
+            readOnly={readOnly}
           />
         )}
         <InlineEditField
           label={t("interests")}
           value={month.interests}
           onSave={(v) => onUpdate("interests", v)}
+          readOnly={readOnly}
         />
         <InlineEditField
           label={t("personalRemaining")}
           value={month.personalRemaining}
           onSave={(v) => onUpdate("personalRemaining", v)}
+          readOnly={readOnly}
         />
       </CardContent>
     </Card>
