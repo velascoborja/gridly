@@ -109,6 +109,7 @@
   "Landing": {
     "heroTitle": "Control income, expenses, and savings with a vision that fits.",
     "heroDescription": "Gridly converts your financial year into a coherent chain: from the starting balance to the monthly close, with an annual summary, quick editing, and Excel export.",
+    "demoCta": "View demo",
     "features": {
       "monthly": {
         "title": "Monthly Control",
@@ -136,6 +137,17 @@
       "totalIncome": "Total income",
       "totalExpenses": "Total expenses",
       "monthlySavings": "Monthly savings"
+    }
+  },
+  "Demo": {
+    "month": {
+      "eyebrow": "Demo",
+      "description": "Explore {month} {year} with sample data in read-only mode. Sign in with Google to create your own private workspace."
+    },
+    "summary": {
+      "eyebrow": "Demo",
+      "title": "Annual Summary {year}",
+      "description": "Explore the projected close for {year} with sample data. Sign in with Google to create your own private workspace."
     }
   },
   "Monthly": {

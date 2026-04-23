@@ -22,6 +22,7 @@ interface Props {
   description: string;
   savingConfig: boolean;
   startingBalanceEditable: boolean;
+  readOnly?: boolean;
   onConfigChange: Dispatch<SetStateAction<YearConfig>>;
   onExport: () => void;
   onPendingSave: (savePromise: Promise<void>) => void;
@@ -82,6 +83,7 @@ export function KpiCards({
   description,
   savingConfig,
   startingBalanceEditable,
+  readOnly = false,
   onConfigChange,
   onExport,
   onPendingSave,
@@ -166,52 +168,56 @@ export function KpiCards({
             </div>
 
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center lg:flex-col lg:items-end">
-              <div className="flex items-center gap-2">
-                <Dialog>
-                  <DialogTrigger
-                    render={
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-9 w-9 border-border/70 bg-background/80 text-muted-foreground shadow-sm hover:border-primary/30 hover:bg-primary/[0.06] hover:text-primary"
-                      >
-                        <Settings className="h-4 w-4" />
-                        <span className="sr-only">{tAnnual("configButton")}</span>
-                      </Button>
-                    }
-                  />
-                  <DialogContent className="max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>{tAnnual("configTitle")}</DialogTitle>
-                      <DialogDescription>
-                        {tAnnual("configDescription")}
-                      </DialogDescription>
-                    </DialogHeader>
-                    <YearConfigForm
-                      config={config}
-                      startingBalanceEditable={startingBalanceEditable}
-                      onConfigChange={onConfigChange}
-                      onPendingSave={onPendingSave}
-                    />
-                  </DialogContent>
-                </Dialog>
+              {!readOnly ? (
+                <>
+                  <div className="flex items-center gap-2">
+                    <Dialog>
+                      <DialogTrigger
+                        render={
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-9 w-9 border-border/70 bg-background/80 text-muted-foreground shadow-sm hover:border-primary/30 hover:bg-primary/[0.06] hover:text-primary"
+                          >
+                            <Settings className="h-4 w-4" />
+                            <span className="sr-only">{tAnnual("configButton")}</span>
+                          </Button>
+                        }
+                      />
+                      <DialogContent className="max-w-md">
+                        <DialogHeader>
+                          <DialogTitle>{tAnnual("configTitle")}</DialogTitle>
+                          <DialogDescription>
+                            {tAnnual("configDescription")}
+                          </DialogDescription>
+                        </DialogHeader>
+                        <YearConfigForm
+                          config={config}
+                          startingBalanceEditable={startingBalanceEditable}
+                          onConfigChange={onConfigChange}
+                          onPendingSave={onPendingSave}
+                        />
+                      </DialogContent>
+                    </Dialog>
 
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={onExport}
-                  disabled={savingConfig}
-                  className="border-primary/20 bg-primary/[0.06] text-primary shadow-sm hover:border-primary/35 hover:bg-primary/[0.1] hover:text-primary"
-                >
-                  <Download className="mr-2 h-4 w-4" />
-                  {savingConfig ? tAnnual("saving") : tAnnual("exportExcel")}
-                </Button>
-              </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={onExport}
+                      disabled={savingConfig}
+                      className="border-primary/20 bg-primary/[0.06] text-primary shadow-sm hover:border-primary/35 hover:bg-primary/[0.1] hover:text-primary"
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      {savingConfig ? tAnnual("saving") : tAnnual("exportExcel")}
+                    </Button>
+                  </div>
 
-              {savingConfig ? (
-                <p className="max-w-sm text-xs leading-5 text-muted-foreground sm:max-w-md lg:text-right">
-                  {tAnnual("savingDescription")}
-                </p>
+                  {savingConfig ? (
+                    <p className="max-w-sm text-xs leading-5 text-muted-foreground sm:max-w-md lg:text-right">
+                      {tAnnual("savingDescription")}
+                    </p>
+                  ) : null}
+                </>
               ) : null}
             </div>
           </div>

@@ -11,9 +11,14 @@ import type { YearData, YearConfig } from "@/lib/types";
 interface Props {
   yearData: YearData;
   startingBalanceEditable: boolean;
+  readOnly?: boolean;
 }
 
-export function AnnualView({ yearData: initial, startingBalanceEditable }: Props) {
+export function AnnualView({
+  yearData: initial,
+  startingBalanceEditable,
+  readOnly = false,
+}: Props) {
   const t = useTranslations("Annual");
   const [config, setConfig] = useState<YearConfig>(initial.config);
   const [savingConfig, setSavingConfig] = useState(false);
@@ -22,6 +27,10 @@ export function AnnualView({ yearData: initial, startingBalanceEditable }: Props
   const months = computeMonthChain(initial.months, config.startingBalance, config.interestRate);
 
   const trackPendingSave = (savePromise: Promise<void>) => {
+    if (readOnly) {
+      return;
+    }
+
     pendingSaveCountRef.current += 1;
     pendingSavesRef.current.add(savePromise);
     setSavingConfig(true);
@@ -42,6 +51,10 @@ export function AnnualView({ yearData: initial, startingBalanceEditable }: Props
   };
 
   const handleExport = async () => {
+    if (readOnly) {
+      return;
+    }
+
     await waitForPendingSaves();
     window.open(`/api/years/${config.year}/export`, "_blank");
   };
@@ -53,8 +66,9 @@ export function AnnualView({ yearData: initial, startingBalanceEditable }: Props
         startingBalance={config.startingBalance}
         config={config}
         description={t("description")}
-        savingConfig={savingConfig}
+        savingConfig={readOnly ? false : savingConfig}
         startingBalanceEditable={startingBalanceEditable}
+        readOnly={readOnly}
         onConfigChange={setConfig}
         onExport={handleExport}
         onPendingSave={trackPendingSave}

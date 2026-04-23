@@ -109,6 +109,7 @@
   "Landing": {
     "heroTitle": "Controla ingresos, gastos y ahorro con una visión que sí encaja.",
     "heroDescription": "Gridly convierte tu año financiero en una cadena coherente: desde el saldo inicial hasta el cierre mensual, con resumen anual, edición rápida y exportación a Excel.",
+    "demoCta": "Ver demo",
     "features": {
       "monthly": {
         "title": "Control mensual",
@@ -136,6 +137,17 @@
       "totalIncome": "Ingresos totales",
       "totalExpenses": "Gastos totales",
       "monthlySavings": "Ahorro del mes"
+    }
+  },
+  "Demo": {
+    "month": {
+      "eyebrow": "Demo",
+      "description": "Explora {month} {year} con datos de ejemplo en modo lectura. Inicia sesión con Google para crear tu propio espacio privado."
+    },
+    "summary": {
+      "eyebrow": "Demo",
+      "title": "Resumen anual {year}",
+      "description": "Explora el cierre previsto de {year} con datos de ejemplo. Inicia sesión con Google para crear tu propio espacio privado."
     }
   },
   "Monthly": {

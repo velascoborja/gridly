@@ -19,9 +19,28 @@ interface Props {
   currentMonth: number | null;
   view: "overview" | "summary" | "settings";
   years: number[];
+  monthPathPrefix?: string;
+  summaryPathPrefix?: string;
+  hideCreateYear?: boolean;
 }
 
-export function NavSelectors({ currentYear, currentMonth, view, years }: Props) {
+function buildMonthHref(prefix: string | undefined, year: number, month: number) {
+  return `${prefix ?? ""}/${year}/${month}`;
+}
+
+function buildSummaryHref(prefix: string | undefined, year: number) {
+  return `${prefix ?? ""}/${year}/summary`;
+}
+
+export function NavSelectors({
+  currentYear,
+  currentMonth,
+  view,
+  years,
+  monthPathPrefix,
+  summaryPathPrefix,
+  hideCreateYear = false,
+}: Props) {
   const router = useRouter();
   const t = useTranslations("Nav");
   const selectedMonth = currentMonth ?? new Date().getMonth() + 1;
@@ -31,13 +50,16 @@ export function NavSelectors({ currentYear, currentMonth, view, years }: Props) 
   const handleYearChange = (val: string | null) => {
     if (!val) return;
     const y = parseInt(val, 10);
-    if (view === "summary") router.push(`/${y}/summary`);
-    else router.push(`/${y}/${selectedMonth}`);
+    if (view === "summary") router.push(buildSummaryHref(summaryPathPrefix, y));
+    else router.push(buildMonthHref(monthPathPrefix, y, selectedMonth));
   };
 
+  const monthHref = buildMonthHref(monthPathPrefix, currentYear, selectedMonth);
+  const summaryHref = buildSummaryHref(summaryPathPrefix, currentYear);
+
   const mainTabs = [
-    { label: t("months"), key: "overview" as const, href: `/${currentYear}/${selectedMonth}` },
-    { label: t("annualSummary"), key: "summary" as const, href: `/${currentYear}/summary` as const },
+    { label: t("months"), key: "overview" as const, href: monthHref },
+    { label: t("annualSummary"), key: "summary" as const, href: summaryHref },
   ];
 
   return (
@@ -58,16 +80,18 @@ export function NavSelectors({ currentYear, currentMonth, view, years }: Props) 
             </SelectContent>
           </Select>
 
-          <Link
-            href={`/setup/${nextCreatableYear}`}
-            aria-label={t("createYear", { year: nextCreatableYear })}
-            className={cn(
-              buttonVariants({ variant: "outline", size: "icon-sm" }),
-              "size-8 rounded-md border-border/70 bg-background/90 text-primary shadow-sm hover:border-primary/40 hover:bg-primary/[0.06] sm:size-9"
-            )}
-          >
-            <Plus className="size-4" />
-          </Link>
+          {!hideCreateYear && (
+            <Link
+              href={`/setup/${nextCreatableYear}`}
+              aria-label={t("createYear", { year: nextCreatableYear })}
+              className={cn(
+                buttonVariants({ variant: "outline", size: "icon-sm" }),
+                "size-8 rounded-md border-border/70 bg-background/90 text-primary shadow-sm hover:border-primary/40 hover:bg-primary/[0.06] sm:size-9"
+              )}
+            >
+              <Plus className="size-4" />
+            </Link>
+          )}
         </div>
 
         <div className="min-w-0 rounded-lg border border-border/70 bg-muted/40 p-1 shadow-sm">
