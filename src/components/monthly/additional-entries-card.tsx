@@ -26,10 +26,11 @@ interface Props {
   type: "income" | "expense";
   entries: AdditionalEntry[];
   onEntriesChange: (entries: AdditionalEntry[]) => void;
+  readOnly?: boolean;
   title: string;
 }
 
-export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange, title }: Props) {
+export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange, readOnly = false, title }: Props) {
   const t = useTranslations("Monthly.additionalEntries");
   const common = useTranslations("Common");
   const locale = useLocale();
@@ -114,7 +115,7 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
       </CardHeader>
       <CardContent className="flex flex-col gap-2.5">
         <div>
-          {adding ? (
+          {!readOnly && adding ? (
             <div className="rounded-xl border border-border/70 bg-muted/20 p-1.5">
               <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto] sm:items-center">
                 <Input
@@ -147,7 +148,7 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
                 </Button>
               </div>
             </div>
-          ) : (
+          ) : !readOnly ? (
             <button
               className="inline-flex items-center gap-2 rounded-md text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               onClick={() => setAdding(true)}
@@ -155,17 +156,17 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
             >
               <Plus className="h-3.5 w-3.5" /> {t("addEntry")}
             </button>
-          )}
+          ) : null}
         </div>
 
         <div className="flex flex-col gap-2">
-          {sortedEntries.length === 0 && !adding && (
+          {sortedEntries.length === 0 && (readOnly || !adding) && (
             <div className="rounded-xl border border-dashed border-border/70 bg-muted/20 px-3 py-3 text-sm text-muted-foreground">
               {t("noEntries")}
             </div>
           )}
           {sortedEntries.map((entry) =>
-            editingId === entry.id ? (
+            !readOnly && editingId === entry.id ? (
               <div key={entry.id} className="rounded-xl border border-border/70 bg-muted/20 p-1.5">
                 <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto] sm:items-center">
                   <Input
@@ -199,45 +200,53 @@ export function AdditionalEntriesCard({ monthId, type, entries, onEntriesChange,
             ) : (
               <div key={entry.id} className="rounded-xl border border-transparent px-2 py-1.5 transition-colors hover:border-border/70 hover:bg-muted/40">
                 <div className="flex min-w-0 items-center justify-between gap-2">
-                  <button
-                    className="min-w-0 flex-1 truncate text-left text-sm font-medium text-foreground transition-colors hover:text-primary focus-visible:text-primary"
-                    onClick={() => openEditForm(entry)}
-                    type="button"
-                    aria-label={`${t("edit")} ${entry.label}`}
-                    title={entry.label}
-                  >
-                    {entry.label}
-                  </button>
+                  {readOnly ? (
+                    <span className="min-w-0 flex-1 truncate text-left text-sm font-medium text-foreground" title={entry.label}>
+                      {entry.label}
+                    </span>
+                  ) : (
+                    <button
+                      className="min-w-0 flex-1 truncate text-left text-sm font-medium text-foreground transition-colors hover:text-primary focus-visible:text-primary"
+                      onClick={() => openEditForm(entry)}
+                      type="button"
+                      aria-label={`${t("edit")} ${entry.label}`}
+                      title={entry.label}
+                    >
+                      {entry.label}
+                    </button>
+                  )}
                   <div className="flex shrink-0 items-center gap-1.5">
                     <span className="whitespace-nowrap text-sm font-semibold tabular-nums">{formatCurrency(entry.amount, locale)}</span>
-                    <AlertDialog>
-                      <AlertDialogTrigger
-                        render={
-                          <Button
-                            size="icon-xs"
-                            variant="ghost"
-                            className="text-muted-foreground hover:text-destructive"
-                            aria-label={`${t("delete")} ${entry.label}`}
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        }
-                      />
-                      <AlertDialogContent size="sm">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>{t("confirmDeleteTitle")}</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            {t("confirmDeleteDescription", { label: entry.label })}
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel variant="ghost">{t("cancel")}</AlertDialogCancel>
-                          <AlertDialogAction variant="destructive" onClick={() => handleDelete(entry.id)}>
-                            {t("confirmDeleteAction")}
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                    {!readOnly ? (
+                      <AlertDialog>
+                        <AlertDialogTrigger
+                          render={
+                            <Button
+                              size="icon-xs"
+                              variant="ghost"
+                              className="text-muted-foreground hover:text-destructive"
+                              aria-label={`${t("delete")} ${entry.label}`}
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          }
+                        />
+                        <AlertDialogContent size="sm">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>{t("confirmDeleteTitle")}</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              {t("confirmDeleteDescription", { label: entry.label })}
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel variant="ghost">{t("cancel")}</AlertDialogCancel>
+                            <AlertDialogAction variant="destructive" onClick={() => handleDelete(entry.id)}>
+                              {t("confirmDeleteAction")}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    ) : null}
                   </div>
                 </div>
               </div>

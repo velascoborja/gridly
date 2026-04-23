@@ -3,10 +3,14 @@ import Image from "next/image";
 import { Link } from "@/i18n/routing";
 import { ChartColumnBig, PiggyBank, Wallet } from "lucide-react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { getDemoHref } from "@/lib/demo/demo-year";
+import { cn } from "@/lib/utils";
 
 export function PublicHero() {
   const t = useTranslations("Landing");
+  const demoHref = getDemoHref();
 
   const FEATURES = [
     {
@@ -40,7 +44,18 @@ export function PublicHero() {
             priority
           />
         </Link>
-        <GoogleSignInButton />
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            href={demoHref}
+            className={cn(
+              buttonVariants({ variant: "outline", size: "lg" }),
+              "rounded-[4px] border-[#b9b9f9] bg-white/80 px-5 text-base font-normal text-[#533afd] shadow-[0_15px_35px_-18px_rgba(50,50,93,0.18)] backdrop-blur-sm hover:bg-[#533afd]/[0.05] hover:text-[#533afd]",
+            )}
+          >
+            {t("demoCta")}
+          </Link>
+          <GoogleSignInButton />
+        </div>
       </header>
 
       <main className="relative z-10 mx-auto grid w-full max-w-7xl gap-12 px-4 pb-14 pt-10 sm:px-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(22rem,0.95fr)] lg:items-center lg:px-8 lg:pt-16">
