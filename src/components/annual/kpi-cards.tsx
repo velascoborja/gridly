@@ -149,7 +149,7 @@ export function KpiCards({
 
   return (
     <div className="grid gap-4 xl:grid-cols-[minmax(0,1.6fr)_minmax(18rem,0.85fr)]">
-      <Card className="surface-depth-floating border-primary/20 bg-card/95">
+      <Card className="surface-depth-floating border-primary/20 bg-linear-to-b from-primary/[0.08] via-card/98 to-card/95">
         <CardContent className="px-5 py-5 md:px-6">
           <div className="mb-6 grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
             <div className="min-w-0">
@@ -242,7 +242,7 @@ export function KpiCards({
         </CardContent>
       </Card>
 
-      <Card className="border-border/70 bg-card/90 shadow-sm">
+      <Card className="border-border/70 bg-card/92 shadow-sm">
         <CardContent className="flex flex-col justify-center px-5 py-6 h-full">
           <div className="space-y-6">
             {supportingMetrics.map((metric, index) => {
