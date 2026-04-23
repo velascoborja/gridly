@@ -33,7 +33,7 @@ export function PublicHero() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(83,58,253,0.18),transparent_28%),radial-gradient(circle_at_top_right,rgba(249,107,238,0.12),transparent_24%),linear-gradient(180deg,#fbfcff_0%,#f6f8fc_42%,#f2f5fb_100%)] text-foreground">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[linear-gradient(180deg,rgba(255,255,255,0.88),transparent)]" />
-      <header className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
+      <header className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-start gap-4 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
         <Link href="/" className="group inline-flex items-center gap-2">
           <Image
             src="/gridly-wordmark.svg"
@@ -44,17 +44,17 @@ export function PublicHero() {
             priority
           />
         </Link>
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
           <Link
             href={demoHref}
             className={cn(
               buttonVariants({ variant: "outline", size: "lg" }),
-              "rounded-[4px] border-[#b9b9f9] bg-white/80 px-5 text-base font-normal text-[#533afd] shadow-[0_15px_35px_-18px_rgba(50,50,93,0.18)] backdrop-blur-sm hover:bg-[#533afd]/[0.05] hover:text-[#533afd]",
+              "w-full justify-center rounded-[4px] border-[#b9b9f9] bg-white/80 px-5 text-base font-normal text-[#533afd] shadow-[0_15px_35px_-18px_rgba(50,50,93,0.18)] backdrop-blur-sm hover:bg-[#533afd]/[0.05] hover:text-[#533afd] sm:w-auto",
             )}
           >
             {t("demoCta")}
           </Link>
-          <GoogleSignInButton />
+          <GoogleSignInButton className="w-full sm:w-auto" buttonClassName="w-full justify-center sm:w-auto" />
         </div>
       </header>
 

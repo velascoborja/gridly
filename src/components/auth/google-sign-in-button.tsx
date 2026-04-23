@@ -1,18 +1,27 @@
 import { signIn } from "@/auth";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
-export function GoogleSignInButton() {
+type GoogleSignInButtonProps = {
+  className?: string;
+  buttonClassName?: string;
+};
+
+export function GoogleSignInButton({ className, buttonClassName }: GoogleSignInButtonProps = {}) {
   async function signInWithGoogle() {
     "use server";
     await signIn("google", { redirectTo: "/" });
   }
 
   return (
-    <form action={signInWithGoogle}>
+    <form action={signInWithGoogle} className={className}>
       <Button 
         type="submit" 
         size="lg" 
-        className="group relative flex h-10 items-center gap-3 rounded-[4px] bg-[#533afd] px-5 text-base font-normal text-white shadow-[0_15px_35px_-5px_rgba(50,50,93,0.15),0_5px_15px_-5px_rgba(0,0,0,0.08)] transition-all duration-200 hover:bg-[#4434d4] hover:shadow-[0_18px_40px_-5px_rgba(50,50,93,0.2),0_8px_20px_-5px_rgba(0,0,0,0.1)] focus:outline-none focus:ring-2 focus:ring-[#533afd] focus:ring-offset-2 active:transform active:scale-[0.98]"
+        className={cn(
+          "group relative flex h-10 items-center gap-3 rounded-[4px] bg-[#533afd] px-5 text-base font-normal text-white shadow-[0_15px_35px_-5px_rgba(50,50,93,0.15),0_5px_15px_-5px_rgba(0,0,0,0.08)] transition-all duration-200 hover:bg-[#4434d4] hover:shadow-[0_18px_40px_-5px_rgba(50,50,93,0.2),0_8px_20px_-5px_rgba(0,0,0,0.1)] focus:outline-none focus:ring-2 focus:ring-[#533afd] focus:ring-offset-2 active:transform active:scale-[0.98]",
+          buttonClassName,
+        )}
       >
         <svg 
           viewBox="0 0 24 24" 
