@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { formatCurrency } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 
 interface Field {
   key: string;
@@ -209,32 +209,60 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
                       {t("hasExtraPaymentsDescription")}
                     </span>
                   </span>
-                  <input
-                    type="checkbox"
-                    checked={hasExtraPayments}
-                    onChange={(e) => setHasExtraPayments(e.target.checked)}
-                    disabled={submitting}
-                    className="mt-1 h-5 w-5 rounded border-border text-primary accent-primary"
-                  />
+                  <span className="relative mt-1 inline-flex shrink-0 items-center">
+                    <input
+                      type="checkbox"
+                      role="switch"
+                      checked={hasExtraPayments}
+                      onChange={(e) => setHasExtraPayments(e.target.checked)}
+                      disabled={submitting}
+                      className="peer sr-only"
+                    />
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        "inline-flex h-6 w-11 items-center rounded-full border p-0.5 transition-[background-color,box-shadow] duration-200 ease-out peer-focus-visible:ring-4 peer-focus-visible:ring-ring/25",
+                        hasExtraPayments
+                          ? "border-primary/70 bg-primary shadow-[0_8px_18px_-10px_rgba(83,58,253,0.7)]"
+                          : "border-border bg-background shadow-inner",
+                        submitting ? "opacity-50" : "cursor-pointer"
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "block size-5 rounded-full bg-white shadow-[0_2px_8px_rgba(15,23,42,0.18)] transition-transform duration-200 ease-out",
+                          hasExtraPayments ? "translate-x-5" : "translate-x-0"
+                        )}
+                      />
+                    </span>
+                  </span>
                 </label>
 
-                {hasExtraPayments ? (
-                  <div className="mt-4 space-y-2">
-                    <label className="text-sm font-medium text-foreground">
-                      {t("estimatedExtraPayment")}
-                    </label>
-                    <Input
-                      type="text"
-                      inputMode="decimal"
-                      value={values.estimatedExtraPayment}
-                      onChange={(e) =>
-                        setValues((prev) => ({ ...prev, estimatedExtraPayment: e.target.value }))
-                      }
-                      disabled={submitting}
-                      className="h-11 rounded-xl px-4 text-sm"
-                    />
+                <div
+                  className={cn(
+                    "grid transition-[grid-template-rows,opacity,margin-top] duration-200 ease-out",
+                    hasExtraPayments ? "mt-4 grid-rows-[1fr] opacity-100" : "mt-0 grid-rows-[0fr] opacity-0"
+                  )}
+                  aria-hidden={!hasExtraPayments}
+                >
+                  <div className="overflow-hidden px-1 pb-2">
+                    <div className="space-y-2 border-t border-border/50 pt-4">
+                      <label className="text-sm font-medium text-foreground">
+                        {t("estimatedExtraPayment")}
+                      </label>
+                      <Input
+                        type="text"
+                        inputMode="decimal"
+                        value={values.estimatedExtraPayment}
+                        onChange={(e) =>
+                          setValues((prev) => ({ ...prev, estimatedExtraPayment: e.target.value }))
+                        }
+                        disabled={submitting || !hasExtraPayments}
+                        className="h-11 rounded-xl px-4 text-sm"
+                      />
+                    </div>
                   </div>
-                ) : null}
+                </div>
               </div>
 
               {error ? (
