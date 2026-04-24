@@ -9,6 +9,15 @@ test("inline fixed fields support row press activation", () => {
   assert.match(source, /role=\{isRowInteractive \? "button" : undefined\}/);
 });
 
+test("inline fixed fields expose an explicit save button while editing", () => {
+  const source = readFileSync(new URL("./inline-edit-field.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /Loader2/);
+  assert.match(source, /aria-busy=\{saving\}/);
+  assert.match(source, /onClick=\{\(\) => void handleSave\(\)\}/);
+  assert.match(source, /saving \? tCommon\("saving"\) : tCommon\("save"\)/);
+});
+
 test("additional entry amounts remain direct edit triggers", () => {
   const source = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
 

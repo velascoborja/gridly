@@ -5,6 +5,7 @@
     "deleteAccount": "Eliminar cuenta",
     "account": "Cuenta",
     "save": "Guardar",
+    "saving": "Guardando...",
     "yearNotConfigured": "Año sin configurar",
     "noDataForYear": "Sin datos para {year}",
     "missingYearStart": "Falta el arranque del ejercicio",

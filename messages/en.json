@@ -5,6 +5,7 @@
     "deleteAccount": "Delete account",
     "account": "Account",
     "save": "Save",
+    "saving": "Saving...",
     "yearNotConfigured": "Year not configured",
     "noDataForYear": "No data for {year}",
     "missingYearStart": "Missing year start",
