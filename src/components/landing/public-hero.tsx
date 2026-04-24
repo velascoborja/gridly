@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Link } from "@/i18n/routing";
 import { ChartColumnBig, CheckCircle2, Info, PiggyBank, Wallet } from "lucide-react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
+import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getDemoHref } from "@/lib/demo/demo-year";
@@ -48,6 +49,11 @@ export function PublicHero({ accountDeleted = false, authError = false }: Public
             className="h-11 w-[149px] transition-transform duration-200 group-hover:-translate-y-0.5 sm:h-12 sm:w-[162px]"
             priority
           />
+          {process.env.NODE_ENV === "development" && (
+            <Badge variant="default" className="pointer-events-none uppercase">
+              Dev
+            </Badge>
+          )}
         </Link>
         <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
           <Link
