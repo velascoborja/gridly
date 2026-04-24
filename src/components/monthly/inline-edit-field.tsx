@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn, formatCurrency } from "@/lib/utils";
 
@@ -31,6 +32,7 @@ export function InlineEditField({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const saveButtonRef = useRef<HTMLButtonElement>(null);
   const cancelButtonRef = useRef<HTMLButtonElement>(null);
   const discardIntentRef = useRef(false);
 
@@ -44,6 +46,8 @@ export function InlineEditField({
   }, [editing, value]);
 
   const handleSave = async () => {
+    if (saving) return;
+
     const parsed = parseFloat(inputVal.replace(",", "."));
     if (isNaN(parsed)) {
       setError(true);
@@ -73,7 +77,7 @@ export function InlineEditField({
       return;
     }
 
-    if (e.relatedTarget === cancelButtonRef.current) {
+    if (e.relatedTarget === saveButtonRef.current || e.relatedTarget === cancelButtonRef.current) {
       return;
     }
 
@@ -81,7 +85,7 @@ export function InlineEditField({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") handleSave();
+    if (e.key === "Enter") void handleSave();
     if (e.key === "Escape") {
       discardIntentRef.current = true;
       setEditing(false);
@@ -120,10 +124,10 @@ export function InlineEditField({
     >
       <span className="min-w-0 truncate whitespace-nowrap text-sm font-medium text-foreground">{label}</span>
       {editing ? (
-        <div className="flex min-w-0 shrink-0 items-center justify-end gap-1.5">
+        <div className="flex min-w-0 shrink-0 flex-wrap items-center justify-end gap-1.5" aria-busy={saving}>
           <input
             ref={inputRef}
-            className={`h-9 w-20 rounded-md border bg-background px-2.5 text-right text-sm outline-none transition-colors focus:ring-4 focus:ring-ring/20 sm:w-32 ${error ? "border-destructive" : "border-border"}`}
+            className={`h-9 w-24 rounded-md border bg-background px-2.5 text-right text-sm outline-none transition-colors focus:ring-4 focus:ring-ring/20 sm:w-32 ${error ? "border-destructive" : "border-border"}`}
             value={inputVal}
             onChange={(e) => { setInputVal(e.target.value); setError(false); }}
             onBlur={handleBlur}
@@ -133,11 +137,23 @@ export function InlineEditField({
             inputMode="decimal"
           />
           <Button
+            ref={saveButtonRef}
+            size="sm"
+            className="h-9 shrink-0 px-3"
+            onClick={() => void handleSave()}
+            disabled={saving}
+            type="button"
+          >
+            {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+            {saving ? tCommon("saving") : tCommon("save")}
+          </Button>
+          <Button
             ref={cancelButtonRef}
             size="sm"
             variant="ghost"
             className="h-9 shrink-0 px-2 text-muted-foreground sm:px-3"
             onClick={discardEdits}
+            disabled={saving}
             type="button"
           >
             {tCommon("cancel")}
