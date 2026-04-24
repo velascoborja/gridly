@@ -24,7 +24,10 @@
     "english": "English",
     "dangerZone": "Danger Zone",
     "deleteAccountConfirm": "Are you sure you want to delete your account? This action cannot be undone.",
-    "todoDeleteAccount": "Delete account functionality coming soon."
+    "deleteAccountTitle": "Permanently delete account",
+    "deleteAccountDialogDescription": "This will delete your user, Google access, and all exercises, months, and entries. You will not be able to recover this data.",
+    "deleteAccountDeleting": "Deleting...",
+    "deleteAccountError": "Could not delete the account. Check the connection and try again."
   },
   "Annual": {
     "title": "Annual Summary",
@@ -111,6 +114,8 @@
     "heroTitle": "Control income, expenses, and savings with a vision that fits.",
     "heroDescription": "Gridly converts your financial year into a coherent chain: from the starting balance to the monthly close, with an annual summary, quick editing, and Excel export.",
     "demoCta": "View demo",
+    "accountDeletedTitle": "Account deleted",
+    "accountDeletedDescription": "Your account and data have been deleted successfully.",
     "features": {
       "monthly": {
         "title": "Monthly Control",

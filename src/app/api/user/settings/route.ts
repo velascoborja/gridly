@@ -24,3 +24,19 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
+
+export async function DELETE() {
+  const user = await getSessionUser();
+  if (!user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    await db.delete(users).where(eq(users.id, user.id));
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Failed to delete account:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}

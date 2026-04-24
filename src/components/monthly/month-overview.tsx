@@ -180,8 +180,8 @@ export function MonthOverview({
     config.year > today.getFullYear() || (config.year === today.getFullYear() && month.month > today.getMonth() + 1);
 
   return (
-    <div className="space-y-6">
-      <div className="overflow-hidden rounded-lg border border-border/70 bg-background/90 shadow-[0_30px_45px_-30px_rgba(50,50,93,0.25),0_18px_36px_-24px_rgba(0,0,0,0.1)]">
+    <div>
+      <div className="mb-6 overflow-hidden rounded-lg border border-border/70 bg-background/90 shadow-[0_30px_45px_-30px_rgba(50,50,93,0.25),0_18px_36px_-24px_rgba(0,0,0,0.1)]">
         <div className="flex items-center gap-2 border-b border-border/70 px-3 py-3 sm:px-4">
           {previousMonth ? (
             <Link
@@ -286,7 +286,7 @@ export function MonthOverview({
 
       <Card
         className={cn(
-          "overflow-hidden border-white/10 text-white shadow-[0_30px_45px_-30px_rgba(50,50,93,0.45),0_18px_36px_-18px_rgba(0,0,0,0.22)] transition-colors duration-500",
+          "mb-6 overflow-hidden border-white/10 text-white shadow-[0_30px_45px_-30px_rgba(50,50,93,0.45),0_18px_36px_-18px_rgba(0,0,0,0.22)] transition-colors duration-500",
           isPastMonth
             ? "bg-gradient-to-br from-slate-900 via-[#0d253d] to-slate-950"
             : isSelectedMonthCurrent
@@ -391,10 +391,10 @@ export function MonthOverview({
           id="month-fixed-editors"
           aria-hidden={!showFixedEditors}
           className={cn(
-            "overflow-hidden transition-[height,opacity,transform,margin] duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-[height,opacity,transform]",
+            "overflow-hidden transition-[height,opacity,transform] duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-[height,opacity,transform]",
             fixedEditorsVisible
-              ? "mt-0 opacity-100 translate-y-0"
-              : "-mt-2 opacity-0 -translate-y-1.5 pointer-events-none"
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 -translate-y-1.5 pointer-events-none"
           )}
           style={{ height: fixedEditorsHeight === "auto" ? "auto" : `${fixedEditorsHeight}px` }}
           onTransitionEnd={(event) => {
@@ -406,7 +406,7 @@ export function MonthOverview({
             setRenderFixedEditors(false);
           }}
         >
-          <div ref={fixedEditorsInnerRef} className="overflow-hidden">
+          <div ref={fixedEditorsInnerRef} className="overflow-hidden pb-6">
             <div
               className={cn(
                 "grid gap-4 pt-1 pb-0.5 transition-[opacity,transform,filter] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] sm:grid-cols-2",

@@ -24,7 +24,10 @@
     "english": "Inglés",
     "dangerZone": "Zona de peligro",
     "deleteAccountConfirm": "¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.",
-    "todoDeleteAccount": "Funcionalidad de eliminación de cuenta próximamente."
+    "deleteAccountTitle": "Eliminar cuenta de forma permanente",
+    "deleteAccountDialogDescription": "Se eliminarán tu usuario, el acceso con Google y todos tus ejercicios, meses y movimientos. No podrás recuperar estos datos.",
+    "deleteAccountDeleting": "Eliminando...",
+    "deleteAccountError": "No se ha podido eliminar la cuenta. Revisa la conexión e inténtalo de nuevo."
   },
   "Annual": {
     "title": "Resumen anual",
@@ -111,6 +114,8 @@
     "heroTitle": "Controla ingresos, gastos y ahorro con una visión que sí encaja.",
     "heroDescription": "Gridly convierte tu año financiero en una cadena coherente: desde el saldo inicial hasta el cierre mensual, con resumen anual, edición rápida y exportación a Excel.",
     "demoCta": "Ver demo",
+    "accountDeletedTitle": "Cuenta eliminada",
+    "accountDeletedDescription": "Tu cuenta y tus datos se han eliminado correctamente.",
     "features": {
       "monthly": {
         "title": "Control mensual",

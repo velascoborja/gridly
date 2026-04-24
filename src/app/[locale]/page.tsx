@@ -3,8 +3,18 @@ import { PublicHero } from "@/components/landing/public-hero";
 import { getAppRedirectPath } from "@/lib/server/year-data";
 import { redirect } from "@/i18n/routing";
 
-export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
+export default async function Home({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ accountDeleted?: string | string[] }>;
+}) {
   const { locale } = await params;
+  const { accountDeleted } = await searchParams;
+  const accountDeletedConfirmed = Array.isArray(accountDeleted)
+    ? accountDeleted.includes("1")
+    : accountDeleted === "1";
   const session = await auth();
   const currentYear = new Date().getFullYear();
 
@@ -15,5 +25,5 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
     redirect({ href: path, locale });
   }
 
-  return <PublicHero />;
+  return <PublicHero accountDeleted={accountDeletedConfirmed} />;
 }

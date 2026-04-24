@@ -1,14 +1,18 @@
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { Link } from "@/i18n/routing";
-import { ChartColumnBig, PiggyBank, Wallet } from "lucide-react";
+import { ChartColumnBig, CheckCircle2, PiggyBank, Wallet } from "lucide-react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getDemoHref } from "@/lib/demo/demo-year";
 import { cn } from "@/lib/utils";
 
-export function PublicHero() {
+interface PublicHeroProps {
+  accountDeleted?: boolean;
+}
+
+export function PublicHero({ accountDeleted = false }: PublicHeroProps) {
   const t = useTranslations("Landing");
   const demoHref = getDemoHref();
 
@@ -57,6 +61,18 @@ export function PublicHero() {
           <GoogleSignInButton className="w-full sm:w-auto" buttonClassName="w-full justify-center sm:w-auto" />
         </div>
       </header>
+
+      {accountDeleted ? (
+        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex max-w-2xl items-start gap-3 rounded-[6px] border border-[rgba(21,190,83,0.4)] bg-[rgba(21,190,83,0.12)] px-4 py-3 text-[#108c3d] shadow-[0_15px_35px_-28px_rgba(50,50,93,0.25)]">
+            <CheckCircle2 className="mt-0.5 size-5 shrink-0" />
+            <div className="space-y-1">
+              <p className="text-sm font-medium">{t("accountDeletedTitle")}</p>
+              <p className="text-sm leading-6 text-[#108c3d]/85">{t("accountDeletedDescription")}</p>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <main className="relative z-10 mx-auto grid w-full max-w-7xl gap-12 px-4 pb-14 pt-10 sm:px-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(22rem,0.95fr)] lg:items-center lg:px-8 lg:pt-16">
         <section className="space-y-8">

@@ -2,7 +2,7 @@
 
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter, usePathname, routing } from "@/i18n/routing";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import {
   Select,
   SelectContent,
@@ -12,15 +12,32 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Globe, Trash2, AlertCircle } from "lucide-react";
 
 export function SettingsForm() {
   const t = useTranslations("Settings");
   const common = useTranslations("Common");
   const locale = useLocale();
+  const languageLabels: Record<string, string> = {
+    es: t("spanish"),
+    en: t("english"),
+  };
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   function onLanguageChange(nextLocale: string | null) {
     if (!nextLocale) return;
@@ -49,8 +66,25 @@ export function SettingsForm() {
     });
   }
 
-  function handleDeleteAccount() {
-    alert(t("todoDeleteAccount"));
+  async function handleDeleteAccount() {
+    setDeleteError("");
+    setIsDeleting(true);
+
+    try {
+      const res = await fetch("/api/user/settings", {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        throw new Error(`Failed to delete account: ${res.statusText}`);
+      }
+
+      window.location.assign(`/${locale}?accountDeleted=1`);
+    } catch (err) {
+      console.error("Failed to delete account:", err);
+      setDeleteError(t("deleteAccountError"));
+      setIsDeleting(false);
+    }
   }
 
   return (
@@ -73,7 +107,9 @@ export function SettingsForm() {
               disabled={isPending}
             >
               <SelectTrigger className="h-10 rounded-xl border-border/70 bg-background/90 shadow-sm transition-all focus:border-primary focus:ring-primary/20">
-                <SelectValue placeholder={t("language")} />
+                <SelectValue placeholder={t("language")}>
+                  {(value) => languageLabels[String(value)] ?? t("language")}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="es">{t("spanish")}</SelectItem>
@@ -95,14 +131,50 @@ export function SettingsForm() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Button 
-            variant="destructive" 
-            onClick={handleDeleteAccount}
-            className="gap-2 rounded-xl shadow-sm"
-          >
-            <Trash2 className="size-4" />
-            {common("deleteAccount")}
-          </Button>
+          <div className="space-y-3">
+            <AlertDialog>
+              <AlertDialogTrigger
+                render={
+                  <Button
+                    variant="destructive"
+                    disabled={isDeleting}
+                    className="gap-2 rounded-xl shadow-sm"
+                  >
+                    <Trash2 className="size-4" />
+                    {common("deleteAccount")}
+                  </Button>
+                }
+              />
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>{t("deleteAccountTitle")}</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {t("deleteAccountDialogDescription")}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel disabled={isDeleting}>
+                    {common("cancel")}
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    variant="destructive"
+                    onClick={handleDeleteAccount}
+                    disabled={isDeleting}
+                    aria-busy={isDeleting}
+                    className="gap-2"
+                  >
+                    <Trash2 className="size-4" />
+                    {isDeleting ? t("deleteAccountDeleting") : common("deleteAccount")}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            {deleteError ? (
+              <p className="text-sm text-destructive" role="alert">
+                {deleteError}
+              </p>
+            ) : null}
+          </div>
         </CardContent>
       </Card>
     </div>
