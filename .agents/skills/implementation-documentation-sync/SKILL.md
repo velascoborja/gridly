@@ -30,5 +30,5 @@ After completing an implementation, follow these steps:
     - `## Implementation Details`: Specific logic, file paths, and integration points.
 
 ### 4. Verification
-- Ensure the documentation remains technical, concise, and Spanish-localized where appropriate (as per project conventions).
+- Ensure the documentation remains technical, concise, and written in English (following existing project documentation).
 - Verify that all internal links between documentation files are still valid.
