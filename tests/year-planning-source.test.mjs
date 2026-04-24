@@ -54,3 +54,10 @@ test("year config source offers starting balance editing when the year is editab
   assert.match(source, /onSave=\{\(v\) => handleSave\("startingBalance", v\)\}/, "year config form should save startingBalance when editable");
   assert.match(source, /disabled=\{!startingBalanceEditable\}/, "year config form should disable startingBalance editing for carried-over years");
 });
+
+test("month route passes starting balance editability into the shared year shell", async () => {
+  const source = await readSource("src/app/[locale]/[year]/[month]/page.tsx");
+
+  assert.match(source, /const startingBalanceEditable = years\[0\] === year;/, "month route should derive the same editable first-year state as summary");
+  assert.match(source, /startingBalanceEditable=\{startingBalanceEditable\}/, "month route should pass editability into the shared year shell");
+});

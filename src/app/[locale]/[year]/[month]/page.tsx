@@ -25,12 +25,15 @@ export default async function MonthPage({
     notFound();
   }
 
+  const startingBalanceEditable = years[0] === year;
+
   return (
     <YearPageClient
       yearData={yearData}
       initialMonth={month}
       initialView="overview"
       years={years.length > 0 ? years : [year]}
+      startingBalanceEditable={startingBalanceEditable}
       user={user}
     />
   );
