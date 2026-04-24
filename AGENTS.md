@@ -63,3 +63,8 @@ Gridly follows a premium, fintech-inspired visual system (Stripe-like) documente
 Detailed documentation for specific features can be found in `docs/features/`. Refer to these files for in-depth understanding of implementation logic and domain rules.
 
 - [Year Settings & Setup](docs/features/year-settings.md): Details on year creation, configuration fields, and prefill logic.
+- [Monthly Management](docs/features/monthly-management.md): Core tracking interface for income, fixed expenses, and interest calculations.
+- [Additional Entries](docs/features/additional-entries.md): Management of granular variable expenses and income transactions.
+- [Balance & Interest Logic](docs/features/calculations-engine.md): The mathematical engine behind the month-over-month financial chain.
+- [Yearly Carry-over](docs/features/balance-carry-over.md): Automatic synchronization of balances across consecutive years.
+- [Data Export](docs/features/data-export.md): Excel workbook generation for offline analysis and data portability.
