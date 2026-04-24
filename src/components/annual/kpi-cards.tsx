@@ -186,7 +186,7 @@ export function KpiCards({
                           </Button>
                         }
                       />
-                      <DialogContent className="max-w-md">
+                      <DialogContent className="max-w-md py-6">
                         <DialogHeader>
                           <DialogTitle>{tAnnual("configTitle")}</DialogTitle>
                           <DialogDescription>

@@ -10,16 +10,25 @@ interface InlineEditFieldProps {
   label: string;
   value: number;
   onSave: (newValue: number) => Promise<void>;
+  formatDisplayValue?: (value: number, locale: string) => string;
+  formatEditValue?: (value: number) => string;
+  parseInputValue?: (input: string) => number;
   disabled?: boolean;
   readOnly?: boolean;
   className?: string;
   activateOnRowPress?: boolean;
 }
 
+const defaultFormatEditValue = (value: number) => String(value);
+const defaultParseInputValue = (input: string) => parseFloat(input.replace(",", "."));
+
 export function InlineEditField({
   label,
   value,
   onSave,
+  formatDisplayValue = formatCurrency,
+  formatEditValue = defaultFormatEditValue,
+  parseInputValue = defaultParseInputValue,
   disabled,
   readOnly = false,
   className,
@@ -39,16 +48,16 @@ export function InlineEditField({
   useEffect(() => {
     if (editing) {
       discardIntentRef.current = false;
-      setInputVal(String(value));
+      setInputVal(formatEditValue(value));
       inputRef.current?.focus();
       inputRef.current?.select();
     }
-  }, [editing, value]);
+  }, [editing, formatEditValue, value]);
 
   const handleSave = async () => {
     if (saving) return;
 
-    const parsed = parseFloat(inputVal.replace(",", "."));
+    const parsed = parseInputValue(inputVal);
     if (isNaN(parsed)) {
       setError(true);
       return;
@@ -174,7 +183,7 @@ export function InlineEditField({
           disabled={disabled}
           type="button"
         >
-          {formatCurrency(value, locale)}
+          {formatDisplayValue(value, locale)}
         </button>
       )}
     </div>

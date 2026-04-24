@@ -15,3 +15,13 @@ test("year page lets annual summary update shared year data", () => {
 
   assert.match(source, /<AnnualView[\s\S]*onYearDataChange=\{setCurrentYearData\}/);
 });
+
+test("annual interest rate setting edits inline with percent formatting", () => {
+  const source = readFileSync(new URL("./year-config-form.tsx", import.meta.url), "utf8");
+
+  assert.doesNotMatch(source, /prompt\(/);
+  assert.match(source, /label=\{t\("interestRate"\)\}/);
+  assert.match(source, /formatDisplayValue=\{\(v\) => `\$\{\(v \* 100\)\.toFixed\(2\)\}%`\}/);
+  assert.match(source, /formatEditValue=\{\(v\) => String\(\+\(v \* 100\)\.toFixed\(2\)\)\}/);
+  assert.match(source, /parseInputValue=\{\(input\) => parseFloat\(input\.replace\(",", "\."\)\) \/ 100\}/);
+});

@@ -158,20 +158,14 @@ export function YearConfigForm({
           />
         </div>
         <div className="rounded-2xl border border-border/60 bg-muted/20 p-4">
-          <div className="flex items-center justify-between gap-4">
-            <span className="text-sm text-muted-foreground">{t("interestRate")}</span>
-            <button
-              className="rounded-md border border-transparent px-2 py-1 text-sm font-medium tabular-nums text-foreground transition-colors hover:border-border hover:bg-background hover:text-foreground cursor-pointer"
-              onClick={() => {
-                const v = prompt(t("interestRate"), String(config.interestRate * 100));
-                if (v === null) return;
-                const num = parseFloat(v.replace(",", "."));
-                if (!isNaN(num)) void handleSave("interestRate", num / 100);
-              }}
-            >
-              {(config.interestRate * 100).toFixed(2)}%
-            </button>
-          </div>
+          <InlineEditField
+            label={t("interestRate")}
+            value={config.interestRate}
+            onSave={(v) => handleSave("interestRate", v)}
+            formatDisplayValue={(v) => `${(v * 100).toFixed(2)}%`}
+            formatEditValue={(v) => String(+(v * 100).toFixed(2))}
+            parseInputValue={(input) => parseFloat(input.replace(",", ".")) / 100}
+          />
         </div>
       </div>
     </div>
