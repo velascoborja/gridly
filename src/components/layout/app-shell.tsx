@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Link } from "@/i18n/routing";
 import { NavSelectors } from "./nav-selectors";
 import { UserMenu } from "@/components/auth/user-menu";
+import { Badge } from "@/components/ui/badge";
 
 interface Props {
   currentYear: number;
@@ -45,6 +46,11 @@ export function AppShell({
               className="h-10 w-[135px] transition-transform duration-200 group-hover:-translate-y-0.5 md:h-12 md:w-[162px]"
               priority
             />
+            {process.env.NODE_ENV === "development" && (
+              <Badge variant="default" className="pointer-events-none uppercase">
+                DEV
+              </Badge>
+            )}
           </Link>
           <div className="contents md:flex md:flex-col md:items-end md:gap-3">
             <div className="flex items-center justify-end justify-self-end">
