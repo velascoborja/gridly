@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { cn, formatCurrency } from "@/lib/utils";
 
 interface Field {
@@ -111,6 +112,11 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
                     className="h-10 w-[135px]"
                     priority
                   />
+                  {process.env.NODE_ENV === "development" && (
+                    <Badge variant="default" className="pointer-events-none uppercase">
+                      DEV
+                    </Badge>
+                  )}
                 </div>
                 <div className="space-y-0.5">
                   <p className="text-sm text-white/70">{t("subtitle")}</p>
