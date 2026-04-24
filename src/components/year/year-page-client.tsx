@@ -79,8 +79,13 @@ export function YearPageClient({
   startingBalanceEditable = false,
   user,
 }: Props) {
+  const [currentYearData, setCurrentYearData] = useState<YearData>(yearData);
   const [selectedMonth, setSelectedMonth] = useState(initialMonth);
   const [selectedView, setSelectedView] = useState<YearClientView>(initialView);
+
+  useEffect(() => {
+    setCurrentYearData(yearData);
+  }, [yearData]);
 
   useEffect(() => {
     setSelectedMonth(initialMonth);
@@ -94,7 +99,7 @@ export function YearPageClient({
     function syncStateFromLocation() {
       const nextState = parseStateFromPathname(window.location.pathname);
       if (!nextState) return;
-      if (nextState.year !== null && nextState.year !== yearData.config.year) return;
+      if (nextState.year !== null && nextState.year !== currentYearData.config.year) return;
 
       setSelectedView(nextState.view);
       if (nextState.month) {
@@ -106,35 +111,35 @@ export function YearPageClient({
     return () => {
       window.removeEventListener("popstate", syncStateFromLocation);
     };
-  }, [yearData.config.year]);
+  }, [currentYearData.config.year]);
 
   const handleMonthSelect = useCallback((nextMonth: number) => {
     setSelectedMonth((currentMonth) => {
       if (selectedView === "overview" && currentMonth === nextMonth) return currentMonth;
 
-      window.history.pushState(null, "", buildYearRoute(yearData.config.year, String(nextMonth)));
+      window.history.pushState(null, "", buildYearRoute(currentYearData.config.year, String(nextMonth)));
       return nextMonth;
     });
     setSelectedView("overview");
-  }, [selectedView, yearData.config.year]);
+  }, [selectedView, currentYearData.config.year]);
 
   const handleSummarySelect = useCallback(() => {
     if (selectedView === "summary") return;
 
-    window.history.pushState(null, "", buildYearRoute(yearData.config.year, "summary"));
+    window.history.pushState(null, "", buildYearRoute(currentYearData.config.year, "summary"));
     setSelectedView("summary");
-  }, [selectedView, yearData.config.year]);
+  }, [selectedView, currentYearData.config.year]);
 
   const handleSettingsSelect = useCallback(() => {
     if (selectedView === "settings") return;
 
-    window.history.pushState(null, "", buildSettingsRoute(yearData.config.year));
+    window.history.pushState(null, "", buildSettingsRoute(currentYearData.config.year));
     setSelectedView("settings");
-  }, [selectedView, yearData.config.year]);
+  }, [selectedView, currentYearData.config.year]);
 
   return (
     <AppShell
-      currentYear={yearData.config.year}
+      currentYear={currentYearData.config.year}
       currentMonth={selectedMonth}
       view={selectedView}
       years={years}
@@ -148,12 +153,13 @@ export function YearPageClient({
           <SettingsForm />
         </div>
       ) : selectedView === "summary" ? (
-        <AnnualView yearData={yearData} startingBalanceEditable={startingBalanceEditable} />
+        <AnnualView yearData={currentYearData} startingBalanceEditable={startingBalanceEditable} />
       ) : (
         <MonthOverview
-          yearData={yearData}
+          yearData={currentYearData}
           monthNumber={selectedMonth}
           onMonthSelect={handleMonthSelect}
+          onYearDataChange={setCurrentYearData}
         />
       )}
     </AppShell>

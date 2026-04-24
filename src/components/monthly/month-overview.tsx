@@ -21,6 +21,7 @@ interface Props {
   monthPathPrefix?: string;
   currentMonthPathPrefix?: string;
   onMonthSelect?: (month: number) => void;
+  onYearDataChange?: (yearData: YearData) => void;
 }
 
 export function MonthOverview({
@@ -30,6 +31,7 @@ export function MonthOverview({
   monthPathPrefix,
   currentMonthPathPrefix,
   onMonthSelect,
+  onYearDataChange,
 }: Props) {
   const t = useTranslations("Monthly");
   const tOverview = useTranslations("Monthly.overview");
@@ -148,9 +150,16 @@ export function MonthOverview({
             }
           : m
       );
-      return recompute(updated);
+      const recomputedMonths = recompute(updated);
+      if (onYearDataChange) {
+        onYearDataChange({
+          config,
+          months: recomputedMonths,
+        });
+      }
+      return recomputedMonths;
     });
-  }, [month, recompute]);
+  }, [config, month, onYearDataChange, recompute]);
 
   const handleEntriesChange = useCallback((type: "income" | "expense", entries: AdditionalEntry[]) => {
     setMonths((prev) => {
@@ -159,9 +168,16 @@ export function MonthOverview({
         if (type === "expense") return { ...m, additionalExpenses: sortAdditionalEntriesDesc(entries) };
         return { ...m, additionalIncomes: sortAdditionalEntriesDesc(entries) };
       });
-      return recompute(updated);
+      const recomputedMonths = recompute(updated);
+      if (onYearDataChange) {
+        onYearDataChange({
+          config,
+          months: recomputedMonths,
+        });
+      }
+      return recomputedMonths;
     });
-  }, [monthNumber, recompute]);
+  }, [config, monthNumber, onYearDataChange, recompute]);
 
   if (!month) {
     return (
