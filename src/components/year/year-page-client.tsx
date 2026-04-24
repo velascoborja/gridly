@@ -153,7 +153,11 @@ export function YearPageClient({
           <SettingsForm />
         </div>
       ) : selectedView === "summary" ? (
-        <AnnualView yearData={currentYearData} startingBalanceEditable={startingBalanceEditable} />
+        <AnnualView
+          yearData={currentYearData}
+          startingBalanceEditable={startingBalanceEditable}
+          onYearDataChange={setCurrentYearData}
+        />
       ) : (
         <MonthOverview
           yearData={currentYearData}

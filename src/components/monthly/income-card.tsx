@@ -9,13 +9,13 @@ import type { MonthData } from "@/lib/types";
 interface Props {
   month: MonthData;
   onUpdate: (field: string, value: number) => Promise<void>;
+  showAdditionalPayslip: boolean;
   readOnly?: boolean;
 }
 
-export function IncomeCard({ month, onUpdate, readOnly = false }: Props) {
+export function IncomeCard({ month, onUpdate, showAdditionalPayslip, readOnly = false }: Props) {
   const t = useTranslations("Monthly.income");
   const tFixed = useTranslations("Monthly.fixed");
-  const isJuneOrDec = month.month === 6 || month.month === 12;
   const isJuly = month.month === 7;
 
   return (
@@ -39,7 +39,7 @@ export function IncomeCard({ month, onUpdate, readOnly = false }: Props) {
           readOnly={readOnly}
           activateOnRowPress
         />
-        {isJuneOrDec && (
+        {showAdditionalPayslip && (
           <InlineEditField
             label={t("additionalPayslip")}
             value={month.additionalPayslip}

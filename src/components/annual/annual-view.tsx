@@ -12,12 +12,14 @@ interface Props {
   yearData: YearData;
   startingBalanceEditable: boolean;
   readOnly?: boolean;
+  onYearDataChange?: (yearData: YearData) => void;
 }
 
 export function AnnualView({
   yearData: initial,
   startingBalanceEditable,
   readOnly = false,
+  onYearDataChange,
 }: Props) {
   const t = useTranslations("Annual");
   const [config, setConfig] = useState<YearConfig>(initial.config);
@@ -28,13 +30,20 @@ export function AnnualView({
   const months = computeMonthChain(monthRows, config.startingBalance, config.interestRate);
 
   const applyExtraPaymentsToMonths = (hasExtraPayments: boolean, estimatedExtraPayment: number) => {
-    setMonthRows((current) =>
-      current.map((month) =>
+    setMonthRows((current) => {
+      const updatedRows = current.map((month) =>
         month.month === 6 || month.month === 12
           ? { ...month, additionalPayslip: hasExtraPayments ? estimatedExtraPayment : 0 }
           : month
-      )
-    );
+      );
+      const nextConfig = { ...config, hasExtraPayments, estimatedExtraPayment };
+      const recomputedMonths = computeMonthChain(updatedRows, nextConfig.startingBalance, nextConfig.interestRate);
+      onYearDataChange?.({
+        config: nextConfig,
+        months: recomputedMonths,
+      });
+      return updatedRows;
+    });
   };
 
   const trackPendingSave = (savePromise: Promise<void>) => {

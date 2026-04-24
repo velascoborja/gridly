@@ -432,7 +432,12 @@ export function MonthOverview({
               )}
             >
               <FixedExpensesCard month={month} onUpdate={handleFixedUpdate} readOnly={readOnly} />
-              <IncomeCard month={month} onUpdate={handleFixedUpdate} readOnly={readOnly} />
+              <IncomeCard
+                month={month}
+                onUpdate={handleFixedUpdate}
+                showAdditionalPayslip={config.hasExtraPayments && (month.month === 6 || month.month === 12)}
+                readOnly={readOnly}
+              />
             </div>
           </div>
         </div>
