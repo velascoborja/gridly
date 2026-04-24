@@ -6,6 +6,7 @@
     "account": "Cuenta",
     "save": "Guardar",
     "saving": "Guardando...",
+    "resetToAnnualValue": "Restaurar valor de la configuración anual",
     "yearNotConfigured": "Año sin configurar",
     "noDataForYear": "Sin datos para {year}",
     "missingYearStart": "Falta el arranque del ejercicio",

@@ -24,6 +24,8 @@ interface Props {
   onYearDataChange?: (yearData: YearData) => void;
 }
 
+type FixedUpdateOptions = { interestsManualOverride?: boolean };
+
 export function MonthOverview({
   yearData: initialYearData,
   monthNumber,
@@ -131,12 +133,12 @@ export function MonthOverview({
     return computeMonthChain(updated, config.startingBalance, config.interestRate);
   }, [config.interestRate, config.startingBalance]);
 
-  const handleFixedUpdate = useCallback(async (field: string, value: number) => {
+  const handleFixedUpdate = useCallback(async (field: string, value: number, options?: FixedUpdateOptions) => {
     if (!month) return;
     const res = await fetch(`/api/months/${month.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ [field]: value }),
+      body: JSON.stringify({ [field]: value, ...options }),
     });
     if (!res.ok) throw new Error("Failed to update");
 
@@ -146,7 +148,11 @@ export function MonthOverview({
           ? {
               ...m,
               [field]: value,
-              ...(field === "interests" ? { interestsManualOverride: true } : {}),
+              ...(options?.interestsManualOverride !== undefined
+                ? { interestsManualOverride: options.interestsManualOverride }
+                : field === "interests"
+                  ? { interestsManualOverride: true }
+                  : {}),
             }
           : m
       );
@@ -431,11 +437,12 @@ export function MonthOverview({
                   : "opacity-0 translate-y-1.5 blur-[2px]"
               )}
             >
-              <FixedExpensesCard month={month} onUpdate={handleFixedUpdate} readOnly={readOnly} />
+              <FixedExpensesCard month={month} onUpdate={handleFixedUpdate} annualDefaults={config} readOnly={readOnly} />
               <IncomeCard
                 month={month}
                 onUpdate={handleFixedUpdate}
                 showAdditionalPayslip={config.hasExtraPayments && (month.month === 6 || month.month === 12)}
+                annualDefaults={config}
                 readOnly={readOnly}
               />
             </div>

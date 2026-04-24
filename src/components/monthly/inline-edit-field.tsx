@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Check, Loader2, X } from "lucide-react";
+import { BrushCleaning, Check, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn, formatCurrency } from "@/lib/utils";
 
@@ -17,6 +17,9 @@ interface InlineEditFieldProps {
   readOnly?: boolean;
   className?: string;
   activateOnRowPress?: boolean;
+  resetValue?: number;
+  showReset?: boolean;
+  onReset?: (resetValue: number) => Promise<void>;
 }
 
 const defaultFormatEditValue = (value: number) => String(value);
@@ -33,6 +36,9 @@ export function InlineEditField({
   readOnly = false,
   className,
   activateOnRowPress = false,
+  resetValue,
+  showReset,
+  onReset,
 }: InlineEditFieldProps) {
   const locale = useLocale();
   const tCommon = useTranslations("Common");
@@ -108,7 +114,24 @@ export function InlineEditField({
     }
   };
 
+  const handleReset = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    if (saving || resetValue === undefined) return;
+
+    setSaving(true);
+    try {
+      await (onReset ?? onSave)(resetValue);
+      setError(false);
+    } catch {
+      setError(true);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const isRowInteractive = activateOnRowPress && !editing && !disabled && !readOnly;
+  const resetVisible = showReset ?? (resetValue !== undefined && Math.abs(value - resetValue) > 0.005);
+  const canReset = resetValue !== undefined && resetVisible && !disabled && !readOnly;
 
   return (
     <div
@@ -173,18 +196,34 @@ export function InlineEditField({
           </Button>
         </div>
       ) : (
-        <button
-          className={cn(
-            "shrink-0 rounded-md px-2 py-1 text-sm font-semibold tabular-nums transition-colors hover:bg-background hover:text-primary disabled:cursor-default disabled:opacity-50",
-            error ? "text-destructive" : "text-foreground",
-            readOnly && "cursor-default hover:bg-transparent hover:text-foreground"
-          )}
-          onClick={startEditing}
-          disabled={disabled}
-          type="button"
-        >
-          {formatDisplayValue(value, locale)}
-        </button>
+        <div className="flex min-w-0 items-center justify-end gap-1">
+          {canReset ? (
+            <Button
+              size="icon-sm"
+              variant="ghost"
+              className="h-7 w-7 shrink-0 rounded-md text-muted-foreground hover:bg-background hover:text-primary"
+              onClick={(event) => void handleReset(event)}
+              disabled={saving}
+              title={tCommon("resetToAnnualValue")}
+              type="button"
+            >
+              {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <BrushCleaning className="h-3.5 w-3.5" />}
+              <span className="sr-only">{tCommon("resetToAnnualValue")}</span>
+            </Button>
+          ) : null}
+          <button
+            className={cn(
+              "shrink-0 rounded-md px-2 py-1 text-sm font-semibold tabular-nums transition-colors hover:bg-background hover:text-primary disabled:cursor-default disabled:opacity-50",
+              error ? "text-destructive" : "text-foreground",
+              readOnly && "cursor-default hover:bg-transparent hover:text-foreground"
+            )}
+            onClick={startEditing}
+            disabled={disabled || saving}
+            type="button"
+          >
+            {formatDisplayValue(value, locale)}
+          </button>
+        </div>
       )}
     </div>
   );

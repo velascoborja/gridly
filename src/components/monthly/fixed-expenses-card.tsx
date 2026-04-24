@@ -4,15 +4,16 @@ import { useTranslations } from "next-intl";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { InlineEditField } from "./inline-edit-field";
-import type { MonthData } from "@/lib/types";
+import type { MonthData, YearConfig } from "@/lib/types";
 
 interface Props {
   month: MonthData;
   onUpdate: (field: string, value: number) => Promise<void>;
+  annualDefaults: Pick<YearConfig, "monthlyHomeExpense" | "monthlyPersonalBudget" | "monthlyInvestment">;
   readOnly?: boolean;
 }
 
-export function FixedExpensesCard({ month, onUpdate, readOnly = false }: Props) {
+export function FixedExpensesCard({ month, onUpdate, annualDefaults, readOnly = false }: Props) {
   const t = useTranslations("Monthly.fixedExpenses");
   const tFixed = useTranslations("Monthly.fixed");
 
@@ -36,6 +37,7 @@ export function FixedExpensesCard({ month, onUpdate, readOnly = false }: Props) 
           onSave={(v) => onUpdate("homeExpense", v)}
           readOnly={readOnly}
           activateOnRowPress
+          resetValue={annualDefaults.monthlyHomeExpense}
         />
         <InlineEditField
           label={t("personalExpense")}
@@ -43,6 +45,7 @@ export function FixedExpensesCard({ month, onUpdate, readOnly = false }: Props) 
           onSave={(v) => onUpdate("personalExpense", v)}
           readOnly={readOnly}
           activateOnRowPress
+          resetValue={annualDefaults.monthlyPersonalBudget}
         />
         <InlineEditField
           label={t("investment")}
@@ -50,6 +53,7 @@ export function FixedExpensesCard({ month, onUpdate, readOnly = false }: Props) 
           onSave={(v) => onUpdate("investment", v)}
           readOnly={readOnly}
           activateOnRowPress
+          resetValue={annualDefaults.monthlyInvestment}
         />
       </CardContent>
     </Card>

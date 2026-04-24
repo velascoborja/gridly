@@ -29,7 +29,9 @@ export async function PATCH(
       (updates as Record<string, string>)[field] = String(body[field]);
     }
   }
-  if (body.interests !== undefined) {
+  if (body.interestsManualOverride !== undefined) {
+    updates.interestsManualOverride = Boolean(body.interestsManualOverride);
+  } else if (body.interests !== undefined) {
     updates.interestsManualOverride = true;
   }
 

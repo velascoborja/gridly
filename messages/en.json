@@ -6,6 +6,7 @@
     "account": "Account",
     "save": "Save",
     "saving": "Saving...",
+    "resetToAnnualValue": "Reset to annual setup value",
     "yearNotConfigured": "Year not configured",
     "noDataForYear": "No data for {year}",
     "missingYearStart": "Missing year start",

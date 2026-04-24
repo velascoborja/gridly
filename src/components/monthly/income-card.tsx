@@ -4,16 +4,20 @@ import { useTranslations } from "next-intl";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { InlineEditField } from "./inline-edit-field";
-import type { MonthData } from "@/lib/types";
+import { calculateMonthlyInterest } from "@/lib/calculations";
+import type { MonthData, YearConfig } from "@/lib/types";
+
+type FixedUpdateOptions = { interestsManualOverride?: boolean };
 
 interface Props {
   month: MonthData;
-  onUpdate: (field: string, value: number) => Promise<void>;
+  onUpdate: (field: string, value: number, options?: FixedUpdateOptions) => Promise<void>;
   showAdditionalPayslip: boolean;
+  annualDefaults: Pick<YearConfig, "estimatedSalary" | "estimatedExtraPayment" | "interestRate">;
   readOnly?: boolean;
 }
 
-export function IncomeCard({ month, onUpdate, showAdditionalPayslip, readOnly = false }: Props) {
+export function IncomeCard({ month, onUpdate, showAdditionalPayslip, annualDefaults, readOnly = false }: Props) {
   const t = useTranslations("Monthly.income");
   const tFixed = useTranslations("Monthly.fixed");
   const isJuly = month.month === 7;
@@ -38,6 +42,7 @@ export function IncomeCard({ month, onUpdate, showAdditionalPayslip, readOnly = 
           onSave={(v) => onUpdate("payslip", v)}
           readOnly={readOnly}
           activateOnRowPress
+          resetValue={annualDefaults.estimatedSalary}
         />
         {showAdditionalPayslip && (
           <InlineEditField
@@ -46,6 +51,7 @@ export function IncomeCard({ month, onUpdate, showAdditionalPayslip, readOnly = 
             onSave={(v) => onUpdate("additionalPayslip", v)}
             readOnly={readOnly}
             activateOnRowPress
+            resetValue={annualDefaults.estimatedExtraPayment}
           />
         )}
         {isJuly && (
@@ -63,6 +69,9 @@ export function IncomeCard({ month, onUpdate, showAdditionalPayslip, readOnly = 
           onSave={(v) => onUpdate("interests", v)}
           readOnly={readOnly}
           activateOnRowPress
+          resetValue={calculateMonthlyInterest(month.startingBalance, annualDefaults.interestRate)}
+          showReset={month.interestsManualOverride}
+          onReset={(v) => onUpdate("interests", v, { interestsManualOverride: false })}
         />
         <InlineEditField
           label={t("personalRemaining")}
