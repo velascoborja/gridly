@@ -51,7 +51,7 @@ export function PublicHero({ accountDeleted = false, authError = false }: Public
           />
           {process.env.NODE_ENV === "development" && (
             <Badge variant="default" className="pointer-events-none uppercase">
-              Dev
+              DEV
             </Badge>
           )}
         </Link>
