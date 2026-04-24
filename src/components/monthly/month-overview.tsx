@@ -353,13 +353,13 @@ export function MonthOverview({
               {/* Center: Primary KPIs */}
               <div className="flex gap-8">
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.18em] text-white/50 font-medium">{tOverview("netSavings")}</p>
+                  <p className="text-[10px] uppercase tracking-[0.18em] text-white/50 font-medium">Ahorro Neto</p>
                   <p className={`text-3xl font-bold tracking-tight tabular-nums ${savingsPositive ? "text-emerald-300" : "text-rose-300"}`}>
                     {savingsPositive ? "+" : ""}{formatCurrency(month.savings, locale)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.18em] text-white/50 font-medium">{tOverview("endingBalance")}</p>
+                  <p className="text-[10px] uppercase tracking-[0.18em] text-white/50 font-medium">Saldo Final</p>
                   <p className="text-3xl font-bold tracking-tight tabular-nums text-white/90">
                     {formatCurrency(month.endingBalance, locale)}
                   </p>
@@ -370,15 +370,15 @@ export function MonthOverview({
             {/* Right: Secondary Stats */}
             <div className="flex w-full justify-center gap-6 border-t border-white/10 pt-4 md:w-auto md:border-l md:border-t-0 md:pl-8 md:pt-0">
               <div className="space-y-1 md:text-right">
-                <p className="text-xs uppercase tracking-widest text-white/30 font-bold">{tOverview("startingBalance")}</p>
+                <p className="text-xs uppercase tracking-widest text-white/30 font-bold">Inicial</p>
                 <p className="text-base font-medium tabular-nums text-white/80">{formatCurrency(month.startingBalance, locale)}</p>
               </div>
               <div className="space-y-1 md:text-right">
-                <p className="text-xs uppercase tracking-widest text-white/30 font-bold">{tOverview("totalIncome")}</p>
+                <p className="text-xs uppercase tracking-widest text-white/30 font-bold">Ingresos</p>
                 <p className="text-base font-medium tabular-nums text-emerald-400/80">{formatCurrency(month.totalIncome, locale)}</p>
               </div>
               <div className="space-y-1 md:text-right">
-                <p className="text-xs uppercase tracking-widest text-white/30 font-bold">{tOverview("totalExpenses")}</p>
+                <p className="text-xs uppercase tracking-widest text-white/30 font-bold">Gastos</p>
                 <p className="text-base font-medium tabular-nums text-rose-400/80">{formatCurrency(month.totalExpenses, locale)}</p>
               </div>
             </div>

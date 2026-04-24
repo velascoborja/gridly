@@ -71,6 +71,11 @@ function label(ws: ExcelJS.Worksheet, cell: string, text: string) {
   ws.getCell(cell).value = text;
 }
 
+function formatExportMonthName(month: number, locale: "en" | "es") {
+  const name = formatMonthName(month, locale);
+  return name.charAt(0).toLocaleUpperCase(locale) + name.slice(1);
+}
+
 function writeMonthSection(
   ws: ExcelJS.Worksheet,
   year: number,
@@ -79,7 +84,7 @@ function writeMonthSection(
   locale: "en" | "es",
 ) {
   const t = EXPORT_MESSAGES[locale];
-  const sheetName = formatMonthName(month.month, locale);
+  const sheetName = formatExportMonthName(month.month, locale);
 
   ws.mergeCells(`A${startRow}:E${startRow}`);
   const title = ws.getCell(`A${startRow}`);
@@ -175,7 +180,7 @@ export async function buildWorkbook(yearData: YearData, locale: "en" | "es" = "e
 
   yearData.months.forEach((month, index) => {
     const row = currentRow + 1 + index;
-    ws.getCell(`A${row}`).value = formatMonthName(month.month, locale);
+    ws.getCell(`A${row}`).value = formatExportMonthName(month.month, locale);
     money(ws, `B${row}`, month.startingBalance);
     money(ws, `C${row}`, month.totalIncome);
     money(ws, `D${row}`, month.totalExpenses);
