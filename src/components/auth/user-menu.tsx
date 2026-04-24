@@ -22,10 +22,17 @@ interface Props {
   name?: string | null;
   active?: boolean;
   variant?: "header" | "footer";
+  onSettingsSelect?: () => void;
 }
 
-export function UserMenu({ email, name, active, variant = "header" }: Props) {
+export function UserMenu({ email, name, active, variant = "header", onSettingsSelect }: Props) {
   const t = useTranslations("Common");
+  const handleSettingsNavigate = (event: { preventDefault: () => void }) => {
+    if (!onSettingsSelect) return;
+
+    event.preventDefault();
+    onSettingsSelect();
+  };
 
   if (variant === "footer") {
     return (
@@ -36,6 +43,7 @@ export function UserMenu({ email, name, active, variant = "header" }: Props) {
         </div>
         <Link
           href="/settings"
+          onNavigate={handleSettingsNavigate}
           className={cn(
             "flex w-full items-center justify-center gap-2 rounded-lg border transition-all duration-200",
             active
@@ -84,6 +92,7 @@ export function UserMenu({ email, name, active, variant = "header" }: Props) {
       </div>
       <Link
         href="/settings"
+        onNavigate={handleSettingsNavigate}
         className={cn(
           "flex size-9 items-center justify-center rounded-full border transition-all duration-200 hover:shadow-sm",
           active

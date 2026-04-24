@@ -16,6 +16,7 @@ interface Props {
   };
   onMonthViewSelect?: () => void;
   onSummaryViewSelect?: () => void;
+  onSettingsSelect?: () => void;
   children: React.ReactNode;
 }
 
@@ -27,6 +28,7 @@ export function AppShell({
   user,
   onMonthViewSelect,
   onSummaryViewSelect,
+  onSettingsSelect,
   children,
 }: Props) {
   return (
@@ -46,7 +48,12 @@ export function AppShell({
           </Link>
           <div className="contents md:flex md:flex-col md:items-end md:gap-3">
             <div className="flex items-center justify-end justify-self-end">
-              <UserMenu email={user.email} name={user.name} active={view === "settings"} />
+              <UserMenu
+                email={user.email}
+                name={user.name}
+                active={view === "settings"}
+                onSettingsSelect={onSettingsSelect}
+              />
             </div>
             <div className="col-span-2 flex min-w-0 justify-center md:col-span-1 md:justify-end">
               <NavSelectors
