@@ -3,6 +3,8 @@ export interface YearConfig {
   year: number;
   startingBalance: number;
   estimatedSalary: number;
+  hasExtraPayments: boolean;
+  estimatedExtraPayment: number;
   monthlyInvestment: number;
   monthlyHomeExpense: number;
   monthlyPersonalBudget: number;

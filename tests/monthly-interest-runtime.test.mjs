@@ -86,3 +86,36 @@ test("computeMonthChain auto-calculates interest from each month's starting bala
     await cleanup();
   }
 });
+
+test("estimatedMonthData only applies configured extra payments when enabled", async () => {
+  const { estimatedMonthData, cleanup } = await loadCalculationsModule();
+
+  try {
+    const config = {
+      id: 1,
+      year: 2026,
+      startingBalance: 0,
+      estimatedSalary: 2000,
+      monthlyInvestment: 0,
+      monthlyHomeExpense: 0,
+      monthlyPersonalBudget: 0,
+      interestRate: 0,
+      hasExtraPayments: false,
+      estimatedExtraPayment: 1200,
+    };
+
+    assert.equal(estimatedMonthData(6, config).additionalPayslip, 0);
+    assert.equal(estimatedMonthData(12, config).additionalPayslip, 0);
+
+    const enabledConfig = {
+      ...config,
+      hasExtraPayments: true,
+    };
+
+    assert.equal(estimatedMonthData(5, enabledConfig).additionalPayslip, 0);
+    assert.equal(estimatedMonthData(6, enabledConfig).additionalPayslip, 1200);
+    assert.equal(estimatedMonthData(12, enabledConfig).additionalPayslip, 1200);
+  } finally {
+    await cleanup();
+  }
+});

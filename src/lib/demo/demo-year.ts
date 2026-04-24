@@ -17,6 +17,8 @@ export function getDemoYearData(): YearData {
     year: DEMO_YEAR,
     startingBalance: 6400,
     estimatedSalary: 2450,
+    hasExtraPayments: true,
+    estimatedExtraPayment: 2450,
     monthlyInvestment: 350,
     monthlyHomeExpense: 980,
     monthlyPersonalBudget: 420,
@@ -136,7 +138,10 @@ function estimatedMonthData(month: number, config: YearConfig): Omit<RawMonthDat
     personalExpense: config.monthlyPersonalBudget,
     investment: config.monthlyInvestment,
     payslip: config.estimatedSalary,
-    additionalPayslip: month === 6 || month === 12 ? config.estimatedSalary : 0,
+    additionalPayslip:
+      config.hasExtraPayments && (month === 6 || month === 12)
+        ? config.estimatedExtraPayment
+        : 0,
     bonus: 0,
     interests: 0,
     interestsManualOverride: false,

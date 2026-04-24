@@ -76,6 +76,8 @@ export const years = pgTable("years", {
   year: integer("year").notNull(),
   startingBalance: numeric("starting_balance", { precision: 12, scale: 2 }).notNull().default("0"),
   estimatedSalary: numeric("estimated_salary", { precision: 12, scale: 2 }).notNull().default("0"),
+  hasExtraPayments: boolean("has_extra_payments").notNull().default(false),
+  estimatedExtraPayment: numeric("estimated_extra_payment", { precision: 12, scale: 2 }).notNull().default("0"),
   monthlyInvestment: numeric("monthly_investment", { precision: 12, scale: 2 }).notNull().default("0"),
   monthlyHomeExpense: numeric("monthly_home_expense", { precision: 12, scale: 2 }).notNull().default("0"),
   monthlyPersonalBudget: numeric("monthly_personal_budget", { precision: 12, scale: 2 }).notNull().default("0"),

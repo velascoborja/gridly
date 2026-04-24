@@ -27,7 +27,17 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { year, startingBalance = 0, estimatedSalary = 0, monthlyInvestment = 0, monthlyHomeExpense = 0, monthlyPersonalBudget = 0, interestRate = 0 } = body;
+  const {
+    year,
+    startingBalance = 0,
+    estimatedSalary = 0,
+    hasExtraPayments = false,
+    estimatedExtraPayment = 0,
+    monthlyInvestment = 0,
+    monthlyHomeExpense = 0,
+    monthlyPersonalBudget = 0,
+    interestRate = 0,
+  } = body;
 
   if (!year) return Response.json({ error: "year is required" }, { status: 400 });
 
@@ -65,6 +75,8 @@ export async function POST(request: Request) {
     year,
     startingBalance: String(derivedStartingBalance),
     estimatedSalary: String(estimatedSalary),
+    hasExtraPayments: Boolean(hasExtraPayments),
+    estimatedExtraPayment: String(estimatedExtraPayment),
     monthlyInvestment: String(monthlyInvestment),
     monthlyHomeExpense: String(monthlyHomeExpense),
     monthlyPersonalBudget: String(monthlyPersonalBudget),

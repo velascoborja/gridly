@@ -41,9 +41,11 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
   const [values, setValues] = useState<Record<string, string>>(
     Object.fromEntries([
       ["startingBalance", String(derivedStartingBalance)],
+      ["estimatedExtraPayment", "0"],
       ...FIELDS.map((f) => [f.key, f.defaultValue]),
     ])
   );
+  const [hasExtraPayments, setHasExtraPayments] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -52,9 +54,13 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
     setSubmitting(true);
     setError("");
 
-    const body: Record<string, number | string> = { year };
+    const body: Record<string, number | string | boolean> = { year };
     const startingBalance = parseFloat(values.startingBalance.replace(",", "."));
     body.startingBalance = Number.isNaN(startingBalance) ? 0 : startingBalance;
+    body.hasExtraPayments = hasExtraPayments;
+    const estimatedExtraPayment = parseFloat(values.estimatedExtraPayment.replace(",", "."));
+    body.estimatedExtraPayment =
+      hasExtraPayments && !Number.isNaN(estimatedExtraPayment) ? estimatedExtraPayment : 0;
 
     for (const f of FIELDS) {
       const val = parseFloat(values[f.key].replace(",", "."));
@@ -134,7 +140,9 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/8 p-4 backdrop-blur-sm">
                 <p className="text-xs uppercase tracking-[0.22em] text-white/55">{t("extraPaysLabel")}</p>
-                <p className="mt-2 text-sm font-medium text-white">{t("extraPaysNote")}</p>
+                <p className="mt-2 text-sm font-medium text-white">
+                  {hasExtraPayments ? t("extraPaysEnabledNote") : t("extraPaysDisabledNote")}
+                </p>
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/8 p-4 backdrop-blur-sm">
                 <p className="text-xs uppercase tracking-[0.22em] text-white/55">{t("redirectionLabel")}</p>
@@ -190,6 +198,44 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
                   />
                 </div>
               ))}
+
+              <div className="rounded-2xl border border-border/70 bg-muted/20 p-4">
+                <label className="flex items-start justify-between gap-4">
+                  <span className="space-y-1">
+                    <span className="block text-sm font-medium text-foreground">
+                      {t("hasExtraPayments")}
+                    </span>
+                    <span className="block text-sm leading-6 text-muted-foreground">
+                      {t("hasExtraPaymentsDescription")}
+                    </span>
+                  </span>
+                  <input
+                    type="checkbox"
+                    checked={hasExtraPayments}
+                    onChange={(e) => setHasExtraPayments(e.target.checked)}
+                    disabled={submitting}
+                    className="mt-1 h-5 w-5 rounded border-border text-primary accent-primary"
+                  />
+                </label>
+
+                {hasExtraPayments ? (
+                  <div className="mt-4 space-y-2">
+                    <label className="text-sm font-medium text-foreground">
+                      {t("estimatedExtraPayment")}
+                    </label>
+                    <Input
+                      type="text"
+                      inputMode="decimal"
+                      value={values.estimatedExtraPayment}
+                      onChange={(e) =>
+                        setValues((prev) => ({ ...prev, estimatedExtraPayment: e.target.value }))
+                      }
+                      disabled={submitting}
+                      className="h-11 rounded-xl px-4 text-sm"
+                    />
+                  </div>
+                ) : null}
+              </div>
 
               {error ? (
                 <p

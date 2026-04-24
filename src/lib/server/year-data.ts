@@ -85,6 +85,8 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
       year: yearRow.year,
       startingBalance: parseFloat(yearRow.startingBalance),
       estimatedSalary: parseFloat(yearRow.estimatedSalary),
+      hasExtraPayments: yearRow.hasExtraPayments,
+      estimatedExtraPayment: parseFloat(yearRow.estimatedExtraPayment),
       monthlyInvestment: parseFloat(yearRow.monthlyInvestment),
       monthlyHomeExpense: parseFloat(yearRow.monthlyHomeExpense),
       monthlyPersonalBudget: parseFloat(yearRow.monthlyPersonalBudget),

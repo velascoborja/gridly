@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Loader2 } from "lucide-react";
+import { Check, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn, formatCurrency } from "@/lib/utils";
 
@@ -124,10 +124,13 @@ export function InlineEditField({
     >
       <span className="min-w-0 truncate whitespace-nowrap text-sm font-medium text-foreground">{label}</span>
       {editing ? (
-        <div className="flex min-w-0 shrink-0 flex-wrap items-center justify-end gap-1.5" aria-busy={saving}>
+        <div
+          className="col-span-2 grid min-w-0 grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2"
+          aria-busy={saving}
+        >
           <input
             ref={inputRef}
-            className={`h-9 w-24 rounded-md border bg-background px-2.5 text-right text-sm outline-none transition-colors focus:ring-4 focus:ring-ring/20 sm:w-32 ${error ? "border-destructive" : "border-border"}`}
+            className={`h-10 min-w-0 rounded-md border bg-background px-3 text-right text-sm outline-none transition-colors focus:ring-4 focus:ring-ring/20 ${error ? "border-destructive" : "border-border"}`}
             value={inputVal}
             onChange={(e) => { setInputVal(e.target.value); setError(false); }}
             onBlur={handleBlur}
@@ -138,25 +141,26 @@ export function InlineEditField({
           />
           <Button
             ref={saveButtonRef}
-            size="sm"
-            className="h-9 shrink-0 px-3"
+            size="icon-lg"
+            className="h-10 w-10 shrink-0 rounded-md"
             onClick={() => void handleSave()}
             disabled={saving}
             type="button"
           >
-            {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
-            {saving ? tCommon("saving") : tCommon("save")}
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+            <span className="sr-only">{saving ? tCommon("saving") : tCommon("save")}</span>
           </Button>
           <Button
             ref={cancelButtonRef}
-            size="sm"
+            size="icon-lg"
             variant="ghost"
-            className="h-9 shrink-0 px-2 text-muted-foreground sm:px-3"
+            className="h-10 w-10 shrink-0 rounded-md text-muted-foreground hover:text-foreground"
             onClick={discardEdits}
             disabled={saving}
             type="button"
           >
-            {tCommon("cancel")}
+            <X className="h-4 w-4" />
+            <span className="sr-only">{tCommon("cancel")}</span>
           </Button>
         </div>
       ) : (

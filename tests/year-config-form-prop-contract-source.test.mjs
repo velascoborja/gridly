@@ -27,3 +27,13 @@ test("annual config editing keeps a setter-compatible prop contract", async () =
     "AnnualView should pass the state setter through to the KPI cards",
   );
 });
+
+test("annual extra payment toggle exposes pending feedback and animated details", async () => {
+  const source = await readSource("src/components/annual/year-config-form.tsx");
+
+  assert.match(source, /savingFields/, "extra payment toggle should track pending save state");
+  assert.match(source, /Loader2/, "extra payment toggle should render a visible loading indicator");
+  assert.match(source, /disabled=\{isSavingField\("hasExtraPayments"\)\}/, "extra payment toggle should prevent duplicate saves while pending");
+  assert.match(source, /grid-rows-\[1fr\]/, "extra payment amount field should animate open");
+  assert.match(source, /grid-rows-\[0fr\]/, "extra payment amount field should animate closed");
+});

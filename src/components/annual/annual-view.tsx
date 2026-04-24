@@ -21,10 +21,21 @@ export function AnnualView({
 }: Props) {
   const t = useTranslations("Annual");
   const [config, setConfig] = useState<YearConfig>(initial.config);
+  const [monthRows, setMonthRows] = useState(initial.months);
   const [savingConfig, setSavingConfig] = useState(false);
   const pendingSaveCountRef = useRef(0);
   const pendingSavesRef = useRef(new Set<Promise<void>>());
-  const months = computeMonthChain(initial.months, config.startingBalance, config.interestRate);
+  const months = computeMonthChain(monthRows, config.startingBalance, config.interestRate);
+
+  const applyExtraPaymentsToMonths = (hasExtraPayments: boolean, estimatedExtraPayment: number) => {
+    setMonthRows((current) =>
+      current.map((month) =>
+        month.month === 6 || month.month === 12
+          ? { ...month, additionalPayslip: hasExtraPayments ? estimatedExtraPayment : 0 }
+          : month
+      )
+    );
+  };
 
   const trackPendingSave = (savePromise: Promise<void>) => {
     if (readOnly) {
@@ -70,6 +81,7 @@ export function AnnualView({
         startingBalanceEditable={startingBalanceEditable}
         readOnly={readOnly}
         onConfigChange={setConfig}
+        onExtraPaymentsApplied={applyExtraPaymentsToMonths}
         onExport={handleExport}
         onPendingSave={trackPendingSave}
       />

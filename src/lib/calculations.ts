@@ -71,14 +71,15 @@ export function computeMonthChain(
 }
 
 export function estimatedMonthData(month: number, config: YearConfig): Omit<RawMonthData, "id" | "yearId"> {
+  const isExtraPaymentMonth = month === 6 || month === 12;
+
   return {
     month,
     homeExpense: config.monthlyHomeExpense,
     personalExpense: config.monthlyPersonalBudget,
     investment: config.monthlyInvestment,
     payslip: config.estimatedSalary,
-    // June = 6, December = 12 get additional payslip
-    additionalPayslip: month === 6 || month === 12 ? config.estimatedSalary : 0,
+    additionalPayslip: config.hasExtraPayments && isExtraPaymentMonth ? config.estimatedExtraPayment : 0,
     // July = 7 gets bonus (set to 0 — user fills in actual)
     bonus: 0,
     interests: 0,
