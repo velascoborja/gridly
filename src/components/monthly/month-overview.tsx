@@ -104,11 +104,11 @@ export function MonthOverview({
     });
   }, [renderFixedEditors, showFixedEditors]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     activeMonthTabRef.current?.scrollIntoView({
       block: "nearest",
       inline: "center",
-      behavior: "instant",
+      behavior: "smooth",
     });
   }, [monthNumber]);
 
@@ -228,7 +228,7 @@ export function MonthOverview({
             </span>
           )}
 
-          <div className="min-w-0 flex-1 overflow-x-auto scroll-px-3 snap-x snap-mandatory scrollbar-hide [mask-image:linear-gradient(to_right,transparent,black_12px,black_calc(100%-12px),transparent)] sm:scroll-px-1 sm:[mask-image:none]">
+          <div className="min-w-0 flex-1 overflow-x-auto scroll-px-3 snap-x snap-proximity scrollbar-hide [mask-image:linear-gradient(to_right,transparent,black_12px,black_calc(100%-12px),transparent)] sm:scroll-px-1 sm:[mask-image:none]">
             <div className="mx-auto flex w-max min-w-max gap-2 px-3 sm:px-1 py-1">
               {sortedMonths.map((item) => {
                 const isActive = item.month === month.month;
