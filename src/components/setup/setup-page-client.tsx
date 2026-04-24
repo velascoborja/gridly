@@ -53,6 +53,9 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
     setError("");
 
     const body: Record<string, number | string> = { year };
+    const startingBalance = parseFloat(values.startingBalance.replace(",", "."));
+    body.startingBalance = Number.isNaN(startingBalance) ? 0 : startingBalance;
+
     for (const f of FIELDS) {
       const val = parseFloat(values[f.key].replace(",", "."));
       body[f.key] = Number.isNaN(val) ? 0 : f.key === "interestRate" ? val / 100 : val;

@@ -15,10 +15,11 @@ test("year creation source enforces sequential creation and derived carry-over",
   assert.match(source, /propagateYearCarryOver/, "create year route should propagate carry-over after creation");
 });
 
-test("year update source no longer accepts direct starting balance edits and propagates changes", async () => {
+test("year update source accepts starting balance edits only for the earliest year and propagates changes", async () => {
   const source = await readSource("src/app/api/years/[year]/route.ts");
 
-  assert.doesNotMatch(source, /body\.startingBalance/, "year update route should not patch startingBalance directly");
+  assert.match(source, /body\.startingBalance/, "year update route should accept startingBalance for editable first years");
+  assert.match(source, /earliestYear !== yearNum/, "year update route should reject startingBalance edits outside the earliest year");
   assert.match(source, /propagateYearCarryOver/, "year update route should propagate downstream years after config changes");
 });
 
@@ -38,17 +39,18 @@ test("setup and monthly entrypoints expose only guided next-year creation", asyn
   const navSource = await readSource("src/components/layout/nav-selectors.tsx");
 
   assert.match(setupSource, /derivedStartingBalance/, "setup should load and display the derived carry-over balance");
+  assert.match(setupSource, /body\.startingBalance/, "setup should submit the editable first-year starting balance");
   assert.match(setupSource, /t\("descriptionFixed"/, "setup should explain the sequential year rule");
-  assert.match(monthPageSource, /nextCreatableYear/, "missing-year screen should compute the next allowed year");
-  assert.match(monthPageSource, /tCommon\("missingYearDescription"\)/, "missing-year screen should explain sequential rule");
+  assert.match(monthPageSource, /redirect\(`\/setup\/\$\{year\}\?redirect=\/\$\{year\}\/\$\{month\}`\)/, "missing first-year route should redirect into setup");
   assert.match(navSource, /Plus/, "nav selector should render a plus icon for year creation");
   assert.match(navSource, /aria-label=\{t\("createYear"/, "nav selector should keep an accessible label for the icon-only create button");
   assert.doesNotMatch(navSource, />\s*Crear \{nextCreatableYear\}\s*</, "nav selector should no longer show a text create-year button");
 });
 
-test("year config source no longer offers editing the starting balance field", async () => {
+test("year config source offers starting balance editing when the year is editable", async () => {
   const source = await readSource("src/components/annual/year-config-form.tsx");
 
-  assert.doesNotMatch(source, /label=\"Saldo inicial del año\"/, "year config form should not render inline editing for startingBalance");
-  assert.match(source, /t\("startingBalanceLabel"\)/, "year config form should explain that starting balance is linked");
+  assert.match(source, /startingBalanceEditable/, "year config form should receive the editable first-year state");
+  assert.match(source, /onSave=\{\(v\) => handleSave\("startingBalance", v\)\}/, "year config form should save startingBalance when editable");
+  assert.match(source, /disabled=\{!startingBalanceEditable\}/, "year config form should disable startingBalance editing for carried-over years");
 });
