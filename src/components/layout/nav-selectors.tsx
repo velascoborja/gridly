@@ -110,13 +110,13 @@ export function NavSelectors({
                 <Link
                   key={tab.key}
                   href={tab.href}
-                  onClick={
-                    tab.key === "overview"
-                      ? onMonthViewSelect
-                      : tab.key === "summary"
-                        ? onSummaryViewSelect
-                        : undefined
-                  }
+                  onNavigate={(event) => {
+                    const handler = tab.key === "overview" ? onMonthViewSelect : onSummaryViewSelect;
+                    if (!handler) return;
+
+                    event.preventDefault();
+                    handler();
+                  }}
                   aria-current={active ? "page" : undefined}
                   className={`inline-flex items-center rounded-md px-3 py-1.5 text-sm font-medium transition-all sm:px-4 sm:py-2 ${
                     active

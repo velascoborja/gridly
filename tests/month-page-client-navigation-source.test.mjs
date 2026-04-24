@@ -19,3 +19,12 @@ test("authenticated year routes use a client shell for in-year navigation", asyn
   assert.match(shellSource, /AnnualView/, "year client shell should render annual summary locally");
   assert.match(shellSource, /MonthOverview/, "year client shell should render month overview locally");
 });
+
+test("authenticated year nav tabs cancel Next navigation when handled locally", async () => {
+  const navSource = await readSource("src/components/layout/nav-selectors.tsx");
+
+  assert.match(navSource, /onNavigate/, "nav selector tabs should use Next's client navigation hook");
+  assert.match(navSource, /event\.preventDefault\(\)/, "local tab handlers should prevent the route navigation");
+  assert.match(navSource, /tab\.key === "overview" \? onMonthViewSelect : onSummaryViewSelect/, "tabs should select the matching local handler");
+  assert.match(navSource, /handler\(\)/, "local tab handler should run after navigation is cancelled");
+});
