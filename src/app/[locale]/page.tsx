@@ -8,13 +8,14 @@ export default async function Home({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ accountDeleted?: string | string[] }>;
+  searchParams: Promise<{ accountDeleted?: string | string[]; authError?: string | string[] }>;
 }) {
   const { locale } = await params;
-  const { accountDeleted } = await searchParams;
+  const { accountDeleted, authError } = await searchParams;
   const accountDeletedConfirmed = Array.isArray(accountDeleted)
     ? accountDeleted.includes("1")
     : accountDeleted === "1";
+  const authErrorDetected = Array.isArray(authError) ? authError.includes("1") : authError === "1";
   const session = await auth();
   const currentYear = new Date().getFullYear();
 
@@ -25,5 +26,5 @@ export default async function Home({
     redirect({ href: path, locale });
   }
 
-  return <PublicHero accountDeleted={accountDeletedConfirmed} />;
+  return <PublicHero accountDeleted={accountDeletedConfirmed} authError={authErrorDetected} />;
 }

@@ -124,6 +124,8 @@
     "demoCta": "Ver demo",
     "accountDeletedTitle": "Cuenta eliminada",
     "accountDeletedDescription": "Tu cuenta y tus datos se han eliminado correctamente.",
+    "authErrorTitle": "Inicio de sesión cancelado",
+    "authErrorDescription": "No se ha iniciado sesión. Puedes volver a intentarlo cuando quieras.",
     "features": {
       "monthly": {
         "title": "Control mensual",

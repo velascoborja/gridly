@@ -124,6 +124,8 @@
     "demoCta": "View demo",
     "accountDeletedTitle": "Account deleted",
     "accountDeletedDescription": "Your account and data have been deleted successfully.",
+    "authErrorTitle": "Sign-in cancelled",
+    "authErrorDescription": "You are not signed in. You can try again whenever you want.",
     "features": {
       "monthly": {
         "title": "Monthly Control",

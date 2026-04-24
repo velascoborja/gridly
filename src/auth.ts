@@ -17,6 +17,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     authenticatorsTable: authenticators,
   }),
   providers: [Google],
+  pages: {
+    error: "/api/auth-ui-error",
+  },
   events: {
     async signIn({ user }) {
       if (user.id) {

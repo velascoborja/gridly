@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { Link } from "@/i18n/routing";
-import { ChartColumnBig, CheckCircle2, PiggyBank, Wallet } from "lucide-react";
+import { ChartColumnBig, CheckCircle2, Info, PiggyBank, Wallet } from "lucide-react";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,9 +10,10 @@ import { cn } from "@/lib/utils";
 
 interface PublicHeroProps {
   accountDeleted?: boolean;
+  authError?: boolean;
 }
 
-export function PublicHero({ accountDeleted = false }: PublicHeroProps) {
+export function PublicHero({ accountDeleted = false, authError = false }: PublicHeroProps) {
   const t = useTranslations("Landing");
   const demoHref = getDemoHref();
 
@@ -69,6 +70,18 @@ export function PublicHero({ accountDeleted = false }: PublicHeroProps) {
             <div className="space-y-1">
               <p className="text-sm font-medium">{t("accountDeletedTitle")}</p>
               <p className="text-sm leading-6 text-[#108c3d]/85">{t("accountDeletedDescription")}</p>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {authError ? (
+        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex max-w-2xl items-start gap-3 rounded-[6px] border border-[#b9b9f9] bg-white/82 px-4 py-3 text-[#533afd] shadow-[0_15px_35px_-28px_rgba(50,50,93,0.25)] backdrop-blur-sm">
+            <Info className="mt-0.5 size-5 shrink-0" />
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-[#061b31]">{t("authErrorTitle")}</p>
+              <p className="text-sm leading-6 text-[#64748d]">{t("authErrorDescription")}</p>
             </div>
           </div>
         </div>
