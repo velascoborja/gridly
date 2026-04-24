@@ -252,7 +252,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
                   aria-hidden={!hasExtraPayments}
                 >
                   <div className="overflow-hidden px-1 pb-2">
-                    <div className="space-y-2 border-t border-border/50 pt-4">
+                    <div className="space-y-3 border-t border-border/50 pt-4">
                       <label className="text-sm font-medium text-foreground">
                         {t("estimatedExtraPayment")}
                       </label>
