@@ -57,3 +57,9 @@ Gridly follows a premium, fintech-inspired visual system (Stripe-like) documente
 - **Data Access:** Client components use `fetch()` to internal APIs; server components use Drizzle directly.
 - **Styling:** Adhere to Tailwind CSS v4 and the visual tokens defined in `src/app/globals.css`. For any UI modification, consult `DESIGN.md` first and follow its rules for spacing, elevation, typography, colors, interactive states, and component styling.
 - **Numeric Handling:** Convert DB strings to `number` immediately after reading and back to `string` for DB operations.
+
+## Feature Documentation
+
+Detailed documentation for specific features can be found in `docs/features/`. Refer to these files for in-depth understanding of implementation logic and domain rules.
+
+- [Year Settings & Setup](docs/features/year-settings.md): Details on year creation, configuration fields, and prefill logic.
