@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Link } from "@/i18n/routing";
 
 interface PublicDemoShellProps {
@@ -29,6 +30,11 @@ export function PublicDemoShell({
             className="h-11 w-[149px] transition-transform duration-200 group-hover:-translate-y-0.5 sm:h-12 sm:w-[162px]"
             priority
           />
+          {process.env.NODE_ENV === "development" && (
+            <Badge variant="default" className="pointer-events-none uppercase">
+              DEV
+            </Badge>
+          )}
         </Link>
         <GoogleSignInButton />
       </header>
