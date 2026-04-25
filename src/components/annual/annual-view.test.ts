@@ -10,6 +10,15 @@ test("annual extra payment edits sync recalculated year data to parent state", (
   assert.match(source, /onYearDataChange\?\.\(\{[\s\S]*config: nextConfig,[\s\S]*months: recomputedMonths,[\s\S]*\}\)/);
 });
 
+test("annual config edits sync every setting to shared year data", () => {
+  const source = readFileSync(new URL("./annual-view.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /const handleConfigChange: Dispatch<SetStateAction<YearConfig>>/);
+  assert.match(source, /const nextConfig = typeof update === "function" \? update\(currentConfig\) : update/);
+  assert.match(source, /computeMonthChain\(monthRows, nextConfig\.startingBalance, nextConfig\.interestRate\)/);
+  assert.match(source, /onConfigChange=\{handleConfigChange\}/);
+});
+
 test("year page lets annual summary update shared year data", () => {
   const source = readFileSync(new URL("../year/year-page-client.tsx", import.meta.url), "utf8");
 

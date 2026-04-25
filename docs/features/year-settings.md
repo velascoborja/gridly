@@ -32,6 +32,8 @@ Once a year is created, its configuration can be modified within the **Annual Su
 
 - **Component:** `src/components/annual/year-config-form.tsx` allows inline editing of all fields.
 - **Persistence:** Changes are sent via `PATCH /api/years/[year]`.
+- **Client Sync:** `src/components/annual/annual-view.tsx` propagates every saved config change into the page-level `YearData` state so summary metrics remain consistent after in-app navigation.
+- **Route Revalidation:** `PATCH /api/years/[year]` revalidates the localized annual summary routes to prevent stale App Router payloads from being restored after visiting setup or other routes.
 - **Side Effects:** Updating `hasExtraPayments` or `estimatedExtraPayment` triggers a re-calculation of the extra payments in the months (June/Dec) via the `onExtraPaymentsApplied` callback.
 
 ## Implementation Details

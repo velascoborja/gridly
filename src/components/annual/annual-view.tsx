@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import { computeMonthChain } from "@/lib/calculations";
 import { KpiCards } from "./kpi-cards";
 import { BalanceChart } from "./balance-chart";
@@ -28,6 +28,23 @@ export function AnnualView({
   const pendingSaveCountRef = useRef(0);
   const pendingSavesRef = useRef(new Set<Promise<void>>());
   const months = computeMonthChain(monthRows, config.startingBalance, config.interestRate);
+
+  useEffect(() => {
+    setConfig(initial.config);
+    setMonthRows(initial.months);
+  }, [initial]);
+
+  const handleConfigChange: Dispatch<SetStateAction<YearConfig>> = (update) => {
+    setConfig((currentConfig) => {
+      const nextConfig = typeof update === "function" ? update(currentConfig) : update;
+      const recomputedMonths = computeMonthChain(monthRows, nextConfig.startingBalance, nextConfig.interestRate);
+      onYearDataChange?.({
+        config: nextConfig,
+        months: recomputedMonths,
+      });
+      return nextConfig;
+    });
+  };
 
   const applyExtraPaymentsToMonths = (hasExtraPayments: boolean, estimatedExtraPayment: number) => {
     setMonthRows((current) => {
@@ -89,7 +106,7 @@ export function AnnualView({
         savingConfig={readOnly ? false : savingConfig}
         startingBalanceEditable={startingBalanceEditable}
         readOnly={readOnly}
-        onConfigChange={setConfig}
+        onConfigChange={handleConfigChange}
         onExtraPaymentsApplied={applyExtraPaymentsToMonths}
         onExport={handleExport}
         onPendingSave={trackPendingSave}
