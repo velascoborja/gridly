@@ -23,13 +23,8 @@ test("annual config editing keeps a setter-compatible prop contract", async () =
   );
   assert.match(
     annualViewSource,
-    /const handleConfigChange:\s*Dispatch<SetStateAction<YearConfig>>/,
-    "AnnualView should keep a setter-compatible config callback",
-  );
-  assert.match(
-    annualViewSource,
-    /onConfigChange=\{handleConfigChange\}/,
-    "AnnualView should pass the syncing config callback through to the KPI cards",
+    /onConfigChange=\{setConfig\}/,
+    "AnnualView should pass the state setter through to the KPI cards",
   );
 });
 

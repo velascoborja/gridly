@@ -1,7 +1,6 @@
 import { db } from "@/db";
 import { months, years } from "@/db/schema";
 import { and, eq, inArray } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
 import { propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getYearData, getYearsForUser } from "@/lib/server/year-data";
 import { getSessionUser } from "@/lib/server/session";
@@ -78,9 +77,5 @@ export async function PATCH(
   }
 
   await propagateYearCarryOver(user.id, yearNum);
-  revalidatePath(`/${yearNum}/summary`);
-  for (const locale of ["es", "en"]) {
-    revalidatePath(`/${locale}/${yearNum}/summary`);
-  }
   return Response.json(updated);
 }
