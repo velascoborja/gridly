@@ -82,7 +82,11 @@
       "monthlyInvestment": "Inversión mensual",
       "monthlyHomeExpense": "Gasto hogar mensual",
       "monthlyPersonalBudget": "Presupuesto personal",
-      "interestRate": "Tipo de interés anual (%)"
+      "interestRate": "Tipo de interés anual (%)",
+      "confirmOverwriteTitle": "¿Sobrescribir los meses?",
+      "confirmOverwriteDescription": "Este cambio actualizará los 12 meses con la configuración anual y sobrescribirá los valores fijos editados manualmente.",
+      "confirmOverwriteCancel": "Cancelar",
+      "confirmOverwriteAction": "Aplicar"
     }
   },
   "Setup": {

@@ -82,7 +82,11 @@
       "monthlyInvestment": "Monthly investment",
       "monthlyHomeExpense": "Monthly home expense",
       "monthlyPersonalBudget": "Personal budget",
-      "interestRate": "Annual interest rate (%)"
+      "interestRate": "Annual interest rate (%)",
+      "confirmOverwriteTitle": "Overwrite the months?",
+      "confirmOverwriteDescription": "This change will update all 12 months from the annual setup and overwrite manually edited fixed values.",
+      "confirmOverwriteCancel": "Cancel",
+      "confirmOverwriteAction": "Apply"
     }
   },
   "Setup": {

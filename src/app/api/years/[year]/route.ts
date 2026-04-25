@@ -1,10 +1,48 @@
 import { db } from "@/db";
 import { months, years } from "@/db/schema";
 import { and, eq, inArray } from "drizzle-orm";
+import type { YearConfig } from "@/lib/types";
 import { propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getYearData, getYearsForUser } from "@/lib/server/year-data";
 import { getSessionUser } from "@/lib/server/session";
 import { getOwnedYear } from "@/lib/server/ownership";
+
+function yearConfigFromRow(row: typeof years.$inferSelect): YearConfig {
+  return {
+    id: row.id,
+    year: row.year,
+    startingBalance: parseFloat(row.startingBalance),
+    estimatedSalary: parseFloat(row.estimatedSalary),
+    hasExtraPayments: row.hasExtraPayments,
+    estimatedExtraPayment: parseFloat(row.estimatedExtraPayment),
+    monthlyInvestment: parseFloat(row.monthlyInvestment),
+    monthlyHomeExpense: parseFloat(row.monthlyHomeExpense),
+    monthlyPersonalBudget: parseFloat(row.monthlyPersonalBudget),
+    interestRate: parseFloat(row.interestRate),
+  };
+}
+
+async function applyYearConfigToStoredMonths(yearId: number, config: YearConfig) {
+  await db
+    .update(months)
+    .set({
+      homeExpense: String(config.monthlyHomeExpense),
+      personalExpense: String(config.monthlyPersonalBudget),
+      investment: String(config.monthlyInvestment),
+      payslip: String(config.estimatedSalary),
+      additionalPayslip: "0",
+      interests: "0",
+      interestsManualOverride: false,
+    })
+    .where(eq(months.yearId, yearId));
+
+  if (config.hasExtraPayments) {
+    await db
+      .update(months)
+      .set({ additionalPayslip: String(config.estimatedExtraPayment) })
+      .where(and(eq(months.yearId, yearId), inArray(months.month, [6, 12])));
+  }
+}
 
 export async function GET(
   _req: Request,
@@ -61,20 +99,7 @@ export async function PATCH(
   if (body.interestRate !== undefined) updates.interestRate = String(body.interestRate);
 
   const [updated] = await db.update(years).set(updates).where(eq(years.id, yearRow.id)).returning();
-
-  if (body.hasExtraPayments !== undefined || body.estimatedExtraPayment !== undefined) {
-    const hasExtraPayments =
-      body.hasExtraPayments !== undefined ? Boolean(body.hasExtraPayments) : updated.hasExtraPayments;
-    const estimatedExtraPayment =
-      body.estimatedExtraPayment !== undefined
-        ? Number(body.estimatedExtraPayment)
-        : parseFloat(updated.estimatedExtraPayment);
-
-    await db
-      .update(months)
-      .set({ additionalPayslip: String(hasExtraPayments ? estimatedExtraPayment : 0) })
-      .where(and(eq(months.yearId, yearRow.id), inArray(months.month, [6, 12])));
-  }
+  await applyYearConfigToStoredMonths(yearRow.id, yearConfigFromRow(updated));
 
   await propagateYearCarryOver(user.id, yearNum);
   return Response.json(updated);

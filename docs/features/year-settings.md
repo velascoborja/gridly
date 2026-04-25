@@ -32,7 +32,15 @@ Once a year is created, its configuration can be modified within the **Annual Su
 
 - **Component:** `src/components/annual/year-config-form.tsx` allows inline editing of all fields.
 - **Persistence:** Changes are sent via `PATCH /api/years/[year]`.
-- **Side Effects:** Updating `hasExtraPayments` or `estimatedExtraPayment` triggers a re-calculation of the extra payments in the months (June/Dec) via the `onExtraPaymentsApplied` callback.
+- **Confirmation:** Before saving any setup value, the form shows a warning that the change will overwrite monthly fixed values.
+- **Side Effects:** Saving a setup value reapplies the full annual baseline to all 12 months. The client uses `applyYearConfigToMonth` for immediate recalculation, and `PATCH /api/years/[year]` persists the same overwrite rules:
+  - `payslip` = `estimatedSalary`.
+  - `homeExpense` = `monthlyHomeExpense`.
+  - `personalExpense` = `monthlyPersonalBudget`.
+  - `investment` = `monthlyInvestment`.
+  - `additionalPayslip` = `estimatedExtraPayment` for June/December when extra pays are enabled, otherwise `0`.
+  - `interestsManualOverride` is reset to `false` so interest follows the current annual rate again.
+  - Manual monthly fixed-value edits are overwritten; additional entries, bonuses, and personal remaining values are preserved.
 
 ## Implementation Details
 
@@ -52,3 +60,4 @@ The prefill logic (`src/lib/server/year-planning.ts`) follows these rules:
 
 ### Interest Calculation
 Interests are typically calculated based on the `interestRate` and the monthly balance, unless manually overridden.
+When a year setup value is saved from the annual summary, monthly interest overrides are cleared so the updated annual setup controls the projected balance chain.

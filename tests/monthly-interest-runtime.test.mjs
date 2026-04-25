@@ -119,3 +119,54 @@ test("estimatedMonthData only applies configured extra payments when enabled", a
     await cleanup();
   }
 });
+
+test("applyYearConfigToMonth overwrites monthly setup fields while preserving activity fields", async () => {
+  const { applyYearConfigToMonth, cleanup } = await loadCalculationsModule();
+
+  try {
+    const updated = applyYearConfigToMonth(
+      {
+        id: 10,
+        yearId: 20,
+        month: 6,
+        homeExpense: 999,
+        personalExpense: 888,
+        investment: 777,
+        payslip: 666,
+        additionalPayslip: 555,
+        bonus: 444,
+        interests: 333,
+        interestsManualOverride: true,
+        personalRemaining: 222,
+        additionalExpenses: [{ id: 1, monthId: 10, type: "expense", label: "Manual", amount: 11 }],
+        additionalIncomes: [{ id: 2, monthId: 10, type: "income", label: "Manual", amount: 22 }],
+      },
+      {
+        id: 1,
+        year: 2026,
+        startingBalance: 1000,
+        estimatedSalary: 2100,
+        monthlyInvestment: 300,
+        monthlyHomeExpense: 700,
+        monthlyPersonalBudget: 450,
+        interestRate: 0.02,
+        hasExtraPayments: true,
+        estimatedExtraPayment: 2100,
+      },
+    );
+
+    assert.equal(updated.homeExpense, 700);
+    assert.equal(updated.personalExpense, 450);
+    assert.equal(updated.investment, 300);
+    assert.equal(updated.payslip, 2100);
+    assert.equal(updated.additionalPayslip, 2100);
+    assert.equal(updated.interests, 0);
+    assert.equal(updated.interestsManualOverride, false);
+    assert.equal(updated.bonus, 444);
+    assert.equal(updated.personalRemaining, 222);
+    assert.deepEqual(updated.additionalExpenses, [{ id: 1, monthId: 10, type: "expense", label: "Manual", amount: 11 }]);
+    assert.deepEqual(updated.additionalIncomes, [{ id: 2, monthId: 10, type: "income", label: "Manual", amount: 22 }]);
+  } finally {
+    await cleanup();
+  }
+});
