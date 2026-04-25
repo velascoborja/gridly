@@ -1,8 +1,13 @@
 import { and, asc, eq, inArray } from "drizzle-orm";
 import { db } from "@/db";
-import { additionalEntries, months, years } from "@/db/schema";
+import { additionalEntries, monthlyRecurringExpenses, months, yearRecurringExpenses, years } from "@/db/schema";
 import { sortAdditionalEntriesDesc } from "@/lib/additional-entries";
 import { computeMonthChain } from "@/lib/calculations";
+import {
+  parseMonthlyRecurringExpense,
+  parseYearRecurringExpense,
+  sortRecurringExpensesAsc,
+} from "@/lib/recurring-expenses";
 import type { YearData } from "@/lib/types";
 
 export function pickDefaultYear(availableYears: number[], currentYear: number) {
@@ -24,6 +29,12 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
     .where(eq(months.yearId, yearRow.id))
     .orderBy(asc(months.month));
 
+  const recurringTemplates = await db
+    .select()
+    .from(yearRecurringExpenses)
+    .where(eq(yearRecurringExpenses.yearId, yearRow.id))
+    .orderBy(asc(yearRecurringExpenses.sortOrder), asc(yearRecurringExpenses.id));
+
   const allEntries =
     monthRows.length > 0
       ? await db
@@ -32,14 +43,29 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
           .where(inArray(additionalEntries.monthId, monthRows.map((month) => month.id)))
       : [];
 
+  const allRecurringExpenses =
+    monthRows.length > 0
+      ? await db
+          .select()
+          .from(monthlyRecurringExpenses)
+          .where(inArray(monthlyRecurringExpenses.monthId, monthRows.map((month) => month.id)))
+      : [];
+
   const entriesByMonthId = new Map<number, typeof allEntries>();
   for (const entry of allEntries) {
     if (!entriesByMonthId.has(entry.monthId)) entriesByMonthId.set(entry.monthId, []);
     entriesByMonthId.get(entry.monthId)!.push(entry);
   }
 
+  const recurringExpensesByMonthId = new Map<number, typeof allRecurringExpenses>();
+  for (const entry of allRecurringExpenses) {
+    if (!recurringExpensesByMonthId.has(entry.monthId)) recurringExpensesByMonthId.set(entry.monthId, []);
+    recurringExpensesByMonthId.get(entry.monthId)!.push(entry);
+  }
+
   const rawMonths = monthRows.map((month) => {
     const entries = entriesByMonthId.get(month.id) ?? [];
+    const recurringExpenses = recurringExpensesByMonthId.get(month.id) ?? [];
 
     return {
       id: month.id,
@@ -54,6 +80,7 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
       interests: parseFloat(month.interests),
       interestsManualOverride: month.interestsManualOverride,
       personalRemaining: parseFloat(month.personalRemaining),
+      recurringExpenses: sortRecurringExpensesAsc(recurringExpenses.map(parseMonthlyRecurringExpense)),
       additionalExpenses: sortAdditionalEntriesDesc(
         entries
           .filter((entry) => entry.type === "expense")
@@ -92,6 +119,7 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
       monthlyPersonalBudget: parseFloat(yearRow.monthlyPersonalBudget),
       interestRate: parseFloat(yearRow.interestRate),
     },
+    recurringExpenses: sortRecurringExpensesAsc(recurringTemplates.map(parseYearRecurringExpense)),
     months: computeMonthChain(
       rawMonths,
       parseFloat(yearRow.startingBalance),

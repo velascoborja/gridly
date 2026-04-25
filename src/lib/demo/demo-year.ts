@@ -1,4 +1,4 @@
-import type { AdditionalEntry, MonthData, YearConfig, YearData } from "../types";
+import type { AdditionalEntry, MonthData, RecurringExpense, YearConfig, YearData, YearRecurringExpense } from "../types";
 
 export const DEMO_YEAR = 2026;
 export const DEMO_MONTH = 4;
@@ -29,9 +29,26 @@ export function getDemoYearData(): YearData {
     id: index + 1,
     yearId: config.id,
     ...estimatedMonthData(index + 1, config),
+    recurringExpenses: [],
     additionalExpenses: [],
     additionalIncomes: [],
   }));
+
+  const recurringExpenses: YearRecurringExpense[] = [
+    { id: 1, yearId: config.id, label: "Alquiler", amount: 900, sortOrder: 0 },
+    { id: 2, yearId: config.id, label: "Gimnasio", amount: 45, sortOrder: 1 },
+  ];
+
+  for (const month of baseMonths) {
+    month.recurringExpenses = recurringExpenses.map((entry) => ({
+      id: month.month * 10000 + entry.id,
+      monthId: month.id,
+      yearRecurringExpenseId: entry.id,
+      label: entry.label,
+      amount: entry.amount,
+      sortOrder: entry.sortOrder,
+    }));
+  }
 
   // Enero
   baseMonths[0].additionalExpenses = [
@@ -110,6 +127,7 @@ export function getDemoYearData(): YearData {
 
   return {
     config,
+    recurringExpenses,
     months: computeMonthChain(baseMonths, config.startingBalance, config.interestRate),
   };
 }
@@ -127,6 +145,7 @@ interface RawMonthData {
   interests: number;
   interestsManualOverride: boolean;
   personalRemaining: number;
+  recurringExpenses: RecurringExpense[];
   additionalExpenses: AdditionalEntry[];
   additionalIncomes: AdditionalEntry[];
 }
@@ -146,6 +165,7 @@ function estimatedMonthData(month: number, config: YearConfig): Omit<RawMonthDat
     interests: 0,
     interestsManualOverride: false,
     personalRemaining: 0,
+    recurringExpenses: [],
     additionalExpenses: [],
     additionalIncomes: [],
   };
@@ -162,7 +182,8 @@ function totalIncome(month: RawMonthData): number {
 
 function totalExpenses(month: RawMonthData): number {
   const additionalSum = month.additionalExpenses.reduce((sum, entry) => sum + entry.amount, 0);
-  return month.homeExpense + month.personalExpense + month.investment + additionalSum;
+  const recurringSum = month.recurringExpenses.reduce((sum, entry) => sum + entry.amount, 0);
+  return month.homeExpense + month.personalExpense + month.investment + recurringSum + additionalSum;
 }
 
 function computeMonthChain(rawMonths: RawMonthData[], yearStartingBalance: number, interestRate = 0): MonthData[] {

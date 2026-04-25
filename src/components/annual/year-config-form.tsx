@@ -2,16 +2,32 @@
 
 import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
-import { useState, type Dispatch, type SetStateAction } from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import { RecurringExpenseTemplateEditor } from "@/components/recurring-expenses/recurring-expense-template-editor";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { InlineEditField } from "@/components/monthly/inline-edit-field";
 import { cn } from "@/lib/utils";
-import type { YearConfig } from "@/lib/types";
+import type { RecurringExpenseInput } from "@/lib/recurring-expenses";
+import type { YearConfig, YearData, YearRecurringExpense } from "@/lib/types";
 
 interface Props {
   config: YearConfig;
   startingBalanceEditable: boolean;
   onConfigChange: Dispatch<SetStateAction<YearConfig>>;
   onExtraPaymentsApplied?: (hasExtraPayments: boolean, estimatedExtraPayment: number) => void;
+  recurringExpenses: YearRecurringExpense[];
+  onRecurringExpensesApplied: (yearData: YearData) => void;
   onPendingSave?: (savePromise: Promise<void>) => void;
 }
 
@@ -20,11 +36,22 @@ export function YearConfigForm({
   startingBalanceEditable,
   onConfigChange,
   onExtraPaymentsApplied,
+  recurringExpenses,
+  onRecurringExpensesApplied,
   onPendingSave,
 }: Props) {
   const t = useTranslations("Annual.config");
   const [savingFields, setSavingFields] = useState<Set<keyof YearConfig>>(() => new Set());
   const [optimisticExtraPayments, setOptimisticExtraPayments] = useState<boolean | null>(null);
+  const [recurringDraft, setRecurringDraft] = useState<RecurringExpenseInput[]>(
+    recurringExpenses.map((entry) => ({ label: entry.label, amount: entry.amount }))
+  );
+  const [savingRecurring, setSavingRecurring] = useState(false);
+  const [recurringError, setRecurringError] = useState("");
+
+  useEffect(() => {
+    setRecurringDraft(recurringExpenses.map((entry) => ({ label: entry.label, amount: entry.amount })));
+  }, [recurringExpenses]);
   const displayedHasExtraPayments = optimisticExtraPayments ?? config.hasExtraPayments;
   const isSavingField = (field: keyof YearConfig) => savingFields.has(field);
 
@@ -62,6 +89,32 @@ export function YearConfigForm({
       if (field === "hasExtraPayments") {
         setOptimisticExtraPayments(null);
       }
+    }
+  };
+
+  const handleSaveRecurringExpenses = async () => {
+    setSavingRecurring(true);
+    setRecurringError("");
+    const savePromise = (async () => {
+      const res = await fetch(`/api/years/${config.year}/recurring-expenses`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ recurringExpenses: recurringDraft }),
+      });
+      if (!res.ok) throw new Error("Failed to update recurring expenses");
+      const payload = await res.json();
+      if (payload.yearData) {
+        onRecurringExpensesApplied(payload.yearData);
+      }
+    })();
+
+    onPendingSave?.(savePromise);
+    try {
+      await savePromise;
+    } catch {
+      setRecurringError(t("recurringExpensesError"));
+    } finally {
+      setSavingRecurring(false);
     }
   };
 
@@ -167,6 +220,47 @@ export function YearConfigForm({
             parseInputValue={(input) => parseFloat(input.replace(",", ".")) / 100}
           />
         </div>
+
+        <RecurringExpenseTemplateEditor
+          entries={recurringDraft}
+          onChange={setRecurringDraft}
+          disabled={savingRecurring}
+          title={t("recurringExpensesTitle")}
+          description={t("recurringExpensesDescription")}
+        />
+        {recurringError ? (
+          <p role="alert" className="rounded-xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm leading-6 text-destructive">
+            {recurringError}
+          </p>
+        ) : null}
+        <AlertDialog>
+          <AlertDialogTrigger
+            render={
+              <Button
+                type="button"
+                variant="outline"
+                disabled={savingRecurring}
+                className="w-full border-primary/20 bg-primary/[0.06] text-primary hover:bg-primary/[0.1]"
+              >
+                {savingRecurring ? t("recurringExpensesSaving") : t("recurringExpensesSave")}
+              </Button>
+            }
+          />
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>{t("recurringExpensesConfirmTitle")}</AlertDialogTitle>
+              <AlertDialogDescription>
+                {t("recurringExpensesConfirmDescription")}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={savingRecurring}>{t("recurringExpensesCancel")}</AlertDialogCancel>
+              <AlertDialogAction onClick={() => void handleSaveRecurringExpenses()} disabled={savingRecurring}>
+                {savingRecurring ? t("recurringExpensesSaving") : t("recurringExpensesConfirmAction")}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import { db } from "@/db";
-import { months } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { monthlyRecurringExpenses, months, yearRecurringExpenses } from "@/db/schema";
+import { asc, eq } from "drizzle-orm";
 import { computeMonthChain, estimatedMonthData } from "@/lib/calculations";
 import type { YearConfig } from "@/lib/types";
 import { getSessionUser } from "@/lib/server/session";
@@ -62,5 +62,25 @@ export async function POST(
   }));
 
   const inserted = await db.insert(months).values(values).returning();
+  const templates = await db
+    .select()
+    .from(yearRecurringExpenses)
+    .where(eq(yearRecurringExpenses.yearId, yearRow.id))
+    .orderBy(asc(yearRecurringExpenses.sortOrder), asc(yearRecurringExpenses.id));
+
+  if (templates.length > 0) {
+    await db.insert(monthlyRecurringExpenses).values(
+      inserted.flatMap((month) =>
+        templates.map((template) => ({
+          monthId: month.id,
+          yearRecurringExpenseId: template.id,
+          label: template.label,
+          amount: template.amount,
+          sortOrder: template.sortOrder,
+        }))
+      )
+    );
+  }
+
   return Response.json(inserted, { status: 201 });
 }

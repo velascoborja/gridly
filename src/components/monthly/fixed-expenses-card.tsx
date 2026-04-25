@@ -1,21 +1,27 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { InlineEditField } from "./inline-edit-field";
-import type { MonthData, YearConfig } from "@/lib/types";
+import { RecurringExpensesList } from "./recurring-expenses-list";
+import { sumRecurringExpenses } from "@/lib/recurring-expenses";
+import { formatCurrency } from "@/lib/utils";
+import type { MonthData, RecurringExpense, YearConfig } from "@/lib/types";
 
 interface Props {
   month: MonthData;
   onUpdate: (field: string, value: number) => Promise<void>;
+  onRecurringEntriesChange: (entries: RecurringExpense[]) => void;
   annualDefaults: Pick<YearConfig, "monthlyHomeExpense" | "monthlyPersonalBudget" | "monthlyInvestment">;
   readOnly?: boolean;
 }
 
-export function FixedExpensesCard({ month, onUpdate, annualDefaults, readOnly = false }: Props) {
+export function FixedExpensesCard({ month, onUpdate, onRecurringEntriesChange, annualDefaults, readOnly = false }: Props) {
   const t = useTranslations("Monthly.fixedExpenses");
   const tFixed = useTranslations("Monthly.fixed");
+  const locale = useLocale();
+  const recurringTotal = sumRecurringExpenses(month.recurringExpenses);
 
   return (
     <Card size="sm" className="relative border-border/70 bg-muted/40 shadow-sm shadow-black/5">
@@ -55,6 +61,22 @@ export function FixedExpensesCard({ month, onUpdate, annualDefaults, readOnly = 
           activateOnRowPress
           resetValue={annualDefaults.monthlyInvestment}
         />
+        <div className="mt-3 border-t border-border/60 pt-3">
+          <div className="mb-2 flex items-center justify-between gap-3 px-2">
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
+              {t("recurringExpensesTitle")}
+            </p>
+            <span className="whitespace-nowrap text-xs font-semibold tabular-nums text-rose-600 dark:text-rose-300">
+              {formatCurrency(recurringTotal, locale)}
+            </span>
+          </div>
+          <RecurringExpensesList
+            monthId={month.id}
+            entries={month.recurringExpenses}
+            onEntriesChange={onRecurringEntriesChange}
+            readOnly={readOnly}
+          />
+        </div>
       </CardContent>
     </Card>
   );

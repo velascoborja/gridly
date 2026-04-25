@@ -79,3 +79,19 @@ test("interest reset clears the manual override instead of saving another manual
   assert.match(routeSource, /body\.interestsManualOverride !== undefined/);
   assert.match(routeSource, /updates\.interestsManualOverride = Boolean\(body\.interestsManualOverride\)/);
 });
+
+test("fixed expenses card embeds recurring expenses without month-level add", () => {
+  const overviewSource = readFileSync(new URL("./month-overview.tsx", import.meta.url), "utf8");
+  const expensesSource = readFileSync(new URL("./fixed-expenses-card.tsx", import.meta.url), "utf8");
+  const listSource = readFileSync(new URL("./recurring-expenses-list.tsx", import.meta.url), "utf8");
+
+  assert.doesNotMatch(overviewSource, /<RecurringExpensesCard/);
+  assert.match(overviewSource, /handleRecurringExpensesChange/);
+  assert.match(overviewSource, /recurringExpenses: sortRecurringExpensesAsc\(entries\)/);
+  assert.match(expensesSource, /RecurringExpensesList/);
+  assert.match(expensesSource, /{t\("recurringExpensesTitle"\)}/);
+  assert.match(listSource, /\/api\/months\/\$\{monthId\}\/recurring-expenses\/\$\{id\}/);
+  assert.doesNotMatch(listSource, /method: "POST"/);
+  assert.doesNotMatch(listSource, /addEntry/);
+  assert.match(listSource, /deletingId === entry\.id/);
+});

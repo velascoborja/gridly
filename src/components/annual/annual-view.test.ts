@@ -25,3 +25,14 @@ test("annual interest rate setting edits inline with percent formatting", () => 
   assert.match(source, /formatEditValue=\{\(v\) => String\(\+\(v \* 100\)\.toFixed\(2\)\)\}/);
   assert.match(source, /parseInputValue=\{\(input\) => parseFloat\(input\.replace\(",", "\."\)\) \/ 100\}/);
 });
+
+test("annual settings can reapply recurring expense templates to every month", () => {
+  const viewSource = readFileSync(new URL("./annual-view.tsx", import.meta.url), "utf8");
+  const formSource = readFileSync(new URL("./year-config-form.tsx", import.meta.url), "utf8");
+
+  assert.match(viewSource, /handleRecurringExpensesApplied/);
+  assert.match(viewSource, /onRecurringExpensesApplied=\{handleRecurringExpensesApplied\}/);
+  assert.match(formSource, /RecurringExpenseTemplateEditor/);
+  assert.match(formSource, /AlertDialog/);
+  assert.match(formSource, /\/api\/years\/\$\{config\.year\}\/recurring-expenses/);
+});

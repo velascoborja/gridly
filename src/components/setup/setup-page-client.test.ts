@@ -14,3 +14,11 @@ test("extra payments toggle uses an animated switch and reveal", () => {
   assert.match(source, /overflow-hidden px-1 pb-2/);
   assert.match(source, /aria-hidden=\{!hasExtraPayments\}/);
 });
+
+test("setup submits recurring expense templates with the year config", () => {
+  const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /RecurringExpenseTemplateEditor/);
+  assert.match(source, /const \[recurringExpenses, setRecurringExpenses\]/);
+  assert.match(source, /body\.recurringExpenses = recurringExpenses/);
+});

@@ -82,7 +82,16 @@
       "monthlyInvestment": "Monthly investment",
       "monthlyHomeExpense": "Monthly home expense",
       "monthlyPersonalBudget": "Personal budget",
-      "interestRate": "Annual interest rate (%)"
+      "interestRate": "Annual interest rate (%)",
+      "recurringExpensesTitle": "Recurring expenses",
+      "recurringExpensesDescription": "Monthly template that will be applied to every month in the year.",
+      "recurringExpensesSave": "Save recurring expenses",
+      "recurringExpensesSaving": "Saving...",
+      "recurringExpensesError": "Could not save recurring expenses.",
+      "recurringExpensesConfirmTitle": "Reapply recurring expenses?",
+      "recurringExpensesConfirmDescription": "Recurring expenses for every month in this year will be replaced. Manual changes made inside specific months will be lost.",
+      "recurringExpensesConfirmAction": "Reapply",
+      "recurringExpensesCancel": "Cancel"
     }
   },
   "Setup": {
@@ -117,7 +126,24 @@
     "errorGeneric": "Could not create the year. Please check the data and try again.",
     "errorConnection": "Could not create the year. Please check the connection and try again.",
     "submitting": "Creating...",
-    "submit": "Create and fill estimates"
+    "submit": "Create and fill estimates",
+    "recurringExpensesTitle": "Recurring expenses",
+    "recurringExpensesDescription": "Add expenses that you want to copy automatically into each month."
+  },
+  "RecurringExpenses": {
+    "editor": {
+      "add": "Add",
+      "empty": "No recurring expenses.",
+      "labelPlaceholder": "Concept",
+      "remove": "Remove recurring expense"
+    },
+    "monthly": {
+      "title": "Recurring expenses",
+      "description": "Planned expenses that repeat every month. Changes here only affect this month.",
+      "total": "Total",
+      "empty": "No recurring expenses this month.",
+      "deleteEntry": "Remove recurring expense {label}"
+    }
   },
   "Landing": {
     "heroTitle": "Control income, expenses, and savings with a vision that fits.",
@@ -215,7 +241,8 @@
       "description": "Budgets for recurring expenses and investments.",
       "homeExpense": "Home expenses",
       "personalExpense": "Personal expenses",
-      "investment": "Investment"
+      "investment": "Investment",
+      "recurringExpensesTitle": "Recurring expenses"
     },
     "additionalEntries": {
       "titleIncome": "Additional income",

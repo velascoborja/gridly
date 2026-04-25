@@ -19,6 +19,23 @@ export interface AdditionalEntry {
   amount: number;
 }
 
+export interface YearRecurringExpense {
+  id: number;
+  yearId: number;
+  label: string;
+  amount: number;
+  sortOrder: number;
+}
+
+export interface RecurringExpense {
+  id: number;
+  monthId: number;
+  yearRecurringExpenseId: number | null;
+  label: string;
+  amount: number;
+  sortOrder: number;
+}
+
 export interface MonthData {
   id: number;
   yearId: number;
@@ -32,6 +49,7 @@ export interface MonthData {
   interests: number;
   interestsManualOverride: boolean;
   personalRemaining: number;
+  recurringExpenses: RecurringExpense[];
   additionalExpenses: AdditionalEntry[];
   additionalIncomes: AdditionalEntry[];
   // computed
@@ -44,5 +62,6 @@ export interface MonthData {
 
 export interface YearData {
   config: YearConfig;
+  recurringExpenses: YearRecurringExpense[];
   months: MonthData[];
 }

@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { years } from "@/db/schema";
+import { yearRecurringExpenses, years } from "@/db/schema";
 import { and, asc, eq } from "drizzle-orm";
 import { propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { deriveStartingBalance, shouldAllowYearCreation } from "@/lib/server/year-planning";
@@ -37,6 +37,7 @@ export async function POST(request: Request) {
     monthlyHomeExpense = 0,
     monthlyPersonalBudget = 0,
     interestRate = 0,
+    recurringExpenses = [],
   } = body;
 
   if (!year) return Response.json({ error: "year is required" }, { status: 400 });
@@ -82,6 +83,21 @@ export async function POST(request: Request) {
     monthlyPersonalBudget: String(monthlyPersonalBudget),
     interestRate: String(interestRate),
   }).returning();
+
+  const recurringValues = Array.isArray(recurringExpenses)
+    ? recurringExpenses
+        .map((entry, index) => ({
+          yearId: row.id,
+          label: String(entry.label ?? "").trim(),
+          amount: String(Number(entry.amount) || 0),
+          sortOrder: index,
+        }))
+        .filter((entry) => entry.label.length > 0)
+    : [];
+
+  if (recurringValues.length > 0) {
+    await db.insert(yearRecurringExpenses).values(recurringValues);
+  }
 
   await propagateYearCarryOver(user.id, year);
 

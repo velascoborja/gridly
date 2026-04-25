@@ -10,9 +10,10 @@ import { AdditionalEntriesCard } from "./additional-entries-card";
 import { FixedExpensesCard } from "./fixed-expenses-card";
 import { IncomeCard } from "./income-card";
 import { sortAdditionalEntriesDesc } from "@/lib/additional-entries";
+import { sortRecurringExpensesAsc } from "@/lib/recurring-expenses";
 import { cn, formatCurrency, formatMonthName } from "@/lib/utils";
 import { computeMonthChain } from "@/lib/calculations";
-import type { MonthData, YearData, AdditionalEntry } from "@/lib/types";
+import type { MonthData, YearData, AdditionalEntry, RecurringExpense } from "@/lib/types";
 
 interface Props {
   yearData: YearData;
@@ -44,6 +45,7 @@ export function MonthOverview({
   const [fixedEditorsVisible, setFixedEditorsVisible] = useState(false);
   const [fixedEditorsHeight, setFixedEditorsHeight] = useState<number | "auto">(0);
   const config = initialYearData.config;
+  const yearRecurringExpenses = initialYearData.recurringExpenses;
   const today = new Date();
   const activeMonthTabRef = useRef<HTMLDivElement>(null);
   const fixedEditorsInnerRef = useRef<HTMLDivElement>(null);
@@ -159,13 +161,14 @@ export function MonthOverview({
       const recomputedMonths = recompute(updated);
       if (onYearDataChange) {
         onYearDataChange({
-          config,
-          months: recomputedMonths,
-        });
+        config,
+        recurringExpenses: yearRecurringExpenses,
+        months: recomputedMonths,
+      });
       }
       return recomputedMonths;
     });
-  }, [config, month, onYearDataChange, recompute]);
+  }, [config, month, onYearDataChange, recompute, yearRecurringExpenses]);
 
   const handleEntriesChange = useCallback((type: "income" | "expense", entries: AdditionalEntry[]) => {
     setMonths((prev) => {
@@ -177,13 +180,31 @@ export function MonthOverview({
       const recomputedMonths = recompute(updated);
       if (onYearDataChange) {
         onYearDataChange({
+        config,
+        recurringExpenses: yearRecurringExpenses,
+        months: recomputedMonths,
+      });
+      }
+      return recomputedMonths;
+    });
+  }, [config, monthNumber, onYearDataChange, recompute, yearRecurringExpenses]);
+
+  const handleRecurringExpensesChange = useCallback((entries: RecurringExpense[]) => {
+    setMonths((prev) => {
+      const updated = prev.map((m) =>
+        m.month === monthNumber ? { ...m, recurringExpenses: sortRecurringExpensesAsc(entries) } : m
+      );
+      const recomputedMonths = recompute(updated);
+      if (onYearDataChange) {
+        onYearDataChange({
           config,
+          recurringExpenses: yearRecurringExpenses,
           months: recomputedMonths,
         });
       }
       return recomputedMonths;
     });
-  }, [config, monthNumber, onYearDataChange, recompute]);
+  }, [config, monthNumber, onYearDataChange, recompute, yearRecurringExpenses]);
 
   if (!month) {
     return (
@@ -437,7 +458,13 @@ export function MonthOverview({
                   : "opacity-0 translate-y-1.5 blur-[2px]"
               )}
             >
-              <FixedExpensesCard month={month} onUpdate={handleFixedUpdate} annualDefaults={config} readOnly={readOnly} />
+              <FixedExpensesCard
+                month={month}
+                onUpdate={handleFixedUpdate}
+                onRecurringEntriesChange={handleRecurringExpensesChange}
+                annualDefaults={config}
+                readOnly={readOnly}
+              />
               <IncomeCard
                 month={month}
                 onUpdate={handleFixedUpdate}

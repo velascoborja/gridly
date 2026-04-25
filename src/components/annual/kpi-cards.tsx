@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { formatCurrency } from "@/lib/utils";
 import { YearConfigForm } from "./year-config-form";
-import type { MonthData, YearConfig } from "@/lib/types";
+import type { MonthData, YearConfig, YearData, YearRecurringExpense } from "@/lib/types";
 
 interface Props {
   months: MonthData[];
@@ -25,6 +25,8 @@ interface Props {
   readOnly?: boolean;
   onConfigChange: Dispatch<SetStateAction<YearConfig>>;
   onExtraPaymentsApplied: (hasExtraPayments: boolean, estimatedExtraPayment: number) => void;
+  recurringExpenses: YearRecurringExpense[];
+  onRecurringExpensesApplied: (yearData: YearData) => void;
   onExport: () => void;
   onPendingSave: (savePromise: Promise<void>) => void;
 }
@@ -87,6 +89,8 @@ export function KpiCards({
   readOnly = false,
   onConfigChange,
   onExtraPaymentsApplied,
+  recurringExpenses,
+  onRecurringExpensesApplied,
   onExport,
   onPendingSave,
 }: Props) {
@@ -198,6 +202,8 @@ export function KpiCards({
                           startingBalanceEditable={startingBalanceEditable}
                           onConfigChange={onConfigChange}
                           onExtraPaymentsApplied={onExtraPaymentsApplied}
+                          recurringExpenses={recurringExpenses}
+                          onRecurringExpensesApplied={onRecurringExpensesApplied}
                           onPendingSave={onPendingSave}
                         />
                       </DialogContent>

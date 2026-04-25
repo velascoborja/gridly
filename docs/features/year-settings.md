@@ -26,6 +26,18 @@ The following fields define the financial baseline for a year:
 | `monthlyPersonalBudget` | Standard monthly discretionary budget. | Prefills monthly `personalExpense`. |
 | `interestRate` | Yearly interest rate for savings (decimal). | e.g., `0.02` for 2%. |
 
+## Recurring Expense Templates
+
+Year setup also supports any number of recurring expense templates. These are stored in `year_recurring_expenses` and contain:
+
+| Field | Description |
+|---|---|
+| `label` | Expense name shown to the user. |
+| `amount` | Monthly amount copied into each month. |
+| `sortOrder` | Stable ordering for setup, annual settings, and monthly views. |
+
+During setup, the client sends `recurringExpenses` with the year creation request. The prefill endpoint then copies those templates into `monthly_recurring_expenses` for all 12 months.
+
 ## Annual Summary & Updates
 
 Once a year is created, its configuration can be modified within the **Annual Summary** view (`src/app/[locale]/[year]/summary/page.tsx`).
@@ -33,6 +45,12 @@ Once a year is created, its configuration can be modified within the **Annual Su
 - **Component:** `src/components/annual/year-config-form.tsx` allows inline editing of all fields.
 - **Persistence:** Changes are sent via `PATCH /api/years/[year]`.
 - **Side Effects:** Updating `hasExtraPayments` or `estimatedExtraPayment` triggers a re-calculation of the extra payments in the months (June/Dec) via the `onExtraPaymentsApplied` callback.
+
+Annual Summary also includes the recurring expense template editor.
+
+- **Endpoint:** `PUT /api/years/[year]/recurring-expenses`.
+- **Side Effect:** The template list is authoritative. Saving it deletes all monthly recurring expense rows for that year and recreates them from the template, overriding any manual monthly recurring expense edits.
+- **Confirmation:** The UI shows a Spanish confirmation dialog before applying this overwrite.
 
 ## Implementation Details
 
@@ -49,6 +67,7 @@ The prefill logic (`src/lib/server/year-planning.ts`) follows these rules:
 - `personalExpense` = `monthlyPersonalBudget`.
 - `investment` = `monthlyInvestment`.
 - If `hasExtraPayments` is `true`: Months 6 and 12 get `additionalPayslip` = `estimatedExtraPayment`.
+- Every `year_recurring_expenses` row is copied into every month as a `monthly_recurring_expenses` row.
 
 ### Interest Calculation
 Interests are typically calculated based on the `interestRate` and the monthly balance, unless manually overridden.

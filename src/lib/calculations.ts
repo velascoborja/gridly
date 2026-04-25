@@ -1,4 +1,4 @@
-import type { AdditionalEntry, MonthData, YearConfig } from "./types";
+import type { AdditionalEntry, MonthData, RecurringExpense, YearConfig } from "./types";
 
 interface RawMonthData {
   id: number;
@@ -13,6 +13,7 @@ interface RawMonthData {
   interests: number;
   interestsManualOverride: boolean;
   personalRemaining: number;
+  recurringExpenses?: RecurringExpense[];
   additionalExpenses: AdditionalEntry[];
   additionalIncomes: AdditionalEntry[];
 }
@@ -28,7 +29,8 @@ export function totalIncome(m: RawMonthData): number {
 
 export function totalExpenses(m: RawMonthData): number {
   const additionalSum = m.additionalExpenses.reduce((sum, e) => sum + e.amount, 0);
-  return m.homeExpense + m.personalExpense + m.investment + additionalSum;
+  const recurringSum = (m.recurringExpenses ?? []).reduce((sum, e) => sum + e.amount, 0);
+  return m.homeExpense + m.personalExpense + m.investment + recurringSum + additionalSum;
 }
 
 export function savings(m: RawMonthData): number {
@@ -52,6 +54,7 @@ export function computeMonthChain(
     const monthWithInterest = {
       ...m,
       interests,
+      recurringExpenses: m.recurringExpenses ?? [],
     };
     const income = totalIncome(monthWithInterest);
     const expenses = totalExpenses(monthWithInterest);
@@ -85,6 +88,7 @@ export function estimatedMonthData(month: number, config: YearConfig): Omit<RawM
     interests: 0,
     interestsManualOverride: false,
     personalRemaining: 0,
+    recurringExpenses: [],
     additionalExpenses: [],
     additionalIncomes: [],
   };

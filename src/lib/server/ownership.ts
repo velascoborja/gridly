@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { additionalEntries, months, years } from "@/db/schema";
+import { additionalEntries, monthlyRecurringExpenses, months, years } from "@/db/schema";
 
 export function statusForAuth(isAuthenticated: boolean) {
   return isAuthenticated ? 200 : 401;
@@ -29,6 +29,17 @@ export async function getOwnedEntry(userId: string, entryId: number) {
     .innerJoin(months, eq(additionalEntries.monthId, months.id))
     .innerJoin(years, eq(months.yearId, years.id))
     .where(and(eq(additionalEntries.id, entryId), eq(years.userId, userId)));
+
+  return row[0]?.entry ?? null;
+}
+
+export async function getOwnedRecurringExpense(userId: string, entryId: number) {
+  const row = await db
+    .select({ entry: monthlyRecurringExpenses })
+    .from(monthlyRecurringExpenses)
+    .innerJoin(months, eq(monthlyRecurringExpenses.monthId, months.id))
+    .innerJoin(years, eq(months.yearId, years.id))
+    .where(and(eq(monthlyRecurringExpenses.id, entryId), eq(years.userId, userId)));
 
   return row[0]?.entry ?? null;
 }

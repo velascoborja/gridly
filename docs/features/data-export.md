@@ -18,6 +18,7 @@ The generated workbook includes:
 - A summary sheet with annual KPIs.
 - 12 individual sheets (one per month) containing:
     - Fixed income and expenses.
+    - Recurring expenses.
     - Detailed lists of additional entries.
     - Monthly balances and savings.
 - Formatting: Professional styling with Stripe-inspired colors and numeric formatting.

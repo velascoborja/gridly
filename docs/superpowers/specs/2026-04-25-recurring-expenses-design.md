@@ -14,7 +14,7 @@ Recurring expenses are separate from fixed expenses and additional entries:
 
 - Let users define any number of recurring expenses during year creation.
 - Show recurring expenses in a new dedicated section on each monthly page.
-- Let users add, edit, and delete recurring expenses within a month.
+- Let users edit and delete recurring expenses within a month.
 - Keep month-level recurring expense edits local to that month.
 - Let users edit the year template list from annual summary settings.
 - Make annual template edits authoritative and reapply them to all months in the year, overriding monthly recurring expense edits.
@@ -48,7 +48,7 @@ Add `monthly_recurring_expenses` as the per-month editable copy table:
 - `sortOrder`: integer for stable UI ordering.
 - `createdAt`: timestamp defaulting to now.
 
-`yearRecurringExpenseId` is nullable so users can add month-only recurring expenses from a monthly page. Those rows belong only to that month and are not part of the annual template.
+`yearRecurringExpenseId` is nullable for resilience if a template is removed while preserving historical rows, but the monthly UI does not create new recurring expenses.
 
 As with the existing numeric fields, database numeric values should be converted to `number` immediately after reading and converted back to strings for database writes.
 
@@ -95,16 +95,15 @@ It is separate from:
 - `Gastos fijos`
 - `Gastos adicionales`
 
-The monthly recurring expenses section will allow users to:
+The monthly recurring expenses section appears inside the fixed expenses card and will allow users to:
 
 - Edit a row label.
 - Edit a row amount.
 - Delete a row.
-- Add a new month-only recurring expense.
 
 All monthly changes affect only the current month. They do not update `year_recurring_expenses` and do not affect other months.
 
-Rows copied from annual templates keep `yearRecurringExpenseId`. Rows created directly in the monthly page use `yearRecurringExpenseId = null`.
+Rows copied from annual templates keep `yearRecurringExpenseId`.
 
 ## Calculations
 
@@ -145,7 +144,6 @@ Add annual template endpoints:
 
 Add monthly recurring expense endpoints:
 
-- `POST /api/months/[monthId]/recurring-expenses`
 - `PATCH /api/months/[monthId]/recurring-expenses/[entryId]`
 - `DELETE /api/months/[monthId]/recurring-expenses/[entryId]`
 
@@ -157,7 +155,7 @@ Existing authorization and ownership checks should follow the patterns used by y
 
 Create a reusable recurring expense list editor for setup and annual settings. It should own local row state and emit an ordered list of `{ label, amount }` items.
 
-Create or adapt a monthly recurring expenses card for month pages. It can reuse interaction patterns from `AdditionalEntriesCard`, but it should use recurring-expense-specific labels and API routes. The monthly card should display a section total and should provide instant feedback while add, edit, and delete operations are pending.
+Create or adapt a monthly recurring expenses list for month pages. It should render inside the fixed expenses card, use recurring-expense-specific labels and API routes, display a section total, and provide instant feedback while edit and delete operations are pending.
 
 All user-facing strings should be Spanish and added to the existing localization structure.
 
@@ -209,7 +207,7 @@ Add a dedicated feature document:
 None. The agreed behavior is:
 
 - Recurring expenses have a dedicated monthly section.
-- Monthly users can add, edit, and delete rows.
+- Monthly users can edit and delete rows, but cannot add rows.
 - Monthly edits affect only that month.
 - Setup and annual settings both edit the annual template list.
 - Annual template edits overwrite all monthly recurring expense rows for that year.

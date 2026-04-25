@@ -36,6 +36,8 @@ test("demo year data contains 12 chained months with extra pays in June and Dece
 
   assert.equal(data.months[5].additionalPayslip, data.config.estimatedSalary);
   assert.equal(data.months[11].additionalPayslip, data.config.estimatedSalary);
+  assert.deepEqual(data.recurringExpenses.map((entry) => entry.label), ["Alquiler", "Gimnasio"]);
+  assert.deepEqual(data.months[0].recurringExpenses.map((entry) => entry.label), ["Alquiler", "Gimnasio"]);
   assert.deepEqual(data.months[0].additionalExpenses, [
     { id: 101, monthId: 1, type: "expense", label: "Seguro anual", amount: 320 },
     { id: 102, monthId: 1, type: "expense", label: "Cena Reyes", amount: 85 },

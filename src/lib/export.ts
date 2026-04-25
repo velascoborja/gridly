@@ -18,6 +18,7 @@ const EXPORT_MESSAGES = {
     monthlyHomeExpense: "Monthly home expense",
     monthlyPersonalBudget: "Personal budget",
     interestRate: "Interest rate",
+    recurringExpenses: "Recurring expenses",
     homeExpense: "Home expenses",
     personalExpense: "Personal expenses",
     investment: "Investment",
@@ -42,6 +43,7 @@ const EXPORT_MESSAGES = {
     monthlyHomeExpense: "Gasto hogar mensual",
     monthlyPersonalBudget: "Presupuesto personal",
     interestRate: "Tipo interés",
+    recurringExpenses: "Gastos recurrentes",
     homeExpense: "Casa (mes siguiente)",
     personalExpense: "Gastos propios",
     investment: "Inversión",
@@ -106,6 +108,9 @@ function writeMonthSection(
   addExpRow(t.homeExpense, month.homeExpense);
   addExpRow(t.personalExpense, month.personalExpense);
   addExpRow(t.investment, month.investment);
+  for (const entry of month.recurringExpenses ?? []) {
+    addExpRow(entry.label, entry.amount);
+  }
   for (const entry of month.additionalExpenses) {
     addExpRow(entry.label, entry.amount);
   }

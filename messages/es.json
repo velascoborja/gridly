@@ -82,7 +82,16 @@
       "monthlyInvestment": "Inversión mensual",
       "monthlyHomeExpense": "Gasto hogar mensual",
       "monthlyPersonalBudget": "Presupuesto personal",
-      "interestRate": "Tipo de interés anual (%)"
+      "interestRate": "Tipo de interés anual (%)",
+      "recurringExpensesTitle": "Gastos recurrentes",
+      "recurringExpensesDescription": "Plantilla mensual que se aplicará a todos los meses del año.",
+      "recurringExpensesSave": "Guardar gastos recurrentes",
+      "recurringExpensesSaving": "Guardando...",
+      "recurringExpensesError": "No se han podido guardar los gastos recurrentes.",
+      "recurringExpensesConfirmTitle": "¿Reaplicar gastos recurrentes?",
+      "recurringExpensesConfirmDescription": "Se reemplazarán los gastos recurrentes de todos los meses de este año. Los cambios manuales hechos dentro de meses concretos se perderán.",
+      "recurringExpensesConfirmAction": "Reaplicar",
+      "recurringExpensesCancel": "Cancelar"
     }
   },
   "Setup": {
@@ -117,7 +126,24 @@
     "errorGeneric": "No se ha podido crear el año. Revisa los datos e inténtalo de nuevo.",
     "errorConnection": "No se ha podido crear el año. Revisa la conexión e inténtalo de nuevo.",
     "submitting": "Creando...",
-    "submit": "Crear y rellenar estimaciones"
+    "submit": "Crear y rellenar estimaciones",
+    "recurringExpensesTitle": "Gastos recurrentes",
+    "recurringExpensesDescription": "Añade gastos que quieres copiar automáticamente en cada mes."
+  },
+  "RecurringExpenses": {
+    "editor": {
+      "add": "Añadir",
+      "empty": "Sin gastos recurrentes.",
+      "labelPlaceholder": "Concepto",
+      "remove": "Eliminar gasto recurrente"
+    },
+    "monthly": {
+      "title": "Gastos recurrentes",
+      "description": "Gastos planificados que se repiten cada mes. Los cambios aquí solo afectan a este mes.",
+      "total": "Total",
+      "empty": "Sin gastos recurrentes este mes.",
+      "deleteEntry": "Eliminar gasto recurrente {label}"
+    }
   },
   "Landing": {
     "heroTitle": "Controla ingresos, gastos y ahorro con una visión que sí encaja.",
@@ -215,7 +241,8 @@
       "description": "Presupuestos para gastos recurrentes e inversión.",
       "homeExpense": "Casa (mes siguiente)",
       "personalExpense": "Gastos propios",
-      "investment": "Inversión"
+      "investment": "Inversión",
+      "recurringExpensesTitle": "Gastos recurrentes"
     },
     "additionalEntries": {
       "titleIncome": "Ingresos adicionales",

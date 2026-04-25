@@ -8,6 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { RecurringExpenseTemplateEditor } from "@/components/recurring-expenses/recurring-expense-template-editor";
+import type { RecurringExpenseInput } from "@/lib/recurring-expenses";
 import { cn, formatCurrency } from "@/lib/utils";
 
 interface Field {
@@ -47,6 +49,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
     ])
   );
   const [hasExtraPayments, setHasExtraPayments] = useState(false);
+  const [recurringExpenses, setRecurringExpenses] = useState<RecurringExpenseInput[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -55,7 +58,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
     setSubmitting(true);
     setError("");
 
-    const body: Record<string, number | string | boolean> = { year };
+    const body: Record<string, number | string | boolean | RecurringExpenseInput[]> = { year };
     const startingBalance = parseFloat(values.startingBalance.replace(",", "."));
     body.startingBalance = Number.isNaN(startingBalance) ? 0 : startingBalance;
     body.hasExtraPayments = hasExtraPayments;
@@ -67,6 +70,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
       const val = parseFloat(values[f.key].replace(",", "."));
       body[f.key] = Number.isNaN(val) ? 0 : f.key === "interestRate" ? val / 100 : val;
     }
+    body.recurringExpenses = recurringExpenses;
 
     try {
       const res = await fetch("/api/years", {
@@ -270,6 +274,14 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
                   </div>
                 </div>
               </div>
+
+              <RecurringExpenseTemplateEditor
+                entries={recurringExpenses}
+                onChange={setRecurringExpenses}
+                disabled={submitting}
+                title={t("recurringExpensesTitle")}
+                description={t("recurringExpensesDescription")}
+              />
 
               {error ? (
                 <p
