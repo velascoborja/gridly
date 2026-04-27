@@ -37,15 +37,6 @@ export const metadata: Metadata = {
   creator: "Gridly",
   publisher: "Gridly",
   manifest: "/manifest.webmanifest",
-  icons: {
-    icon: [
-      { url: "/favicon.ico" },
-      { url: "/icon.svg", type: "image/svg+xml" }
-    ],
-    apple: [
-      { url: "/apple-touch-icon.png" }
-    ]
-  },
   appleWebApp: {
     capable: true,
     title: "Gridly",
