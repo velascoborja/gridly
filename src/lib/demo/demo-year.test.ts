@@ -6,7 +6,7 @@ import {
   getDemoYearData,
   DEMO_YEAR,
   DEMO_MONTH,
-} from "./demo-year.ts";
+} from "./demo-year";
 
 test("demo year data exposes the canonical public demo route", () => {
   assert.equal(DEMO_YEAR, 2026);
