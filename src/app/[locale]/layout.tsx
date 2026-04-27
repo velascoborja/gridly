@@ -22,7 +22,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#533afd",
+  themeColor: "#ffffff",
 };
 
 export const metadata: Metadata = {
@@ -37,15 +37,6 @@ export const metadata: Metadata = {
   creator: "Gridly",
   publisher: "Gridly",
   manifest: "/manifest.webmanifest",
-  icons: {
-    icon: [
-      { url: "/favicon.ico", type: "image/svg+xml" },
-      { url: "/icon.svg", type: "image/svg+xml" },
-    ],
-    apple: [
-      { url: "/apple-icon.svg", type: "image/svg+xml" },
-    ],
-  },
   appleWebApp: {
     capable: true,
     title: "Gridly",
