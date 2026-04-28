@@ -10,7 +10,7 @@ Years are created through a guided setup process located at `/setup/[year]`.
 2. **Client Component:** `src/components/setup/setup-page-client.tsx` handles the form state and submission.
 3. **API Call:** A `POST` request is sent to `/api/years` with the initial configuration.
 4. **Data Prefill:** Upon successful creation, a `POST` request is sent to `/api/years/[year]/prefill`. This endpoint initializes all 12 months for that year using the provided configuration.
-5. **Return Navigation:** The create-year entry point includes a `redirect` query pointing to the current month or annual summary route, and the setup client refreshes the Next route cache before navigating back.
+5. **Return Navigation:** The create-year entry point includes a `redirect` query pointing to the current month or annual summary route. `src/components/layout/nav-selectors.tsx` derives that redirect from the current browser pathname at click time so locally switched views (month/summary via `pushState`) return to the visible view even before any cache refresh. The setup client refreshes the Next route cache before navigating back.
 
 ## Configuration Fields (YearConfig)
 
