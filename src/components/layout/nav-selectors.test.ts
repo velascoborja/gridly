@@ -6,6 +6,6 @@ test("create year navigation derives its redirect from the current browser path"
   const source = readFileSync(new URL("./nav-selectors.tsx", import.meta.url), "utf8");
 
   assert.match(source, /buildSetupHrefFromPathname/);
-  assert.match(source, /window\.location\.pathname/);
-  assert.match(source, /router\.push\([\s\S]*buildSetupHrefFromPathname/);
+  assert.match(source, /const pathname = usePathname\(\)/);
+  assert.match(source, /const createYearHref = buildSetupHrefFromPathname\(nextCreatableYear, pathname/);
 });

@@ -89,18 +89,6 @@ export function NavSelectors({
             {!hideCreateYear && (
               <Link
                 href={createYearHref}
-                onNavigate={(event) => {
-                  event.preventDefault();
-                  router.push(
-                    buildSetupHrefFromPathname(
-                      nextCreatableYear,
-                      window.location.pathname,
-                      currentYear,
-                      selectedMonth,
-                      view
-                    )
-                  );
-                }}
                 aria-label={t("createYear", { year: nextCreatableYear })}
                 className={cn(
                   buttonVariants({ variant: "outline", size: "icon-sm" }),
