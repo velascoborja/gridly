@@ -19,8 +19,12 @@ The Monthly View (`/locale/[year]/[month]`) is the primary workspace for users. 
 ### Data Persistence
 - Client-side edits to fields (e.g., `payslip`, `homeExpense`) are saved via `PATCH /api/months/[monthId]`.
 - Recurring expense edit/delete operations are saved via `/api/months/[monthId]/recurring-expenses/[entryId]`.
-- After a successful monthly mutation, the client calls `router.refresh()` so returning from another route (for example `/setup/[year]`) does not restore stale server payloads from the Next client cache.
+- After a successful monthly mutation, `MonthOverview` recomputes the full month chain and lifts the updated `YearData` to `YearPageClient`. It does not call `router.refresh()`, preserving the App Router client cache while navigating between months.
 - The UI uses optimistic updates or instant feedback to ensure a smooth experience.
+
+### Month Navigation
+- Month, summary, and settings switches inside `YearPageClient` update local React state and call `window.history.pushState()`. Next.js 16 integrates native history updates with router state, so the URL changes without forcing a new server navigation for each month.
+- Direct visits to `/locale/[year]/[month]` and browser back/forward still hydrate from the App Router pages and synchronize back into the client state.
 
 ### Recurring Expense Behavior
 

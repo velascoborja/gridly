@@ -24,7 +24,7 @@ Monthly changes use:
 - `PATCH /api/months/[monthId]/recurring-expenses/[entryId]`
 - `DELETE /api/months/[monthId]/recurring-expenses/[entryId]`
 
-Monthly changes affect only the selected month. The monthly page does not offer a way to add recurring expenses; additions are managed from setup or Annual Summary templates.
+Monthly changes affect only the selected month. After persistence, the monthly client state is updated and the full month chain is recomputed locally; the monthly view does not call `router.refresh()` for these edits, so month-to-month navigation keeps using the existing client state and route cache. The monthly page does not offer a way to add recurring expenses; additions are managed from setup or Annual Summary templates.
 
 ## Calculations
 

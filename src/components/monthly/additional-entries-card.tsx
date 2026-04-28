@@ -26,7 +26,6 @@ interface Props {
   type: "income" | "expense";
   entries: AdditionalEntry[];
   onEntriesChange: (entries: AdditionalEntry[]) => void;
-  onPersistedChange?: () => void;
   readOnly?: boolean;
   title: string;
 }
@@ -36,7 +35,6 @@ export function AdditionalEntriesCard({
   type,
   entries,
   onEntriesChange,
-  onPersistedChange,
   readOnly = false,
   title,
 }: Props) {
@@ -82,7 +80,6 @@ export function AdditionalEntriesCard({
       if (!res.ok) return;
       const entry = await res.json();
       onEntriesChange(sortAdditionalEntriesDesc([...entries, { ...entry, amount: parseFloat(entry.amount) }]));
-      onPersistedChange?.();
       closeAddForm();
     } finally {
       setIsAdding(false);
@@ -97,7 +94,6 @@ export function AdditionalEntriesCard({
       const res = await fetch(`/api/months/${monthId}/entries/${id}`, { method: "DELETE" });
       if (!res.ok) return;
       onEntriesChange(sortAdditionalEntriesDesc(entries.filter((e) => e.id !== id)));
-      onPersistedChange?.();
     } finally {
       setDeletingId(null);
     }
@@ -122,7 +118,6 @@ export function AdditionalEntriesCard({
           entries.map((e) => e.id === id ? { ...updated, amount: parseFloat(updated.amount) } : e)
         )
       );
-      onPersistedChange?.();
       setEditingId(null);
     } finally {
       setSavingId(null);

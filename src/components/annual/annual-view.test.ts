@@ -28,13 +28,14 @@ test("year page lets annual summary update shared year data", () => {
   assert.match(source, /<AnnualView[\s\S]*onYearDataChange=\{setCurrentYearData\}/);
 });
 
-test("year page uses Next router navigation for in-year view changes", () => {
+test("year page uses native history for in-year view changes without server navigation", () => {
   const source = readFileSync(new URL("../year/year-page-client.tsx", import.meta.url), "utf8");
 
-  assert.match(source, /import \{ usePathname, useRouter \} from "@\/i18n\/routing"/);
-  assert.doesNotMatch(source, /window\.history\.pushState/);
-  assert.match(source, /router\.push\(buildYearRoute\(routePrefix, currentYearData\.config\.year, String\(nextMonth\)\)/);
-  assert.match(source, /router\.push\(buildYearRoute\(routePrefix, currentYearData\.config\.year, "summary"\)/);
+  assert.match(source, /import \{ usePathname \} from "@\/i18n\/routing"/);
+  assert.doesNotMatch(source, /useRouter/);
+  assert.match(source, /window\.history\.pushState\(null, "", buildYearRoute\(routePrefix, currentYearData\.config\.year, String\(nextMonth\)\)\)/);
+  assert.match(source, /window\.history\.pushState\(null, "", buildYearRoute\(routePrefix, currentYearData\.config\.year, "summary"\)\)/);
+  assert.match(source, /window\.history\.pushState\(null, "", buildSettingsRoute\(routePrefix\)\)/);
 });
 
 test("annual config saves refresh the current route cache", () => {

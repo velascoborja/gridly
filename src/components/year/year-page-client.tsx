@@ -5,7 +5,7 @@ import { AnnualView } from "@/components/annual/annual-view";
 import { AppShell } from "@/components/layout/app-shell";
 import { MonthOverview } from "@/components/monthly/month-overview";
 import { SettingsForm } from "@/components/settings/settings-form";
-import { usePathname, useRouter } from "@/i18n/routing";
+import { usePathname } from "@/i18n/routing";
 import type { YearData } from "@/lib/types";
 
 type YearClientView = "overview" | "summary" | "settings";
@@ -78,7 +78,6 @@ export function YearPageClient({
   startingBalanceEditable = false,
   user,
 }: Props) {
-  const router = useRouter();
   const pathname = usePathname();
   const [currentYearData, setCurrentYearData] = useState<YearData>(yearData);
   const [selectedMonth, setSelectedMonth] = useState(initialMonth);
@@ -120,22 +119,22 @@ export function YearPageClient({
 
     setSelectedMonth(nextMonth);
     setSelectedView("overview");
-    router.push(buildYearRoute(routePrefix, currentYearData.config.year, String(nextMonth)));
-  }, [currentYearData.config.year, routePrefix, router, selectedMonth, selectedView]);
+    window.history.pushState(null, "", buildYearRoute(routePrefix, currentYearData.config.year, String(nextMonth)));
+  }, [currentYearData.config.year, routePrefix, selectedMonth, selectedView]);
 
   const handleSummarySelect = useCallback(() => {
     if (selectedView === "summary") return;
 
     setSelectedView("summary");
-    router.push(buildYearRoute(routePrefix, currentYearData.config.year, "summary"));
-  }, [currentYearData.config.year, routePrefix, router, selectedView]);
+    window.history.pushState(null, "", buildYearRoute(routePrefix, currentYearData.config.year, "summary"));
+  }, [currentYearData.config.year, routePrefix, selectedView]);
 
   const handleSettingsSelect = useCallback(() => {
     if (selectedView === "settings") return;
 
     setSelectedView("settings");
-    router.push(buildSettingsRoute(routePrefix));
-  }, [routePrefix, router, selectedView]);
+    window.history.pushState(null, "", buildSettingsRoute(routePrefix));
+  }, [routePrefix, selectedView]);
 
   return (
     <AppShell
