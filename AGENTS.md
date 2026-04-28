@@ -63,6 +63,8 @@ Gridly follows a premium, fintech-inspired visual system (Stripe-like) documente
 
 Detailed documentation for specific features can be found in `docs/features/`. Refer to these files for in-depth understanding of implementation logic and domain rules.
 
+When changing any of the features listed below, update the related documentation in the same change. If the work affects a feature that is not yet documented, add a new feature page under `docs/features/` and link it from this section.
+
 - [Year Settings & Setup](docs/features/year-settings.md): Details on year creation, configuration fields, and prefill logic.
 - [Monthly Management](docs/features/monthly-management.md): Core tracking interface for income, fixed expenses, and interest calculations.
 - [Additional Entries](docs/features/additional-entries.md): Management of granular variable expenses and income transactions.
