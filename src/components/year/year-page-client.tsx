@@ -7,8 +7,14 @@ import { MonthOverview } from "@/components/monthly/month-overview";
 import { SettingsForm } from "@/components/settings/settings-form";
 import { usePathname } from "@/i18n/routing";
 import type { YearData } from "@/lib/types";
-
-type YearClientView = "overview" | "summary" | "settings";
+import {
+  type YearRouteView,
+  parseYearRoutePathname,
+  getYearRoutePrefix,
+  buildYearMonthHref,
+  buildYearSummaryHref,
+  buildSettingsHref,
+} from "@/lib/year-routes";
 
 interface Props {
   yearData: YearData;
@@ -22,52 +28,24 @@ interface Props {
   };
 }
 
-function parseStateFromPathname(pathname: string) {
-  if (pathname.match(/\/settings$/)) {
+function getInitialStateFromPathname(
+  pathname: string,
+  currentYear: number,
+  fallbackMonth: number,
+  fallbackView: "overview" | "summary"
+) {
+  const pathnameState = parseYearRoutePathname(pathname);
+  if (pathnameState && pathnameState.year === currentYear) {
     return {
-      year: null,
-      view: "settings" as const,
-      month: null,
+      month: pathnameState.month ?? fallbackMonth,
+      view: pathnameState.view,
     };
   }
 
-  const summaryMatch = pathname.match(/\/(\d+)\/summary$/);
-  if (summaryMatch) {
-    return {
-      year: Number.parseInt(summaryMatch[1], 10),
-      view: "summary" as const,
-      month: null,
-    };
-  }
-
-  const monthMatch = pathname.match(/\/(\d+)\/(\d+)$/);
-  if (monthMatch) {
-    return {
-      year: Number.parseInt(monthMatch[1], 10),
-      view: "overview" as const,
-      month: Number.parseInt(monthMatch[2], 10),
-    };
-  }
-
-  return null;
-}
-
-function getRoutePrefix(pathname: string, year: number) {
-  const yearMatch = pathname.match(new RegExp(`^(.*)/${year}/(?:summary|\\d+)$`));
-  if (yearMatch) return yearMatch[1];
-
-  const settingsMatch = pathname.match(/^(.*)\/settings$/);
-  if (settingsMatch) return settingsMatch[1];
-
-  return "";
-}
-
-function buildYearRoute(prefix: string, year: number, segment: string) {
-  return `${prefix}/${year}/${segment}`;
-}
-
-function buildSettingsRoute(prefix: string) {
-  return `${prefix}/settings`;
+  return {
+    month: fallbackMonth,
+    view: fallbackView,
+  };
 }
 
 export function YearPageClient({
@@ -79,26 +57,19 @@ export function YearPageClient({
   user,
 }: Props) {
   const pathname = usePathname();
+  const initialState = getInitialStateFromPathname(pathname, yearData.config.year, initialMonth, initialView);
   const [currentYearData, setCurrentYearData] = useState<YearData>(yearData);
-  const [selectedMonth, setSelectedMonth] = useState(initialMonth);
-  const [selectedView, setSelectedView] = useState<YearClientView>(initialView);
-  const routePrefix = getRoutePrefix(pathname, currentYearData.config.year);
+  const [selectedMonth, setSelectedMonth] = useState(() => initialState.month);
+  const [selectedView, setSelectedView] = useState<YearRouteView>(() => initialState.view);
+  const routePrefix = getYearRoutePrefix(pathname, currentYearData.config.year);
 
   useEffect(() => {
     setCurrentYearData(yearData);
   }, [yearData]);
 
   useEffect(() => {
-    setSelectedMonth(initialMonth);
-  }, [initialMonth]);
-
-  useEffect(() => {
-    setSelectedView(initialView);
-  }, [initialView]);
-
-  useEffect(() => {
-    function syncStateFromLocation() {
-      const nextState = parseStateFromPathname(window.location.pathname);
+    function syncStateFromPathname(nextPathname: string) {
+      const nextState = parseYearRoutePathname(nextPathname);
       if (!nextState) return;
       if (nextState.year !== null && nextState.year !== currentYearData.config.year) return;
 
@@ -108,32 +79,38 @@ export function YearPageClient({
       }
     }
 
+    syncStateFromPathname(pathname);
+
+    function syncStateFromLocation() {
+      syncStateFromPathname(window.location.pathname);
+    }
+
     window.addEventListener("popstate", syncStateFromLocation);
     return () => {
       window.removeEventListener("popstate", syncStateFromLocation);
     };
-  }, [currentYearData.config.year]);
+  }, [currentYearData.config.year, pathname]);
 
   const handleMonthSelect = useCallback((nextMonth: number) => {
     if (selectedView === "overview" && selectedMonth === nextMonth) return;
 
     setSelectedMonth(nextMonth);
     setSelectedView("overview");
-    window.history.pushState(null, "", buildYearRoute(routePrefix, currentYearData.config.year, String(nextMonth)));
+    window.history.pushState(null, "", buildYearMonthHref(routePrefix, currentYearData.config.year, nextMonth));
   }, [currentYearData.config.year, routePrefix, selectedMonth, selectedView]);
 
   const handleSummarySelect = useCallback(() => {
     if (selectedView === "summary") return;
 
     setSelectedView("summary");
-    window.history.pushState(null, "", buildYearRoute(routePrefix, currentYearData.config.year, "summary"));
+    window.history.pushState(null, "", buildYearSummaryHref(routePrefix, currentYearData.config.year));
   }, [currentYearData.config.year, routePrefix, selectedView]);
 
   const handleSettingsSelect = useCallback(() => {
     if (selectedView === "settings") return;
 
     setSelectedView("settings");
-    window.history.pushState(null, "", buildSettingsRoute(routePrefix));
+    window.history.pushState(null, "", buildSettingsHref(routePrefix));
   }, [routePrefix, selectedView]);
 
   return (
