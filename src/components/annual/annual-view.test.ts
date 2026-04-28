@@ -28,6 +28,22 @@ test("year page lets annual summary update shared year data", () => {
   assert.match(source, /<AnnualView[\s\S]*onYearDataChange=\{setCurrentYearData\}/);
 });
 
+test("year page uses Next router navigation for in-year view changes", () => {
+  const source = readFileSync(new URL("../year/year-page-client.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /import \{ usePathname, useRouter \} from "@\/i18n\/routing"/);
+  assert.doesNotMatch(source, /window\.history\.pushState/);
+  assert.match(source, /router\.push\(buildYearRoute\(routePrefix, currentYearData\.config\.year, String\(nextMonth\)\)/);
+  assert.match(source, /router\.push\(buildYearRoute\(routePrefix, currentYearData\.config\.year, "summary"\)/);
+});
+
+test("annual config saves refresh the current route cache", () => {
+  const source = readFileSync(new URL("./year-config-form.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /import \{ useRouter \} from "@\/i18n\/routing"/);
+  assert.match(source, /router\.refresh\(\)/);
+});
+
 test("annual interest rate setting edits inline with percent formatting", () => {
   const source = readFileSync(new URL("./year-config-form.tsx", import.meta.url), "utf8");
 

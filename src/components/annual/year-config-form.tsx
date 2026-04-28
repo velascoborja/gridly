@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 import { useState, type Dispatch, type SetStateAction } from "react";
+import { useRouter } from "@/i18n/routing";
 import { InlineEditField } from "@/components/monthly/inline-edit-field";
 import {
   AlertDialog,
@@ -40,6 +41,7 @@ export function YearConfigForm({
 }: Props) {
   const t = useTranslations("Annual.config");
   const locale = useLocale();
+  const router = useRouter();
   const [savingFields, setSavingFields] = useState<Set<keyof YearConfig>>(() => new Set());
   const [optimisticExtraPayments, setOptimisticExtraPayments] = useState<boolean | null>(null);
   const [pendingOverwrite, setPendingOverwrite] = useState<PendingOverwrite | null>(null);
@@ -105,6 +107,7 @@ export function YearConfigForm({
         onConfigApplied?.(next);
         return next;
       });
+      router.refresh();
     })();
 
     onPendingSave?.(savePromise);

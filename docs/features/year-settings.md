@@ -10,6 +10,7 @@ Years are created through a guided setup process located at `/setup/[year]`.
 2. **Client Component:** `src/components/setup/setup-page-client.tsx` handles the form state and submission.
 3. **API Call:** A `POST` request is sent to `/api/years` with the initial configuration.
 4. **Data Prefill:** Upon successful creation, a `POST` request is sent to `/api/years/[year]/prefill`. This endpoint initializes all 12 months for that year using the provided configuration.
+5. **Return Navigation:** The create-year entry point includes a `redirect` query pointing to the current month or annual summary route, and the setup client refreshes the Next route cache before navigating back.
 
 ## Configuration Fields (YearConfig)
 
@@ -33,6 +34,7 @@ Once a year is created, its configuration can be modified within the **Annual Su
 - **Component:** `src/components/annual/year-config-form.tsx` allows inline editing of all fields.
 - **Persistence:** Changes are sent via `PATCH /api/years/[year]`.
 - **Confirmation:** Before saving any setup value, the form shows a warning that the change will overwrite monthly fixed values.
+- **Cache Refresh:** After a successful save, the client calls `router.refresh()` so route cache restores after visiting setup or another route include the updated annual balance.
 - **Side Effects:** Saving a setup value reapplies the full annual baseline to all 12 months. The client uses `applyYearConfigToMonth` for immediate recalculation, and `PATCH /api/years/[year]` persists the same overwrite rules:
   - `payslip` = `estimatedSalary`.
   - `homeExpense` = `monthlyHomeExpense`.

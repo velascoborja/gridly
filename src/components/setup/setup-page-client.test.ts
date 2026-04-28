@@ -14,3 +14,10 @@ test("extra payments toggle uses an animated switch and reveal", () => {
   assert.match(source, /overflow-hidden px-1 pb-2/);
   assert.match(source, /aria-hidden=\{!hasExtraPayments\}/);
 });
+
+test("create year submission refreshes before returning to the selected route", () => {
+  const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /router\.refresh\(\)/);
+  assert.match(source, /router\.push\(redirectTo\)/);
+});

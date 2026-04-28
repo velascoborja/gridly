@@ -48,6 +48,7 @@ Always use the custom navigation components and hooks exported from `@/i18n/rout
 
 - `Link`: Automatically prefixes the `href` with the current locale.
 - `useRouter`, `usePathname`, `redirect`: Locale-aware versions of Next.js utilities.
+- Use `useRouter().refresh()` from `@/i18n/routing` after client-side mutations that need fresh App Router server payloads.
 
 ```tsx
 import { Link } from "@/i18n/routing";

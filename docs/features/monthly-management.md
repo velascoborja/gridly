@@ -17,6 +17,7 @@ The Monthly View (`/locale/[year]/[month]`) is the primary workspace for users. 
 
 ### Data Persistence
 - Client-side edits to fields (e.g., `payslip`, `homeExpense`) are saved via `PATCH /api/months/[monthId]`.
+- After a successful monthly mutation, the client calls `router.refresh()` so returning from another route (for example `/setup/[year]`) does not restore stale server payloads from the Next client cache.
 - The UI uses optimistic updates or instant feedback to ensure a smooth experience.
 
 ### Interest Calculation

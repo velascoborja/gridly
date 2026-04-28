@@ -3,7 +3,8 @@
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "@/i18n/routing";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -87,6 +88,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
       }
 
       await fetch(`/api/years/${year}/prefill`, { method: "POST" });
+      router.refresh();
       router.push(redirectTo);
     } catch {
       setError(t("errorConnection"));

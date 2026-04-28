@@ -5,6 +5,7 @@ import { AnnualView } from "@/components/annual/annual-view";
 import { AppShell } from "@/components/layout/app-shell";
 import { MonthOverview } from "@/components/monthly/month-overview";
 import { SettingsForm } from "@/components/settings/settings-form";
+import { usePathname, useRouter } from "@/i18n/routing";
 import type { YearData } from "@/lib/types";
 
 type YearClientView = "overview" | "summary" | "settings";
@@ -61,13 +62,11 @@ function getRoutePrefix(pathname: string, year: number) {
   return "";
 }
 
-function buildYearRoute(year: number, segment: string) {
-  const prefix = getRoutePrefix(window.location.pathname, year);
+function buildYearRoute(prefix: string, year: number, segment: string) {
   return `${prefix}/${year}/${segment}`;
 }
 
-function buildSettingsRoute(year: number) {
-  const prefix = getRoutePrefix(window.location.pathname, year);
+function buildSettingsRoute(prefix: string) {
   return `${prefix}/settings`;
 }
 
@@ -79,9 +78,12 @@ export function YearPageClient({
   startingBalanceEditable = false,
   user,
 }: Props) {
+  const router = useRouter();
+  const pathname = usePathname();
   const [currentYearData, setCurrentYearData] = useState<YearData>(yearData);
   const [selectedMonth, setSelectedMonth] = useState(initialMonth);
   const [selectedView, setSelectedView] = useState<YearClientView>(initialView);
+  const routePrefix = getRoutePrefix(pathname, currentYearData.config.year);
 
   useEffect(() => {
     setCurrentYearData(yearData);
@@ -114,28 +116,26 @@ export function YearPageClient({
   }, [currentYearData.config.year]);
 
   const handleMonthSelect = useCallback((nextMonth: number) => {
-    setSelectedMonth((currentMonth) => {
-      if (selectedView === "overview" && currentMonth === nextMonth) return currentMonth;
+    if (selectedView === "overview" && selectedMonth === nextMonth) return;
 
-      window.history.pushState(null, "", buildYearRoute(currentYearData.config.year, String(nextMonth)));
-      return nextMonth;
-    });
+    setSelectedMonth(nextMonth);
     setSelectedView("overview");
-  }, [selectedView, currentYearData.config.year]);
+    router.push(buildYearRoute(routePrefix, currentYearData.config.year, String(nextMonth)));
+  }, [currentYearData.config.year, routePrefix, router, selectedMonth, selectedView]);
 
   const handleSummarySelect = useCallback(() => {
     if (selectedView === "summary") return;
 
-    window.history.pushState(null, "", buildYearRoute(currentYearData.config.year, "summary"));
     setSelectedView("summary");
-  }, [selectedView, currentYearData.config.year]);
+    router.push(buildYearRoute(routePrefix, currentYearData.config.year, "summary"));
+  }, [currentYearData.config.year, routePrefix, router, selectedView]);
 
   const handleSettingsSelect = useCallback(() => {
     if (selectedView === "settings") return;
 
-    window.history.pushState(null, "", buildSettingsRoute(currentYearData.config.year));
     setSelectedView("settings");
-  }, [selectedView, currentYearData.config.year]);
+    router.push(buildSettingsRoute(routePrefix));
+  }, [routePrefix, router, selectedView]);
 
   return (
     <AppShell
