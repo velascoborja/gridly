@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
-import { useRouter } from "@/i18n/routing";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { RecurringExpenseTemplateEditor } from "@/components/recurring-expenses/recurring-expense-template-editor";
 import type { RecurringExpenseInput } from "@/lib/recurring-expenses";
 import { cn, formatCurrency } from "@/lib/utils";
+import { createAndPrefillYear } from "@/lib/server/actions/years";
 
 interface Field {
   key: string;
@@ -32,7 +32,6 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
   const searchParams = useSearchParams();
   const redirectTo =
     searchParams.get("redirect") ?? `/${year}/${new Date().getMonth() + 1}`;
-  const router = useRouter();
 
   const FIELDS: Field[] = [
     { key: "estimatedSalary", label: t("estimatedSalary"), defaultValue: "0" },
@@ -59,43 +58,30 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
     setSubmitting(true);
     setError("");
 
-    const body: Record<string, number | string | boolean | RecurringExpenseInput[]> = { year };
-    const startingBalance = parseFloat(values.startingBalance.replace(",", "."));
-    body.startingBalance = Number.isNaN(startingBalance) ? 0 : startingBalance;
-    body.hasExtraPayments = hasExtraPayments;
-    const estimatedExtraPayment = parseFloat(values.estimatedExtraPayment.replace(",", "."));
-    body.estimatedExtraPayment =
-      hasExtraPayments && !Number.isNaN(estimatedExtraPayment) ? estimatedExtraPayment : 0;
-
-    for (const f of FIELDS) {
-      const val = parseFloat(values[f.key].replace(",", "."));
-      body[f.key] = Number.isNaN(val) ? 0 : f.key === "interestRate" ? val / 100 : val;
-    }
-    body.recurringExpenses = recurringExpenses;
-
     try {
-      const res = await fetch("/api/years", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
+      const startingBalance = parseFloat(values.startingBalance.replace(",", "."));
+      const estimatedExtraPayment = parseFloat(values.estimatedExtraPayment.replace(",", "."));
+      
+      const payload = {
+        year,
+        startingBalance: Number.isNaN(startingBalance) ? 0 : startingBalance,
+        estimatedSalary: parseFloat(values.estimatedSalary.replace(",", ".")) || 0,
+        hasExtraPayments,
+        estimatedExtraPayment: hasExtraPayments && !Number.isNaN(estimatedExtraPayment) ? estimatedExtraPayment : 0,
+        monthlyInvestment: parseFloat(values.monthlyInvestment.replace(",", ".")) || 0,
+        monthlyHomeExpense: parseFloat(values.monthlyHomeExpense.replace(",", ".")) || 0,
+        monthlyPersonalBudget: parseFloat(values.monthlyPersonalBudget.replace(",", ".")) || 0,
+        interestRate: (parseFloat(values.interestRate.replace(",", ".")) || 0) / 100,
+        recurringExpenses,
+      };
 
-      if (!res.ok) {
-        const payload = await res.json().catch(() => null);
-        setError(
-          payload?.error === "Only the next year can be created"
-            ? t("errorOnlyNextYear")
-            : t("errorGeneric")
-        );
-        setSubmitting(false);
-        return;
-      }
+      await createAndPrefillYear(payload);
 
-      await fetch(`/api/years/${year}/prefill`, { method: "POST" });
-      router.refresh();
-      router.push(redirectTo);
-    } catch {
-      setError(t("errorConnection"));
+      // Hard navigation to bypass all client caches
+      window.location.href = `/${locale}${redirectTo}`;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "";
+      setError(message === "Only the next year can be created" ? t("errorOnlyNextYear") : t("errorGeneric"));
       setSubmitting(false);
     }
   };
