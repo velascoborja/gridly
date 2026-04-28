@@ -211,6 +211,7 @@ export function YearConfigForm({
                   value={config.estimatedExtraPayment}
                   onSave={(v) => handleSave("estimatedExtraPayment", v)}
                   disabled={!displayedHasExtraPayments}
+                  className="gap-x-4 gap-y-5"
                 />
               </div>
             </div>

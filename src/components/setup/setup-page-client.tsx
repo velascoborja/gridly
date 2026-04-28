@@ -254,8 +254,8 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
                   aria-hidden={!hasExtraPayments}
                 >
                   <div className="overflow-hidden px-1 pb-2">
-                    <div className="space-y-3 border-t border-border/50 pt-4">
-                      <label className="text-sm font-medium text-foreground">
+                    <div className="border-t border-border/50 pt-4">
+                      <label className="block text-sm font-medium leading-5 text-foreground">
                         {t("estimatedExtraPayment")}
                       </label>
                       <Input
@@ -266,7 +266,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
                           setValues((prev) => ({ ...prev, estimatedExtraPayment: e.target.value }))
                         }
                         disabled={submitting || !hasExtraPayments}
-                        className="h-11 rounded-xl px-4 text-sm"
+                        className="mt-5 h-11 rounded-xl px-4 text-sm"
                       />
                     </div>
                   </div>
