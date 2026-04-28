@@ -11,5 +11,8 @@ test("localized app entry exposes a branded loading shell for first open", async
 
   assert.match(source, /Preparando Gridly/);
   assert.match(source, /gridly-wordmark\.svg/);
-  assert.match(source, /animate-pulse/);
+  assert.match(source, /animate-spin/);
+  assert.match(source, /role="status"/);
+  assert.doesNotMatch(source, /h-1 overflow-hidden/);
+  assert.doesNotMatch(source, /w-1\/2 animate-pulse/);
 });

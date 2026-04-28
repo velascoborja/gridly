@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Loader2 } from "lucide-react";
 
 export default function LocaleLoading() {
   return (
@@ -19,8 +20,9 @@ export default function LocaleLoading() {
         <p className="text-[0.8125rem] font-normal text-muted-foreground">
           Preparando Gridly...
         </p>
-        <div className="mt-5 h-1 overflow-hidden rounded-[4px] bg-muted">
-          <div className="h-full w-1/2 animate-pulse rounded-[4px] bg-primary" />
+        <div role="status" className="mt-5 flex justify-center text-primary">
+          <Loader2 className="size-6 animate-spin" aria-hidden="true" />
+          <span className="sr-only">Preparando Gridly...</span>
         </div>
       </section>
     </main>
