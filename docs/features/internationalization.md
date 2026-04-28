@@ -49,12 +49,21 @@ Always use the custom navigation components and hooks exported from `@/i18n/rout
 - `Link`: Automatically prefixes the `href` with the current locale.
 - `useRouter`, `usePathname`, `redirect`: Locale-aware versions of Next.js utilities.
 - Use `useRouter().refresh()` from `@/i18n/routing` after client-side mutations that need fresh App Router server payloads.
-- For state-only navigation inside an already hydrated workspace, use `window.history.pushState()` with locale-aware paths derived from `usePathname()`. Next.js 16 syncs native history updates with router state without triggering a server navigation.
+
+#### In-Year Routing & Workspace State
+To provide a fast, app-like experience and preserve locally updated `YearData` across views, Gridly uses a "Workspace" model for in-year navigation:
+
+- **State Persistence:** Navigation between months, the annual summary, and settings uses `window.history.pushState()` instead of standard router transitions. This prevents Next.js from refetching data and allows the `YearPageClient` to keep its local state (e.g., pending edits or recalculated balances) visible as the user switches tabs.
+- **Shared Utilities:** All path parsing and URL generation must use the utilities in `src/lib/year-routes.ts` (e.g., `parseYearRoutePathname`, `buildYearMonthHref`). This ensures consistency between the URL and the client-side UI state.
+- **Loading Stability:** The `BaseAppShell` and standardized `loading.tsx` files ensure that the header and background remain stable during navigation, avoiding layout shifts while the server is reached for initial page loads or hard refreshes.
 
 ```tsx
-import { Link } from "@/i18n/routing";
+import { buildYearMonthHref } from "@/lib/year-routes";
+import { getYearRoutePrefix } from "@/lib/year-routes";
 
-<Link href="/settings">Go to settings</Link>
+// Example: local navigation to month 4
+const prefix = getYearRoutePrefix(pathname, year);
+window.history.pushState(null, "", buildYearMonthHref(prefix, year, 4));
 ```
 
 ### Adding New Strings

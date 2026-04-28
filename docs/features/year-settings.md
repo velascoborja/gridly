@@ -10,7 +10,16 @@ Years are created through a guided setup process located at `/setup/[year]`.
 2. **Client Component:** `src/components/setup/setup-page-client.tsx` handles the form state and submission.
 3. **API Call:** A `POST` request is sent to `/api/years` with the initial configuration.
 4. **Data Prefill:** Upon successful creation, a `POST` request is sent to `/api/years/[year]/prefill`. This endpoint initializes all 12 months for that year using the provided configuration.
-5. **Return Navigation:** The create-year entry point includes a `redirect` query pointing to the current month or annual summary route. `src/components/layout/nav-selectors.tsx` derives that redirect from the current browser pathname at click time so locally switched views (month/summary via `pushState`) return to the visible view even before any cache refresh. The setup client refreshes the Next route cache before navigating back.
+5. **Return Navigation:** The create-year entry point includes a `redirect` query pointing to the current month or annual summary route. Navigation components use `buildSetupHrefFromPathname` from `src/lib/year-routes.ts` to derive this redirect from the current browser pathname at click time. This ensures that even if the user has navigated locally (via `pushState`), the setup flow returns them to the exact view they were looking at. The setup client refreshes the Next route cache before navigating back.
+
+## Navigation & Workspace Model
+
+Gridly employs an "In-Year Workspace" model to manage the complex financial state of a year:
+
+- **Unified Client Shell:** Both monthly and annual summary pages delegate rendering to `YearPageClient`. This component owns the current `YearData` and manages local navigation.
+- **Pure Local Navigation:** Switching between months or views (summary/settings) uses `window.history.pushState()`. This avoids server-side data refetching, allowing the UI to remain responsive and preserve unsaved client-side recalculations.
+- **Route Synchronization:** The `YearPageClient` listens for `popstate` events and uses `parseYearRoutePathname` from `src/lib/year-routes.ts` to keep the UI tabs and the URL in sync.
+- **Server Navigation:** Changing the *year* (e.g., from 2024 to 2025) or going to the landing page uses standard Next.js router transitions, as these require entirely new data sets or different layouts.
 
 ## Configuration Fields (YearConfig)
 
