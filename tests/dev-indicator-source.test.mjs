@@ -7,7 +7,7 @@ async function readSource(path) {
 }
 
 const filesToCheck = [
-  "src/components/layout/app-shell.tsx",
+  "src/components/layout/base-app-shell.tsx",
   "src/components/landing/public-hero.tsx",
   "src/components/demo/public-demo-shell.tsx",
   "src/components/setup/setup-page-client.tsx",

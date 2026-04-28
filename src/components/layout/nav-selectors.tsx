@@ -2,7 +2,7 @@
 
 import { useRouter, usePathname, Link } from "@/i18n/routing";
 import { buttonVariants } from "@/components/ui/button";
-import { getNextCreatableYear } from "@/lib/server/year-planning";
+import { getNextCreatableYear } from "@/lib/server/year-navigation";
 import { cn } from "@/lib/utils";
 import { Plus } from "lucide-react";
 import { useTranslations } from "next-intl";

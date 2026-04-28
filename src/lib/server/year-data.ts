@@ -9,13 +9,7 @@ import {
   sortRecurringExpensesAsc,
 } from "@/lib/recurring-expenses";
 import type { YearData } from "@/lib/types";
-
-export function pickDefaultYear(availableYears: number[], currentYear: number) {
-  if (availableYears.includes(currentYear)) return currentYear;
-
-  const sortedYears = [...availableYears].sort((a, b) => b - a);
-  return sortedYears[0] ?? currentYear;
-}
+import { pickDefaultYear } from "./year-navigation";
 
 export async function getYearData(userId: string, year: number): Promise<YearData | null> {
   const yearRow = await db.query.years.findFirst({

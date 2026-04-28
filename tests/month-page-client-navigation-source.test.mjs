@@ -24,24 +24,26 @@ test("authenticated year routes use a client shell for in-year navigation", asyn
 
 test("authenticated year nav tabs cancel Next navigation when handled locally", async () => {
   const navSource = await readSource("src/components/layout/nav-selectors.tsx");
+  const routesSource = await readSource("src/lib/year-routes.ts");
 
   assert.match(navSource, /onNavigate/, "nav selector tabs should use Next's client navigation hook");
   assert.match(navSource, /event\.preventDefault\(\)/, "local tab handlers should prevent the route navigation");
   assert.match(navSource, /tab\.key === "overview" \? onMonthViewSelect : onSummaryViewSelect/, "tabs should select the matching local handler");
   assert.match(navSource, /handler\(\)/, "local tab handler should run after navigation is cancelled");
-  assert.match(navSource, /buildCreateYearHref/, "create-year navigation should preserve the selected return route");
-  assert.match(navSource, /redirect=\$\{encodeURIComponent\(returnPath\)\}/, "create-year redirect should encode the current month or summary route");
+  assert.match(navSource, /buildSetupHrefFromPathname/, "create-year navigation should preserve the selected return route");
+  assert.match(routesSource, /redirect=\$\{encodeURIComponent\(returnPath\)\}/, "create-year redirect should encode the current month or summary route");
 });
 
 test("settings can be rendered inside the authenticated year client shell", async () => {
   const shellSource = await readSource("src/components/year/year-page-client.tsx");
   const appShellSource = await readSource("src/components/layout/app-shell.tsx");
   const userMenuSource = await readSource("src/components/auth/user-menu.tsx");
+  const routesSource = await readSource("src/lib/year-routes.ts");
 
   assert.match(shellSource, /SettingsForm/, "year client shell should render settings locally");
   assert.match(shellSource, /"settings"/, "year client shell should track settings as a local view");
   assert.match(shellSource, /onSettingsSelect=\{handleSettingsSelect\}/, "year client shell should wire a local settings handler");
-  assert.match(shellSource, /\/settings\$/, "year client shell should sync browser back/forward for settings");
+  assert.match(routesSource, /\/settings\$/, "year client shell should sync browser back/forward for settings");
   assert.match(appShellSource, /onSettingsSelect\?: \(\) => void/, "app shell should accept a local settings handler");
   assert.match(appShellSource, /<UserMenu[\s\S]*onSettingsSelect=\{onSettingsSelect\}/, "app shell should pass settings handling into the user menu");
   assert.match(userMenuSource, /onNavigate=\{handleSettingsNavigate\}/, "settings links should use Next's navigation hook");

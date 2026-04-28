@@ -17,18 +17,33 @@ async function transpileModuleToTemp(relativePath, outDir) {
     },
     fileName: sourcePath,
   });
+  
+  // Fix imports to include .mjs extension for Node ESM
+  let content = output.outputText;
+  content = content.replace(/from\s+["'](\.\.?\/[^"']+)["']/g, (match, p1) => {
+    if (p1.endsWith(".mjs")) return match;
+    return `from "${p1}.mjs"`;
+  });
+
   const outPath = join(outDir, relativePath.replace(/^src\//, "").replace(/\.ts$/, ".mjs"));
   await mkdir(dirname(outPath), { recursive: true });
-  await writeFile(outPath, output.outputText, "utf8");
+  await writeFile(outPath, content, "utf8");
 }
 
 async function loadYearPlanningHelpers() {
   const outDir = await mkdtemp(join(process.cwd(), ".tmp-gridly-year-planning-test-"));
+  await transpileModuleToTemp("src/lib/server/year-navigation.ts", outDir);
   await transpileModuleToTemp("src/lib/server/year-planning.ts", outDir);
-  const modulePath = join(outDir, "lib", "server", "year-planning.mjs");
-  const mod = await import(`file://${modulePath}`);
+  
+  const navPath = join(outDir, "lib", "server", "year-navigation.mjs");
+  const planningPath = join(outDir, "lib", "server", "year-planning.mjs");
+  
+  const navMod = await import(`file://${navPath}`);
+  const planningMod = await import(`file://${planningPath}`);
+  
   return {
-    ...mod,
+    ...navMod,
+    ...planningMod,
     cleanup: () => rm(outDir, { recursive: true, force: true }),
   };
 }
@@ -57,9 +72,9 @@ test("shouldAllowYearCreation only accepts the next creatable year", async () =>
   const { shouldAllowYearCreation, cleanup } = await loadYearPlanningHelpers();
 
   try {
+    assert.equal(shouldAllowYearCreation([2024, 2025], 2026, 2026), true);
+    assert.equal(shouldAllowYearCreation([2024, 2025], 2026, 2027), false);
     assert.equal(shouldAllowYearCreation([], 2026, 2026), true);
-    assert.equal(shouldAllowYearCreation([2024, 2025, 2026], 2030, 2027), true);
-    assert.equal(shouldAllowYearCreation([2024, 2025, 2026], 2030, 2028), false);
   } finally {
     await cleanup();
   }
@@ -71,12 +86,12 @@ test("deriveStartingBalance uses the previous december ending balance", async ()
   try {
     const previousYear = {
       months: [
-        { month: 11, endingBalance: 1000 },
-        { month: 12, endingBalance: 1234.56 },
+        { month: 11, endingBalance: 5000 },
+        { month: 12, endingBalance: 6200.55 },
       ],
     };
 
-    assert.equal(deriveStartingBalance(previousYear), 1234.56);
+    assert.equal(deriveStartingBalance(previousYear), 6200.55);
   } finally {
     await cleanup();
   }

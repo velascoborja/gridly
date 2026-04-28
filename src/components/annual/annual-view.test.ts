@@ -33,9 +33,19 @@ test("year page uses native history for in-year view changes without server navi
 
   assert.match(source, /import \{ usePathname \} from "@\/i18n\/routing"/);
   assert.doesNotMatch(source, /useRouter/);
-  assert.match(source, /window\.history\.pushState\(null, "", buildYearRoute\(routePrefix, currentYearData\.config\.year, String\(nextMonth\)\)\)/);
-  assert.match(source, /window\.history\.pushState\(null, "", buildYearRoute\(routePrefix, currentYearData\.config\.year, "summary"\)\)/);
-  assert.match(source, /window\.history\.pushState\(null, "", buildSettingsRoute\(routePrefix\)\)/);
+  assert.match(source, /window\.history\.pushState\(null, "", buildYearMonthHref\(routePrefix, currentYearData\.config\.year, nextMonth\)\)/);
+  assert.match(source, /window\.history\.pushState\(null, "", buildYearSummaryHref\(routePrefix, currentYearData\.config\.year\)\)/);
+  assert.match(source, /window\.history\.pushState\(null, "", buildSettingsHref\(routePrefix\)\)/);
+});
+
+test("year page syncs the selected view from pathname changes after setup navigation", () => {
+  const source = readFileSync(new URL("../year/year-page-client.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /function getInitialStateFromPathname/);
+  assert.match(source, /useState<YearRouteView>\(\(\) => initialState\.view\)/);
+  assert.match(source, /function syncStateFromPathname\(nextPathname: string\)/);
+  assert.match(source, /syncStateFromPathname\(pathname\)/);
+  assert.match(source, /\}, \[currentYearData\.config\.year, pathname\]\)/);
 });
 
 test("annual config saves refresh the current route cache", () => {

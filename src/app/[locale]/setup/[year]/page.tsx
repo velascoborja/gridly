@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
-import { deriveStartingBalance, getNextCreatableYear } from "@/lib/server/year-planning";
+import { deriveStartingBalance } from "@/lib/server/year-planning";
+import { getNextCreatableYear } from "@/lib/server/year-navigation";
 import { getYearData, getYearsForUser } from "@/lib/server/year-data";
 import { requireSessionUser } from "@/lib/server/session";
 import { SetupPageClient } from "@/components/setup/setup-page-client";

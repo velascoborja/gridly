@@ -7,13 +7,14 @@ async function readSource(path) {
 }
 
 test("app shell header keeps the mobile sticky area compact", async () => {
-  const source = await readSource("src/components/layout/app-shell.tsx");
+  const baseSource = await readSource("src/components/layout/base-app-shell.tsx");
+  const shellSource = await readSource("src/components/layout/app-shell.tsx");
 
-  assert.match(source, /grid-cols-\[1fr_auto\]/, "mobile header should use a compact two-column grid");
-  assert.match(source, /py-2/, "mobile header should use compact vertical padding");
-  assert.match(source, /md:py-4/, "desktop header should retain its larger vertical padding");
-  assert.match(source, /className="[^"]*h-10[^"]*w-\[135px\][^"]*md:h-12[^"]*md:w-\[162px\]/, "mobile wordmark should render smaller than desktop");
-  assert.match(source, /col-span-2[^"]*md:col-span-1/, "mobile navigation should sit in a single compact second row");
+  assert.match(baseSource, /grid-cols-\[1fr_auto\]/, "mobile header should use a compact two-column grid");
+  assert.match(baseSource, /py-2/, "mobile header should use compact vertical padding");
+  assert.match(baseSource, /md:py-4/, "desktop header should retain its larger vertical padding");
+  assert.match(baseSource, /className="[^"]*h-10[^"]*w-\[135px\][^"]*md:h-12[^"]*md:w-\[162px\]/, "mobile wordmark should render smaller than desktop");
+  assert.match(shellSource, /col-span-2[^"]*md:col-span-1/, "mobile navigation should sit in a single compact second row");
 });
 
 test("nav selectors stay horizontal on mobile", async () => {

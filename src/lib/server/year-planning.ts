@@ -1,10 +1,4 @@
-export function getNextCreatableYear(existingYears: number[], fallbackYear: number) {
-  if (existingYears.length === 0) {
-    return fallbackYear;
-  }
-
-  return Math.max(...existingYears) + 1;
-}
+import { getNextCreatableYear } from "./year-navigation";
 
 export function shouldAllowYearCreation(
   existingYears: number[],

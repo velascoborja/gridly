@@ -1,7 +1,8 @@
 import { AppShell } from "@/components/layout/app-shell";
 import { SettingsForm } from "@/components/settings/settings-form";
 import { requireSessionUser } from "@/lib/server/session";
-import { getYearsForUser, pickDefaultYear } from "@/lib/server/year-data";
+import { getYearsForUser } from "@/lib/server/year-data";
+import { pickDefaultYear } from "@/lib/server/year-navigation";
 
 export default async function SettingsPage() {
   const user = await requireSessionUser();

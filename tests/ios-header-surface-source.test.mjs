@@ -8,7 +8,7 @@ async function readSource(path) {
 
 test("app header exposes a matching iOS status bar surface", async () => {
   const layoutSource = await readSource("src/app/[locale]/layout.tsx");
-  const shellSource = await readSource("src/components/layout/app-shell.tsx");
+  const shellSource = await readSource("src/components/layout/base-app-shell.tsx");
   const globalsSource = await readSource("src/app/globals.css");
 
   assert.match(layoutSource, /themeColor:\s*"#ffffff"/, "Safari should start with white browser chrome at the top");
