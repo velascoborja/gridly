@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, Link } from "@/i18n/routing";
+import { useRouter, usePathname, Link } from "@/i18n/routing";
 import { buttonVariants } from "@/components/ui/button";
 import { getNextCreatableYear } from "@/lib/server/year-planning";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  buildYearMonthHref,
+  buildYearSummaryHref,
+  buildSetupHrefFromPathname,
+} from "@/lib/year-routes";
 
 interface Props {
   currentYear: number;
@@ -25,19 +30,6 @@ interface Props {
   hideYearSelector?: boolean;
   onMonthViewSelect?: () => void;
   onSummaryViewSelect?: () => void;
-}
-
-function buildMonthHref(prefix: string | undefined, year: number, month: number) {
-  return `${prefix ?? ""}/${year}/${month}`;
-}
-
-function buildSummaryHref(prefix: string | undefined, year: number) {
-  return `${prefix ?? ""}/${year}/summary`;
-}
-
-function buildCreateYearHref(nextYear: number, currentYear: number, currentMonth: number, view: Props["view"]) {
-  const returnPath = view === "summary" ? `/${currentYear}/summary` : `/${currentYear}/${currentMonth}`;
-  return `/setup/${nextYear}?redirect=${encodeURIComponent(returnPath)}`;
 }
 
 export function NavSelectors({
@@ -53,6 +45,7 @@ export function NavSelectors({
   onSummaryViewSelect,
 }: Props) {
   const router = useRouter();
+  const pathname = usePathname();
   const t = useTranslations("Nav");
   const selectedMonth = currentMonth ?? new Date().getMonth() + 1;
   const nextCreatableYear = getNextCreatableYear(years, currentYear);
@@ -61,13 +54,13 @@ export function NavSelectors({
   const handleYearChange = (val: string | null) => {
     if (!val) return;
     const y = parseInt(val, 10);
-    if (view === "summary") router.push(buildSummaryHref(summaryPathPrefix, y));
-    else router.push(buildMonthHref(monthPathPrefix, y, selectedMonth));
+    if (view === "summary") router.push(buildYearSummaryHref(summaryPathPrefix, y));
+    else router.push(buildYearMonthHref(monthPathPrefix, y, selectedMonth));
   };
 
-  const monthHref = buildMonthHref(monthPathPrefix, currentYear, selectedMonth);
-  const summaryHref = buildSummaryHref(summaryPathPrefix, currentYear);
-  const createYearHref = buildCreateYearHref(nextCreatableYear, currentYear, selectedMonth, view);
+  const monthHref = buildYearMonthHref(monthPathPrefix, currentYear, selectedMonth);
+  const summaryHref = buildYearSummaryHref(summaryPathPrefix, currentYear);
+  const createYearHref = buildSetupHrefFromPathname(nextCreatableYear, pathname, currentYear, selectedMonth, view);
 
   const mainTabs = [
     { label: t("months"), key: "overview" as const, href: monthHref },
@@ -96,6 +89,18 @@ export function NavSelectors({
             {!hideCreateYear && (
               <Link
                 href={createYearHref}
+                onNavigate={(event) => {
+                  event.preventDefault();
+                  router.push(
+                    buildSetupHrefFromPathname(
+                      nextCreatableYear,
+                      window.location.pathname,
+                      currentYear,
+                      selectedMonth,
+                      view
+                    )
+                  );
+                }}
                 aria-label={t("createYear", { year: nextCreatableYear })}
                 className={cn(
                   buttonVariants({ variant: "outline", size: "icon-sm" }),
