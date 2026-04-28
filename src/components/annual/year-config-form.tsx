@@ -156,6 +156,7 @@ export function YearConfigForm({
       if (payload.yearData) {
         onRecurringExpensesApplied(payload.yearData);
       }
+      router.refresh();
     })();
 
     onPendingSave?.(savePromise);

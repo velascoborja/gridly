@@ -17,6 +17,7 @@ Recurring expenses let users define named monthly expenses that repeat across a 
 During setup, `POST /api/years` saves the template list and `POST /api/years/[year]/prefill` copies every template into all 12 months.
 
 Annual template updates use `PUT /api/years/[year]/recurring-expenses`. This endpoint replaces the template list, deletes all monthly recurring expense rows for that year, recreates them from the new template, and propagates downstream year carry-over.
+After the annual editor receives the updated `yearData`, it refreshes the current App Router route cache so returning from setup or another route keeps the recalculated recurring expense totals.
 
 Monthly changes use:
 

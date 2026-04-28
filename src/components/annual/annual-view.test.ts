@@ -44,6 +44,17 @@ test("annual config saves refresh the current route cache", () => {
   assert.match(source, /router\.refresh\(\)/);
 });
 
+test("annual recurring expense saves refresh the current route cache", () => {
+  const source = readFileSync(new URL("./year-config-form.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /const handleSaveRecurringExpenses = async \(\) => \{/);
+  assert.match(
+    source,
+    /fetch\(`\/api\/years\/\$\{config\.year\}\/recurring-expenses`[\s\S]*router\.refresh\(\)/,
+    "saving recurring expenses should refresh the summary route cache"
+  );
+});
+
 test("annual interest rate setting edits inline with percent formatting", () => {
   const source = readFileSync(new URL("./year-config-form.tsx", import.meta.url), "utf8");
 

@@ -67,6 +67,7 @@ When changing any of the features listed below, update the related documentation
 
 - [Year Settings & Setup](docs/features/year-settings.md): Details on year creation, configuration fields, and prefill logic.
 - [Monthly Management](docs/features/monthly-management.md): Core tracking interface for income, fixed expenses, and interest calculations.
+- [Recurring Expenses](docs/features/recurring-expenses.md): Annual recurring expense templates and monthly recurring expense copies.
 - [Additional Entries](docs/features/additional-entries.md): Management of granular variable expenses and income transactions.
 - [Balance & Interest Logic](docs/features/calculations-engine.md): The mathematical engine behind the month-over-month financial chain.
 - [Yearly Carry-over](docs/features/balance-carry-over.md): Automatic synchronization of balances across consecutive years.
