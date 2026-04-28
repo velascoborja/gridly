@@ -30,3 +30,4 @@ homeExpense + personalExpense + investment + recurringExpensesTotal + additional
 
 - **Automatic:** Calculated as `(Starting Balance * YearConfig.interestRate) / 12`.
 - **Manual Override:** Users can toggle `interestsManualOverride` to set a specific interest amount for a month, bypassing the automatic calculation. This is useful for high-yield accounts where interests are paid differently.
+- **Annual Setup Reapply:** Saving year setup values from the annual summary resets monthly interest overrides and reapplies the annual baseline fields with `applyYearConfigToMonth`, so the annual balance reflects the latest setup immediately.

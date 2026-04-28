@@ -1,9 +1,10 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { RecurringExpenseTemplateEditor } from "@/components/recurring-expenses/recurring-expense-template-editor";
+import { useRouter } from "@/i18n/routing";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,22 +26,30 @@ interface Props {
   config: YearConfig;
   startingBalanceEditable: boolean;
   onConfigChange: Dispatch<SetStateAction<YearConfig>>;
-  onExtraPaymentsApplied?: (hasExtraPayments: boolean, estimatedExtraPayment: number) => void;
+  onConfigApplied?: (config: YearConfig) => void;
   recurringExpenses: YearRecurringExpense[];
   onRecurringExpensesApplied: (yearData: YearData) => void;
   onPendingSave?: (savePromise: Promise<void>) => void;
+}
+
+interface PendingOverwrite {
+  field: keyof YearConfig;
+  value: number | boolean;
+  resolve: (confirmed: boolean) => void;
 }
 
 export function YearConfigForm({
   config,
   startingBalanceEditable,
   onConfigChange,
-  onExtraPaymentsApplied,
+  onConfigApplied,
   recurringExpenses,
   onRecurringExpensesApplied,
   onPendingSave,
 }: Props) {
   const t = useTranslations("Annual.config");
+  const locale = useLocale();
+  const router = useRouter();
   const [savingFields, setSavingFields] = useState<Set<keyof YearConfig>>(() => new Set());
   const [optimisticExtraPayments, setOptimisticExtraPayments] = useState<boolean | null>(null);
   const [recurringDraft, setRecurringDraft] = useState<RecurringExpenseInput[]>(
@@ -48,14 +57,56 @@ export function YearConfigForm({
   );
   const [savingRecurring, setSavingRecurring] = useState(false);
   const [recurringError, setRecurringError] = useState("");
+  const [pendingOverwrite, setPendingOverwrite] = useState<PendingOverwrite | null>(null);
 
   useEffect(() => {
     setRecurringDraft(recurringExpenses.map((entry) => ({ label: entry.label, amount: entry.amount })));
   }, [recurringExpenses]);
   const displayedHasExtraPayments = optimisticExtraPayments ?? config.hasExtraPayments;
   const isSavingField = (field: keyof YearConfig) => savingFields.has(field);
+  const confirmFallback =
+    locale === "en"
+      ? {
+          title: "Overwrite the months?",
+          description: "This change will update all 12 months from the annual setup and overwrite manually edited fixed values.",
+          cancel: "Cancel",
+          action: "Apply",
+        }
+      : {
+          title: "¿Sobrescribir los meses?",
+          description: "Este cambio actualizará los 12 meses con la configuración anual y sobrescribirá los valores fijos editados manualmente.",
+          cancel: "Cancelar",
+          action: "Aplicar",
+        };
+  const confirmCopy = {
+    title: t.has("confirmOverwriteTitle") ? t("confirmOverwriteTitle") : confirmFallback.title,
+    description: t.has("confirmOverwriteDescription")
+      ? t("confirmOverwriteDescription")
+      : confirmFallback.description,
+    cancel: t.has("confirmOverwriteCancel") ? t("confirmOverwriteCancel") : confirmFallback.cancel,
+    action: t.has("confirmOverwriteAction") ? t("confirmOverwriteAction") : confirmFallback.action,
+  };
+
+  const requestOverwriteConfirmation = (field: keyof YearConfig, value: number | boolean) =>
+    new Promise<boolean>((resolve) => {
+      setPendingOverwrite({ field, value, resolve });
+    });
+
+  const settleOverwriteConfirmation = (confirmed: boolean) => {
+    pendingOverwrite?.resolve(confirmed);
+    setPendingOverwrite(null);
+  };
 
   const handleSave = async (field: keyof YearConfig, value: number | boolean) => {
+    if (config[field] === value) {
+      return;
+    }
+
+    const confirmed = await requestOverwriteConfirmation(field, value);
+    if (!confirmed) {
+      return;
+    }
+
     setSavingFields((current) => new Set(current).add(field));
     if (field === "hasExtraPayments") {
       setOptimisticExtraPayments(Boolean(value));
@@ -70,11 +121,10 @@ export function YearConfigForm({
       if (!res.ok) throw new Error("Failed to update");
       onConfigChange((current) => {
         const next = { ...current, [field]: value };
-        if (field === "hasExtraPayments" || field === "estimatedExtraPayment") {
-          onExtraPaymentsApplied?.(next.hasExtraPayments, next.estimatedExtraPayment);
-        }
+        onConfigApplied?.(next);
         return next;
       });
+      router.refresh();
     })();
 
     onPendingSave?.(savePromise);
@@ -120,6 +170,26 @@ export function YearConfigForm({
 
   return (
     <div className="space-y-3 mt-6">
+      <AlertDialog open={pendingOverwrite !== null} onOpenChange={(open) => {
+        if (!open) settleOverwriteConfirmation(false);
+      }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{confirmCopy.title}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirmCopy.description}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => settleOverwriteConfirmation(false)}>
+              {confirmCopy.cancel}
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={() => settleOverwriteConfirmation(true)}>
+              {confirmCopy.action}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <div className="grid gap-3">
         <div className="rounded-2xl border border-border/60 bg-muted/20 p-4">
           <InlineEditField
@@ -184,6 +254,7 @@ export function YearConfigForm({
                   value={config.estimatedExtraPayment}
                   onSave={(v) => handleSave("estimatedExtraPayment", v)}
                   disabled={!displayedHasExtraPayments}
+                  className="gap-x-4 gap-y-5"
                 />
               </div>
             </div>

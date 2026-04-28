@@ -53,7 +53,8 @@ Gridly follows a premium, fintech-inspired visual system (Stripe-like) documente
 
 ## Development Conventions
 
-- **Localization:** UI strings are in Spanish. **Do not translate to English.**
+- **Internationalization (i18n):** Uses `next-intl`. All UI strings must be in `messages/es.json` (Spanish) and `messages/en.json` (English). **Do not hardcode strings.** Use `@/i18n/routing` for all navigation components (Link, useRouter).
+- **Localization:** Primary UI language is Spanish. Ensure Spanish translations are provided first.
 - **Data Access:** Client components use `fetch()` to internal APIs; server components use Drizzle directly.
 - **Styling:** Adhere to Tailwind CSS v4 and the visual tokens defined in `src/app/globals.css`. For any UI modification, consult `DESIGN.md` first and follow its rules for spacing, elevation, typography, colors, interactive states, and component styling.
 - **Numeric Handling:** Convert DB strings to `number` immediately after reading and back to `string` for DB operations.
@@ -62,9 +63,12 @@ Gridly follows a premium, fintech-inspired visual system (Stripe-like) documente
 
 Detailed documentation for specific features can be found in `docs/features/`. Refer to these files for in-depth understanding of implementation logic and domain rules.
 
+When changing any of the features listed below, update the related documentation in the same change. If the work affects a feature that is not yet documented, add a new feature page under `docs/features/` and link it from this section.
+
 - [Year Settings & Setup](docs/features/year-settings.md): Details on year creation, configuration fields, and prefill logic.
 - [Monthly Management](docs/features/monthly-management.md): Core tracking interface for income, fixed expenses, and interest calculations.
 - [Additional Entries](docs/features/additional-entries.md): Management of granular variable expenses and income transactions.
 - [Balance & Interest Logic](docs/features/calculations-engine.md): The mathematical engine behind the month-over-month financial chain.
 - [Yearly Carry-over](docs/features/balance-carry-over.md): Automatic synchronization of balances across consecutive years.
 - [Data Export](docs/features/data-export.md): Excel workbook generation for offline analysis and data portability.
+- [Internationalization](docs/features/internationalization.md): Implementation details for multi-language support and routing.

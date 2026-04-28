@@ -14,7 +14,9 @@ test("authenticated year routes use a client shell for in-year navigation", asyn
   assert.match(pageSource, /YearPageClient/, "month page should delegate rendering to the shared client shell");
   assert.match(summarySource, /YearPageClient/, "summary page should delegate rendering to the shared client shell");
   assert.match(shellSource, /"use client"/, "year client shell must run on the client");
-  assert.match(shellSource, /window\.history\.pushState/, "year client shell should update the URL without a full route navigation");
+  assert.doesNotMatch(shellSource, /window\.history\.pushState/, "year client shell should keep Next router state in sync with the URL");
+  assert.match(shellSource, /usePathname, useRouter/, "year client shell should use locale-aware Next navigation");
+  assert.match(shellSource, /router\.push/, "year client shell should navigate through the Next router");
   assert.match(shellSource, /popstate/, "year client shell should stay in sync with browser back and forward");
   assert.match(shellSource, /AnnualView/, "year client shell should render annual summary locally");
   assert.match(shellSource, /MonthOverview/, "year client shell should render month overview locally");
@@ -27,6 +29,8 @@ test("authenticated year nav tabs cancel Next navigation when handled locally", 
   assert.match(navSource, /event\.preventDefault\(\)/, "local tab handlers should prevent the route navigation");
   assert.match(navSource, /tab\.key === "overview" \? onMonthViewSelect : onSummaryViewSelect/, "tabs should select the matching local handler");
   assert.match(navSource, /handler\(\)/, "local tab handler should run after navigation is cancelled");
+  assert.match(navSource, /buildCreateYearHref/, "create-year navigation should preserve the selected return route");
+  assert.match(navSource, /redirect=\$\{encodeURIComponent\(returnPath\)\}/, "create-year redirect should encode the current month or summary route");
 });
 
 test("settings can be rendered inside the authenticated year client shell", async () => {

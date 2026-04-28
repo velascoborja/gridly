@@ -91,7 +91,11 @@
       "recurringExpensesConfirmTitle": "Reapply recurring expenses?",
       "recurringExpensesConfirmDescription": "Recurring expenses for every month in this year will be replaced. Manual changes made inside specific months will be lost.",
       "recurringExpensesConfirmAction": "Reapply",
-      "recurringExpensesCancel": "Cancel"
+      "recurringExpensesCancel": "Cancel",
+      "confirmOverwriteTitle": "Overwrite the months?",
+      "confirmOverwriteDescription": "This change will update all 12 months from the annual setup and overwrite manually edited fixed values.",
+      "confirmOverwriteCancel": "Cancel",
+      "confirmOverwriteAction": "Apply"
     }
   },
   "Setup": {

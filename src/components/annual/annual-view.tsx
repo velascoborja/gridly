@@ -1,8 +1,8 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react";
-import { computeMonthChain } from "@/lib/calculations";
+import { useEffect, useRef, useState } from "react";
+import { applyYearConfigToMonth, computeMonthChain } from "@/lib/calculations";
 import { KpiCards } from "./kpi-cards";
 import { BalanceChart } from "./balance-chart";
 import { SavingsChart } from "./savings-chart";
@@ -36,27 +36,9 @@ export function AnnualView({
     setRecurringExpenses(initial.recurringExpenses);
   }, [initial]);
 
-  const handleConfigChange: Dispatch<SetStateAction<YearConfig>> = (update) => {
-    setConfig((currentConfig) => {
-      const nextConfig = typeof update === "function" ? update(currentConfig) : update;
-      const recomputedMonths = computeMonthChain(monthRows, nextConfig.startingBalance, nextConfig.interestRate);
-      onYearDataChange?.({
-        config: nextConfig,
-        months: recomputedMonths,
-        recurringExpenses,
-      });
-      return nextConfig;
-    });
-  };
-
-  const applyExtraPaymentsToMonths = (hasExtraPayments: boolean, estimatedExtraPayment: number) => {
+  const applyConfigToMonths = (nextConfig: YearConfig) => {
     setMonthRows((current) => {
-      const updatedRows = current.map((month) =>
-        month.month === 6 || month.month === 12
-          ? { ...month, additionalPayslip: hasExtraPayments ? estimatedExtraPayment : 0 }
-          : month
-      );
-      const nextConfig = { ...config, hasExtraPayments, estimatedExtraPayment };
+      const updatedRows = current.map((month) => applyYearConfigToMonth(month, nextConfig));
       const recomputedMonths = computeMonthChain(updatedRows, nextConfig.startingBalance, nextConfig.interestRate);
       onYearDataChange?.({
         config: nextConfig,
@@ -68,6 +50,7 @@ export function AnnualView({
   };
 
   const handleRecurringExpensesApplied = (yearData: YearData) => {
+    setConfig(yearData.config);
     setRecurringExpenses(yearData.recurringExpenses);
     setMonthRows(yearData.months);
     onYearDataChange?.(yearData);
@@ -116,8 +99,8 @@ export function AnnualView({
         savingConfig={readOnly ? false : savingConfig}
         startingBalanceEditable={startingBalanceEditable}
         readOnly={readOnly}
-        onConfigChange={handleConfigChange}
-        onExtraPaymentsApplied={applyExtraPaymentsToMonths}
+        onConfigChange={setConfig}
+        onConfigApplied={applyConfigToMonths}
         recurringExpenses={recurringExpenses}
         onRecurringExpensesApplied={handleRecurringExpensesApplied}
         onExport={handleExport}

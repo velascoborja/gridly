@@ -91,7 +91,11 @@
       "recurringExpensesConfirmTitle": "¿Reaplicar gastos recurrentes?",
       "recurringExpensesConfirmDescription": "Se reemplazarán los gastos recurrentes de todos los meses de este año. Los cambios manuales hechos dentro de meses concretos se perderán.",
       "recurringExpensesConfirmAction": "Reaplicar",
-      "recurringExpensesCancel": "Cancelar"
+      "recurringExpensesCancel": "Cancelar",
+      "confirmOverwriteTitle": "¿Sobrescribir los meses?",
+      "confirmOverwriteDescription": "Este cambio actualizará los 12 meses con la configuración anual y sobrescribirá los valores fijos editados manualmente.",
+      "confirmOverwriteCancel": "Cancelar",
+      "confirmOverwriteAction": "Aplicar"
     }
   },
   "Setup": {

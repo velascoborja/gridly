@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Eye, EyeOff } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { Link } from "@/i18n/routing";
+import { Link, useRouter } from "@/i18n/routing";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { AdditionalEntriesCard } from "./additional-entries-card";
@@ -39,6 +39,7 @@ export function MonthOverview({
   const t = useTranslations("Monthly");
   const tOverview = useTranslations("Monthly.overview");
   const locale = useLocale();
+  const router = useRouter();
   const [months, setMonths] = useState<MonthData[]>(initialYearData.months);
   const [showFixedEditors, setShowFixedEditors] = useState(readOnly);
   const [renderFixedEditors, setRenderFixedEditors] = useState(false);
@@ -168,7 +169,8 @@ export function MonthOverview({
       }
       return recomputedMonths;
     });
-  }, [config, month, onYearDataChange, recompute, yearRecurringExpenses]);
+    router.refresh();
+  }, [config, month, onYearDataChange, recompute, router, yearRecurringExpenses]);
 
   const handleEntriesChange = useCallback((type: "income" | "expense", entries: AdditionalEntry[]) => {
     setMonths((prev) => {
@@ -204,7 +206,8 @@ export function MonthOverview({
       }
       return recomputedMonths;
     });
-  }, [config, monthNumber, onYearDataChange, recompute, yearRecurringExpenses]);
+    router.refresh();
+  }, [config, monthNumber, onYearDataChange, recompute, router, yearRecurringExpenses]);
 
   if (!month) {
     return (
@@ -483,6 +486,7 @@ export function MonthOverview({
           type="expense"
           entries={month.additionalExpenses}
           onEntriesChange={(entries) => handleEntriesChange("expense", entries)}
+          onPersistedChange={() => router.refresh()}
           readOnly={readOnly}
           title={tOverview("additionalExpensesTitle")}
         />
@@ -492,6 +496,7 @@ export function MonthOverview({
           type="income"
           entries={month.additionalIncomes}
           onEntriesChange={(entries) => handleEntriesChange("income", entries)}
+          onPersistedChange={() => router.refresh()}
           readOnly={readOnly}
           title={tOverview("additionalIncomeTitle")}
         />

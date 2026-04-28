@@ -94,6 +94,21 @@ export function estimatedMonthData(month: number, config: YearConfig): Omit<RawM
   };
 }
 
+export function applyYearConfigToMonth<T extends RawMonthData>(month: T, config: YearConfig): T {
+  const isExtraPaymentMonth = month.month === 6 || month.month === 12;
+
+  return {
+    ...month,
+    homeExpense: config.monthlyHomeExpense,
+    personalExpense: config.monthlyPersonalBudget,
+    investment: config.monthlyInvestment,
+    payslip: config.estimatedSalary,
+    additionalPayslip: config.hasExtraPayments && isExtraPaymentMonth ? config.estimatedExtraPayment : 0,
+    interests: 0,
+    interestsManualOverride: false,
+  };
+}
+
 export function round2(n: number): number {
   return Math.round(n * 100) / 100;
 }

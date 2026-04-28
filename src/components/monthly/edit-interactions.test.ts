@@ -95,3 +95,13 @@ test("fixed expenses card embeds recurring expenses without month-level add", ()
   assert.doesNotMatch(listSource, /addEntry/);
   assert.match(listSource, /deletingId === entry\.id/);
 });
+
+test("monthly edits refresh the current route cache after persistence", () => {
+  const overviewSource = readFileSync(new URL("./month-overview.tsx", import.meta.url), "utf8");
+  const entriesSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
+
+  assert.match(overviewSource, /import \{ Link, useRouter \} from "@\/i18n\/routing"/);
+  assert.match(overviewSource, /router\.refresh\(\)/);
+  assert.match(entriesSource, /onPersistedChange\?: \(\) => void/);
+  assert.match(entriesSource, /onPersistedChange\?\.\(\)/);
+});

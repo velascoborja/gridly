@@ -24,7 +24,7 @@ interface Props {
   startingBalanceEditable: boolean;
   readOnly?: boolean;
   onConfigChange: Dispatch<SetStateAction<YearConfig>>;
-  onExtraPaymentsApplied: (hasExtraPayments: boolean, estimatedExtraPayment: number) => void;
+  onConfigApplied: (config: YearConfig) => void;
   recurringExpenses: YearRecurringExpense[];
   onRecurringExpensesApplied: (yearData: YearData) => void;
   onExport: () => void;
@@ -88,7 +88,7 @@ export function KpiCards({
   startingBalanceEditable,
   readOnly = false,
   onConfigChange,
-  onExtraPaymentsApplied,
+  onConfigApplied,
   recurringExpenses,
   onRecurringExpensesApplied,
   onExport,
@@ -201,7 +201,7 @@ export function KpiCards({
                           config={config}
                           startingBalanceEditable={startingBalanceEditable}
                           onConfigChange={onConfigChange}
-                          onExtraPaymentsApplied={onExtraPaymentsApplied}
+                          onConfigApplied={onConfigApplied}
                           recurringExpenses={recurringExpenses}
                           onRecurringExpensesApplied={onRecurringExpensesApplied}
                           onPendingSave={onPendingSave}

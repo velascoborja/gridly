@@ -36,6 +36,7 @@ export const metadata: Metadata = {
   referrer: "origin-when-cross-origin",
   creator: "Gridly",
   publisher: "Gridly",
+  manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     title: "Gridly",

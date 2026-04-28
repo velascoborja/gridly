@@ -35,6 +35,11 @@ function buildSummaryHref(prefix: string | undefined, year: number) {
   return `${prefix ?? ""}/${year}/summary`;
 }
 
+function buildCreateYearHref(nextYear: number, currentYear: number, currentMonth: number, view: Props["view"]) {
+  const returnPath = view === "summary" ? `/${currentYear}/summary` : `/${currentYear}/${currentMonth}`;
+  return `/setup/${nextYear}?redirect=${encodeURIComponent(returnPath)}`;
+}
+
 export function NavSelectors({
   currentYear,
   currentMonth,
@@ -62,6 +67,7 @@ export function NavSelectors({
 
   const monthHref = buildMonthHref(monthPathPrefix, currentYear, selectedMonth);
   const summaryHref = buildSummaryHref(summaryPathPrefix, currentYear);
+  const createYearHref = buildCreateYearHref(nextCreatableYear, currentYear, selectedMonth, view);
 
   const mainTabs = [
     { label: t("months"), key: "overview" as const, href: monthHref },
@@ -89,7 +95,7 @@ export function NavSelectors({
 
             {!hideCreateYear && (
               <Link
-                href={`/setup/${nextCreatableYear}`}
+                href={createYearHref}
                 aria-label={t("createYear", { year: nextCreatableYear })}
                 className={cn(
                   buttonVariants({ variant: "outline", size: "icon-sm" }),
