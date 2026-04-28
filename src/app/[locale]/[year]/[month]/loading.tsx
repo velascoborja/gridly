@@ -1,18 +1,8 @@
-import { AppShell } from "@/components/layout/app-shell";
+import { BaseAppShell } from "@/components/layout/base-app-shell";
 
 export default function MonthlyLoading() {
-  const today = new Date();
-  const currentYear = today.getFullYear();
-  const currentMonth = today.getMonth() + 1;
-
   return (
-    <AppShell
-      currentYear={currentYear}
-      currentMonth={currentMonth}
-      view="overview"
-      years={[currentYear]}
-      user={{}}
-    >
+    <BaseAppShell>
       <div className="space-y-6 animate-pulse">
         <div className="overflow-hidden rounded-lg border border-border/70 bg-background/90 shadow-[0_30px_45px_-30px_rgba(50,50,93,0.25),0_18px_36px_-24px_rgba(0,0,0,0.1)]">
           <div className="flex items-center gap-2 border-b border-border/70 px-3 py-3 sm:px-4">
@@ -88,6 +78,6 @@ export default function MonthlyLoading() {
           </div>
         </div>
       </div>
-    </AppShell>
+    </BaseAppShell>
   );
 }

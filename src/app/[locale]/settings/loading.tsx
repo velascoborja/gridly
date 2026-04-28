@@ -1,18 +1,8 @@
-import { AppShell } from "@/components/layout/app-shell";
+import { BaseAppShell } from "@/components/layout/base-app-shell";
 
 export default function SettingsLoading() {
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1;
-
   return (
-    <AppShell
-      currentYear={currentYear}
-      currentMonth={currentMonth}
-      view="settings"
-      years={[currentYear]}
-      user={{}}
-    >
+    <BaseAppShell>
       <div className="mx-auto max-w-4xl py-6">
         <div className="space-y-6 animate-pulse">
           <div className="rounded-[6px] border border-border/70 bg-background/85 p-6 shadow-sm">
@@ -28,6 +18,6 @@ export default function SettingsLoading() {
           </div>
         </div>
       </div>
-    </AppShell>
+    </BaseAppShell>
   );
 }
