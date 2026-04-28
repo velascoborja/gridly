@@ -55,6 +55,7 @@ Gridly follows a premium, fintech-inspired visual system (Stripe-like) documente
 
 - **Internationalization (i18n):** Uses `next-intl`. All UI strings must be in `messages/es.json` (Spanish) and `messages/en.json` (English). **Do not hardcode strings.** Use `@/i18n/routing` for all navigation components (Link, useRouter).
 - **Localization:** Primary UI language is Spanish. Ensure Spanish translations are provided first.
+- **In-Year Routing:** In-year navigation between months, summary, and settings uses local `window.history.pushState()` to avoid refetching `YearData`. Use the shared utilities in `src/lib/year-routes.ts` instead of writing custom path regexes to derive states or construct routes.
 - **Data Access:** Client components use `fetch()` to internal APIs; server components use Drizzle directly.
 - **Styling:** Adhere to Tailwind CSS v4 and the visual tokens defined in `src/app/globals.css`. For any UI modification, consult `DESIGN.md` first and follow its rules for spacing, elevation, typography, colors, interactive states, and component styling.
 - **Numeric Handling:** Convert DB strings to `number` immediately after reading and back to `string` for DB operations.
