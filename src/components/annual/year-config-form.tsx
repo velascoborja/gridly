@@ -172,7 +172,7 @@ export function YearConfigForm({
   };
 
   return (
-    <div className="space-y-3 mt-6">
+    <div className="mt-2 space-y-3">
       <AlertDialog open={pendingOverwrite !== null} onOpenChange={(open) => {
         if (!open) settleOverwriteConfirmation(false);
       }}>

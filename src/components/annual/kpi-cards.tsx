@@ -190,7 +190,7 @@ export function KpiCards({
                           </Button>
                         }
                       />
-                      <DialogContent className="max-w-md py-6">
+                      <DialogContent className="max-w-md gap-3 py-6">
                         <DialogHeader>
                           <DialogTitle>{tAnnual("configTitle")}</DialogTitle>
                           <DialogDescription>
