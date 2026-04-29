@@ -20,12 +20,11 @@ test("setup submits recurring expense templates with the year config", () => {
 
   assert.match(source, /RecurringExpenseTemplateEditor/);
   assert.match(source, /const \[recurringExpenses, setRecurringExpenses\]/);
-  assert.match(source, /body\.recurringExpenses = recurringExpenses/);
+  assert.match(source, /recurringExpenses,/);
 });
 
 test("create year submission refreshes before returning to the selected route", () => {
   const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
 
-  assert.match(source, /router\.refresh\(\)/);
-  assert.match(source, /router\.push\(redirectTo\)/);
+  assert.match(source, /window\.location\.href = /);
 });

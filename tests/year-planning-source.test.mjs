@@ -7,12 +7,12 @@ async function readSource(path) {
 }
 
 test("year creation source enforces sequential creation and derived carry-over", async () => {
-  const source = await readSource("src/app/api/years/route.ts");
+  const source = await readSource("src/lib/server/actions/years.ts");
 
-  assert.match(source, /latestYear/, "create year route should look up the latest existing year");
-  assert.match(source, /Only the next year can be created/, "create year route should reject non-sequential requests");
-  assert.match(source, /deriveStartingBalance/, "create year route should derive the next starting balance from prior data");
-  assert.match(source, /propagateYearCarryOver/, "create year route should propagate carry-over after creation");
+  assert.match(source, /latestYear/, "create year action should look up the latest existing year");
+  assert.match(source, /Only the next year can be created/, "create year action should reject non-sequential requests");
+  assert.match(source, /deriveStartingBalance/, "create year action should derive the next starting balance from prior data");
+  assert.match(source, /propagateYearCarryOver/, "create year action should propagate carry-over after creation");
 });
 
 test("year update source accepts starting balance edits only for the earliest year and propagates changes", async () => {
@@ -39,7 +39,7 @@ test("setup and monthly entrypoints expose only guided next-year creation", asyn
   const navSource = await readSource("src/components/layout/nav-selectors.tsx");
 
   assert.match(setupSource, /derivedStartingBalance/, "setup should load and display the derived carry-over balance");
-  assert.match(setupSource, /body\.startingBalance/, "setup should submit the editable first-year starting balance");
+  assert.match(setupSource, /startingBalance: Number\.isNaN\(startingBalance\)\s*\?\s*0\s*:\s*startingBalance/, "setup should submit the editable first-year starting balance");
   assert.match(setupSource, /t\("descriptionFixed"/, "setup should explain the sequential year rule");
   assert.match(monthPageSource, /redirect\(`\/setup\/\$\{year\}\?redirect=\/\$\{year\}\/\$\{month\}`\)/, "missing first-year route should redirect into setup");
   assert.match(navSource, /Plus/, "nav selector should render a plus icon for year creation");
