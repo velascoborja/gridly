@@ -139,3 +139,11 @@ test("additional entry rows expose drag move and a month picker fallback", () =>
   assert.match(entriesSource, /t\("moveEntry"\)/);
   assert.match(overviewSource, /moveTargets=\{additionalEntryMoveTargets\}/);
 });
+
+test("additional entry move picker is only visible on mobile while rows stay draggable", () => {
+  const entriesSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
+
+  assert.match(entriesSource, /draggable=\{canMoveEntry\(entry\)\}/);
+  assert.match(entriesSource, /sm:hidden[\s\S]*aria-label=\{`\$\{t\("moveEntry"\)\} \$\{entry\.label\}`\}/);
+  assert.match(entriesSource, /movePickerOpenId === entry\.id[\s\S]*sm:hidden/);
+});

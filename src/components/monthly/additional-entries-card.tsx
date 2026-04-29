@@ -304,7 +304,7 @@ export function AdditionalEntriesCard({
                       <Button
                         size="icon-xs"
                         variant="ghost"
-                        className="text-muted-foreground hover:text-primary"
+                        className="text-muted-foreground hover:text-primary sm:hidden"
                         aria-label={`${t("moveEntry")} ${entry.label}`}
                         title={t("moveEntry")}
                         onClick={() => setMovePickerOpenId((current) => current === entry.id ? null : entry.id)}
@@ -363,7 +363,7 @@ export function AdditionalEntriesCard({
                   </div>
                 </div>
                 {!readOnly && movePickerOpenId === entry.id && moveTargets.length > 0 ? (
-                  <div className="mt-2 rounded-lg border border-border/70 bg-background/95 p-2 shadow-sm">
+                  <div className="mt-2 rounded-lg border border-border/70 bg-background/95 p-2 shadow-sm sm:hidden">
                     <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
                       {t("movePickerTitle")}
                     </p>
