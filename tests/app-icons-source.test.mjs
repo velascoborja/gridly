@@ -18,6 +18,15 @@ function pngSize(buffer) {
   };
 }
 
+function pngFromIco(buffer) {
+  assert.equal(buffer.readUInt16LE(2), 1, "favicon should be an ICO file");
+  assert.equal(buffer.readUInt16LE(4), 1, "favicon should contain at least one icon entry");
+
+  const bytesInResource = buffer.readUInt32LE(14);
+  const imageOffset = buffer.readUInt32LE(18);
+  return buffer.subarray(imageOffset, imageOffset + bytesInResource);
+}
+
 function rgbaPng(buffer) {
   const signature = buffer.subarray(0, 8).toString("hex");
   assert.equal(signature, "89504e470d0a1a0a", "file should be a PNG");
@@ -118,15 +127,26 @@ function alphaBounds(buffer, minimumAlpha) {
   };
 }
 
+function assertPngFillsCanvas(label, buffer) {
+  assert.deepEqual(
+    alphaBounds(buffer, 240),
+    pngSize(buffer),
+    `${label} should fill its canvas without baked-in transparent padding`
+  );
+}
+
 test("Next app icon files cover favicon, SVG icon, and Apple touch icon", async () => {
   const favicon = await readBytes("src/app/favicon.ico");
   const icon = await readSource("src/app/icon.svg");
+  const publicIcon = await readSource("public/icon.svg");
   const appleIcon = await readBytes("src/app/apple-icon.png");
   const conventionalAppleTouchIcon = await readBytes("public/apple-touch-icon.png");
 
   assert.equal(favicon.readUInt16LE(2), 1, "favicon should be an ICO file");
   assert.equal(favicon.readUInt16LE(4), 1, "favicon should contain at least one icon entry");
   assert.match(icon, /<svg\b/, "icon should be an SVG file");
+  assert.equal(publicIcon, icon, "public SVG icon should stay in sync with the Next SVG icon");
+  assert.match(icon, /viewBox="12 10 72 72"/, "SVG icon should crop to the visible mark instead of preserving browser favicon padding");
   assert.deepEqual(pngSize(appleIcon), { width: 180, height: 180 }, "Apple icon should use the standard iOS touch icon size");
   assert.deepEqual(
     pngSize(conventionalAppleTouchIcon),
@@ -138,11 +158,8 @@ test("Next app icon files cover favicon, SVG icon, and Apple touch icon", async 
     appleIcon,
     "root apple-touch-icon fallback should stay in sync with the Next apple icon"
   );
-  assert.deepEqual(
-    alphaBounds(appleIcon, 240),
-    { width: 180, height: 180 },
-    "Apple icon should fill its canvas without baked-in transparent padding"
-  );
+  assertPngFillsCanvas("favicon", pngFromIco(favicon));
+  assertPngFillsCanvas("Apple icon", appleIcon);
 });
 
 test("manifest uses installable PNG icons and layout does not override file metadata", async () => {
@@ -156,5 +173,7 @@ test("manifest uses installable PNG icons and layout does not override file meta
   assert.match(manifest, /src: '\/icon-512\.png'/, "manifest should include a 512px PNG icon");
   assert.deepEqual(pngSize(icon192), { width: 192, height: 192 });
   assert.deepEqual(pngSize(icon512), { width: 512, height: 512 });
+  assertPngFillsCanvas("192px manifest icon", icon192);
+  assertPngFillsCanvas("512px manifest icon", icon512);
   assert.doesNotMatch(layout, /\n\s+icons:\s*\{/, "layout should let Next file-based icon metadata generate head links");
 });
