@@ -213,6 +213,7 @@
       "backToCurrentMonth": "Back to current month",
       "previousMonth": "Go to previous month: {month}",
       "nextMonth": "Go to next month: {month}",
+      "dropEntryOnMonth": "Drop entry on {month}",
       "editMonth": "Show fixed values",
       "hideMonthEditor": "Hide fixed values",
       "editMonthAria": "Edit fixed income and expenses for {month}",
@@ -264,6 +265,10 @@
       "delete": "Delete",
       "saving": "Saving...",
       "deleting": "Deleting...",
+      "moveEntry": "Move",
+      "moveEntryTo": "Move to {month}",
+      "movePickerTitle": "Move to...",
+      "moving": "Moving...",
       "confirmDeleteTitle": "Delete this entry?",
       "confirmDeleteDescription": "\"{label}\" will be removed from the list. This action cannot be undone.",
       "confirmDeleteAction": "Delete"

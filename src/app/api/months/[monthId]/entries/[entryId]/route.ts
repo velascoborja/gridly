@@ -26,6 +26,23 @@ export async function PATCH(
   const entry = await getOwnedEntry(user.id, id);
   if (!month || !entry || entry.monthId !== month.id) return Response.json({ error: "Entry not found" }, { status: 404 });
 
+  if (body.monthId !== undefined) {
+    const targetMonthId = parseInt(String(body.monthId), 10);
+    if (Number.isNaN(targetMonthId)) {
+      return Response.json({ error: "Invalid target month" }, { status: 400 });
+    }
+
+    const targetMonth = await getOwnedMonth(user.id, targetMonthId);
+    if (!targetMonth) {
+      return Response.json({ error: "Target month not found" }, { status: 404 });
+    }
+    if (targetMonth.yearId !== month.yearId) {
+      return Response.json({ error: "Target month must be in the same year" }, { status: 400 });
+    }
+
+    updates.monthId = targetMonth.id;
+  }
+
   const [updated] = await db.update(additionalEntries).set(updates).where(eq(additionalEntries.id, entry.id)).returning();
   const yearNumber = await getYearNumberForYearId(month.yearId);
   if (yearNumber !== null) {

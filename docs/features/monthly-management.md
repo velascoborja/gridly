@@ -19,6 +19,7 @@ The Monthly View (`/locale/[year]/[month]`) is the primary workspace for users. 
 ### Data Persistence
 - Client-side edits to fields (e.g., `payslip`, `homeExpense`) are saved via `PATCH /api/months/[monthId]`.
 - Recurring expense edit/delete operations are saved via `/api/months/[monthId]/recurring-expenses/[entryId]`.
+- Additional income and expense entries can be moved between months from the month view. Dragging an entry onto a different month tab, or choosing a month from the row's move picker, persists through `PATCH /api/months/[monthId]/entries/[entryId]` with a target `monthId`.
 - After a successful monthly mutation, `MonthOverview` recomputes the full month chain and lifts the updated `YearData` to `YearPageClient`. It does not call `router.refresh()`, preserving the App Router client cache while navigating between months.
 - The UI uses optimistic updates or instant feedback to ensure a smooth experience.
 

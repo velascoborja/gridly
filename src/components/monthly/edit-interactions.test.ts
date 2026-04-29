@@ -105,3 +105,37 @@ test("monthly edits update client state without clearing the route cache", () =>
   assert.doesNotMatch(overviewSource, /router\.refresh\(\)/);
   assert.doesNotMatch(entriesSource, /onPersistedChange/);
 });
+
+test("monthly additional entries can be moved between months without refreshing the route cache", () => {
+  const overviewSource = readFileSync(new URL("./month-overview.tsx", import.meta.url), "utf8");
+
+  assert.match(overviewSource, /type DraggedAdditionalEntry = /);
+  assert.match(overviewSource, /const \[draggedEntry, setDraggedEntry\] = useState<DraggedAdditionalEntry \| null>\(null\)/);
+  assert.match(overviewSource, /handleAdditionalEntryMove/);
+  assert.match(overviewSource, /fetch\(`\/api\/months\/\$\{sourceMonthId\}\/entries\/\$\{entryId\}`/);
+  assert.match(overviewSource, /body: JSON\.stringify\(\{ monthId: targetMonthId \}\)/);
+  assert.match(overviewSource, /computeMonthChain/);
+  assert.doesNotMatch(overviewSource, /router\.refresh\(\)/);
+});
+
+test("month tabs expose drop targets while an additional entry is being dragged", () => {
+  const overviewSource = readFileSync(new URL("./month-overview.tsx", import.meta.url), "utf8");
+
+  assert.match(overviewSource, /onDragOver=\{handleMonthDragOver\(item\.id\)\}/);
+  assert.match(overviewSource, /onDrop=\{handleMonthDrop\(item\.id\)\}/);
+  assert.match(overviewSource, /isAdditionalEntryDropTarget/);
+  assert.match(overviewSource, /border-dashed/);
+});
+
+test("additional entry rows expose drag move and a month picker fallback", () => {
+  const entriesSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
+  const overviewSource = readFileSync(new URL("./month-overview.tsx", import.meta.url), "utf8");
+
+  assert.match(entriesSource, /onEntryDragStart\?: \(entry: AdditionalEntry\) => void/);
+  assert.match(entriesSource, /draggable=\{canMoveEntry\(entry\)\}/);
+  assert.match(entriesSource, /onDragStart=\{\(event\) => handleDragStart\(event, entry\)\}/);
+  assert.match(entriesSource, /moveTargets\?: AdditionalEntryMoveTarget\[\]/);
+  assert.match(entriesSource, /onEntryMove\?: \(entry: AdditionalEntry, targetMonthId: number\) => void/);
+  assert.match(entriesSource, /t\("moveEntry"\)/);
+  assert.match(overviewSource, /moveTargets=\{additionalEntryMoveTargets\}/);
+});

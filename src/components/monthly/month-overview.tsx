@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { AdditionalEntriesCard } from "./additional-entries-card";
+import { AdditionalEntriesCard, type AdditionalEntryMoveTarget } from "./additional-entries-card";
 import { FixedExpensesCard } from "./fixed-expenses-card";
 import { IncomeCard } from "./income-card";
 import { sortAdditionalEntriesDesc } from "@/lib/additional-entries";
@@ -27,6 +27,18 @@ interface Props {
 
 type FixedUpdateOptions = { interestsManualOverride?: boolean };
 
+type DraggedAdditionalEntry = {
+  entry: AdditionalEntry;
+  type: "income" | "expense";
+  sourceMonthId: number;
+  sourceMonthNumber: number;
+};
+
+type MovingAdditionalEntry = {
+  entryId: number;
+  sourceMonthId: number;
+};
+
 export function MonthOverview({
   yearData: initialYearData,
   monthNumber,
@@ -44,6 +56,9 @@ export function MonthOverview({
   const [renderFixedEditors, setRenderFixedEditors] = useState(false);
   const [fixedEditorsVisible, setFixedEditorsVisible] = useState(false);
   const [fixedEditorsHeight, setFixedEditorsHeight] = useState<number | "auto">(0);
+  const [draggedEntry, setDraggedEntry] = useState<DraggedAdditionalEntry | null>(null);
+  const [dragOverMonthId, setDragOverMonthId] = useState<number | null>(null);
+  const [movingEntry, setMovingEntry] = useState<MovingAdditionalEntry | null>(null);
   const config = initialYearData.config;
   const yearRecurringExpenses = initialYearData.recurringExpenses;
   const today = new Date();
@@ -189,6 +204,89 @@ export function MonthOverview({
     });
   }, [config, monthNumber, onYearDataChange, recompute, yearRecurringExpenses]);
 
+  const handleAdditionalEntryMove = useCallback(async (
+    entry: AdditionalEntry,
+    type: "income" | "expense",
+    sourceMonthId: number,
+    targetMonthId: number
+  ) => {
+    if (sourceMonthId === targetMonthId || movingEntry?.entryId === entry.id) return;
+
+    const sourceMonth = months.find((item) => item.id === sourceMonthId);
+    const targetMonth = months.find((item) => item.id === targetMonthId);
+    if (!sourceMonth || !targetMonth || sourceMonth.yearId !== targetMonth.yearId) return;
+
+    const entryId = entry.id;
+    setMovingEntry({ entryId: entry.id, sourceMonthId });
+    try {
+      const res = await fetch(`/api/months/${sourceMonthId}/entries/${entryId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ monthId: targetMonthId }),
+      });
+      if (!res.ok) return;
+
+      const updated = await res.json();
+      const movedEntry: AdditionalEntry = {
+        ...updated,
+        amount: parseFloat(updated.amount),
+      };
+
+      setMonths((prev) => {
+        const updatedMonths = prev.map((item) => {
+          const collectionKey = type === "expense" ? "additionalExpenses" : "additionalIncomes";
+          if (item.id === sourceMonthId) {
+            return {
+              ...item,
+              [collectionKey]: sortAdditionalEntriesDesc(item[collectionKey].filter((candidate) => candidate.id !== entryId)),
+            };
+          }
+          if (item.id === targetMonthId) {
+            return {
+              ...item,
+              [collectionKey]: sortAdditionalEntriesDesc([
+                ...item[collectionKey].filter((candidate) => candidate.id !== entryId),
+                movedEntry,
+              ]),
+            };
+          }
+          return item;
+        });
+        const recomputedMonths = recompute(updatedMonths);
+        if (onYearDataChange) {
+          onYearDataChange({
+            config,
+            recurringExpenses: yearRecurringExpenses,
+            months: recomputedMonths,
+          });
+        }
+        return recomputedMonths;
+      });
+    } finally {
+      setMovingEntry(null);
+      setDraggedEntry(null);
+      setDragOverMonthId(null);
+    }
+  }, [config, months, movingEntry?.entryId, onYearDataChange, recompute, yearRecurringExpenses]);
+
+  const handleMonthDragOver = useCallback((targetMonthId: number) => (event: React.DragEvent<HTMLAnchorElement>) => {
+    if (!draggedEntry || draggedEntry.sourceMonthId === targetMonthId || movingEntry) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+    setDragOverMonthId(targetMonthId);
+  }, [draggedEntry, movingEntry]);
+
+  const handleMonthDragLeave = useCallback((targetMonthId: number) => (event: React.DragEvent<HTMLAnchorElement>) => {
+    if (event.currentTarget.contains(event.relatedTarget as Node | null)) return;
+    setDragOverMonthId((current) => current === targetMonthId ? null : current);
+  }, []);
+
+  const handleMonthDrop = useCallback((targetMonthId: number) => (event: React.DragEvent<HTMLAnchorElement>) => {
+    if (!draggedEntry || draggedEntry.sourceMonthId === targetMonthId) return;
+    event.preventDefault();
+    void handleAdditionalEntryMove(draggedEntry.entry, draggedEntry.type, draggedEntry.sourceMonthId, targetMonthId);
+  }, [draggedEntry, handleAdditionalEntryMove]);
+
   const handleRecurringExpensesChange = useCallback((entries: RecurringExpense[]) => {
     setMonths((prev) => {
       const updated = prev.map((m) =>
@@ -221,6 +319,13 @@ export function MonthOverview({
     config.year < today.getFullYear() || (config.year === today.getFullYear() && month.month < today.getMonth() + 1);
   const isFutureMonth =
     config.year > today.getFullYear() || (config.year === today.getFullYear() && month.month > today.getMonth() + 1);
+  const additionalEntryMoveTargets: AdditionalEntryMoveTarget[] = sortedMonths
+    .filter((item) => item.id !== month.id)
+    .map((item) => ({
+      monthId: item.id,
+      monthNumber: item.month,
+      label: formatMonthName(item.month, locale, "short"),
+    }));
 
   return (
     <div>
@@ -258,6 +363,10 @@ export function MonthOverview({
                 const isItemPastMonth =
                   config.year < today.getFullYear() || (config.year === today.getFullYear() && item.month < today.getMonth() + 1);
                 const monthLabel = formatMonthName(item.month, locale);
+                const isAdditionalEntryDropTarget =
+                  Boolean(draggedEntry) && draggedEntry?.sourceMonthId !== item.id && !movingEntry;
+                const isAdditionalEntryDropHovered = isAdditionalEntryDropTarget && dragOverMonthId === item.id;
+                const monthAriaLabel = isItemCurrentMonth ? `${monthLabel}, ${tOverview("currentMonthLabel")}` : monthLabel;
 
                 return (
                   <div
@@ -268,8 +377,11 @@ export function MonthOverview({
                     <Link
                       href={`${monthBasePath}/${item.month}`}
                       onClick={interceptMonthNavigation(item.month)}
+                      onDragOver={handleMonthDragOver(item.id)}
+                      onDragLeave={handleMonthDragLeave(item.id)}
+                      onDrop={handleMonthDrop(item.id)}
                       aria-current={isActive ? "page" : undefined}
-                      aria-label={isItemCurrentMonth ? `${monthLabel}, ${tOverview("currentMonthLabel")}` : monthLabel}
+                      aria-label={isAdditionalEntryDropTarget ? tOverview("dropEntryOnMonth", { month: monthLabel }) : monthAriaLabel}
                       className={cn(
                         "inline-flex min-w-20 items-center justify-center gap-2 rounded-md border px-3 py-2 text-xs font-medium capitalize transition-all",
                         isActive
@@ -282,7 +394,10 @@ export function MonthOverview({
                             ? "border-primary/25 bg-primary/[0.06] text-foreground hover:border-primary/40 hover:bg-primary/[0.1]"
                             : isItemPastMonth
                               ? "border-border/40 bg-muted/20 text-muted-foreground/60 hover:border-border/60 hover:bg-muted/40 hover:text-foreground/80"
-                              : "border-indigo-100/50 bg-indigo-50/30 text-indigo-700/60 hover:border-indigo-200/70 hover:bg-indigo-50/50 hover:text-indigo-800"
+                              : "border-indigo-100/50 bg-indigo-50/30 text-indigo-700/60 hover:border-indigo-200/70 hover:bg-indigo-50/50 hover:text-indigo-800",
+                        isAdditionalEntryDropTarget &&
+                          "border-dashed border-primary/45 bg-primary/[0.06] text-primary hover:border-primary/70 hover:bg-primary/[0.1]",
+                        isAdditionalEntryDropHovered && "border-primary bg-primary/[0.12] shadow-sm"
                       )}
                     >
                       <span>{formatMonthName(item.month, locale, "short")}</span>
@@ -485,6 +600,21 @@ export function MonthOverview({
           onEntriesChange={(entries) => handleEntriesChange("expense", entries)}
           readOnly={readOnly}
           title={tOverview("additionalExpensesTitle")}
+          moveTargets={additionalEntryMoveTargets}
+          movingEntryId={movingEntry?.entryId ?? null}
+          onEntryDragStart={(entry) => setDraggedEntry({
+            entry,
+            type: "expense",
+            sourceMonthId: month.id,
+            sourceMonthNumber: month.month,
+          })}
+          onEntryDragEnd={() => {
+            setDraggedEntry(null);
+            setDragOverMonthId(null);
+          }}
+          onEntryMove={(entry, targetMonthId) => {
+            void handleAdditionalEntryMove(entry, "expense", month.id, targetMonthId);
+          }}
         />
 
         <AdditionalEntriesCard
@@ -494,6 +624,21 @@ export function MonthOverview({
           onEntriesChange={(entries) => handleEntriesChange("income", entries)}
           readOnly={readOnly}
           title={tOverview("additionalIncomeTitle")}
+          moveTargets={additionalEntryMoveTargets}
+          movingEntryId={movingEntry?.entryId ?? null}
+          onEntryDragStart={(entry) => setDraggedEntry({
+            entry,
+            type: "income",
+            sourceMonthId: month.id,
+            sourceMonthNumber: month.month,
+          })}
+          onEntryDragEnd={() => {
+            setDraggedEntry(null);
+            setDragOverMonthId(null);
+          }}
+          onEntryMove={(entry, targetMonthId) => {
+            void handleAdditionalEntryMove(entry, "income", month.id, targetMonthId);
+          }}
         />
       </div>
     </div>
