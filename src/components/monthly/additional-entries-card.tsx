@@ -2,7 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
-import { ArrowRightLeft, Loader2, Plus, Trash2 } from "lucide-react";
+import { Loader2, Plus, Trash2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,12 +21,6 @@ import { sortAdditionalEntriesDesc, sumAdditionalEntries } from "@/lib/additiona
 import { cn, formatCurrency } from "@/lib/utils";
 import type { AdditionalEntry } from "@/lib/types";
 
-export interface AdditionalEntryMoveTarget {
-  monthId: number;
-  monthNumber: number;
-  label: string;
-}
-
 interface Props {
   monthId: number;
   type: "income" | "expense";
@@ -34,11 +28,9 @@ interface Props {
   onEntriesChange: (entries: AdditionalEntry[]) => void;
   readOnly?: boolean;
   title: string;
-  moveTargets?: AdditionalEntryMoveTarget[];
   movingEntryId?: number | null;
   onEntryDragStart?: (entry: AdditionalEntry) => void;
   onEntryDragEnd?: () => void;
-  onEntryMove?: (entry: AdditionalEntry, targetMonthId: number) => void;
 }
 
 export function AdditionalEntriesCard({
@@ -48,11 +40,9 @@ export function AdditionalEntriesCard({
   onEntriesChange,
   readOnly = false,
   title,
-  moveTargets = [],
   movingEntryId = null,
   onEntryDragStart,
   onEntryDragEnd,
-  onEntryMove,
 }: Props) {
   const t = useTranslations("Monthly.additionalEntries");
   const common = useTranslations("Common");
@@ -66,7 +56,6 @@ export function AdditionalEntriesCard({
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editLabel, setEditLabel] = useState("");
   const [editAmount, setEditAmount] = useState("");
-  const [movePickerOpenId, setMovePickerOpenId] = useState<number | null>(null);
   const sortedEntries = sortAdditionalEntriesDesc(entries);
   const entriesTotal = sumAdditionalEntries(entries);
 
@@ -77,7 +66,6 @@ export function AdditionalEntriesCard({
   };
 
   const openEditForm = (entry: AdditionalEntry) => {
-    setMovePickerOpenId(null);
     setEditingId(entry.id);
     setEditLabel(entry.label);
     setEditAmount(String(entry.amount));
@@ -300,19 +288,6 @@ export function AdditionalEntriesCard({
                     </button>
                   )}
                   <div className="flex shrink-0 items-center gap-1.5">
-                    {!readOnly && moveTargets.length > 0 ? (
-                      <Button
-                        size="icon-xs"
-                        variant="ghost"
-                        className="text-muted-foreground hover:text-primary sm:hidden"
-                        aria-label={`${t("moveEntry")} ${entry.label}`}
-                        title={t("moveEntry")}
-                        onClick={() => setMovePickerOpenId((current) => current === entry.id ? null : entry.id)}
-                        disabled={movingEntryId === entry.id || deletingId === entry.id}
-                      >
-                        {movingEntryId === entry.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <ArrowRightLeft className="h-3 w-3" />}
-                      </Button>
-                    ) : null}
                     {readOnly ? (
                       <span className="whitespace-nowrap text-sm font-semibold tabular-nums">
                         {formatCurrency(entry.amount, locale)}
@@ -362,31 +337,6 @@ export function AdditionalEntriesCard({
                     ) : null}
                   </div>
                 </div>
-                {!readOnly && movePickerOpenId === entry.id && moveTargets.length > 0 ? (
-                  <div className="mt-2 rounded-lg border border-border/70 bg-background/95 p-2 shadow-sm sm:hidden">
-                    <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                      {t("movePickerTitle")}
-                    </p>
-                    <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-4">
-                      {moveTargets.map((target) => (
-                        <Button
-                          key={target.monthId}
-                          size="sm"
-                          variant="outline"
-                          className="h-8 justify-center px-2 text-xs capitalize"
-                          aria-label={t("moveEntryTo", { month: target.label })}
-                          onClick={() => {
-                            onEntryMove?.(entry, target.monthId);
-                            setMovePickerOpenId(null);
-                          }}
-                          disabled={movingEntryId === entry.id}
-                        >
-                          {target.label}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
               </div>
             )
           )}

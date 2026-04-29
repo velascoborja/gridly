@@ -20,5 +20,5 @@ Each entry consists of:
     - `POST /api/months/[monthId]/entries`: Create a new entry.
     - `PATCH /api/months/[monthId]/entries/[entryId]`: Edit an entry label/amount or move it to another month by sending `monthId`.
     - `DELETE /api/months/[monthId]/entries/[entryId]`: Remove an entry.
-- **Moving Entries:** In editable monthly views, additional income and expense rows can be dragged onto another month in the month strip. The row also exposes a compact month picker fallback for touch and keyboard-oriented workflows. Moving changes the entry's owning month only; it does not copy or duplicate the entry. Moves are restricted to months in the same year.
+- **Moving Entries:** In editable monthly views, additional income and expense rows can be dragged onto another month in the month strip. Moving changes the entry's owning month only; it does not copy or duplicate the entry. Moves are restricted to months in the same year.
 - **Integration:** The sum of all additional income and expenses is automatically factored into the `totalIncome` and `totalExpenses` calculations in `src/lib/calculations.ts`.

@@ -127,23 +127,17 @@ test("month tabs expose drop targets while an additional entry is being dragged"
   assert.match(overviewSource, /border-dashed/);
 });
 
-test("additional entry rows expose drag move and a month picker fallback", () => {
+test("additional entry rows move by drag and drop without a separate move button", () => {
   const entriesSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
   const overviewSource = readFileSync(new URL("./month-overview.tsx", import.meta.url), "utf8");
 
   assert.match(entriesSource, /onEntryDragStart\?: \(entry: AdditionalEntry\) => void/);
   assert.match(entriesSource, /draggable=\{canMoveEntry\(entry\)\}/);
   assert.match(entriesSource, /onDragStart=\{\(event\) => handleDragStart\(event, entry\)\}/);
-  assert.match(entriesSource, /moveTargets\?: AdditionalEntryMoveTarget\[\]/);
-  assert.match(entriesSource, /onEntryMove\?: \(entry: AdditionalEntry, targetMonthId: number\) => void/);
-  assert.match(entriesSource, /t\("moveEntry"\)/);
-  assert.match(overviewSource, /moveTargets=\{additionalEntryMoveTargets\}/);
-});
-
-test("additional entry move picker is only visible on mobile while rows stay draggable", () => {
-  const entriesSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
-
-  assert.match(entriesSource, /draggable=\{canMoveEntry\(entry\)\}/);
-  assert.match(entriesSource, /sm:hidden[\s\S]*aria-label=\{`\$\{t\("moveEntry"\)\} \$\{entry\.label\}`\}/);
-  assert.match(entriesSource, /movePickerOpenId === entry\.id[\s\S]*sm:hidden/);
+  assert.doesNotMatch(entriesSource, /ArrowRightLeft/);
+  assert.doesNotMatch(entriesSource, /movePickerOpenId/);
+  assert.doesNotMatch(entriesSource, /moveTargets\?: AdditionalEntryMoveTarget\[\]/);
+  assert.doesNotMatch(entriesSource, /onEntryMove\?: \(entry: AdditionalEntry, targetMonthId: number\) => void/);
+  assert.doesNotMatch(entriesSource, /t\("moveEntry"\)/);
+  assert.doesNotMatch(overviewSource, /moveTargets=\{additionalEntryMoveTargets\}/);
 });

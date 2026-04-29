@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { AdditionalEntriesCard, type AdditionalEntryMoveTarget } from "./additional-entries-card";
+import { AdditionalEntriesCard } from "./additional-entries-card";
 import { FixedExpensesCard } from "./fixed-expenses-card";
 import { IncomeCard } from "./income-card";
 import { sortAdditionalEntriesDesc } from "@/lib/additional-entries";
@@ -319,14 +319,6 @@ export function MonthOverview({
     config.year < today.getFullYear() || (config.year === today.getFullYear() && month.month < today.getMonth() + 1);
   const isFutureMonth =
     config.year > today.getFullYear() || (config.year === today.getFullYear() && month.month > today.getMonth() + 1);
-  const additionalEntryMoveTargets: AdditionalEntryMoveTarget[] = sortedMonths
-    .filter((item) => item.id !== month.id)
-    .map((item) => ({
-      monthId: item.id,
-      monthNumber: item.month,
-      label: formatMonthName(item.month, locale, "short"),
-    }));
-
   return (
     <div>
       <div className="mb-6 overflow-hidden rounded-lg border border-border/70 bg-background/90 shadow-[0_30px_45px_-30px_rgba(50,50,93,0.25),0_18px_36px_-24px_rgba(0,0,0,0.1)]">
@@ -600,7 +592,6 @@ export function MonthOverview({
           onEntriesChange={(entries) => handleEntriesChange("expense", entries)}
           readOnly={readOnly}
           title={tOverview("additionalExpensesTitle")}
-          moveTargets={additionalEntryMoveTargets}
           movingEntryId={movingEntry?.entryId ?? null}
           onEntryDragStart={(entry) => setDraggedEntry({
             entry,
@@ -612,9 +603,6 @@ export function MonthOverview({
             setDraggedEntry(null);
             setDragOverMonthId(null);
           }}
-          onEntryMove={(entry, targetMonthId) => {
-            void handleAdditionalEntryMove(entry, "expense", month.id, targetMonthId);
-          }}
         />
 
         <AdditionalEntriesCard
@@ -624,7 +612,6 @@ export function MonthOverview({
           onEntriesChange={(entries) => handleEntriesChange("income", entries)}
           readOnly={readOnly}
           title={tOverview("additionalIncomeTitle")}
-          moveTargets={additionalEntryMoveTargets}
           movingEntryId={movingEntry?.entryId ?? null}
           onEntryDragStart={(entry) => setDraggedEntry({
             entry,
@@ -635,9 +622,6 @@ export function MonthOverview({
           onEntryDragEnd={() => {
             setDraggedEntry(null);
             setDragOverMonthId(null);
-          }}
-          onEntryMove={(entry, targetMonthId) => {
-            void handleAdditionalEntryMove(entry, "income", month.id, targetMonthId);
           }}
         />
       </div>
