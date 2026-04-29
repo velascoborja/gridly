@@ -57,6 +57,7 @@ export function YearConfigForm({
   );
   const [savingRecurring, setSavingRecurring] = useState(false);
   const [recurringError, setRecurringError] = useState("");
+  const [recurringDialogOpen, setRecurringDialogOpen] = useState(false);
   const [pendingOverwrite, setPendingOverwrite] = useState<PendingOverwrite | null>(null);
 
   useEffect(() => {
@@ -162,6 +163,7 @@ export function YearConfigForm({
     onPendingSave?.(savePromise);
     try {
       await savePromise;
+      setRecurringDialogOpen(false);
     } catch {
       setRecurringError(t("recurringExpensesError"));
     } finally {
@@ -305,7 +307,7 @@ export function YearConfigForm({
             {recurringError}
           </p>
         ) : null}
-        <AlertDialog>
+        <AlertDialog open={recurringDialogOpen} onOpenChange={setRecurringDialogOpen}>
           <AlertDialogTrigger
             render={
               <Button

@@ -66,6 +66,18 @@ test("annual recurring expense saves refresh the current route cache", () => {
   );
 });
 
+test("annual recurring expense confirmation closes after a successful save", () => {
+  const source = readFileSync(new URL("./year-config-form.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /const \[recurringDialogOpen, setRecurringDialogOpen\] = useState\(false\)/);
+  assert.match(source, /<AlertDialog open=\{recurringDialogOpen\} onOpenChange=\{setRecurringDialogOpen\}>/);
+  assert.match(
+    source,
+    /await savePromise;[\s\S]*setRecurringDialogOpen\(false\);[\s\S]*catch/,
+    "successful recurring expense saves should close the confirmation dialog before handling failures"
+  );
+});
+
 test("annual interest rate setting edits inline with percent formatting", () => {
   const source = readFileSync(new URL("./year-config-form.tsx", import.meta.url), "utf8");
 
