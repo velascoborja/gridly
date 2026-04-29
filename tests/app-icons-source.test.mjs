@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { inflateSync } from "node:zlib";
 
 async function readSource(path) {
   return readFile(new URL(`../${path}`, import.meta.url), "utf8");
@@ -14,6 +15,106 @@ function pngSize(buffer) {
   return {
     width: buffer.readUInt32BE(16),
     height: buffer.readUInt32BE(20),
+  };
+}
+
+function rgbaPng(buffer) {
+  const signature = buffer.subarray(0, 8).toString("hex");
+  assert.equal(signature, "89504e470d0a1a0a", "file should be a PNG");
+
+  let offset = 8;
+  let width = 0;
+  let height = 0;
+  let bitDepth = 0;
+  let colorType = 0;
+  const chunks = [];
+
+  while (offset < buffer.length) {
+    const length = buffer.readUInt32BE(offset);
+    offset += 4;
+    const type = buffer.toString("ascii", offset, offset + 4);
+    offset += 4;
+    const data = buffer.subarray(offset, offset + length);
+    offset += length + 4;
+
+    if (type === "IHDR") {
+      width = data.readUInt32BE(0);
+      height = data.readUInt32BE(4);
+      bitDepth = data[8];
+      colorType = data[9];
+    } else if (type === "IDAT") {
+      chunks.push(data);
+    } else if (type === "IEND") {
+      break;
+    }
+  }
+
+  assert.equal(bitDepth, 8, "icon PNGs should use 8-bit channels");
+  assert.equal(colorType, 6, "icon PNGs should use RGBA pixels");
+
+  const raw = inflateSync(Buffer.concat(chunks));
+  const bytesPerPixel = 4;
+  const stride = width * bytesPerPixel;
+  const pixels = Buffer.alloc(height * stride);
+  let sourceOffset = 0;
+
+  for (let y = 0; y < height; y += 1) {
+    const filter = raw[sourceOffset];
+    sourceOffset += 1;
+    const row = raw.subarray(sourceOffset, sourceOffset + stride);
+    sourceOffset += stride;
+    const outputRow = pixels.subarray(y * stride, (y + 1) * stride);
+
+    for (let x = 0; x < stride; x += 1) {
+      const left = x >= bytesPerPixel ? outputRow[x - bytesPerPixel] : 0;
+      const above = y > 0 ? pixels[(y - 1) * stride + x] : 0;
+      const upperLeft = y > 0 && x >= bytesPerPixel ? pixels[(y - 1) * stride + x - bytesPerPixel] : 0;
+      let value = row[x];
+
+      if (filter === 1) {
+        value += left;
+      } else if (filter === 2) {
+        value += above;
+      } else if (filter === 3) {
+        value += Math.floor((left + above) / 2);
+      } else if (filter === 4) {
+        const estimate = left + above - upperLeft;
+        const leftDistance = Math.abs(estimate - left);
+        const aboveDistance = Math.abs(estimate - above);
+        const upperLeftDistance = Math.abs(estimate - upperLeft);
+        value += leftDistance <= aboveDistance && leftDistance <= upperLeftDistance ? left : aboveDistance <= upperLeftDistance ? above : upperLeft;
+      } else {
+        assert.equal(filter, 0, "PNG filter should be valid");
+      }
+
+      outputRow[x] = value & 255;
+    }
+  }
+
+  return { width, height, pixels };
+}
+
+function alphaBounds(buffer, minimumAlpha) {
+  const { width, height, pixels } = rgbaPng(buffer);
+  let minX = width;
+  let minY = height;
+  let maxX = -1;
+  let maxY = -1;
+
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      if (pixels[(y * width + x) * 4 + 3] >= minimumAlpha) {
+        minX = Math.min(minX, x);
+        minY = Math.min(minY, y);
+        maxX = Math.max(maxX, x);
+        maxY = Math.max(maxY, y);
+      }
+    }
+  }
+
+  return {
+    width: maxX >= minX ? maxX - minX + 1 : 0,
+    height: maxY >= minY ? maxY - minY + 1 : 0,
   };
 }
 
@@ -36,6 +137,11 @@ test("Next app icon files cover favicon, SVG icon, and Apple touch icon", async 
     conventionalAppleTouchIcon,
     appleIcon,
     "root apple-touch-icon fallback should stay in sync with the Next apple icon"
+  );
+  assert.deepEqual(
+    alphaBounds(appleIcon, 240),
+    { width: 180, height: 180 },
+    "Apple icon should fill its canvas without baked-in transparent padding"
   );
 });
 
