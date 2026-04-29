@@ -21,11 +21,22 @@ test("Next app icon files cover favicon, SVG icon, and Apple touch icon", async 
   const favicon = await readBytes("src/app/favicon.ico");
   const icon = await readSource("src/app/icon.svg");
   const appleIcon = await readBytes("src/app/apple-icon.png");
+  const conventionalAppleTouchIcon = await readBytes("public/apple-touch-icon.png");
 
   assert.equal(favicon.readUInt16LE(2), 1, "favicon should be an ICO file");
   assert.equal(favicon.readUInt16LE(4), 1, "favicon should contain at least one icon entry");
   assert.match(icon, /<svg\b/, "icon should be an SVG file");
   assert.deepEqual(pngSize(appleIcon), { width: 180, height: 180 }, "Apple icon should use the standard iOS touch icon size");
+  assert.deepEqual(
+    pngSize(conventionalAppleTouchIcon),
+    { width: 180, height: 180 },
+    "root apple-touch-icon fallback should use the standard iOS touch icon size"
+  );
+  assert.deepEqual(
+    conventionalAppleTouchIcon,
+    appleIcon,
+    "root apple-touch-icon fallback should stay in sync with the Next apple icon"
+  );
 });
 
 test("manifest uses installable PNG icons and layout does not override file metadata", async () => {
