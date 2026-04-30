@@ -70,6 +70,22 @@ test("monthly fixed fields map annual setup values to reset targets", () => {
   assert.match(overviewSource, /annualDefaults=\{config\}/);
 });
 
+test("personal surplus can be reset to zero from the fixed income row", () => {
+  const incomeSource = readFileSync(new URL("./income-card.tsx", import.meta.url), "utf8");
+  const inlineSource = readFileSync(new URL("./inline-edit-field.tsx", import.meta.url), "utf8");
+  const esMessages = readFileSync(new URL("../../../messages/es.json", import.meta.url), "utf8");
+  const enMessages = readFileSync(new URL("../../../messages/en.json", import.meta.url), "utf8");
+
+  assert.match(incomeSource, /label=\{t\("personalRemaining"\)\}/);
+  assert.match(incomeSource, /resetValue=\{0\}/);
+  assert.match(incomeSource, /showReset=\{Math\.abs\(month\.personalRemaining\) > 0\.005\}/);
+  assert.match(incomeSource, /resetLabel=\{tCommon\("resetToZero"\)\}/);
+  assert.match(inlineSource, /resetLabel\?: string/);
+  assert.match(inlineSource, /const resetActionLabel = resetLabel \?\? tCommon\("resetToAnnualValue"\)/);
+  assert.match(esMessages, /"resetToZero": "Restablecer a cero"/);
+  assert.match(enMessages, /"resetToZero": "Reset to zero"/);
+});
+
 test("interest reset clears the manual override instead of saving another manual value", () => {
   const overviewSource = readFileSync(new URL("./month-overview.tsx", import.meta.url), "utf8");
   const routeSource = readFileSync(new URL("../../app/api/months/[monthId]/route.ts", import.meta.url), "utf8");

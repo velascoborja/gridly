@@ -20,6 +20,7 @@ interface Props {
 export function IncomeCard({ month, onUpdate, showAdditionalPayslip, annualDefaults, readOnly = false }: Props) {
   const t = useTranslations("Monthly.income");
   const tFixed = useTranslations("Monthly.fixed");
+  const tCommon = useTranslations("Common");
   const isJuly = month.month === 7;
 
   return (
@@ -79,6 +80,9 @@ export function IncomeCard({ month, onUpdate, showAdditionalPayslip, annualDefau
           onSave={(v) => onUpdate("personalRemaining", v)}
           readOnly={readOnly}
           activateOnRowPress
+          resetValue={0}
+          showReset={Math.abs(month.personalRemaining) > 0.005}
+          resetLabel={tCommon("resetToZero")}
         />
       </CardContent>
     </Card>

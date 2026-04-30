@@ -8,7 +8,7 @@ The Monthly View (`/locale/[year]/[month]`) is the primary workspace for users. 
 
 ## Key Components
 
-- **Income Card:** Displays net salary (`payslip`), extra payments (`additionalPayslip`), bonuses, and generated interests.
+- **Income Card:** Displays net salary (`payslip`), extra payments (`additionalPayslip`), bonuses, generated interests, and personal surplus (`personalRemaining`).
 - **Fixed Expenses Card:** Tracks recurring costs such as housing (`homeExpense`), personal budget (`personalExpense`), and investments (`investment`).
 - **Recurring Expenses Section:** Shows named planned expenses copied from the year template inside the Fixed Expenses card. Users can edit or delete rows for the current month only.
 - **Summary Card:** Provides a real-time breakdown of `Total Income`, `Total Expenses`, and the resulting `Savings`.
@@ -40,6 +40,7 @@ Monthly recurring expense rows live in `monthly_recurring_expenses`.
 - Monthly interest is calculated based on the `Starting Balance` and the `YearConfig.interestRate`.
 - Formula: `(Starting Balance * interestRate) / 12`.
 - Users can manually override the interest amount if needed.
+- Fixed income fields can expose reset actions. Salary and extra pay reset to the annual setup values, interest resets to the calculated value and clears the manual override, and personal surplus resets to `0` when it has a non-zero value.
 
 ### Spanish Employment Conventions
 - **Extra Pays:** In Spain, net salary is often paid in 14 payments. Gridly automatically handles this by prefilling `additionalPayslip` in June (Month 6) and December (Month 12) if the year is configured with extra payments.

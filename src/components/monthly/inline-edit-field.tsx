@@ -19,6 +19,7 @@ interface InlineEditFieldProps {
   activateOnRowPress?: boolean;
   resetValue?: number;
   showReset?: boolean;
+  resetLabel?: string;
   onReset?: (resetValue: number) => Promise<void>;
 }
 
@@ -38,6 +39,7 @@ export function InlineEditField({
   activateOnRowPress = false,
   resetValue,
   showReset,
+  resetLabel,
   onReset,
 }: InlineEditFieldProps) {
   const locale = useLocale();
@@ -132,6 +134,7 @@ export function InlineEditField({
   const isRowInteractive = activateOnRowPress && !editing && !disabled && !readOnly;
   const resetVisible = showReset ?? (resetValue !== undefined && Math.abs(value - resetValue) > 0.005);
   const canReset = resetValue !== undefined && resetVisible && !disabled && !readOnly;
+  const resetActionLabel = resetLabel ?? tCommon("resetToAnnualValue");
 
   return (
     <div
@@ -204,11 +207,11 @@ export function InlineEditField({
               className="h-7 w-7 shrink-0 rounded-md text-muted-foreground hover:bg-background hover:text-primary"
               onClick={(event) => void handleReset(event)}
               disabled={saving}
-              title={tCommon("resetToAnnualValue")}
+              title={resetActionLabel}
               type="button"
             >
               {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <BrushCleaning className="h-3.5 w-3.5" />}
-              <span className="sr-only">{tCommon("resetToAnnualValue")}</span>
+              <span className="sr-only">{resetActionLabel}</span>
             </Button>
           ) : null}
           <button
