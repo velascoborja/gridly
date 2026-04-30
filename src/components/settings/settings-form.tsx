@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,6 +25,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Globe, Trash2, AlertCircle } from "lucide-react";
+
+type DeleteConfirmationStep = "impact" | "typed";
 
 export function SettingsForm() {
   const t = useTranslations("Settings");
@@ -38,6 +41,12 @@ export function SettingsForm() {
   const [isPending, startTransition] = useTransition();
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteConfirmationStep, setDeleteConfirmationStep] =
+    useState<DeleteConfirmationStep>("impact");
+  const [deleteConfirmationText, setDeleteConfirmationText] = useState("");
+  const requiredDeleteConfirmation = t("deleteAccountConfirmationPhrase");
+  const canConfirmAccountDeletion = deleteConfirmationText.trim() === requiredDeleteConfirmation;
 
   function onLanguageChange(nextLocale: string | null) {
     if (!nextLocale) return;
@@ -87,6 +96,16 @@ export function SettingsForm() {
     }
   }
 
+  function handleDeleteDialogOpenChange(open: boolean) {
+    if (isDeleting) return;
+
+    setDeleteDialogOpen(open);
+    if (!open) {
+      setDeleteConfirmationStep("impact");
+      setDeleteConfirmationText("");
+    }
+  }
+
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <Card className="border-border/70 bg-background/85 shadow-sm">
@@ -132,7 +151,7 @@ export function SettingsForm() {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            <AlertDialog>
+            <AlertDialog open={deleteDialogOpen} onOpenChange={handleDeleteDialogOpenChange}>
               <AlertDialogTrigger
                 render={
                   <Button
@@ -146,27 +165,80 @@ export function SettingsForm() {
                 }
               />
               <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>{t("deleteAccountTitle")}</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    {t("deleteAccountDialogDescription")}
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel disabled={isDeleting}>
-                    {common("cancel")}
-                  </AlertDialogCancel>
-                  <AlertDialogAction
-                    variant="destructive"
-                    onClick={handleDeleteAccount}
-                    disabled={isDeleting}
-                    aria-busy={isDeleting}
-                    className="gap-2"
-                  >
-                    <Trash2 className="size-4" />
-                    {isDeleting ? t("deleteAccountDeleting") : common("deleteAccount")}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
+                {deleteConfirmationStep === "impact" ? (
+                  <>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>{t("deleteAccountTitle")}</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        {t("deleteAccountDialogDescription")}
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel disabled={isDeleting}>
+                        {common("cancel")}
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        variant="destructive"
+                        onClick={() => setDeleteConfirmationStep("typed")}
+                        disabled={isDeleting}
+                        className="gap-2"
+                      >
+                        <AlertCircle className="size-4" />
+                        {t("deleteAccountContinue")}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </>
+                ) : (
+                  <>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>{t("deleteAccountSecondTitle")}</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        {t("deleteAccountSecondDescription", {
+                          phrase: requiredDeleteConfirmation,
+                        })}
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <div className="space-y-2">
+                      <label
+                        htmlFor="delete-account-confirmation"
+                        className="text-sm font-medium text-foreground"
+                      >
+                        {t("deleteAccountConfirmationLabel")}
+                      </label>
+                      <Input
+                        id="delete-account-confirmation"
+                        value={deleteConfirmationText}
+                        onChange={(event) => setDeleteConfirmationText(event.target.value)}
+                        disabled={isDeleting}
+                        autoComplete="off"
+                        aria-describedby="delete-account-confirmation-hint"
+                      />
+                      <p
+                        id="delete-account-confirmation-hint"
+                        className="text-xs text-muted-foreground"
+                      >
+                        {t("deleteAccountConfirmationHint", {
+                          phrase: requiredDeleteConfirmation,
+                        })}
+                      </p>
+                    </div>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel disabled={isDeleting}>
+                        {common("cancel")}
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        variant="destructive"
+                        onClick={handleDeleteAccount}
+                        disabled={isDeleting || !canConfirmAccountDeletion}
+                        aria-busy={isDeleting}
+                        className="gap-2"
+                      >
+                        <Trash2 className="size-4" />
+                        {isDeleting ? t("deleteAccountDeleting") : common("deleteAccount")}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </>
+                )}
               </AlertDialogContent>
             </AlertDialog>
             {deleteError ? (

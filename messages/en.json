@@ -27,6 +27,12 @@
     "deleteAccountConfirm": "Are you sure you want to delete your account? This action cannot be undone.",
     "deleteAccountTitle": "Permanently delete account",
     "deleteAccountDialogDescription": "This will delete your user, Google access, and all exercises, months, and entries. You will not be able to recover this data.",
+    "deleteAccountContinue": "Continue",
+    "deleteAccountSecondTitle": "Final confirmation",
+    "deleteAccountSecondDescription": "To confirm that you want to permanently delete the account, type {phrase}.",
+    "deleteAccountConfirmationLabel": "Confirmation text",
+    "deleteAccountConfirmationHint": "Type {phrase} to enable deletion.",
+    "deleteAccountConfirmationPhrase": "DELETE",
     "deleteAccountDeleting": "Deleting...",
     "deleteAccountError": "Could not delete the account. Check the connection and try again."
   },

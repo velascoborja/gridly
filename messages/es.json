@@ -27,6 +27,12 @@
     "deleteAccountConfirm": "¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.",
     "deleteAccountTitle": "Eliminar cuenta de forma permanente",
     "deleteAccountDialogDescription": "Se eliminarán tu usuario, el acceso con Google y todos tus ejercicios, meses y movimientos. No podrás recuperar estos datos.",
+    "deleteAccountContinue": "Continuar",
+    "deleteAccountSecondTitle": "Última confirmación",
+    "deleteAccountSecondDescription": "Para confirmar que quieres eliminar la cuenta definitivamente, escribe {phrase}.",
+    "deleteAccountConfirmationLabel": "Texto de confirmación",
+    "deleteAccountConfirmationHint": "Escribe {phrase} para activar la eliminación.",
+    "deleteAccountConfirmationPhrase": "ELIMINAR",
     "deleteAccountDeleting": "Eliminando...",
     "deleteAccountError": "No se ha podido eliminar la cuenta. Revisa la conexión e inténtalo de nuevo."
   },
