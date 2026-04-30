@@ -102,7 +102,18 @@
       "confirmOverwriteTitle": "¿Sobrescribir los meses?",
       "confirmOverwriteDescription": "Este cambio actualizará los 12 meses con la configuración anual y sobrescribirá los valores fijos editados manualmente.",
       "confirmOverwriteCancel": "Cancelar",
-      "confirmOverwriteAction": "Aplicar"
+      "confirmOverwriteAction": "Aplicar",
+      "overwriteBadge": "Se aplica a los 12 meses",
+      "sectionStartingPoint": "Punto de partida",
+      "sectionStartingPointDescription": "Define el saldo desde el que arranca la cadena anual.",
+      "sectionIncome": "Ingresos",
+      "sectionIncomeDescription": "Configura el salario base y las pagas extra de junio y diciembre.",
+      "sectionMonthlyAllocation": "Distribución mensual",
+      "sectionMonthlyAllocationDescription": "Agrupa los importes fijos que se repiten cada mes.",
+      "sectionGrowth": "Crecimiento",
+      "sectionGrowthDescription": "Controla la rentabilidad anual usada para proyectar intereses.",
+      "sectionRecurringExpenses": "Plantillas recurrentes",
+      "sectionRecurringExpensesDescription": "Reaplica gastos recurrentes a todos los meses del año."
     }
   },
   "Setup": {

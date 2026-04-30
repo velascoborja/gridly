@@ -102,7 +102,18 @@
       "confirmOverwriteTitle": "Overwrite the months?",
       "confirmOverwriteDescription": "This change will update all 12 months from the annual setup and overwrite manually edited fixed values.",
       "confirmOverwriteCancel": "Cancel",
-      "confirmOverwriteAction": "Apply"
+      "confirmOverwriteAction": "Apply",
+      "overwriteBadge": "Applies to all 12 months",
+      "sectionStartingPoint": "Starting point",
+      "sectionStartingPointDescription": "Defines the balance that starts the annual chain.",
+      "sectionIncome": "Income",
+      "sectionIncomeDescription": "Configure base salary and the June and December extra pays.",
+      "sectionMonthlyAllocation": "Monthly allocation",
+      "sectionMonthlyAllocationDescription": "Groups the fixed amounts repeated every month.",
+      "sectionGrowth": "Growth",
+      "sectionGrowthDescription": "Controls the annual return used to project interest.",
+      "sectionRecurringExpenses": "Recurring templates",
+      "sectionRecurringExpensesDescription": "Reapply recurring expenses to every month in the year."
     }
   },
   "Setup": {

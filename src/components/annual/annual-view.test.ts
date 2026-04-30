@@ -98,3 +98,29 @@ test("annual settings can reapply recurring expense templates to every month", (
   assert.match(formSource, /AlertDialog/);
   assert.match(formSource, /\/api\/years\/\$\{config\.year\}\/recurring-expenses/);
 });
+
+test("annual setup form groups fields into sorted financial sections", () => {
+  const formSource = readFileSync(new URL("./year-config-form.tsx", import.meta.url), "utf8");
+
+  const startingIndex = formSource.indexOf('t("sectionStartingPoint")');
+  const incomeIndex = formSource.indexOf('t("sectionIncome")');
+  const allocationIndex = formSource.indexOf('t("sectionMonthlyAllocation")');
+  const growthIndex = formSource.indexOf('t("sectionGrowth")');
+  const recurringIndex = formSource.indexOf('t("sectionRecurringExpenses")');
+
+  assert.ok(startingIndex > -1, "starting point section should be rendered");
+  assert.ok(incomeIndex > startingIndex, "income should follow starting point");
+  assert.ok(allocationIndex > incomeIndex, "monthly allocation should follow income");
+  assert.ok(growthIndex > allocationIndex, "growth assumptions should follow monthly allocation");
+  assert.ok(recurringIndex > growthIndex, "recurring expenses should be the final setup section");
+  assert.match(formSource, /lg:grid-cols-2/, "income and monthly allocation should pair on larger screens");
+  assert.match(formSource, /t\("overwriteBadge"\)/, "the form should show a visible overwrite impact badge");
+});
+
+test("annual setup dialog has room for the grouped desktop layout", () => {
+  const source = readFileSync(new URL("./kpi-cards.tsx", import.meta.url), "utf8");
+  const formSource = readFileSync(new URL("./year-config-form.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /DialogContent className="[^"]*sm:max-w-3xl/, "config dialog should override the default narrow desktop max width");
+  assert.match(formSource, /items-start gap-3 lg:grid-cols-2/, "desktop section columns should not stretch each other vertically");
+});

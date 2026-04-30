@@ -172,7 +172,7 @@ export function YearConfigForm({
   };
 
   return (
-    <div className="mt-2 space-y-3">
+    <div className="space-y-4">
       <AlertDialog open={pendingOverwrite !== null} onOpenChange={(open) => {
         if (!open) settleOverwriteConfirmation(false);
       }}>
@@ -193,148 +193,193 @@ export function YearConfigForm({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <div className="grid gap-3">
-        <div className="rounded-2xl border border-border/60 bg-muted/20 p-4">
-          <InlineEditField
-            label={t(startingBalanceEditable ? "startingBalanceEditableLabel" : "startingBalanceLabel")}
-            value={config.startingBalance}
-            onSave={(v) => handleSave("startingBalance", v)}
-            disabled={!startingBalanceEditable}
-          />
-          <p className="px-2 pt-1 text-sm leading-6 text-muted-foreground">
-            {t(startingBalanceEditable ? "startingBalanceEditableDescription" : "startingBalanceDescription")}
-          </p>
-        </div>
-        <div className="rounded-2xl border border-border/60 bg-muted/20 p-4">
-          <InlineEditField
-            label={t("estimatedSalary")}
-            value={config.estimatedSalary}
-            onSave={(v) => handleSave("estimatedSalary", v)}
-          />
-        </div>
-        <div className="rounded-2xl border border-border/60 bg-muted/20 p-4">
-          <label
-            className="flex items-start justify-between gap-4"
-            aria-busy={isSavingField("hasExtraPayments")}
-          >
-            <span className="space-y-1">
-              <span className="block text-sm font-medium text-foreground">
-                {t("hasExtraPayments")}
-              </span>
-              <span className="block text-sm leading-6 text-muted-foreground">
-                {t("hasExtraPaymentsDescription")}
-              </span>
-            </span>
-            <span className="mt-1 flex h-5 shrink-0 items-center gap-2">
-              <input
-                type="checkbox"
-                checked={displayedHasExtraPayments}
-                onChange={(event) =>
-                  void handleSave("hasExtraPayments", event.target.checked).catch(() => undefined)
-                }
-                disabled={isSavingField("hasExtraPayments")}
-                className="h-5 w-5 rounded border-border text-primary accent-primary"
-              />
-              {isSavingField("hasExtraPayments") ? (
-                <Loader2
-                  className="h-4 w-4 shrink-0 animate-spin text-primary"
-                  aria-hidden="true"
-                />
-              ) : null}
-            </span>
-          </label>
-          <div
-            className={cn(
-              "grid transition-[grid-template-rows,opacity,margin-top] duration-200 ease-out",
-              displayedHasExtraPayments ? "mt-4 grid-rows-[1fr] opacity-100" : "mt-0 grid-rows-[0fr] opacity-0"
-            )}
-            aria-hidden={!displayedHasExtraPayments}
-          >
-            <div className="overflow-hidden">
-              <div className="border-t border-border/50 pt-4">
-                <InlineEditField
-                  label={t("estimatedExtraPayment")}
-                  value={config.estimatedExtraPayment}
-                  onSave={(v) => handleSave("estimatedExtraPayment", v)}
-                  disabled={!displayedHasExtraPayments}
-                  className="gap-x-4 gap-y-5"
-                />
+      <div className="max-h-[min(72vh,44rem)] overflow-y-auto px-5 pb-5 md:px-6 md:pb-6">
+        <div className="grid gap-3">
+          <section className="rounded-lg border border-border/70 bg-card p-4 shadow-sm">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <h3 className="text-sm font-medium text-foreground">{t("sectionStartingPoint")}</h3>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">{t("sectionStartingPointDescription")}</p>
               </div>
+              <span className="inline-flex w-fit shrink-0 items-center rounded-md border border-amber-500/25 bg-amber-500/10 px-2.5 py-1 text-xs font-medium text-amber-700 dark:text-amber-300">
+                {t("overwriteBadge")}
+              </span>
             </div>
+            <InlineEditField
+              label={t(startingBalanceEditable ? "startingBalanceEditableLabel" : "startingBalanceLabel")}
+              value={config.startingBalance}
+              onSave={(v) => handleSave("startingBalance", v)}
+              disabled={!startingBalanceEditable}
+            />
+            <p className="px-2 pt-1 text-sm leading-6 text-muted-foreground">
+              {t(startingBalanceEditable ? "startingBalanceEditableDescription" : "startingBalanceDescription")}
+            </p>
+          </section>
+
+          <div className="grid items-start gap-3 lg:grid-cols-2">
+            <section className="rounded-lg border border-border/70 bg-card p-4 shadow-sm">
+              <div className="mb-4">
+                <h3 className="text-sm font-medium text-foreground">{t("sectionIncome")}</h3>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">{t("sectionIncomeDescription")}</p>
+              </div>
+              <div className="divide-y divide-border/50">
+                <div className="pb-4">
+                  <InlineEditField
+                    label={t("estimatedSalary")}
+                    value={config.estimatedSalary}
+                    onSave={(v) => handleSave("estimatedSalary", v)}
+                  />
+                </div>
+                <div className="pt-4">
+                  <label
+                    className="flex items-start justify-between gap-4"
+                    aria-busy={isSavingField("hasExtraPayments")}
+                  >
+                    <span className="space-y-1">
+                      <span className="block text-sm font-medium text-foreground">
+                        {t("hasExtraPayments")}
+                      </span>
+                      <span className="block text-sm leading-6 text-muted-foreground">
+                        {t("hasExtraPaymentsDescription")}
+                      </span>
+                    </span>
+                    <span className="mt-1 flex h-5 shrink-0 items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={displayedHasExtraPayments}
+                        onChange={(event) =>
+                          void handleSave("hasExtraPayments", event.target.checked).catch(() => undefined)
+                        }
+                        disabled={isSavingField("hasExtraPayments")}
+                        className="h-5 w-5 rounded border-border text-primary accent-primary"
+                      />
+                      {isSavingField("hasExtraPayments") ? (
+                        <Loader2
+                          className="h-4 w-4 shrink-0 animate-spin text-primary"
+                          aria-hidden="true"
+                        />
+                      ) : null}
+                    </span>
+                  </label>
+                  <div
+                    className={cn(
+                      "grid transition-[grid-template-rows,opacity,margin-top] duration-200 ease-out",
+                      displayedHasExtraPayments ? "mt-4 grid-rows-[1fr] opacity-100" : "mt-0 grid-rows-[0fr] opacity-0"
+                    )}
+                    aria-hidden={!displayedHasExtraPayments}
+                  >
+                    <div className="overflow-hidden">
+                      <div className="border-t border-border/50 pt-4">
+                        <InlineEditField
+                          label={t("estimatedExtraPayment")}
+                          value={config.estimatedExtraPayment}
+                          onSave={(v) => handleSave("estimatedExtraPayment", v)}
+                          disabled={!displayedHasExtraPayments}
+                          className="gap-x-4 gap-y-5"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section className="rounded-lg border border-border/70 bg-card p-4 shadow-sm">
+              <div className="mb-4">
+                <h3 className="text-sm font-medium text-foreground">{t("sectionMonthlyAllocation")}</h3>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">{t("sectionMonthlyAllocationDescription")}</p>
+              </div>
+              <div className="divide-y divide-border/50">
+                <div className="pb-4">
+                  <InlineEditField
+                    label={t("monthlyInvestment")}
+                    value={config.monthlyInvestment}
+                    onSave={(v) => handleSave("monthlyInvestment", v)}
+                  />
+                </div>
+                <div className="py-4">
+                  <InlineEditField
+                    label={t("monthlyHomeExpense")}
+                    value={config.monthlyHomeExpense}
+                    onSave={(v) => handleSave("monthlyHomeExpense", v)}
+                  />
+                </div>
+                <div className="pt-4">
+                  <InlineEditField
+                    label={t("monthlyPersonalBudget")}
+                    value={config.monthlyPersonalBudget}
+                    onSave={(v) => handleSave("monthlyPersonalBudget", v)}
+                  />
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <section className="rounded-lg border border-border/70 bg-card p-4 shadow-sm">
+            <div className="mb-4">
+              <h3 className="text-sm font-medium text-foreground">{t("sectionGrowth")}</h3>
+              <p className="mt-1 text-sm leading-6 text-muted-foreground">{t("sectionGrowthDescription")}</p>
+            </div>
+            <InlineEditField
+              label={t("interestRate")}
+              value={config.interestRate}
+              onSave={(v) => handleSave("interestRate", v)}
+              formatDisplayValue={(v) => `${(v * 100).toFixed(2)}%`}
+              formatEditValue={(v) => String(+(v * 100).toFixed(2))}
+              parseInputValue={(input) => parseFloat(input.replace(",", ".")) / 100}
+            />
+          </section>
+
+          <section className="rounded-lg border border-primary/15 bg-primary/[0.035] p-4 shadow-sm">
+            <div className="mb-3">
+              <h3 className="text-sm font-medium text-foreground">{t("sectionRecurringExpenses")}</h3>
+              <p className="mt-1 text-sm leading-6 text-muted-foreground">{t("sectionRecurringExpensesDescription")}</p>
+            </div>
+          </section>
+
+          <div>
+            <RecurringExpenseTemplateEditor
+              entries={recurringDraft}
+              onChange={setRecurringDraft}
+              disabled={savingRecurring}
+              title={t("recurringExpensesTitle")}
+              description={t("recurringExpensesDescription")}
+            />
+            {recurringError ? (
+              <p role="alert" className="mt-3 rounded-md border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm leading-6 text-destructive">
+                {recurringError}
+              </p>
+            ) : null}
+            <AlertDialog open={recurringDialogOpen} onOpenChange={setRecurringDialogOpen}>
+              <AlertDialogTrigger
+                render={
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={savingRecurring}
+                    className="mt-3 w-full border-primary/20 bg-primary/[0.06] text-primary hover:bg-primary/[0.1]"
+                  >
+                    {savingRecurring ? t("recurringExpensesSaving") : t("recurringExpensesSave")}
+                  </Button>
+                }
+              />
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>{t("recurringExpensesConfirmTitle")}</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {t("recurringExpensesConfirmDescription")}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel disabled={savingRecurring}>{t("recurringExpensesCancel")}</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => void handleSaveRecurringExpenses()} disabled={savingRecurring}>
+                    {savingRecurring ? t("recurringExpensesSaving") : t("recurringExpensesConfirmAction")}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
-        <div className="rounded-2xl border border-border/60 bg-muted/20 p-4">
-          <InlineEditField
-            label={t("monthlyInvestment")}
-            value={config.monthlyInvestment}
-            onSave={(v) => handleSave("monthlyInvestment", v)}
-          />
-        </div>
-        <div className="rounded-2xl border border-border/60 bg-muted/20 p-4">
-          <InlineEditField
-            label={t("monthlyHomeExpense")}
-            value={config.monthlyHomeExpense}
-            onSave={(v) => handleSave("monthlyHomeExpense", v)}
-          />
-        </div>
-        <div className="rounded-2xl border border-border/60 bg-muted/20 p-4">
-          <InlineEditField
-            label={t("monthlyPersonalBudget")}
-            value={config.monthlyPersonalBudget}
-            onSave={(v) => handleSave("monthlyPersonalBudget", v)}
-          />
-        </div>
-        <div className="rounded-2xl border border-border/60 bg-muted/20 p-4">
-          <InlineEditField
-            label={t("interestRate")}
-            value={config.interestRate}
-            onSave={(v) => handleSave("interestRate", v)}
-            formatDisplayValue={(v) => `${(v * 100).toFixed(2)}%`}
-            formatEditValue={(v) => String(+(v * 100).toFixed(2))}
-            parseInputValue={(input) => parseFloat(input.replace(",", ".")) / 100}
-          />
-        </div>
-
-        <RecurringExpenseTemplateEditor
-          entries={recurringDraft}
-          onChange={setRecurringDraft}
-          disabled={savingRecurring}
-          title={t("recurringExpensesTitle")}
-          description={t("recurringExpensesDescription")}
-        />
-        {recurringError ? (
-          <p role="alert" className="rounded-xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm leading-6 text-destructive">
-            {recurringError}
-          </p>
-        ) : null}
-        <AlertDialog open={recurringDialogOpen} onOpenChange={setRecurringDialogOpen}>
-          <AlertDialogTrigger
-            render={
-              <Button
-                type="button"
-                variant="outline"
-                disabled={savingRecurring}
-                className="w-full border-primary/20 bg-primary/[0.06] text-primary hover:bg-primary/[0.1]"
-              >
-                {savingRecurring ? t("recurringExpensesSaving") : t("recurringExpensesSave")}
-              </Button>
-            }
-          />
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>{t("recurringExpensesConfirmTitle")}</AlertDialogTitle>
-              <AlertDialogDescription>
-                {t("recurringExpensesConfirmDescription")}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel disabled={savingRecurring}>{t("recurringExpensesCancel")}</AlertDialogCancel>
-              <AlertDialogAction onClick={() => void handleSaveRecurringExpenses()} disabled={savingRecurring}>
-                {savingRecurring ? t("recurringExpensesSaving") : t("recurringExpensesConfirmAction")}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
       </div>
     </div>
   );
