@@ -25,6 +25,7 @@ The Monthly View (`/locale/[year]/[month]`) is the primary workspace for users. 
 
 ### Month Navigation
 - Month, summary, and settings switches inside `YearPageClient` update local React state and call `window.history.pushState()`. All URL generation uses the shared utilities in `src/lib/year-routes.ts`. Next.js 16 integrates native history updates with router state, so the URL changes without forcing a new server navigation for each month.
+- On mobile viewports, `MonthOverview` also supports horizontal swipe navigation across months. The gesture uses `getHorizontalSwipeDirection` from `src/lib/mobile-swipe.ts`, ignores short or mostly vertical gestures, and calls the same local `onMonthSelect` handler used by the month strip so the mounted `YearData` is reused.
 - Direct visits to `/locale/[year]/[month]` and browser back/forward still hydrate from the App Router pages and use `parseYearRoutePathname` from `src/lib/year-routes.ts` to synchronize back into the client state.
 
 ### Recurring Expense Behavior

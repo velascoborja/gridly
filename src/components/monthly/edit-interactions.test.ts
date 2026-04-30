@@ -127,6 +127,17 @@ test("month tabs expose drop targets while an additional entry is being dragged"
   assert.match(overviewSource, /border-dashed/);
 });
 
+test("mobile month view supports horizontal swipe navigation through the local month selector", () => {
+  const overviewSource = readFileSync(new URL("./month-overview.tsx", import.meta.url), "utf8");
+
+  assert.match(overviewSource, /getHorizontalSwipeDirection/);
+  assert.match(overviewSource, /window\.matchMedia\("\(max-width: 767px\)"\)\.matches/);
+  assert.match(overviewSource, /onPointerDown=\{handleSwipePointerDown\}/);
+  assert.match(overviewSource, /onPointerUp=\{handleSwipePointerUp\}/);
+  assert.match(overviewSource, /direction === "next" && nextMonth/);
+  assert.match(overviewSource, /direction === "previous" && previousMonth/);
+});
+
 test("additional entry rows move by drag and drop without a separate move button", () => {
   const entriesSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
   const overviewSource = readFileSync(new URL("./month-overview.tsx", import.meta.url), "utf8");

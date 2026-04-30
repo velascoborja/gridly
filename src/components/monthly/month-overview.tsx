@@ -13,6 +13,7 @@ import { sortAdditionalEntriesDesc } from "@/lib/additional-entries";
 import { sortRecurringExpensesAsc } from "@/lib/recurring-expenses";
 import { cn, formatCurrency, formatMonthName } from "@/lib/utils";
 import { computeMonthChain } from "@/lib/calculations";
+import { getHorizontalSwipeDirection } from "@/lib/mobile-swipe";
 import type { MonthData, YearData, AdditionalEntry, RecurringExpense } from "@/lib/types";
 
 interface Props {
@@ -38,6 +39,14 @@ type MovingAdditionalEntry = {
   entryId: number;
   sourceMonthId: number;
 };
+
+type SwipeStart = {
+  pointerId: number;
+  x: number;
+  y: number;
+};
+
+const interactiveSwipeIgnoreSelector = "a, button, input, textarea, select, [role='button'], [draggable='true']";
 
 export function MonthOverview({
   yearData: initialYearData,
@@ -65,6 +74,7 @@ export function MonthOverview({
   const activeMonthTabRef = useRef<HTMLDivElement>(null);
   const fixedEditorsInnerRef = useRef<HTMLDivElement>(null);
   const fixedEditorsFrameRef = useRef<number | null>(null);
+  const swipeStartRef = useRef<SwipeStart | null>(null);
   const sortedMonths = [...months].sort((a, b) => a.month - b.month);
 
   useEffect(() => {
@@ -145,6 +155,40 @@ export function MonthOverview({
     },
     [onMonthSelect]
   );
+
+  const handleSwipePointerDown = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+    if (!onMonthSelect || event.pointerType === "mouse") return;
+    if (!window.matchMedia("(max-width: 767px)").matches) return;
+    if (event.target instanceof Element && event.target.closest(interactiveSwipeIgnoreSelector)) return;
+
+    swipeStartRef.current = {
+      pointerId: event.pointerId,
+      x: event.clientX,
+      y: event.clientY,
+    };
+  }, [onMonthSelect]);
+
+  const handleSwipePointerUp = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+    const swipeStart = swipeStartRef.current;
+    swipeStartRef.current = null;
+    if (!swipeStart || swipeStart.pointerId !== event.pointerId || !onMonthSelect) return;
+
+    const direction = getHorizontalSwipeDirection({
+      startX: swipeStart.x,
+      startY: swipeStart.y,
+      endX: event.clientX,
+      endY: event.clientY,
+    });
+
+    if (direction === "next" && nextMonth) {
+      onMonthSelect(nextMonth.month);
+      return;
+    }
+
+    if (direction === "previous" && previousMonth) {
+      onMonthSelect(previousMonth.month);
+    }
+  }, [nextMonth, onMonthSelect, previousMonth]);
 
   const recompute = useCallback((updated: MonthData[]) => {
     return computeMonthChain(updated, config.startingBalance, config.interestRate);
@@ -320,7 +364,14 @@ export function MonthOverview({
   const isFutureMonth =
     config.year > today.getFullYear() || (config.year === today.getFullYear() && month.month > today.getMonth() + 1);
   return (
-    <div>
+    <div
+      className="md:touch-auto touch-pan-y"
+      onPointerDown={handleSwipePointerDown}
+      onPointerUp={handleSwipePointerUp}
+      onPointerCancel={() => {
+        swipeStartRef.current = null;
+      }}
+    >
       <div className="mb-6 overflow-hidden rounded-lg border border-border/70 bg-background/90 shadow-[0_30px_45px_-30px_rgba(50,50,93,0.25),0_18px_36px_-24px_rgba(0,0,0,0.1)]">
         <div className="flex items-center gap-2 border-b border-border/70 px-3 py-3 sm:px-4">
           {previousMonth ? (
