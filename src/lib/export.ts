@@ -24,7 +24,6 @@ const EXPORT_MESSAGES = {
     investment: "Investment",
     payslip: "Salary",
     additionalPayslip: "Extra pay",
-    bonus: "Bonus",
     interests: "Interests",
     personalRemaining: "Personal surplus",
   },
@@ -49,7 +48,6 @@ const EXPORT_MESSAGES = {
     investment: "Inversión",
     payslip: "Nómina",
     additionalPayslip: "Paga extra",
-    bonus: "Bonus",
     interests: "Intereses",
     personalRemaining: "Sobrante propios",
   },
@@ -124,7 +122,6 @@ function writeMonthSection(
 
   addIncRow(t.payslip, month.payslip);
   if (month.additionalPayslip > 0) addIncRow(t.additionalPayslip, month.additionalPayslip);
-  if (month.bonus > 0) addIncRow(t.bonus, month.bonus);
   addIncRow(t.interests, month.interests);
   addIncRow(t.personalRemaining, month.personalRemaining);
   for (const entry of month.additionalIncomes) {

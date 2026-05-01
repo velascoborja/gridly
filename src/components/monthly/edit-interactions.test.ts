@@ -42,6 +42,16 @@ test("extra payslip fixed row follows the year extra payments setting", () => {
   assert.match(overviewSource, /showAdditionalPayslip=\{config\.hasExtraPayments && \(month\.month === 6 \|\| month\.month === 12\)\}/);
 });
 
+test("bonus is not exposed as a monthly fixed income field", () => {
+  const incomeSource = readFileSync(new URL("./income-card.tsx", import.meta.url), "utf8");
+  const routeSource = readFileSync(new URL("../../app/api/months/[monthId]/route.ts", import.meta.url), "utf8");
+
+  assert.doesNotMatch(incomeSource, /month\.month === 7/);
+  assert.doesNotMatch(incomeSource, /t\("bonus"\)/);
+  assert.doesNotMatch(incomeSource, /onUpdate\("bonus"/);
+  assert.doesNotMatch(routeSource, /"bonus"/);
+});
+
 test("inline fixed fields expose annual reset action only when values diverge", () => {
   const source = readFileSync(new URL("./inline-edit-field.tsx", import.meta.url), "utf8");
 

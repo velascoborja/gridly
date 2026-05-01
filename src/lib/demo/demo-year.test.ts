@@ -46,7 +46,6 @@ test("demo year data contains 12 chained months with extra pays in June and Dece
     { id: 401, monthId: 4, type: "income", label: "Devolución IRPF", amount: 540 },
     { id: 404, monthId: 4, type: "income", label: "Venta Wallapop", amount: 35 },
   ]);
-  assert.equal(data.months[6].bonus, 780);
   assert.deepEqual(data.months[8].additionalExpenses, [
     { id: 901, monthId: 9, type: "expense", label: "Material oficina/estudios", amount: 85 },
     { id: 902, monthId: 9, type: "expense", label: "Suscripción gimnasio", amount: 45 },

@@ -21,7 +21,6 @@ export function IncomeCard({ month, onUpdate, showAdditionalPayslip, annualDefau
   const t = useTranslations("Monthly.income");
   const tFixed = useTranslations("Monthly.fixed");
   const tCommon = useTranslations("Common");
-  const isJuly = month.month === 7;
 
   return (
     <Card size="sm" className="relative border-border/70 bg-muted/40 shadow-sm shadow-black/5">
@@ -53,15 +52,6 @@ export function IncomeCard({ month, onUpdate, showAdditionalPayslip, annualDefau
             readOnly={readOnly}
             activateOnRowPress
             resetValue={annualDefaults.estimatedExtraPayment}
-          />
-        )}
-        {isJuly && (
-          <InlineEditField
-            label={t("bonus")}
-            value={month.bonus}
-            onSave={(v) => onUpdate("bonus", v)}
-            readOnly={readOnly}
-            activateOnRowPress
           />
         )}
         <InlineEditField

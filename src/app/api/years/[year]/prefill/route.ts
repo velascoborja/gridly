@@ -55,7 +55,6 @@ export async function POST(
     investment: String(month.investment),
     payslip: String(month.payslip),
     additionalPayslip: String(month.additionalPayslip),
-    bonus: String(month.bonus),
     interests: String(month.interests),
     interestsManualOverride: month.interestsManualOverride,
     personalRemaining: String(month.personalRemaining),

@@ -216,7 +216,7 @@ export function YearConfigForm({
             </p>
           </section>
 
-          <div className="grid items-start gap-3 lg:grid-cols-2">
+          <div className="grid items-stretch gap-3 lg:grid-cols-2">
             <section className="rounded-lg border border-border/70 bg-card p-4 shadow-sm">
               <div className="mb-4">
                 <h3 className="text-sm font-medium text-foreground">{t("sectionIncome")}</h3>

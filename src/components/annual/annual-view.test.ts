@@ -122,5 +122,5 @@ test("annual setup dialog has room for the grouped desktop layout", () => {
   const formSource = readFileSync(new URL("./year-config-form.tsx", import.meta.url), "utf8");
 
   assert.match(source, /DialogContent className="[^"]*sm:max-w-3xl/, "config dialog should override the default narrow desktop max width");
-  assert.match(formSource, /items-start gap-3 lg:grid-cols-2/, "desktop section columns should not stretch each other vertically");
+  assert.match(formSource, /items-stretch gap-3 lg:grid-cols-2/, "paired desktop setup cards should match the tallest card height");
 });

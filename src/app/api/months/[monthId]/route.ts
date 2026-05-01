@@ -20,7 +20,7 @@ export async function PATCH(
 
   const fields = [
     "homeExpense", "personalExpense", "investment",
-    "payslip", "additionalPayslip", "bonus", "interests", "personalRemaining",
+    "payslip", "additionalPayslip", "interests", "personalRemaining",
   ] as const;
 
   const updates: Partial<typeof months.$inferInsert> = {};

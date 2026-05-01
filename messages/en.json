@@ -252,10 +252,9 @@
     },
     "income": {
       "title": "Fixed Income",
-      "description": "Base income for the month, including extra pays and bonuses when applicable.",
+      "description": "Base income for the month, including extra pays when applicable.",
       "payslip": "Salary",
       "additionalPayslip": "Extra pay",
-      "bonus": "Bonus",
       "interests": "Interests",
       "personalRemaining": "Personal surplus"
     },
@@ -325,7 +324,6 @@
     "investment": "Investment",
     "payslip": "Salary",
     "additionalPayslip": "Extra pay",
-    "bonus": "Bonus",
     "interests": "Interests",
     "personalRemaining": "Personal surplus"
   }

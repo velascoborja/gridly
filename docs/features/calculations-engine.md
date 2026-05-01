@@ -17,7 +17,7 @@ Gridly treats a year as a sequential chain of months. The output of one month is
 The core logic is encapsulated in the `computeMonthChain` function:
 - It iterates through the 12 months.
 - It calculates interests for each month based on that month's `startingBalance`.
-- It aggregates all income sources (payslip, bonus, additional incomes, interests).
+- It aggregates all income sources (payslip, extra pays, additional incomes, interests, and personal surplus).
 - It aggregates all expense sources (fixed expenses, recurring expenses, additional expenses).
 
 Total expenses are:

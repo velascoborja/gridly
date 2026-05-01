@@ -8,7 +8,7 @@ The Monthly View (`/locale/[year]/[month]`) is the primary workspace for users. 
 
 ## Key Components
 
-- **Income Card:** Displays net salary (`payslip`), extra payments (`additionalPayslip`), bonuses, generated interests, and personal surplus (`personalRemaining`).
+- **Income Card:** Displays net salary (`payslip`), extra payments (`additionalPayslip`), generated interests, and personal surplus (`personalRemaining`).
 - **Fixed Expenses Card:** Tracks recurring costs such as housing (`homeExpense`), personal budget (`personalExpense`), and investments (`investment`).
 - **Recurring Expenses Section:** Shows named planned expenses copied from the year template inside the Fixed Expenses card. Users can edit or delete rows for the current month only.
 - **Summary Card:** Provides a real-time breakdown of `Total Income`, `Total Expenses`, and the resulting `Savings`.

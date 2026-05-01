@@ -18,7 +18,7 @@ In scope:
 
 Out of scope:
 
-- Moving fixed scalar values such as payslip, home expense, personal expense, investment, interests, or bonus.
+- Moving fixed scalar values such as payslip, home expense, personal expense, investment, or interests.
 - Moving recurring expenses.
 - Copying entries.
 - Cross-year moves.

@@ -9,7 +9,6 @@ interface RawMonthData {
   investment: number;
   payslip: number;
   additionalPayslip: number;
-  bonus: number;
   interests: number;
   interestsManualOverride: boolean;
   personalRemaining: number;
@@ -24,7 +23,7 @@ export function calculateMonthlyInterest(startingBalance: number, interestRate: 
 
 export function totalIncome(m: RawMonthData): number {
   const additionalSum = m.additionalIncomes.reduce((sum, e) => sum + e.amount, 0);
-  return m.payslip + m.additionalPayslip + m.bonus + m.interests + m.personalRemaining + additionalSum;
+  return m.payslip + m.additionalPayslip + m.interests + m.personalRemaining + additionalSum;
 }
 
 export function totalExpenses(m: RawMonthData): number {
@@ -83,8 +82,6 @@ export function estimatedMonthData(month: number, config: YearConfig): Omit<RawM
     investment: config.monthlyInvestment,
     payslip: config.estimatedSalary,
     additionalPayslip: config.hasExtraPayments && isExtraPaymentMonth ? config.estimatedExtraPayment : 0,
-    // July = 7 gets bonus (set to 0 — user fills in actual)
-    bonus: 0,
     interests: 0,
     interestsManualOverride: false,
     personalRemaining: 0,

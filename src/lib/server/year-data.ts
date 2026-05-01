@@ -70,7 +70,6 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
       investment: parseFloat(month.investment),
       payslip: parseFloat(month.payslip),
       additionalPayslip: parseFloat(month.additionalPayslip),
-      bonus: parseFloat(month.bonus),
       interests: parseFloat(month.interests),
       interestsManualOverride: month.interestsManualOverride,
       personalRemaining: parseFloat(month.personalRemaining),

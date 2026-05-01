@@ -64,7 +64,7 @@ Once a year is created, its configuration can be modified within the **Annual Su
   - `investment` = `monthlyInvestment`.
   - `additionalPayslip` = `estimatedExtraPayment` for June/December when extra pays are enabled, otherwise `0`.
   - `interestsManualOverride` is reset to `false` so interest follows the current annual rate again.
-  - Manual monthly fixed-value edits are overwritten; additional entries, bonuses, and personal remaining values are preserved.
+  - Manual monthly fixed-value edits are overwritten; additional entries and personal remaining values are preserved.
 
 Annual Summary also includes the recurring expense template editor.
 

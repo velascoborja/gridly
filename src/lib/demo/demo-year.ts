@@ -92,7 +92,6 @@ export function getDemoYearData(): YearData {
   ];
 
   // Julio
-  baseMonths[6].bonus = 780;
   baseMonths[6].additionalExpenses = [
     { id: 701, monthId: 7, type: "expense", label: "Vuelos verano", amount: 320 },
   ];
@@ -141,7 +140,6 @@ interface RawMonthData {
   investment: number;
   payslip: number;
   additionalPayslip: number;
-  bonus: number;
   interests: number;
   interestsManualOverride: boolean;
   personalRemaining: number;
@@ -161,7 +159,6 @@ function estimatedMonthData(month: number, config: YearConfig): Omit<RawMonthDat
       config.hasExtraPayments && (month === 6 || month === 12)
         ? config.estimatedExtraPayment
         : 0,
-    bonus: 0,
     interests: 0,
     interestsManualOverride: false,
     personalRemaining: 0,
@@ -177,7 +174,7 @@ function calculateMonthlyInterest(startingBalance: number, interestRate: number)
 
 function totalIncome(month: RawMonthData): number {
   const additionalSum = month.additionalIncomes.reduce((sum, entry) => sum + entry.amount, 0);
-  return month.payslip + month.additionalPayslip + month.bonus + month.interests + month.personalRemaining + additionalSum;
+  return month.payslip + month.additionalPayslip + month.interests + month.personalRemaining + additionalSum;
 }
 
 function totalExpenses(month: RawMonthData): number {

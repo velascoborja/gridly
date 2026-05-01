@@ -255,7 +255,6 @@
       "description": "Entradas base del mes, incluyendo pagas extra y complementos cuando aplican.",
       "payslip": "Nómina",
       "additionalPayslip": "Paga extra",
-      "bonus": "Bonus",
       "interests": "Intereses cuenta",
       "personalRemaining": "Sobrante propios"
     },
@@ -325,7 +324,6 @@
     "investment": "Inversión",
     "payslip": "Nómina",
     "additionalPayslip": "Paga extra",
-    "bonus": "Bonus",
     "interests": "Intereses",
     "personalRemaining": "Sobrante propios"
   }
