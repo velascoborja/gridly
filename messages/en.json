@@ -111,9 +111,7 @@
       "sectionMonthlyAllocation": "Monthly allocation",
       "sectionMonthlyAllocationDescription": "Groups the fixed amounts repeated every month.",
       "sectionGrowth": "Growth",
-      "sectionGrowthDescription": "Controls the annual return used to project interest.",
-      "sectionRecurringExpenses": "Recurring templates",
-      "sectionRecurringExpensesDescription": "Reapply recurring expenses to every month in the year."
+      "sectionGrowthDescription": "Controls the annual return used to project interest."
     }
   },
   "Setup": {

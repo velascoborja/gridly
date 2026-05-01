@@ -53,7 +53,7 @@ During setup, the client sends `recurringExpenses` with the year creation reques
 Once a year is created, its configuration can be modified within the **Annual Summary** view (`src/app/[locale]/[year]/summary/page.tsx`).
 
 - **Component:** `src/components/annual/year-config-form.tsx` allows inline editing of all fields.
-- **Layout:** The annual setup dialog groups fields into Starting point, Income, Monthly allocation, Growth assumptions, and Recurring expense templates. The form is single-column on mobile and pairs Income with Monthly allocation on larger screens.
+- **Layout:** The annual setup dialog groups setup fields into Starting point, Income, Monthly allocation, and Growth assumptions. The form is single-column on mobile and pairs Income with Monthly allocation on larger screens.
 - **Persistence:** Changes are sent via `PATCH /api/years/[year]`.
 - **Confirmation:** Before saving any setup value, the form shows a warning that the change will overwrite monthly fixed values.
 - **Cache Refresh:** After a successful save, the client calls `router.refresh()` so route cache restores after visiting setup or another route include the updated annual balance.

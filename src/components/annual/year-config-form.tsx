@@ -330,13 +330,6 @@ export function YearConfigForm({
             />
           </section>
 
-          <section className="rounded-lg border border-primary/15 bg-primary/[0.035] p-4 shadow-sm">
-            <div className="mb-3">
-              <h3 className="text-sm font-medium text-foreground">{t("sectionRecurringExpenses")}</h3>
-              <p className="mt-1 text-sm leading-6 text-muted-foreground">{t("sectionRecurringExpensesDescription")}</p>
-            </div>
-          </section>
-
           <div>
             <RecurringExpenseTemplateEditor
               entries={recurringDraft}

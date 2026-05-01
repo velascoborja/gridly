@@ -106,13 +106,13 @@ test("annual setup form groups fields into sorted financial sections", () => {
   const incomeIndex = formSource.indexOf('t("sectionIncome")');
   const allocationIndex = formSource.indexOf('t("sectionMonthlyAllocation")');
   const growthIndex = formSource.indexOf('t("sectionGrowth")');
-  const recurringIndex = formSource.indexOf('t("sectionRecurringExpenses")');
+  const recurringIndex = formSource.indexOf('t("recurringExpensesTitle")');
 
   assert.ok(startingIndex > -1, "starting point section should be rendered");
   assert.ok(incomeIndex > startingIndex, "income should follow starting point");
   assert.ok(allocationIndex > incomeIndex, "monthly allocation should follow income");
   assert.ok(growthIndex > allocationIndex, "growth assumptions should follow monthly allocation");
-  assert.ok(recurringIndex > growthIndex, "recurring expenses should be the final setup section");
+  assert.ok(recurringIndex > growthIndex, "recurring expenses editor should follow setup sections");
   assert.match(formSource, /lg:grid-cols-2/, "income and monthly allocation should pair on larger screens");
   assert.match(formSource, /t\("overwriteBadge"\)/, "the form should show a visible overwrite impact badge");
 });

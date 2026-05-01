@@ -111,9 +111,7 @@
       "sectionMonthlyAllocation": "Distribución mensual",
       "sectionMonthlyAllocationDescription": "Agrupa los importes fijos que se repiten cada mes.",
       "sectionGrowth": "Crecimiento",
-      "sectionGrowthDescription": "Controla la rentabilidad anual usada para proyectar intereses.",
-      "sectionRecurringExpenses": "Plantillas recurrentes",
-      "sectionRecurringExpensesDescription": "Reaplica gastos recurrentes a todos los meses del año."
+      "sectionGrowthDescription": "Controla la rentabilidad anual usada para proyectar intereses."
     }
   },
   "Setup": {
