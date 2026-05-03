@@ -39,7 +39,7 @@ test("setup and monthly entrypoints expose only guided next-year creation", asyn
   const navSource = await readSource("src/components/layout/nav-selectors.tsx");
 
   assert.match(setupSource, /derivedStartingBalance/, "setup should load and display the derived carry-over balance");
-  assert.match(setupSource, /startingBalance: Number\.isNaN\(startingBalance\)\s*\?\s*0\s*:\s*startingBalance/, "setup should submit the editable first-year starting balance");
+  assert.match(setupSource, /startingBalance: parseNumber\(values\.startingBalance\)/, "setup should submit the editable first-year starting balance");
   assert.match(setupSource, /t\("descriptionFixed"/, "setup should explain the sequential year rule");
   assert.match(monthPageSource, /redirect\(`\/setup\/\$\{year\}\?redirect=\/\$\{year\}\/\$\{month\}`\)/, "missing first-year route should redirect into setup");
   assert.match(navSource, /Plus/, "nav selector should render a plus icon for year creation");
