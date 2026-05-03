@@ -190,8 +190,8 @@ export function KpiCards({
                           </Button>
                         }
                       />
-                      <DialogContent className="gap-4 p-0 sm:max-w-3xl lg:max-w-4xl">
-                        <DialogHeader className="px-5 pt-5 md:px-6 md:pt-6">
+                      <DialogContent className="gap-4 overflow-hidden p-0 sm:max-w-3xl lg:max-w-4xl">
+                        <DialogHeader className="sticky top-0 z-10 border-b border-border/60 bg-card/75 px-5 pt-5 pb-4 backdrop-blur-md md:px-6 md:pt-6 md:pb-5">
                           <DialogTitle>{tAnnual("configTitle")}</DialogTitle>
                           <DialogDescription>
                             {tAnnual("configDescription")}
