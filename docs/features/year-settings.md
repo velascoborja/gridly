@@ -54,6 +54,7 @@ Once a year is created, its configuration can be modified within the **Annual Su
 
 - **Component:** `src/components/annual/year-config-form.tsx` allows inline editing of all fields.
 - **Layout:** The annual setup dialog groups setup fields into Starting point, Income, Monthly allocation, and Growth assumptions. The form is single-column on mobile and pairs Income with Monthly allocation on larger screens.
+- **Scroll Chrome:** The annual setup dialog header is sticky with a translucent blurred card background so metadata and actions remain visible while the form body scrolls underneath.
 - **Persistence:** Changes are sent via `PATCH /api/years/[year]`.
 - **Confirmation:** Before saving any setup value, the form shows a warning that the change will overwrite monthly fixed values.
 - **Cache Refresh:** After a successful save, the client calls `router.refresh()` so route cache restores after visiting setup or another route include the updated annual balance.
