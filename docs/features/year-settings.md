@@ -26,6 +26,8 @@ The creation screen groups setup fields by financial purpose:
 
 The live preview is derived only from local form state. It shows the starting balance, monthly income, planned expenses, monthly investment, estimated monthly savings before interest, extra-pay status, and a reminder that recurring templates are copied into all 12 months. It does not add fields to the creation payload.
 
+When the starting balance is derived from the previous year, the setup input is read-only and displays a locale-formatted Euro amount via `formatCurrency` (for example, `1.234,56 €` in `es`). Submission still sends the numeric carry-over value, not the formatted string.
+
 ## Navigation & Workspace Model
 
 Gridly employs an "In-Year Workspace" model to manage the complex financial state of a year:
