@@ -78,7 +78,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
   const [error, setError] = useState("");
 
   const summary = {
-    startingBalance: parseNumber(values.startingBalance),
+    startingBalance: startingBalanceEditable ? parseNumber(values.startingBalance) : derivedStartingBalance,
     monthlyIncome: parseNumber(values.estimatedSalary),
     plannedExpenses: parseNumber(values.monthlyHomeExpense) + parseNumber(values.monthlyPersonalBudget),
     monthlyInvestment: parseNumber(values.monthlyInvestment),
@@ -183,7 +183,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
     try {
       const payload = {
         year,
-        startingBalance: parseNumber(values.startingBalance),
+        startingBalance: startingBalanceEditable ? parseNumber(values.startingBalance) : derivedStartingBalance,
         estimatedSalary: parseNumber(values.estimatedSalary),
         hasExtraPayments,
         estimatedExtraPayment: hasExtraPayments ? parseNumber(values.estimatedExtraPayment) : 0,
@@ -281,7 +281,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
                   id="startingBalance"
                   type="text"
                   inputMode="decimal"
-                  value={values.startingBalance}
+                  value={startingBalanceEditable ? values.startingBalance : formatCurrency(derivedStartingBalance, locale)}
                   onChange={(event) => setValues((prev) => ({ ...prev, startingBalance: event.target.value }))}
                   placeholder={t("startingBalancePlaceholder")}
                   disabled={submitting || !startingBalanceEditable}
