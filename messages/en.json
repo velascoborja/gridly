@@ -176,26 +176,39 @@
     }
   },
   "Landing": {
-    "heroTitle": "Control income, expenses, and savings with a vision that fits.",
-    "heroDescription": "Gridly converts your financial year into a coherent chain: from the starting balance to the monthly close, with an annual summary, quick editing, and Excel export.",
+    "heroEyebrow": "Annual finance planner",
+    "heroTitle": "Plan your financial year month by month.",
+    "heroDescription": "Gridly connects income, expenses, savings, and starting balance into a clear annual chain, with extra pay periods, year summary, and Excel export.",
     "demoCta": "View demo",
     "accountDeletedTitle": "Account deleted",
     "accountDeletedDescription": "Your account and data have been deleted successfully.",
     "authErrorTitle": "Sign-in cancelled",
     "authErrorDescription": "You are not signed in. You can try again whenever you want.",
-    "features": {
+    "primaryProof": {
+      "monthly": "12 connected months",
+      "extraPays": "Extra pay in June and December",
+      "export": "Summary and Excel"
+    },
+    "proof": {
       "monthly": {
-        "title": "Monthly Control",
-        "description": "Track income, fixed expenses, and additional movements without losing the balance thread."
+        "title": "Month by month",
+        "description": "Track income, fixed expenses, and additional entries with quick editing."
       },
-      "chained": {
-        "title": "Chained Savings",
-        "description": "Each month starts where the previous one ended so the annual balance is coherent."
+      "chain": {
+        "title": "Connected balance",
+        "description": "Each monthly close automatically feeds the next month starting balance."
       },
       "annual": {
-        "title": "Annual Summary",
-        "description": "Visualize the complete exercise and export the history whenever you need it."
+        "title": "Annual close",
+        "description": "Review charts, extra pay periods, and export the full year to Excel."
       }
+    },
+    "annualStory": {
+      "eyebrow": "Annual close",
+      "title": "Every month moves the year-end picture.",
+      "description": "Starting balance, income, expenses, and monthly savings are chained together so you can see how the full year evolves.",
+      "extraPayMarker": "Extra pay",
+      "projectedClose": "Projected close"
     },
     "preview": {
       "title": "Preview",
@@ -209,7 +222,8 @@
       "monthName": "April",
       "totalIncome": "Total income",
       "totalExpenses": "Total expenses",
-      "monthlySavings": "Monthly savings"
+      "monthlySavings": "Monthly savings",
+      "endingBalance": "Ending balance"
     }
   },
   "Demo": {

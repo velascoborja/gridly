@@ -176,26 +176,39 @@
     }
   },
   "Landing": {
-    "heroTitle": "Controla ingresos, gastos y ahorro con una visión que sí encaja.",
-    "heroDescription": "Gridly convierte tu año financiero en una cadena coherente: desde el saldo inicial hasta el cierre mensual, con resumen anual, edición rápida y exportación a Excel.",
+    "heroEyebrow": "Planificador financiero anual",
+    "heroTitle": "Planifica tu año financiero mes a mes.",
+    "heroDescription": "Gridly une ingresos, gastos, ahorro y saldo inicial en una cadena anual clara, con pagas extra, resumen del ejercicio y exportación a Excel.",
     "demoCta": "Ver demo",
     "accountDeletedTitle": "Cuenta eliminada",
     "accountDeletedDescription": "Tu cuenta y tus datos se han eliminado correctamente.",
     "authErrorTitle": "Inicio de sesión cancelado",
     "authErrorDescription": "No se ha iniciado sesión. Puedes volver a intentarlo cuando quieras.",
-    "features": {
+    "primaryProof": {
+      "monthly": "12 meses conectados",
+      "extraPays": "Pagas extra en junio y diciembre",
+      "export": "Resumen y Excel"
+    },
+    "proof": {
       "monthly": {
-        "title": "Control mensual",
-        "description": "Sigue ingresos, gastos fijos y movimientos adicionales sin perder el hilo del saldo."
+        "title": "Mes a mes",
+        "description": "Registra ingresos, gastos fijos y movimientos adicionales con edición rápida."
       },
-      "chained": {
-        "title": "Ahorro encadenado",
-        "description": "Cada mes arranca donde terminó el anterior para que el balance anual sea coherente."
+      "chain": {
+        "title": "Saldo conectado",
+        "description": "Cada cierre mensual alimenta automáticamente el saldo inicial del siguiente mes."
       },
       "annual": {
-        "title": "Resumen anual",
-        "description": "Visualiza el ejercicio completo y exporta el histórico cuando lo necesites."
+        "title": "Cierre anual",
+        "description": "Consulta gráficos, pagas extra y exporta el ejercicio completo a Excel."
       }
+    },
+    "annualStory": {
+      "eyebrow": "Cierre anual",
+      "title": "Cada mes empuja el cierre del año.",
+      "description": "El saldo inicial, los ingresos, los gastos y el ahorro mensual se encadenan para mostrar cómo evoluciona el ejercicio completo.",
+      "extraPayMarker": "Pagas extra",
+      "projectedClose": "Cierre previsto"
     },
     "preview": {
       "title": "Vista previa",
@@ -209,7 +222,8 @@
       "monthName": "Abril",
       "totalIncome": "Ingresos totales",
       "totalExpenses": "Gastos totales",
-      "monthlySavings": "Ahorro del mes"
+      "monthlySavings": "Ahorro del mes",
+      "endingBalance": "Saldo final"
     }
   },
   "Demo": {
