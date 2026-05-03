@@ -210,7 +210,7 @@ export function YearConfigForm({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      <div className="max-h-[min(72vh,44rem)] overflow-y-auto px-5 pb-5 md:px-6 md:pb-6">
+      <div className="px-5 pt-4 pb-5 md:px-6 md:pt-5 md:pb-6">
         <div className="grid gap-3">
           <section className="rounded-lg border border-border/70 bg-card p-4 shadow-sm">
             <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">

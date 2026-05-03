@@ -190,22 +190,24 @@ export function KpiCards({
                           </Button>
                         }
                       />
-                      <DialogContent className="gap-4 overflow-hidden p-0 sm:max-w-3xl lg:max-w-4xl">
-                        <DialogHeader className="sticky top-0 z-10 border-b border-border/60 bg-card/75 px-5 pt-5 pb-4 backdrop-blur-md md:px-6 md:pt-6 md:pb-5">
-                          <DialogTitle>{tAnnual("configTitle")}</DialogTitle>
-                          <DialogDescription>
-                            {tAnnual("configDescription")}
-                          </DialogDescription>
-                        </DialogHeader>
-                        <YearConfigForm
-                          config={config}
-                          startingBalanceEditable={startingBalanceEditable}
-                          onConfigChange={onConfigChange}
-                          onConfigApplied={onConfigApplied}
-                          recurringExpenses={recurringExpenses}
-                          onRecurringExpensesApplied={onRecurringExpensesApplied}
-                          onPendingSave={onPendingSave}
-                        />
+                      <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-3xl lg:max-w-4xl">
+                        <div className="max-h-[calc(100dvh-2rem)] overflow-y-auto">
+                          <DialogHeader className="sticky top-0 z-10 border-b border-border/50 bg-card/70 px-5 pt-5 pr-14 pb-4 shadow-[0_10px_30px_-24px_rgba(50,50,93,0.45)] backdrop-blur-xl supports-[backdrop-filter]:bg-card/55 md:px-6 md:pt-6 md:pr-16 md:pb-5">
+                            <DialogTitle>{tAnnual("configTitle")}</DialogTitle>
+                            <DialogDescription>
+                              {tAnnual("configDescription")}
+                            </DialogDescription>
+                          </DialogHeader>
+                          <YearConfigForm
+                            config={config}
+                            startingBalanceEditable={startingBalanceEditable}
+                            onConfigChange={onConfigChange}
+                            onConfigApplied={onConfigApplied}
+                            recurringExpenses={recurringExpenses}
+                            onRecurringExpensesApplied={onRecurringExpensesApplied}
+                            onPendingSave={onPendingSave}
+                          />
+                        </div>
                       </DialogContent>
                     </Dialog>
 
