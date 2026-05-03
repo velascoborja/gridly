@@ -5,12 +5,15 @@ import { propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { deriveStartingBalance, shouldAllowYearCreation } from "@/lib/server/year-planning";
 import { getSessionUser } from "@/lib/server/session";
 import { getYearData } from "@/lib/server/year-data";
+import { ensureUserExists } from "@/lib/server/user-provisioning";
 
 export async function GET() {
   const user = await getSessionUser();
   if (!user?.id) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  await ensureUserExists(user);
 
   const rows = await db
     .select({ year: years.year, id: years.id })

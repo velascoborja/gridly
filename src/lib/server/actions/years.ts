@@ -6,6 +6,7 @@ import { asc, eq } from "drizzle-orm";
 import { propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { deriveStartingBalance, shouldAllowYearCreation } from "@/lib/server/year-planning";
 import { getSessionUser } from "@/lib/server/session";
+import { ensureUserExists } from "@/lib/server/user-provisioning";
 import { getYearData } from "@/lib/server/year-data";
 import { computeMonthChain, estimatedMonthData } from "@/lib/calculations";
 import type { YearConfig } from "@/lib/types";
@@ -26,6 +27,8 @@ export async function createAndPrefillYear(data: {
 }) {
   const user = await getSessionUser();
   if (!user?.id) throw new Error("Unauthorized");
+
+  await ensureUserExists(user);
 
   const existingYears = await db
     .select({ year: years.year })
