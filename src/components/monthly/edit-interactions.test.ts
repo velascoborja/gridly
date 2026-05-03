@@ -52,7 +52,7 @@ test("bonus is not exposed as a monthly fixed income field", () => {
   assert.doesNotMatch(routeSource, /"bonus"/);
 });
 
-test("inline fixed fields expose annual reset action only when values diverge", () => {
+test("inline fixed fields can expose annual reset action from explicit manual state", () => {
   const source = readFileSync(new URL("./inline-edit-field.tsx", import.meta.url), "utf8");
 
   assert.match(source, /resetValue\?: number/);
@@ -61,6 +61,29 @@ test("inline fixed fields expose annual reset action only when values diverge", 
   assert.match(source, /const resetVisible = showReset \?\? \(resetValue !== undefined && Math\.abs\(value - resetValue\) > 0\.005\)/);
   assert.match(source, /<BrushCleaning[\s\S]*<button/);
   assert.match(source, /onClick=\{\(event\) => void handleReset\(event\)\}/);
+});
+
+test("annual-backed monthly reset buttons depend on manual override flags", () => {
+  const incomeSource = readFileSync(new URL("./income-card.tsx", import.meta.url), "utf8");
+  const expensesSource = readFileSync(new URL("./fixed-expenses-card.tsx", import.meta.url), "utf8");
+  const overviewSource = readFileSync(new URL("./month-overview.tsx", import.meta.url), "utf8");
+  const routeSource = readFileSync(new URL("../../app/api/months/[monthId]/route.ts", import.meta.url), "utf8");
+  const schemaSource = readFileSync(new URL("../../db/schema.ts", import.meta.url), "utf8");
+
+  assert.match(incomeSource, /showReset=\{month\.payslipManualOverride\}/);
+  assert.match(incomeSource, /onReset=\{\(v\) => onUpdate\("payslip", v, \{ payslipManualOverride: false \}\)\}/);
+  assert.match(incomeSource, /showReset=\{month\.additionalPayslipManualOverride\}/);
+  assert.match(
+    incomeSource,
+    /onReset=\{\(v\) => onUpdate\("additionalPayslip", v, \{ additionalPayslipManualOverride: false \}\)\}/
+  );
+  assert.match(expensesSource, /showReset=\{month\.homeExpenseManualOverride\}/);
+  assert.match(expensesSource, /showReset=\{month\.personalExpenseManualOverride\}/);
+  assert.match(expensesSource, /showReset=\{month\.investmentManualOverride\}/);
+  assert.match(overviewSource, /type FixedUpdateOptions = Partial<Pick<[\s\S]*MonthData,[\s\S]*"payslipManualOverride"/);
+  assert.match(routeSource, /const manualOverrideFields = \{/);
+  assert.match(routeSource, /updates\[manualOverrideField\] = true/);
+  assert.match(schemaSource, /payslipManualOverride: boolean\("payslip_manual_override"\)/);
 });
 
 test("monthly fixed fields map annual setup values to reset targets", () => {
@@ -100,7 +123,7 @@ test("interest reset clears the manual override instead of saving another manual
   const overviewSource = readFileSync(new URL("./month-overview.tsx", import.meta.url), "utf8");
   const routeSource = readFileSync(new URL("../../app/api/months/[monthId]/route.ts", import.meta.url), "utf8");
 
-  assert.match(overviewSource, /type FixedUpdateOptions = \{ interestsManualOverride\?: boolean \}/);
+  assert.match(overviewSource, /type FixedUpdateOptions = Partial<Pick<[\s\S]*"interestsManualOverride"/);
   assert.match(overviewSource, /\.\.\.\(options\?\.interestsManualOverride !== undefined[\s\S]*interestsManualOverride: options\.interestsManualOverride/);
   assert.match(routeSource, /body\.interestsManualOverride !== undefined/);
   assert.match(routeSource, /updates\.interestsManualOverride = Boolean\(body\.interestsManualOverride\)/);

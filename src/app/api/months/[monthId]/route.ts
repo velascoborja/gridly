@@ -22,11 +22,34 @@ export async function PATCH(
     "homeExpense", "personalExpense", "investment",
     "payslip", "additionalPayslip", "interests", "personalRemaining",
   ] as const;
+  const manualOverrideFields = {
+    homeExpense: "homeExpenseManualOverride",
+    personalExpense: "personalExpenseManualOverride",
+    investment: "investmentManualOverride",
+    payslip: "payslipManualOverride",
+    additionalPayslip: "additionalPayslipManualOverride",
+  } as const;
+  const explicitManualOverrideFields = [
+    "homeExpenseManualOverride",
+    "personalExpenseManualOverride",
+    "investmentManualOverride",
+    "payslipManualOverride",
+    "additionalPayslipManualOverride",
+  ] as const;
 
   const updates: Partial<typeof months.$inferInsert> = {};
   for (const field of fields) {
     if (body[field] !== undefined) {
       (updates as Record<string, string>)[field] = String(body[field]);
+      const manualOverrideField = manualOverrideFields[field as keyof typeof manualOverrideFields];
+      if (manualOverrideField && body[manualOverrideField] === undefined) {
+        updates[manualOverrideField] = true;
+      }
+    }
+  }
+  for (const field of explicitManualOverrideFields) {
+    if (body[field] !== undefined) {
+      updates[field] = Boolean(body[field]);
     }
   }
   if (body.interestsManualOverride !== undefined) {

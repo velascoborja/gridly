@@ -136,10 +136,15 @@ interface RawMonthData {
   yearId: number;
   month: number;
   homeExpense: number;
+  homeExpenseManualOverride: boolean;
   personalExpense: number;
+  personalExpenseManualOverride: boolean;
   investment: number;
+  investmentManualOverride: boolean;
   payslip: number;
+  payslipManualOverride: boolean;
   additionalPayslip: number;
+  additionalPayslipManualOverride: boolean;
   interests: number;
   interestsManualOverride: boolean;
   personalRemaining: number;
@@ -152,13 +157,18 @@ function estimatedMonthData(month: number, config: YearConfig): Omit<RawMonthDat
   return {
     month,
     homeExpense: config.monthlyHomeExpense,
+    homeExpenseManualOverride: false,
     personalExpense: config.monthlyPersonalBudget,
+    personalExpenseManualOverride: false,
     investment: config.monthlyInvestment,
+    investmentManualOverride: false,
     payslip: config.estimatedSalary,
+    payslipManualOverride: false,
     additionalPayslip:
       config.hasExtraPayments && (month === 6 || month === 12)
         ? config.estimatedExtraPayment
         : 0,
+    additionalPayslipManualOverride: false,
     interests: 0,
     interestsManualOverride: false,
     personalRemaining: 0,

@@ -18,6 +18,13 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { InlineEditField } from "@/components/monthly/inline-edit-field";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import type { RecurringExpenseInput } from "@/lib/recurring-expenses";
 import type { YearConfig, YearData, YearRecurringExpense } from "@/lib/types";
@@ -26,11 +33,13 @@ interface Props {
   config: YearConfig;
   startingBalanceEditable: boolean;
   onConfigChange: Dispatch<SetStateAction<YearConfig>>;
-  onConfigApplied?: (config: YearConfig) => void;
+  onConfigApplied?: (config: YearConfig, applyFromMonth: number) => void;
   recurringExpenses: YearRecurringExpense[];
   onRecurringExpensesApplied: (yearData: YearData) => void;
   onPendingSave?: (savePromise: Promise<void>) => void;
 }
+
+const MONTH_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
 interface PendingOverwrite {
   field: keyof YearConfig;
@@ -59,30 +68,38 @@ export function YearConfigForm({
   const [recurringError, setRecurringError] = useState("");
   const [recurringDialogOpen, setRecurringDialogOpen] = useState(false);
   const [pendingOverwrite, setPendingOverwrite] = useState<PendingOverwrite | null>(null);
+  const [applyFromMonth, setApplyFromMonth] = useState(1);
 
   useEffect(() => {
     setRecurringDraft(recurringExpenses.map((entry) => ({ label: entry.label, amount: entry.amount })));
   }, [recurringExpenses]);
   const displayedHasExtraPayments = optimisticExtraPayments ?? config.hasExtraPayments;
   const isSavingField = (field: keyof YearConfig) => savingFields.has(field);
+  const monthFormatter = new Intl.DateTimeFormat(locale, { month: "long" });
+  const monthOptions = MONTH_NUMBERS.map((month) => ({
+    value: String(month),
+    label: monthFormatter.format(new Date(2026, month - 1, 1)),
+  }));
+  const selectedApplyFromMonthLabel =
+    monthOptions.find((month) => month.value === String(applyFromMonth))?.label ?? monthOptions[0].label;
   const confirmFallback =
     locale === "en"
       ? {
           title: "Overwrite the months?",
-          description: "This change will update all 12 months from the annual setup and overwrite manually edited fixed values.",
+          description: `This change will update months from ${selectedApplyFromMonthLabel} onward and overwrite manually edited fixed values.`,
           cancel: "Cancel",
           action: "Apply",
         }
       : {
           title: "¿Sobrescribir los meses?",
-          description: "Este cambio actualizará los 12 meses con la configuración anual y sobrescribirá los valores fijos editados manualmente.",
+          description: `Este cambio actualizará los meses desde ${selectedApplyFromMonthLabel} y sobrescribirá los valores fijos editados manualmente.`,
           cancel: "Cancelar",
           action: "Aplicar",
         };
   const confirmCopy = {
     title: t.has("confirmOverwriteTitle") ? t("confirmOverwriteTitle") : confirmFallback.title,
     description: t.has("confirmOverwriteDescription")
-      ? t("confirmOverwriteDescription")
+      ? t("confirmOverwriteDescription", { month: selectedApplyFromMonthLabel })
       : confirmFallback.description,
     cancel: t.has("confirmOverwriteCancel") ? t("confirmOverwriteCancel") : confirmFallback.cancel,
     action: t.has("confirmOverwriteAction") ? t("confirmOverwriteAction") : confirmFallback.action,
@@ -117,12 +134,12 @@ export function YearConfigForm({
       const res = await fetch(`/api/years/${config.year}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ [field]: value }),
+        body: JSON.stringify({ [field]: value, applyFromMonth }),
       });
       if (!res.ok) throw new Error("Failed to update");
       onConfigChange((current) => {
         const next = { ...current, [field]: value };
-        onConfigApplied?.(next);
+        onConfigApplied?.(next, applyFromMonth);
         return next;
       });
       router.refresh();
@@ -150,7 +167,7 @@ export function YearConfigForm({
       const res = await fetch(`/api/years/${config.year}/recurring-expenses`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ recurringExpenses: recurringDraft }),
+        body: JSON.stringify({ recurringExpenses: recurringDraft, applyFromMonth }),
       });
       if (!res.ok) throw new Error("Failed to update recurring expenses");
       const payload = await res.json();
@@ -202,7 +219,7 @@ export function YearConfigForm({
                 <p className="mt-1 text-sm leading-6 text-muted-foreground">{t("sectionStartingPointDescription")}</p>
               </div>
               <span className="inline-flex w-fit shrink-0 items-center rounded-md border border-amber-500/25 bg-amber-500/10 px-2.5 py-1 text-xs font-medium text-amber-700 dark:text-amber-300">
-                {t("overwriteBadge")}
+                {t("startingBalanceScopeBadge")}
               </span>
             </div>
             <InlineEditField
@@ -214,6 +231,36 @@ export function YearConfigForm({
             <p className="px-2 pt-1 text-sm leading-6 text-muted-foreground">
               {t(startingBalanceEditable ? "startingBalanceEditableDescription" : "startingBalanceDescription")}
             </p>
+          </section>
+
+          <section className="rounded-lg border border-primary/15 bg-primary/[0.04] p-4 shadow-sm">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
+                <h3 className="text-sm font-medium text-foreground">{t("applyFromMonthLabel")}</h3>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                  {t("applyFromMonthDescription")}
+                </p>
+                <span className="mt-3 inline-flex w-fit items-center rounded-md border border-amber-500/25 bg-amber-500/10 px-2.5 py-1 text-xs font-medium text-amber-700 dark:text-amber-300">
+                  {t("overwriteBadge", { month: selectedApplyFromMonthLabel })}
+                </span>
+              </div>
+              <Select
+                value={String(applyFromMonth)}
+                items={monthOptions}
+                onValueChange={(value) => setApplyFromMonth(Number(value ?? 1))}
+              >
+                <SelectTrigger className="h-9 w-full rounded-md border-primary/20 bg-background/95 px-3 font-medium text-foreground shadow-sm focus:border-primary focus:ring-primary/20 sm:w-44">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {monthOptions.map((month) => (
+                    <SelectItem key={month.value} value={month.value}>
+                      {month.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </section>
 
           <div className="grid items-stretch gap-3 lg:grid-cols-2">
@@ -360,7 +407,7 @@ export function YearConfigForm({
                 <AlertDialogHeader>
                   <AlertDialogTitle>{t("recurringExpensesConfirmTitle")}</AlertDialogTitle>
                   <AlertDialogDescription>
-                    {t("recurringExpensesConfirmDescription")}
+                    {t("recurringExpensesConfirmDescription", { month: selectedApplyFromMonthLabel })}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

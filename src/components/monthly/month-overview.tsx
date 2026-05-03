@@ -26,7 +26,23 @@ interface Props {
   onYearDataChange?: (yearData: YearData) => void;
 }
 
-type FixedUpdateOptions = { interestsManualOverride?: boolean };
+type FixedUpdateOptions = Partial<Pick<
+  MonthData,
+  | "homeExpenseManualOverride"
+  | "personalExpenseManualOverride"
+  | "investmentManualOverride"
+  | "payslipManualOverride"
+  | "additionalPayslipManualOverride"
+  | "interestsManualOverride"
+>>;
+
+const manualOverrideFields = {
+  homeExpense: "homeExpenseManualOverride",
+  personalExpense: "personalExpenseManualOverride",
+  investment: "investmentManualOverride",
+  payslip: "payslipManualOverride",
+  additionalPayslip: "additionalPayslipManualOverride",
+} as const;
 
 type DraggedAdditionalEntry = {
   entry: AdditionalEntry;
@@ -209,6 +225,10 @@ export function MonthOverview({
           ? {
               ...m,
               [field]: value,
+              ...(field in manualOverrideFields
+                ? { [manualOverrideFields[field as keyof typeof manualOverrideFields]]: true }
+                : {}),
+              ...options,
               ...(options?.interestsManualOverride !== undefined
                 ? { interestsManualOverride: options.interestsManualOverride }
                 : field === "interests"

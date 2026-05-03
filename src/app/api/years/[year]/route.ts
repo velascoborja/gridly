@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { months, years } from "@/db/schema";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, gte, inArray } from "drizzle-orm";
 import type { YearConfig } from "@/lib/types";
 import { propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getYearData, getYearsForUser } from "@/lib/server/year-data";
@@ -22,25 +22,35 @@ function yearConfigFromRow(row: typeof years.$inferSelect): YearConfig {
   };
 }
 
-async function applyYearConfigToStoredMonths(yearId: number, config: YearConfig) {
+function parseApplyFromMonth(value: unknown): number {
+  const month = Number(value ?? 1);
+  return Number.isInteger(month) && month >= 1 && month <= 12 ? month : 1;
+}
+
+async function applyYearConfigToStoredMonths(yearId: number, config: YearConfig, applyFromMonth: number) {
   await db
     .update(months)
     .set({
       homeExpense: String(config.monthlyHomeExpense),
+      homeExpenseManualOverride: false,
       personalExpense: String(config.monthlyPersonalBudget),
+      personalExpenseManualOverride: false,
       investment: String(config.monthlyInvestment),
+      investmentManualOverride: false,
       payslip: String(config.estimatedSalary),
+      payslipManualOverride: false,
       additionalPayslip: "0",
+      additionalPayslipManualOverride: false,
       interests: "0",
       interestsManualOverride: false,
     })
-    .where(eq(months.yearId, yearId));
+    .where(and(eq(months.yearId, yearId), gte(months.month, applyFromMonth)));
 
   if (config.hasExtraPayments) {
     await db
       .update(months)
       .set({ additionalPayslip: String(config.estimatedExtraPayment) })
-      .where(and(eq(months.yearId, yearId), inArray(months.month, [6, 12])));
+      .where(and(eq(months.yearId, yearId), gte(months.month, applyFromMonth), inArray(months.month, [6, 12])));
   }
 }
 
@@ -72,6 +82,7 @@ export async function PATCH(
   const { year } = await params;
   const yearNum = parseInt(year, 10);
   const body = await request.json();
+  const applyFromMonth = parseApplyFromMonth(body.applyFromMonth);
 
   const yearRow = await getOwnedYear(user.id, yearNum);
   if (!yearRow) return Response.json({ error: "Year not found" }, { status: 404 });
@@ -99,7 +110,7 @@ export async function PATCH(
   if (body.interestRate !== undefined) updates.interestRate = String(body.interestRate);
 
   const [updated] = await db.update(years).set(updates).where(eq(years.id, yearRow.id)).returning();
-  await applyYearConfigToStoredMonths(yearRow.id, yearConfigFromRow(updated));
+  await applyYearConfigToStoredMonths(yearRow.id, yearConfigFromRow(updated), applyFromMonth);
 
   await propagateYearCarryOver(user.id, yearNum);
   return Response.json(updated);

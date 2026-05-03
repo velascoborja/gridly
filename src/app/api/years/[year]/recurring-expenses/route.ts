@@ -8,6 +8,11 @@ import { getYearNumberForYearId, propagateYearCarryOver } from "@/lib/server/yea
 import { getSessionUser } from "@/lib/server/session";
 import { getYearData } from "@/lib/server/year-data";
 
+function parseApplyFromMonth(value: unknown): number {
+  const month = Number(value ?? 1);
+  return Number.isInteger(month) && month >= 1 && month <= 12 ? month : 1;
+}
+
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ year: string }> }
@@ -46,6 +51,7 @@ export async function PUT(
   if (!yearRow) return Response.json({ error: "Year not found" }, { status: 404 });
 
   const body = await request.json();
+  const applyFromMonth = parseApplyFromMonth(body.applyFromMonth);
   const normalized = normalizeRecurringExpenseInputs(
     Array.isArray(body.recurringExpenses) ? body.recurringExpenses : []
   );
@@ -72,14 +78,16 @@ export async function PUT(
     .where(eq(months.yearId, yearRow.id))
     .orderBy(asc(months.month));
 
-  if (monthRows.length > 0) {
+  const targetMonthRows = monthRows.filter((month) => month.month >= applyFromMonth);
+
+  if (targetMonthRows.length > 0) {
     await db
       .delete(monthlyRecurringExpenses)
-      .where(inArray(monthlyRecurringExpenses.monthId, monthRows.map((month) => month.id)));
+      .where(inArray(monthlyRecurringExpenses.monthId, targetMonthRows.map((month) => month.id)));
 
     if (templates.length > 0) {
       await db.insert(monthlyRecurringExpenses).values(
-        monthRows.flatMap((month) =>
+        targetMonthRows.flatMap((month) =>
           templates.map((template) => ({
             monthId: month.id,
             yearRecurringExpenseId: template.id,

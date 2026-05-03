@@ -18,6 +18,7 @@ The Monthly View (`/locale/[year]/[month]`) is the primary workspace for users. 
 
 ### Data Persistence
 - Client-side edits to fields (e.g., `payslip`, `homeExpense`) are saved via `PATCH /api/months/[monthId]`.
+- Setup-backed monthly fields track explicit manual override flags: `payslipManualOverride`, `additionalPayslipManualOverride`, `homeExpenseManualOverride`, `personalExpenseManualOverride`, and `investmentManualOverride`. User edits set the related flag to `true`; reset actions clear it to `false`.
 - Recurring expense edit/delete operations are saved via `/api/months/[monthId]/recurring-expenses/[entryId]`.
 - Additional income and expense entries can be moved between months from the month view. Dragging an entry onto a different month tab persists through `PATCH /api/months/[monthId]/entries/[entryId]` with a target `monthId`.
 - After a successful monthly mutation, `MonthOverview` recomputes the full month chain and lifts the updated `YearData` to `YearPageClient`. It does not call `router.refresh()`, preserving the App Router client cache while navigating between months.
@@ -40,7 +41,7 @@ Monthly recurring expense rows live in `monthly_recurring_expenses`.
 - Monthly interest is calculated based on the `Starting Balance` and the `YearConfig.interestRate`.
 - Formula: `(Starting Balance * interestRate) / 12`.
 - Users can manually override the interest amount if needed.
-- Fixed income fields can expose reset actions. Salary and extra pay reset to the annual setup values, interest resets to the calculated value and clears the manual override, and personal surplus resets to `0` when it has a non-zero value.
+- Fixed income and expense fields expose reset actions only when their explicit manual override flag is set. Salary and extra pay reset to the annual setup values, fixed expenses reset to their annual setup values, interest resets to the calculated value and clears `interestsManualOverride`, and personal surplus resets to `0` when it has a non-zero value.
 
 ### Spanish Employment Conventions
 - **Extra Pays:** In Spain, net salary is often paid in 14 payments. Gridly automatically handles this by prefilling `additionalPayslip` in June (Month 6) and December (Month 12) if the year is configured with extra payments.

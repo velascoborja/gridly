@@ -41,10 +41,15 @@ export interface MonthData {
   yearId: number;
   month: number;
   homeExpense: number;
+  homeExpenseManualOverride: boolean;
   personalExpense: number;
+  personalExpenseManualOverride: boolean;
   investment: number;
+  investmentManualOverride: boolean;
   payslip: number;
+  payslipManualOverride: boolean;
   additionalPayslip: number;
+  additionalPayslipManualOverride: boolean;
   interests: number;
   interestsManualOverride: boolean;
   personalRemaining: number;

@@ -9,9 +9,14 @@ import { sumRecurringExpenses } from "@/lib/recurring-expenses";
 import { formatCurrency } from "@/lib/utils";
 import type { MonthData, RecurringExpense, YearConfig } from "@/lib/types";
 
+type FixedUpdateOptions = Partial<Pick<
+  MonthData,
+  "homeExpenseManualOverride" | "personalExpenseManualOverride" | "investmentManualOverride"
+>>;
+
 interface Props {
   month: MonthData;
-  onUpdate: (field: string, value: number) => Promise<void>;
+  onUpdate: (field: string, value: number, options?: FixedUpdateOptions) => Promise<void>;
   onRecurringEntriesChange: (entries: RecurringExpense[]) => void;
   annualDefaults: Pick<YearConfig, "monthlyHomeExpense" | "monthlyPersonalBudget" | "monthlyInvestment">;
   readOnly?: boolean;
@@ -44,6 +49,8 @@ export function FixedExpensesCard({ month, onUpdate, onRecurringEntriesChange, a
           readOnly={readOnly}
           activateOnRowPress
           resetValue={annualDefaults.monthlyHomeExpense}
+          showReset={month.homeExpenseManualOverride}
+          onReset={(v) => onUpdate("homeExpense", v, { homeExpenseManualOverride: false })}
         />
         <InlineEditField
           label={t("personalExpense")}
@@ -52,6 +59,8 @@ export function FixedExpensesCard({ month, onUpdate, onRecurringEntriesChange, a
           readOnly={readOnly}
           activateOnRowPress
           resetValue={annualDefaults.monthlyPersonalBudget}
+          showReset={month.personalExpenseManualOverride}
+          onReset={(v) => onUpdate("personalExpense", v, { personalExpenseManualOverride: false })}
         />
         <InlineEditField
           label={t("investment")}
@@ -60,6 +69,8 @@ export function FixedExpensesCard({ month, onUpdate, onRecurringEntriesChange, a
           readOnly={readOnly}
           activateOnRowPress
           resetValue={annualDefaults.monthlyInvestment}
+          showReset={month.investmentManualOverride}
+          onReset={(v) => onUpdate("investment", v, { investmentManualOverride: false })}
         />
         <div className="mt-3 border-t border-border/60 pt-3">
           <div className="mb-2 flex items-center justify-between gap-3 px-2">

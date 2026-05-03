@@ -5,10 +5,15 @@ interface RawMonthData {
   yearId: number;
   month: number;
   homeExpense: number;
+  homeExpenseManualOverride?: boolean;
   personalExpense: number;
+  personalExpenseManualOverride?: boolean;
   investment: number;
+  investmentManualOverride?: boolean;
   payslip: number;
+  payslipManualOverride?: boolean;
   additionalPayslip: number;
+  additionalPayslipManualOverride?: boolean;
   interests: number;
   interestsManualOverride: boolean;
   personalRemaining: number;
@@ -63,6 +68,11 @@ export function computeMonthChain(
 
     return {
       ...monthWithInterest,
+      homeExpenseManualOverride: Boolean(m.homeExpenseManualOverride),
+      personalExpenseManualOverride: Boolean(m.personalExpenseManualOverride),
+      investmentManualOverride: Boolean(m.investmentManualOverride),
+      payslipManualOverride: Boolean(m.payslipManualOverride),
+      additionalPayslipManualOverride: Boolean(m.additionalPayslipManualOverride),
       totalIncome: income,
       totalExpenses: expenses,
       savings: monthSavings,
@@ -78,10 +88,15 @@ export function estimatedMonthData(month: number, config: YearConfig): Omit<RawM
   return {
     month,
     homeExpense: config.monthlyHomeExpense,
+    homeExpenseManualOverride: false,
     personalExpense: config.monthlyPersonalBudget,
+    personalExpenseManualOverride: false,
     investment: config.monthlyInvestment,
+    investmentManualOverride: false,
     payslip: config.estimatedSalary,
+    payslipManualOverride: false,
     additionalPayslip: config.hasExtraPayments && isExtraPaymentMonth ? config.estimatedExtraPayment : 0,
+    additionalPayslipManualOverride: false,
     interests: 0,
     interestsManualOverride: false,
     personalRemaining: 0,
@@ -91,16 +106,25 @@ export function estimatedMonthData(month: number, config: YearConfig): Omit<RawM
   };
 }
 
-export function applyYearConfigToMonth<T extends RawMonthData>(month: T, config: YearConfig): T {
+export function applyYearConfigToMonth<T extends RawMonthData>(month: T, config: YearConfig, applyFromMonth = 1): T {
+  if (month.month < applyFromMonth) {
+    return month;
+  }
+
   const isExtraPaymentMonth = month.month === 6 || month.month === 12;
 
   return {
     ...month,
     homeExpense: config.monthlyHomeExpense,
+    homeExpenseManualOverride: false,
     personalExpense: config.monthlyPersonalBudget,
+    personalExpenseManualOverride: false,
     investment: config.monthlyInvestment,
+    investmentManualOverride: false,
     payslip: config.estimatedSalary,
+    payslipManualOverride: false,
     additionalPayslip: config.hasExtraPayments && isExtraPaymentMonth ? config.estimatedExtraPayment : 0,
+    additionalPayslipManualOverride: false,
     interests: 0,
     interestsManualOverride: false,
   };

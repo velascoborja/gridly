@@ -24,7 +24,7 @@ interface Props {
   startingBalanceEditable: boolean;
   readOnly?: boolean;
   onConfigChange: Dispatch<SetStateAction<YearConfig>>;
-  onConfigApplied: (config: YearConfig) => void;
+  onConfigApplied: (config: YearConfig, applyFromMonth: number) => void;
   recurringExpenses: YearRecurringExpense[];
   onRecurringExpensesApplied: (yearData: YearData) => void;
   onExport: () => void;

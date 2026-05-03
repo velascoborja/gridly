@@ -6,7 +6,7 @@ test("annual config edits sync recalculated year data to parent state", () => {
   const source = readFileSync(new URL("./annual-view.tsx", import.meta.url), "utf8");
 
   assert.match(source, /onYearDataChange\?: \(yearData: YearData\) => void/);
-  assert.match(source, /const applyConfigToMonths = \(nextConfig: YearConfig\) => \{/);
+  assert.match(source, /const applyConfigToMonths = \(nextConfig: YearConfig, applyFromMonth: number\) => \{/);
   assert.match(source, /onYearDataChange\?\.\(\{[\s\S]*config: nextConfig,[\s\S]*months: recomputedMonths,[\s\S]*\}\)/);
 });
 
@@ -15,11 +15,30 @@ test("annual config edits reapply setup defaults across monthly rows", () => {
   const formSource = readFileSync(new URL("./year-config-form.tsx", import.meta.url), "utf8");
 
   assert.match(source, /applyYearConfigToMonth/, "annual state should reuse the setup-field overwrite helper");
-  assert.match(source, /const updatedRows = current\.map\(\(month\) => applyYearConfigToMonth\(month, nextConfig\)\)/);
+  assert.match(source, /const updatedRows = current\.map\(\(month\) => applyYearConfigToMonth\(month, nextConfig, applyFromMonth\)\)/);
   assert.match(formSource, /AlertDialog/, "saving annual setup edits should warn before overwriting monthly edits");
   assert.match(formSource, /confirmOverwriteTitle/, "warning copy should be localized");
   assert.match(formSource, /t\.has\("confirmOverwriteTitle"\)/, "dialog should not render raw translation keys if the bundle is stale");
   assert.match(formSource, /¿Sobrescribir los meses\?/, "dialog should keep a Spanish fallback for the confirmation title");
+});
+
+test("annual setup dialog exposes one apply-from month selector for setup and recurring overwrites", () => {
+  const formSource = readFileSync(new URL("./year-config-form.tsx", import.meta.url), "utf8");
+  const yearRouteSource = readFileSync(new URL("../../app/api/years/[year]/route.ts", import.meta.url), "utf8");
+  const recurringRouteSource = readFileSync(
+    new URL("../../app/api/years/[year]/recurring-expenses/route.ts", import.meta.url),
+    "utf8"
+  );
+
+  assert.match(formSource, /const \[applyFromMonth, setApplyFromMonth\] = useState\(1\)/);
+  assert.match(formSource, /applyFromMonthLabel/);
+  assert.match(formSource, /<Select[\s\S]*value=\{String\(applyFromMonth\)\}[\s\S]*items=\{monthOptions\}/);
+  assert.match(formSource, /body: JSON\.stringify\(\{ \[field\]: value, applyFromMonth \}\)/);
+  assert.match(formSource, /body: JSON\.stringify\(\{ recurringExpenses: recurringDraft, applyFromMonth \}\)/);
+  assert.match(formSource, /onConfigApplied\?: \(config: YearConfig, applyFromMonth: number\) => void/);
+  assert.match(yearRouteSource, /const applyFromMonth = parseApplyFromMonth\(body\.applyFromMonth\)/);
+  assert.match(recurringRouteSource, /const applyFromMonth = parseApplyFromMonth\(body\.applyFromMonth\)/);
+  assert.match(recurringRouteSource, /month\.month >= applyFromMonth/);
 });
 
 test("year page lets annual summary update shared year data", () => {
@@ -103,18 +122,21 @@ test("annual setup form groups fields into sorted financial sections", () => {
   const formSource = readFileSync(new URL("./year-config-form.tsx", import.meta.url), "utf8");
 
   const startingIndex = formSource.indexOf('t("sectionStartingPoint")');
+  const applyFromIndex = formSource.indexOf('t("applyFromMonthLabel")');
   const incomeIndex = formSource.indexOf('t("sectionIncome")');
   const allocationIndex = formSource.indexOf('t("sectionMonthlyAllocation")');
   const growthIndex = formSource.indexOf('t("sectionGrowth")');
   const recurringIndex = formSource.indexOf('t("recurringExpensesTitle")');
 
   assert.ok(startingIndex > -1, "starting point section should be rendered");
-  assert.ok(incomeIndex > startingIndex, "income should follow starting point");
+  assert.ok(applyFromIndex > startingIndex, "apply-from scope should follow starting point");
+  assert.ok(incomeIndex > applyFromIndex, "income should follow the apply-from scope");
   assert.ok(allocationIndex > incomeIndex, "monthly allocation should follow income");
   assert.ok(growthIndex > allocationIndex, "growth assumptions should follow monthly allocation");
   assert.ok(recurringIndex > growthIndex, "recurring expenses editor should follow setup sections");
   assert.match(formSource, /lg:grid-cols-2/, "income and monthly allocation should pair on larger screens");
-  assert.match(formSource, /t\("overwriteBadge"\)/, "the form should show a visible overwrite impact badge");
+  assert.match(formSource, /t\("overwriteBadge", \{ month: selectedApplyFromMonthLabel \}\)/, "the form should show a visible overwrite impact badge");
+  assert.match(formSource, /t\("startingBalanceScopeBadge"\)/, "starting balance should be labeled as an annual-chain value");
 });
 
 test("annual setup dialog has room for the grouped desktop layout", () => {

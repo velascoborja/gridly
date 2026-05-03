@@ -36,9 +36,9 @@ export function AnnualView({
     setRecurringExpenses(initial.recurringExpenses);
   }, [initial]);
 
-  const applyConfigToMonths = (nextConfig: YearConfig) => {
+  const applyConfigToMonths = (nextConfig: YearConfig, applyFromMonth: number) => {
     setMonthRows((current) => {
-      const updatedRows = current.map((month) => applyYearConfigToMonth(month, nextConfig));
+      const updatedRows = current.map((month) => applyYearConfigToMonth(month, nextConfig, applyFromMonth));
       const recomputedMonths = computeMonthChain(updatedRows, nextConfig.startingBalance, nextConfig.interestRate);
       onYearDataChange?.({
         config: nextConfig,

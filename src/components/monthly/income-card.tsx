@@ -7,7 +7,10 @@ import { InlineEditField } from "./inline-edit-field";
 import { calculateMonthlyInterest } from "@/lib/calculations";
 import type { MonthData, YearConfig } from "@/lib/types";
 
-type FixedUpdateOptions = { interestsManualOverride?: boolean };
+type FixedUpdateOptions = Partial<Pick<
+  MonthData,
+  "payslipManualOverride" | "additionalPayslipManualOverride" | "interestsManualOverride"
+>>;
 
 interface Props {
   month: MonthData;
@@ -43,6 +46,8 @@ export function IncomeCard({ month, onUpdate, showAdditionalPayslip, annualDefau
           readOnly={readOnly}
           activateOnRowPress
           resetValue={annualDefaults.estimatedSalary}
+          showReset={month.payslipManualOverride}
+          onReset={(v) => onUpdate("payslip", v, { payslipManualOverride: false })}
         />
         {showAdditionalPayslip && (
           <InlineEditField
@@ -52,6 +57,8 @@ export function IncomeCard({ month, onUpdate, showAdditionalPayslip, annualDefau
             readOnly={readOnly}
             activateOnRowPress
             resetValue={annualDefaults.estimatedExtraPayment}
+            showReset={month.additionalPayslipManualOverride}
+            onReset={(v) => onUpdate("additionalPayslip", v, { additionalPayslipManualOverride: false })}
           />
         )}
         <InlineEditField

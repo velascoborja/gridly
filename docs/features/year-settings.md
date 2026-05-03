@@ -56,23 +56,25 @@ Once a year is created, its configuration can be modified within the **Annual Su
 - **Component:** `src/components/annual/year-config-form.tsx` allows inline editing of all fields.
 - **Layout:** The annual setup dialog groups setup fields into Starting point, Income, Monthly allocation, and Growth assumptions. The form is single-column on mobile and pairs Income with Monthly allocation on larger screens.
 - **Scroll Chrome:** The annual setup dialog header is sticky with a translucent blurred card background so metadata and actions remain visible while the form body scrolls underneath.
+- **Apply Scope:** The dialog includes an "Apply changes from" selector, defaulting to January. Monthly setup value saves and recurring expense reapplications only overwrite months from the selected month through December. `startingBalance` remains a year-level chain anchor.
 - **Persistence:** Changes are sent via `PATCH /api/years/[year]`.
-- **Confirmation:** Before saving any setup value, the form shows a warning that the change will overwrite monthly fixed values.
+- **Confirmation:** Before saving any setup value, the form shows a warning that the change will overwrite monthly fixed values from the selected month onward.
 - **Cache Refresh:** After a successful save, the client calls `router.refresh()` so route cache restores after visiting setup or another route include the updated annual balance.
-- **Side Effects:** Saving a setup value reapplies the full annual baseline to all 12 months. The client uses `applyYearConfigToMonth` for immediate recalculation, and `PATCH /api/years/[year]` persists the same overwrite rules:
+- **Side Effects:** Saving a monthly setup value reapplies the annual baseline to the selected apply-from range. The client uses `applyYearConfigToMonth(month, config, applyFromMonth)` for immediate recalculation, and `PATCH /api/years/[year]` persists the same overwrite rules for months in that range:
   - `payslip` = `estimatedSalary`.
   - `homeExpense` = `monthlyHomeExpense`.
   - `personalExpense` = `monthlyPersonalBudget`.
   - `investment` = `monthlyInvestment`.
   - `additionalPayslip` = `estimatedExtraPayment` for June/December when extra pays are enabled, otherwise `0`.
+  - Manual override flags for the setup-backed fields are cleared for the selected range.
   - `interestsManualOverride` is reset to `false` so interest follows the current annual rate again.
-  - Manual monthly fixed-value edits are overwritten; additional entries and personal remaining values are preserved.
+  - Manual monthly fixed-value edits are overwritten only in the selected range; earlier months keep their existing fixed values. Additional entries and personal remaining values are preserved.
 
 Annual Summary also includes the recurring expense template editor.
 
 - **Endpoint:** `PUT /api/years/[year]/recurring-expenses`.
-- **Side Effect:** The template list is authoritative. Saving it deletes all monthly recurring expense rows for that year and recreates them from the template, overriding any manual monthly recurring expense edits.
-- **Confirmation:** The UI shows a Spanish confirmation dialog before applying this overwrite.
+- **Side Effect:** The template list is authoritative. Saving it deletes monthly recurring expense rows from the selected apply-from month through December and recreates them from the template, overriding manual monthly recurring expense edits only in that range.
+- **Confirmation:** The UI shows a localized confirmation dialog before applying this overwrite.
 
 ## Implementation Details
 
