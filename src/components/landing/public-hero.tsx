@@ -122,19 +122,6 @@ export function PublicHero({ accountDeleted = false, authError = false }: Public
               <p className="max-w-xl text-base font-light leading-7 text-[#64748d] sm:text-lg">{t("heroDescription")}</p>
             </div>
 
-            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <GoogleSignInButton className="w-full sm:w-auto" buttonClassName="w-full justify-center sm:w-auto" />
-              <Link
-                href={demoHref}
-                className={cn(
-                  buttonVariants({ variant: "outline", size: "lg" }),
-                  "w-full justify-center rounded-[4px] border-[#b9b9f9] bg-white/82 px-5 text-base font-normal text-[#533afd] shadow-[0_15px_35px_-18px_rgba(50,50,93,0.16)] hover:bg-[#533afd]/[0.05] hover:text-[#533afd] sm:w-auto",
-                )}
-              >
-                {t("demoCta")}
-              </Link>
-            </div>
-
             <div className="grid gap-2 sm:grid-cols-3">
               {PROOF_CHIPS.map((label) => (
                 <div
