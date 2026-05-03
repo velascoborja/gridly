@@ -23,6 +23,19 @@ test("setup submits recurring expense templates with the year config", () => {
   assert.match(source, /recurringExpenses,/);
 });
 
+test("setup numeric fields start empty and use translated placeholder hints", () => {
+  const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /placeholder: t\("estimatedSalaryPlaceholder"\)/);
+  assert.match(source, /placeholder: t\("monthlyHomeExpensePlaceholder"\)/);
+  assert.match(source, /placeholder: t\("monthlyPersonalBudgetPlaceholder"\)/);
+  assert.match(source, /placeholder: t\("monthlyInvestmentPlaceholder"\)/);
+  assert.match(source, /placeholder: t\("interestRatePlaceholder"\)/);
+  assert.match(source, /\["startingBalance", startingBalanceEditable \? "" : String\(derivedStartingBalance\)\]/);
+  assert.match(source, /\["estimatedExtraPayment", ""\]/);
+  assert.doesNotMatch(source, /defaultValue: "0"/);
+});
+
 test("create year submission refreshes before returning to the selected route", () => {
   const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
 

@@ -16,7 +16,7 @@ import { createAndPrefillYear } from "@/lib/server/actions/years";
 interface Field {
   key: string;
   label: string;
-  defaultValue: string;
+  placeholder: string;
 }
 
 interface Props {
@@ -34,18 +34,18 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
     searchParams.get("redirect") ?? `/${year}/${new Date().getMonth() + 1}`;
 
   const FIELDS: Field[] = [
-    { key: "estimatedSalary", label: t("estimatedSalary"), defaultValue: "0" },
-    { key: "monthlyHomeExpense", label: t("monthlyHomeExpense"), defaultValue: "0" },
-    { key: "monthlyPersonalBudget", label: t("monthlyPersonalBudget"), defaultValue: "0" },
-    { key: "monthlyInvestment", label: t("monthlyInvestment"), defaultValue: "0" },
-    { key: "interestRate", label: t("interestRate"), defaultValue: "0" },
+    { key: "estimatedSalary", label: t("estimatedSalary"), placeholder: t("estimatedSalaryPlaceholder") },
+    { key: "monthlyHomeExpense", label: t("monthlyHomeExpense"), placeholder: t("monthlyHomeExpensePlaceholder") },
+    { key: "monthlyPersonalBudget", label: t("monthlyPersonalBudget"), placeholder: t("monthlyPersonalBudgetPlaceholder") },
+    { key: "monthlyInvestment", label: t("monthlyInvestment"), placeholder: t("monthlyInvestmentPlaceholder") },
+    { key: "interestRate", label: t("interestRate"), placeholder: t("interestRatePlaceholder") },
   ];
 
   const [values, setValues] = useState<Record<string, string>>(
     Object.fromEntries([
-      ["startingBalance", String(derivedStartingBalance)],
-      ["estimatedExtraPayment", "0"],
-      ...FIELDS.map((f) => [f.key, f.defaultValue]),
+      ["startingBalance", startingBalanceEditable ? "" : String(derivedStartingBalance)],
+      ["estimatedExtraPayment", ""],
+      ...FIELDS.map((f) => [f.key, ""]),
     ])
   );
   const [hasExtraPayments, setHasExtraPayments] = useState(false);
@@ -88,7 +88,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
 
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(64,148,255,0.12),transparent_32%),radial-gradient(circle_at_top_right,rgba(16,185,129,0.08),transparent_28%),linear-gradient(180deg,rgba(248,250,252,0.96),rgba(255,255,255,1))] px-4 py-8 text-foreground sm:px-6 lg:px-8">
-      <div className="mx-auto grid min-h-[calc(100vh-4rem)] w-full max-w-6xl items-center gap-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)]">
+      <div className="mx-auto grid min-h-[calc(100vh-4rem)] w-full max-w-6xl items-start gap-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)]">
         <section className="relative overflow-hidden rounded-[2rem] border border-border/70 bg-[linear-gradient(145deg,rgba(15,23,42,0.94),rgba(37,99,235,0.88))] px-6 py-8 text-primary-foreground shadow-[0_36px_100px_-48px_rgba(15,23,42,0.75)] sm:px-8 sm:py-10">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.18),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.18),transparent_22%)]" />
           <div className="pointer-events-none absolute -right-24 top-10 size-56 rounded-full bg-white/10 blur-3xl" />
@@ -173,6 +173,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
                   inputMode="decimal"
                   value={values.startingBalance}
                   onChange={(e) => setValues((prev) => ({ ...prev, startingBalance: e.target.value }))}
+                  placeholder={t("startingBalancePlaceholder")}
                   disabled={submitting || !startingBalanceEditable}
                   className="h-11 rounded-xl px-4 text-sm"
                 />
@@ -191,6 +192,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
                     inputMode="decimal"
                     value={values[f.key]}
                     onChange={(e) => setValues((prev) => ({ ...prev, [f.key]: e.target.value }))}
+                    placeholder={f.placeholder}
                     disabled={submitting}
                     className="h-11 rounded-xl px-4 text-sm"
                   />
@@ -255,6 +257,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
                         onChange={(e) =>
                           setValues((prev) => ({ ...prev, estimatedExtraPayment: e.target.value }))
                         }
+                        placeholder={t("estimatedExtraPaymentPlaceholder")}
                         disabled={submitting || !hasExtraPayments}
                         className="mt-5 h-11 rounded-xl px-4 text-sm"
                       />
