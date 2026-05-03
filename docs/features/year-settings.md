@@ -11,6 +11,21 @@ Years are created through a guided setup process located at `/setup/[year]`.
 3. **Server Action:** `createAndPrefillYear` in `src/lib/server/actions/years.ts` validates ownership, inserts the year configuration, stores recurring expense templates, initializes all 12 months, copies recurring expenses into each month, propagates carry-over, and revalidates the app layout.
 4. **Return Navigation:** The create-year entry point includes a `redirect` query pointing to the current month or annual summary route. Navigation components use `buildSetupHrefFromPathname` from `src/lib/year-routes.ts` to derive this redirect from the current browser pathname at click time. This ensures that even if the user has navigated locally (via `pushState`), the setup flow returns them to the exact view they were looking at. After the Server Action completes, the setup client performs a hard navigation to the localized redirect target.
 
+The setup screen is a single-page guided workspace. Desktop layouts use a left section stepper, central grouped setup form, and sticky year preview panel. Mobile layouts collapse the stepper into a horizontal section row and render the preview as a normal review block near submission.
+
+## Setup Layout
+
+The creation screen groups setup fields by financial purpose:
+
+- **Starting point:** `startingBalance`, including a locked derived state when the balance comes from the previous year.
+- **Income:** `estimatedSalary`, `hasExtraPayments`, and `estimatedExtraPayment`.
+- **Monthly plan:** `monthlyHomeExpense`, `monthlyPersonalBudget`, and `monthlyInvestment`.
+- **Growth:** `interestRate`.
+- **Recurring expenses:** the year recurring expense template editor.
+- **Review and create:** final error handling, live preview, and submit action.
+
+The live preview is derived only from local form state. It shows the starting balance, monthly income, planned expenses, monthly investment, estimated monthly savings before interest, extra-pay status, and a reminder that recurring templates are copied into all 12 months. It does not add fields to the creation payload.
+
 ## Navigation & Workspace Model
 
 Gridly employs an "In-Year Workspace" model to manage the complex financial state of a year:
