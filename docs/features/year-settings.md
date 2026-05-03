@@ -8,10 +8,9 @@ Years are created through a guided setup process located at `/setup/[year]`.
 
 1. **Setup Page:** `src/app/[locale]/setup/[year]/page.tsx` serves the setup form.
 2. **Client Component:** `src/components/setup/setup-page-client.tsx` handles the form state and submission.
-3. **Server Action Call:** The setup form submits to `createAndPrefillYear` (`src/lib/server/actions/years.ts`) with the initial configuration.
-4. **Atomic Persistence + Prefill:** The server action inserts the year, inserts yearly recurring templates, creates all 12 months, and copies recurring templates into every month inside a transaction.
-5. **User Provisioning Guard:** Before inserting the year, the action ensures the authenticated user row exists in `users` (`ensureUserExists` in `src/lib/server/user-provisioning.ts`). This prevents first-year creation failures caused by missing user records.
-6. **Return Navigation:** The create-year entry point includes a `redirect` query pointing to the current month or annual summary route. Navigation components use `buildSetupHrefFromPathname` from `src/lib/year-routes.ts` to derive this redirect from the current browser pathname at click time. This ensures that even if the user has navigated locally (via `pushState`), the setup flow returns them to the exact view they were looking at. The setup client refreshes the Next route cache before navigating back.
+3. **API Call:** A `POST` request is sent to `/api/years` with the initial configuration.
+4. **Data Prefill:** Upon successful creation, a `POST` request is sent to `/api/years/[year]/prefill`. This endpoint initializes all 12 months for that year using the provided configuration.
+5. **Return Navigation:** The create-year entry point includes a `redirect` query pointing to the current month or annual summary route. Navigation components use `buildSetupHrefFromPathname` from `src/lib/year-routes.ts` to derive this redirect from the current browser pathname at click time. This ensures that even if the user has navigated locally (via `pushState`), the setup flow returns them to the exact view they were looking at. The setup client refreshes the Next route cache before navigating back.
 
 ## Navigation & Workspace Model
 
