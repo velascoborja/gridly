@@ -47,100 +47,98 @@ export async function createAndPrefillYear(data: {
     }
   }
 
-  await db.transaction(async (tx) => {
-    // 1. Insert Year Config
-    const [yearRow] = await tx
-      .insert(years)
-      .values({
-        userId: user.id,
-        year: data.year,
-        startingBalance: String(finalStartingBalance),
-        estimatedSalary: String(data.estimatedSalary),
-        hasExtraPayments: data.hasExtraPayments,
-        estimatedExtraPayment: String(data.estimatedExtraPayment),
-        monthlyInvestment: String(data.monthlyInvestment),
-        monthlyHomeExpense: String(data.monthlyHomeExpense),
-        monthlyPersonalBudget: String(data.monthlyPersonalBudget),
-        interestRate: String(data.interestRate),
-      })
-      .returning();
-
-    // 2. Insert Recurring Expense Templates
-    if (data.recurringExpenses.length > 0) {
-      const recurringValues = data.recurringExpenses
-        .map((entry, index) => ({
-          yearId: yearRow.id,
-          label: String(entry.label ?? "").trim(),
-          amount: String(Number(entry.amount) || 0),
-          sortOrder: index,
-        }))
-        .filter((entry) => entry.label.length > 0);
-
-      if (recurringValues.length > 0) {
-        await tx.insert(yearRecurringExpenses).values(recurringValues);
-      }
-    }
-
-    // 3. Prefill Months
-    const config: YearConfig = {
-      id: yearRow.id,
-      year: yearRow.year,
-      startingBalance: finalStartingBalance,
-      estimatedSalary: data.estimatedSalary,
+  // 1. Insert Year Config
+  const [yearRow] = await db
+    .insert(years)
+    .values({
+      userId: user.id,
+      year: data.year,
+      startingBalance: String(finalStartingBalance),
+      estimatedSalary: String(data.estimatedSalary),
       hasExtraPayments: data.hasExtraPayments,
-      estimatedExtraPayment: data.estimatedExtraPayment,
-      monthlyInvestment: data.monthlyInvestment,
-      monthlyHomeExpense: data.monthlyHomeExpense,
-      monthlyPersonalBudget: data.monthlyPersonalBudget,
-      interestRate: data.interestRate,
-    };
+      estimatedExtraPayment: String(data.estimatedExtraPayment),
+      monthlyInvestment: String(data.monthlyInvestment),
+      monthlyHomeExpense: String(data.monthlyHomeExpense),
+      monthlyPersonalBudget: String(data.monthlyPersonalBudget),
+      interestRate: String(data.interestRate),
+    })
+    .returning();
 
-    const computedMonths = computeMonthChain(
-      Array.from({ length: 12 }, (_, i) => ({
-        id: 0,
+  // 2. Insert Recurring Expense Templates
+  if (data.recurringExpenses.length > 0) {
+    const recurringValues = data.recurringExpenses
+      .map((entry, index) => ({
         yearId: yearRow.id,
-        ...estimatedMonthData(i + 1, config),
-      })),
-      config.startingBalance,
-      config.interestRate
-    );
+        label: String(entry.label ?? "").trim(),
+        amount: String(Number(entry.amount) || 0),
+        sortOrder: index,
+      }))
+      .filter((entry) => entry.label.length > 0);
 
-    const monthValues = computedMonths.map((month) => ({
-      yearId: yearRow.id,
-      month: month.month,
-      homeExpense: String(month.homeExpense),
-      personalExpense: String(month.personalExpense),
-      investment: String(month.investment),
-      payslip: String(month.payslip),
-      additionalPayslip: String(month.additionalPayslip),
-      interests: String(month.interests),
-      interestsManualOverride: month.interestsManualOverride,
-      personalRemaining: String(month.personalRemaining),
-    }));
-
-    const insertedMonths = await tx.insert(months).values(monthValues).returning();
-
-    // 4. Link Recurring Expenses to Months
-    const templates = await tx
-      .select()
-      .from(yearRecurringExpenses)
-      .where(eq(yearRecurringExpenses.yearId, yearRow.id))
-      .orderBy(asc(yearRecurringExpenses.sortOrder), asc(yearRecurringExpenses.id));
-
-    if (templates.length > 0) {
-      await tx.insert(monthlyRecurringExpenses).values(
-        insertedMonths.flatMap((month) =>
-          templates.map((template) => ({
-            monthId: month.id,
-            yearRecurringExpenseId: template.id,
-            label: template.label,
-            amount: template.amount,
-            sortOrder: template.sortOrder,
-          }))
-        )
-      );
+    if (recurringValues.length > 0) {
+      await db.insert(yearRecurringExpenses).values(recurringValues);
     }
-  });
+  }
+
+  // 3. Prefill Months
+  const config: YearConfig = {
+    id: yearRow.id,
+    year: yearRow.year,
+    startingBalance: finalStartingBalance,
+    estimatedSalary: data.estimatedSalary,
+    hasExtraPayments: data.hasExtraPayments,
+    estimatedExtraPayment: data.estimatedExtraPayment,
+    monthlyInvestment: data.monthlyInvestment,
+    monthlyHomeExpense: data.monthlyHomeExpense,
+    monthlyPersonalBudget: data.monthlyPersonalBudget,
+    interestRate: data.interestRate,
+  };
+
+  const computedMonths = computeMonthChain(
+    Array.from({ length: 12 }, (_, i) => ({
+      id: 0,
+      yearId: yearRow.id,
+      ...estimatedMonthData(i + 1, config),
+    })),
+    config.startingBalance,
+    config.interestRate
+  );
+
+  const monthValues = computedMonths.map((month) => ({
+    yearId: yearRow.id,
+    month: month.month,
+    homeExpense: String(month.homeExpense),
+    personalExpense: String(month.personalExpense),
+    investment: String(month.investment),
+    payslip: String(month.payslip),
+    additionalPayslip: String(month.additionalPayslip),
+    interests: String(month.interests),
+    interestsManualOverride: month.interestsManualOverride,
+    personalRemaining: String(month.personalRemaining),
+  }));
+
+  const insertedMonths = await db.insert(months).values(monthValues).returning();
+
+  // 4. Link Recurring Expenses to Months
+  const templates = await db
+    .select()
+    .from(yearRecurringExpenses)
+    .where(eq(yearRecurringExpenses.yearId, yearRow.id))
+    .orderBy(asc(yearRecurringExpenses.sortOrder), asc(yearRecurringExpenses.id));
+
+  if (templates.length > 0) {
+    await db.insert(monthlyRecurringExpenses).values(
+      insertedMonths.flatMap((month) =>
+        templates.map((template) => ({
+          monthId: month.id,
+          yearRecurringExpenseId: template.id,
+          label: template.label,
+          amount: template.amount,
+          sortOrder: template.sortOrder,
+        }))
+      )
+    );
+  }
 
   // 5. Propagate Carry Over
   await propagateYearCarryOver(user.id, data.year);

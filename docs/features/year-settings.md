@@ -8,9 +8,8 @@ Years are created through a guided setup process located at `/setup/[year]`.
 
 1. **Setup Page:** `src/app/[locale]/setup/[year]/page.tsx` serves the setup form.
 2. **Client Component:** `src/components/setup/setup-page-client.tsx` handles the form state and submission.
-3. **API Call:** A `POST` request is sent to `/api/years` with the initial configuration.
-4. **Data Prefill:** Upon successful creation, a `POST` request is sent to `/api/years/[year]/prefill`. This endpoint initializes all 12 months for that year using the provided configuration.
-5. **Return Navigation:** The create-year entry point includes a `redirect` query pointing to the current month or annual summary route. Navigation components use `buildSetupHrefFromPathname` from `src/lib/year-routes.ts` to derive this redirect from the current browser pathname at click time. This ensures that even if the user has navigated locally (via `pushState`), the setup flow returns them to the exact view they were looking at. The setup client refreshes the Next route cache before navigating back.
+3. **Server Action:** `createAndPrefillYear` in `src/lib/server/actions/years.ts` validates ownership, inserts the year configuration, stores recurring expense templates, initializes all 12 months, copies recurring expenses into each month, propagates carry-over, and revalidates the app layout.
+4. **Return Navigation:** The create-year entry point includes a `redirect` query pointing to the current month or annual summary route. Navigation components use `buildSetupHrefFromPathname` from `src/lib/year-routes.ts` to derive this redirect from the current browser pathname at click time. This ensures that even if the user has navigated locally (via `pushState`), the setup flow returns them to the exact view they were looking at. After the Server Action completes, the setup client performs a hard navigation to the localized redirect target.
 
 ## Navigation & Workspace Model
 
@@ -46,7 +45,7 @@ Year setup also supports any number of recurring expense templates. These are st
 | `amount` | Monthly amount copied into each month. |
 | `sortOrder` | Stable ordering for setup, annual settings, and monthly views. |
 
-During setup, the client sends `recurringExpenses` with the year creation request. The prefill endpoint then copies those templates into `monthly_recurring_expenses` for all 12 months.
+During setup, the client sends `recurringExpenses` to `createAndPrefillYear`. The Server Action stores valid templates and then copies them into `monthly_recurring_expenses` for all 12 months.
 
 ## Annual Summary & Updates
 
@@ -83,7 +82,7 @@ Annual Summary also includes the recurring expense template editor.
 - **Formatting:** Use `formatCurrency` from `@/lib/utils`.
 
 ### Month Prefill Logic
-The prefill logic (`src/lib/server/year-planning.ts`) follows these rules:
+The setup prefill logic in `createAndPrefillYear` follows these rules:
 - All 12 months are created.
 - `payslip` = `estimatedSalary`.
 - `homeExpense` = `monthlyHomeExpense`.
