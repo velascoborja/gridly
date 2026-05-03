@@ -121,12 +121,62 @@
     "title": "Configure {year}",
     "subtitle": "Financial year kickoff",
     "guidedConfig": "Guided Configuration",
-    "mainHeading": "Prepare {year} in a single screen",
-    "descriptionEditable": "Define the starting point of the year, estimated salary, and fixed expenses. Gridly automatically fills the months and keeps the monthly flow connected.",
-    "descriptionFixed": "Only the next available exercise can be created. Gridly starts {year} with the closing forecast of {previousYear}.",
+    "headerEyebrow": "New financial year",
+    "mainHeading": "Configure {year}",
+    "descriptionEditable": "These values will create the 12 months of the year. You can adjust any month later.",
+    "descriptionFixed": "Gridly will use the projected close of {previousYear} as the starting balance for {year}.",
     "stepCounter": "Step 1 of 1",
-    "formDescriptionEditable": "Enter the estimates for the year. You can adjust them at any time.",
+    "formDescriptionEditable": "Enter the financial baseline before generating the months.",
     "formDescriptionFixed": "Starting balance linked to {previousYear}: {balance}.",
+    "stepperLabel": "Setup sections",
+    "steps": {
+      "startingPoint": "Start",
+      "income": "Income",
+      "monthlyPlan": "Monthly plan",
+      "recurringExpenses": "Recurring",
+      "reviewCreate": "Review"
+    },
+    "sections": {
+      "startingPoint": {
+        "title": "Starting point",
+        "description": "Define the balance the year starts with."
+      },
+      "income": {
+        "title": "Income",
+        "description": "Configure monthly salary and the extra payments for June and December."
+      },
+      "monthlyPlan": {
+        "title": "Monthly plan",
+        "description": "Set the fixed expenses and investment copied into each month."
+      },
+      "growth": {
+        "title": "Growth",
+        "description": "Add the annual rate Gridly will use to estimate interest."
+      },
+      "recurringExpenses": {
+        "title": "Recurring expenses",
+        "description": "Add named expenses that are copied automatically into every month."
+      },
+      "reviewCreate": {
+        "title": "Review and create",
+        "description": "Check the summary before generating the full year."
+      }
+    },
+    "summary": {
+      "title": "Year preview",
+      "description": "Summary calculated from the current values.",
+      "startingBalance": "Starting balance",
+      "startingBalanceLinked": "Linked from {previousYear}",
+      "monthlyIncome": "Monthly income",
+      "plannedExpenses": "Planned expenses",
+      "monthlyInvestment": "Monthly investment",
+      "monthlySavings": "Estimated monthly savings",
+      "extraPays": "Extra pays",
+      "extraPaysEnabled": "{amount} in June and December",
+      "extraPaysDisabled": "No extra pays will be created",
+      "recurringNote": "Recurring expenses will be copied into all 12 months.",
+      "emptyValue": "Not set"
+    },
     "startingBalanceLabel": "Opening balance of the year (€)",
     "startingBalanceDerived": "Derived starting balance",
     "startingBalanceNote": "Only the next exercise can be created and its starting balance is automatically calculated from {previousYear}.",

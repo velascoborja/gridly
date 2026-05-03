@@ -121,12 +121,62 @@
     "title": "Configurar {year}",
     "subtitle": "Arranque del año financiero",
     "guidedConfig": "Configuración guiada",
-    "mainHeading": "Prepara {year} con una sola pantalla",
-    "descriptionEditable": "Define el punto de partida del año, el salario estimado y los gastos fijos. Gridly rellena automáticamente los meses y mantiene el flujo mensual conectado.",
-    "descriptionFixed": "Solo puedes crear el siguiente ejercicio disponible. Gridly arranca {year} con la previsión de cierre de {previousYear}.",
+    "headerEyebrow": "Nuevo ejercicio",
+    "mainHeading": "Configura {year}",
+    "descriptionEditable": "Estos valores crearán los 12 meses del año. Podrás ajustar cualquier mes después.",
+    "descriptionFixed": "Gridly usará el cierre previsto de {previousYear} como saldo inicial de {year}.",
     "stepCounter": "Paso 1 de 1",
-    "formDescriptionEditable": "Introduce las estimaciones para el año. Podrás ajustarlas en cualquier momento.",
+    "formDescriptionEditable": "Introduce la base financiera del año antes de generar los meses.",
     "formDescriptionFixed": "Saldo inicial enlazado a {previousYear}: {balance}.",
+    "stepperLabel": "Secciones de configuración",
+    "steps": {
+      "startingPoint": "Inicio",
+      "income": "Ingresos",
+      "monthlyPlan": "Plan mensual",
+      "recurringExpenses": "Recurrentes",
+      "reviewCreate": "Revisar"
+    },
+    "sections": {
+      "startingPoint": {
+        "title": "Punto de partida",
+        "description": "Define el saldo con el que empieza el año."
+      },
+      "income": {
+        "title": "Ingresos",
+        "description": "Configura el salario mensual y las pagas extra de junio y diciembre."
+      },
+      "monthlyPlan": {
+        "title": "Plan mensual",
+        "description": "Reparte los gastos fijos y la inversión que se copiarán a cada mes."
+      },
+      "growth": {
+        "title": "Crecimiento",
+        "description": "Añade el tipo anual que Gridly usará para estimar intereses."
+      },
+      "recurringExpenses": {
+        "title": "Gastos recurrentes",
+        "description": "Añade gastos con nombre que se copiarán automáticamente en cada mes."
+      },
+      "reviewCreate": {
+        "title": "Revisar y crear",
+        "description": "Comprueba el resumen antes de generar el año completo."
+      }
+    },
+    "summary": {
+      "title": "Vista previa del año",
+      "description": "Resumen calculado con los valores actuales.",
+      "startingBalance": "Saldo inicial",
+      "startingBalanceLinked": "Enlazado desde {previousYear}",
+      "monthlyIncome": "Ingreso mensual",
+      "plannedExpenses": "Gastos planificados",
+      "monthlyInvestment": "Inversión mensual",
+      "monthlySavings": "Ahorro mensual estimado",
+      "extraPays": "Pagas extra",
+      "extraPaysEnabled": "{amount} en junio y diciembre",
+      "extraPaysDisabled": "No se crearán pagas extra",
+      "recurringNote": "Los gastos recurrentes se copiarán en los 12 meses.",
+      "emptyValue": "Sin definir"
+    },
     "startingBalanceLabel": "Saldo de apertura del año (€)",
     "startingBalanceDerived": "Saldo inicial derivado",
     "startingBalanceNote": "Solo puedes crear el siguiente ejercicio y su saldo inicial se calcula automáticamente desde {previousYear}.",
