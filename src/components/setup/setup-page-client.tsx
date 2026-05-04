@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, useEffect, useRef } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -81,6 +81,45 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
   const [recurringExpenses, setRecurringExpenses] = useState<RecurringExpenseInput[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [activeStep, setActiveStep] = useState<SetupStepId>("starting-point");
+  const navRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: "-10% 0px -80% 0px",
+      threshold: 0,
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setActiveStep(entry.target.id as SetupStepId);
+        }
+      });
+    }, observerOptions);
+
+    SETUP_STEPS.forEach((step) => {
+      const element = document.getElementById(step.id);
+      if (element) observer.observe(element);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    // Only scroll the nav on mobile (where overflow-x-auto is applied)
+    if (window.innerWidth >= 1024) return;
+
+    const activeLink = navRef.current?.querySelector(`a[href="#${activeStep}"]`);
+    if (activeLink) {
+      activeLink.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center",
+      });
+    }
+  }, [activeStep]);
 
   const completedSteps = {
     "starting-point": startingBalanceEditable ? hasSetupFieldValue(values.startingBalance) : true,
@@ -267,6 +306,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
 
         <form onSubmit={handleSubmit} className="grid gap-4 lg:grid-cols-[12rem_minmax(0,1fr)_20rem] lg:items-start">
           <nav
+            ref={navRef}
             aria-label={t("stepperLabel")}
             className="sticky top-0 z-10 -mx-4 overflow-x-auto border-y border-[#e5edf5] bg-[#f6f9fc] px-4 py-2 shadow-[0_8px_20px_rgba(15,23,42,0.05)] lg:top-3 lg:mx-0 lg:overflow-visible lg:rounded-lg lg:border lg:bg-white lg:p-2 lg:shadow-[0_15px_35px_0_rgba(23,23,23,0.06)]"
           >
@@ -275,15 +315,18 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
                 const isStepOptional = step.id === "recurring-expenses";
                 const isStepComplete = completedSteps[step.id];
                 const showOptionalState = isStepOptional && !isStepComplete;
+                const isActive = activeStep === step.id;
 
                 return (
                 <li key={step.id}>
                   <a
                     href={`#${step.id}`}
-                    aria-current={isStepComplete ? "step" : undefined}
+                    aria-current={isActive ? "step" : undefined}
                     className={cn(
                       "flex h-10 items-center gap-2 rounded-md border px-3 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#533afd]/25",
-                      showOptionalState
+                      isActive
+                        ? "border-[#533afd] bg-[#533afd]/[0.04] text-[#533afd]"
+                        : showOptionalState
                         ? "border-dashed border-[#d6d9fc] bg-[#f6f9fc] text-[#64748d] hover:border-[#b9b9f9] hover:bg-[#533afd]/[0.04] hover:text-[#533afd]"
                         : isStepComplete
                         ? "border-[#15be53]/30 bg-[rgba(21,190,83,0.08)] text-[#108c3d] hover:border-[#15be53]/50 hover:bg-[rgba(21,190,83,0.12)]"
@@ -293,7 +336,9 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
                     <span
                       className={cn(
                         "flex size-5 shrink-0 items-center justify-center rounded border text-[11px] tabular-nums",
-                        showOptionalState
+                        isActive
+                          ? "border-[#533afd] bg-[#533afd] text-white"
+                          : showOptionalState
                           ? "border-dashed border-[#b9b9f9] bg-white text-[#64748d]"
                           : isStepComplete
                           ? "border-[#15be53] bg-[#15be53] text-white"

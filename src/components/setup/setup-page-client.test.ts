@@ -55,7 +55,7 @@ test("setup stepper marks each step complete when its section data is ready", ()
   assert.match(source, /completedSteps\[step\.id\]/);
   assert.match(source, /bg-\[#15be53\]/);
   assert.match(source, /border-\[#15be53\]/);
-  assert.match(source, /aria-current=\{isStepComplete \? "step" : undefined\}/);
+  assert.match(source, /aria-current=\{isActive \? "step" : undefined\}/);
 });
 
 test("setup stepper marks recurring expenses as optional instead of completed", () => {
