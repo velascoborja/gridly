@@ -88,6 +88,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
   const [activeStep, setActiveStep] = useState<SetupStepId>("starting-point");
   const [isMobileStepper, setIsMobileStepper] = useState(isSetupMobileStepper);
   const navRef = useRef<HTMLElement>(null);
+  const fullyVisibleStepRatios = useRef(new Map<SetupStepId, number>());
 
   useEffect(() => {
     const mediaQuery = window.matchMedia(setupMobileStepperQuery);
@@ -104,16 +105,18 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
 
     const observerOptions = {
       root: null,
-      rootMargin: "-10% 0px -80% 0px",
-      threshold: 0,
+      threshold: 1,
     };
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setActiveStep(entry.target.id as SetupStepId);
-        }
+        fullyVisibleStepRatios.current.set(entry.target.id as SetupStepId, entry.intersectionRatio);
       });
+
+      const nextActiveStep = SETUP_STEPS.find((step) => (fullyVisibleStepRatios.current.get(step.id) ?? 0) >= 1);
+      if (nextActiveStep) {
+        setActiveStep(nextActiveStep.id);
+      }
     }, observerOptions);
 
     SETUP_STEPS.forEach((step) => {

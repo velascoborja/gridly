@@ -89,6 +89,15 @@ test("setup scroll-linked active step is mobile-only", () => {
   assert.match(source, /const isActive = isMobileStepper && activeStep === step\.id/);
 });
 
+test("setup scroll-linked active step follows the first fully visible card", () => {
+  const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /const fullyVisibleStepRatios = useRef\(new Map<SetupStepId, number>\(\)\)/);
+  assert.match(source, /threshold: 1/);
+  assert.match(source, /fullyVisibleStepRatios\.current\.set\(entry\.target\.id as SetupStepId, entry\.intersectionRatio\)/);
+  assert.match(source, /SETUP_STEPS\.find\(\(step\) => \(fullyVisibleStepRatios\.current\.get\(step\.id\) \?\? 0\) >= 1\)/);
+});
+
 test("setup submit buttons are enabled only when required sections are ready", () => {
   const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
 
