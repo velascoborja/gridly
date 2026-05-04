@@ -151,7 +151,7 @@
       },
       "growth": {
         "title": "Growth",
-        "description": "Add the annual rate Gridly will use to estimate interest."
+        "description": "Add the annual rate Gridly will use to estimate interest. If left blank, the year is created with 0%."
       },
       "recurringExpenses": {
         "title": "Recurring expenses",
@@ -199,7 +199,7 @@
     "monthlyPersonalBudgetPlaceholder": "E.g. 450 €",
     "monthlyInvestment": "Monthly investment",
     "monthlyInvestmentPlaceholder": "E.g. 300 €",
-    "interestRate": "Annual interest rate (%)",
+    "interestRate": "Annual interest rate (%) (optional)",
     "interestRatePlaceholder": "E.g. 2.5",
     "startingBalancePlaceholder": "E.g. 12,500 €",
     "errorOnlyNextYear": "Only the next available exercise can be created.",

@@ -49,8 +49,6 @@ export function PublicHero({ accountDeleted = false, authError = false }: Public
       description: t("proof.annual.description"),
     },
   ];
-  const PROOF_CHIPS = [t("primaryProof.monthly"), t("primaryProof.extraPays"), t("primaryProof.export")];
-
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#fbfcff] text-foreground">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[34rem] bg-[radial-gradient(circle_at_18%_0%,rgba(83,58,253,0.16),transparent_30%),radial-gradient(circle_at_82%_6%,rgba(249,107,238,0.12),transparent_26%),linear-gradient(180deg,#ffffff_0%,rgba(246,249,252,0.86)_56%,transparent_100%)]" />
@@ -120,17 +118,6 @@ export function PublicHero({ accountDeleted = false, authError = false }: Public
                 {t("heroTitle")}
               </h1>
               <p className="max-w-xl text-base font-light leading-7 text-[#64748d] sm:text-lg">{t("heroDescription")}</p>
-            </div>
-
-            <div className="grid gap-2 sm:grid-cols-3">
-              {PROOF_CHIPS.map((label) => (
-                <div
-                  key={label}
-                  className="rounded-[6px] border border-[#e5edf5] bg-white/82 px-3 py-2 text-sm font-light leading-5 text-[#273951] shadow-[0_15px_35px_-30px_rgba(50,50,93,0.22)] backdrop-blur-sm"
-                >
-                  {label}
-                </div>
-              ))}
             </div>
           </div>
 

@@ -151,7 +151,7 @@
       },
       "growth": {
         "title": "Crecimiento",
-        "description": "Añade el tipo anual que Gridly usará para estimar intereses."
+        "description": "Añade el tipo anual que Gridly usará para estimar intereses. Si lo dejas vacío, se creará con 0%."
       },
       "recurringExpenses": {
         "title": "Gastos recurrentes",
@@ -199,7 +199,7 @@
     "monthlyPersonalBudgetPlaceholder": "Ej. 450 €",
     "monthlyInvestment": "Inversión mensual",
     "monthlyInvestmentPlaceholder": "Ej. 300 €",
-    "interestRate": "Tipo de interés anual (%)",
+    "interestRate": "Tipo de interés anual (%) (opcional)",
     "interestRatePlaceholder": "Ej. 2,5",
     "startingBalancePlaceholder": "Ej. 12.500 €",
     "errorOnlyNextYear": "Solo puedes crear el siguiente ejercicio disponible.",

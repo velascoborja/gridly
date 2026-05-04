@@ -80,6 +80,15 @@ test("setup mobile stepper sticks on an opaque top band", () => {
   assert.doesNotMatch(source, /bg-\[#f6f9fc\]\/95/);
 });
 
+test("setup scroll-linked active step is mobile-only", () => {
+  const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /const setupMobileStepperQuery = "\(max-width: 1023px\)"/);
+  assert.match(source, /const \[isMobileStepper, setIsMobileStepper\]/);
+  assert.match(source, /if \(!isMobileStepper\) return/);
+  assert.match(source, /const isActive = isMobileStepper && activeStep === step\.id/);
+});
+
 test("setup submit buttons are enabled only when required sections are ready", () => {
   const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
 
@@ -89,6 +98,14 @@ test("setup submit buttons are enabled only when required sections are ready", (
   assert.match(source, /completedSteps\["monthly-plan"\]/);
   assert.doesNotMatch(source.match(/const canSubmit = [\s\S]*?;/)?.[0] ?? "", /recurring-expenses/);
   assert.match(source, /disabled=\{submitting \|\| !canSubmit\}/);
+});
+
+test("setup treats annual interest rate as optional for creating a year", () => {
+  const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
+
+  const monthlyPlanReadiness = source.match(/"monthly-plan":\s*[\s\S]*?;/)?.[0] ?? "";
+  assert.doesNotMatch(monthlyPlanReadiness, /values\.interestRate/);
+  assert.match(source, /interestRate: parseOptionalPercentage\(values\.interestRate\)/);
 });
 
 test("create year submission refreshes before returning to the selected route", () => {

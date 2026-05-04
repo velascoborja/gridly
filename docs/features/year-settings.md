@@ -11,7 +11,7 @@ Years are created through a guided setup process located at `/setup/[year]`.
 3. **Server Action:** `createAndPrefillYear` in `src/lib/server/actions/years.ts` validates ownership, inserts the year configuration, stores recurring expense templates, initializes all 12 months, copies recurring expenses into each month, propagates carry-over, and revalidates the app layout.
 4. **Return Navigation:** The create-year entry point includes a `redirect` query pointing to the current month or annual summary route. Navigation components use `buildSetupHrefFromPathname` from `src/lib/year-routes.ts` to derive this redirect from the current browser pathname at click time. This ensures that even if the user has navigated locally (via `pushState`), the setup flow returns them to the exact view they were looking at. After the Server Action completes, the setup client performs a hard navigation to the localized redirect target.
 
-The setup screen is a single-page guided workspace. Desktop layouts use a left section stepper, central grouped setup form, and sticky year preview panel. Mobile layouts collapse the stepper into a horizontal section row and render the preview as a normal review block near submission. The mobile stepper sticks to the top on an opaque setup-background band so scrolled form content does not show through above or behind the toolbar.
+The setup screen is a single-page guided workspace. Desktop layouts use a left section stepper, central grouped setup form, and sticky year preview panel. Mobile layouts collapse the stepper into a horizontal section row and render the preview as a normal review block near submission. The mobile stepper sticks to the top on an opaque setup-background band so scrolled form content does not show through above or behind the toolbar. Scroll-linked active-step selection runs only on mobile; desktop keeps the stepper as navigation and completion status without changing the selected tab while scrolling.
 
 ## Setup Layout
 
@@ -26,11 +26,11 @@ The creation screen groups setup fields by financial purpose:
 
 The live preview is derived only from local form state. It shows the starting balance, monthly income, planned expenses, monthly investment, estimated monthly savings before interest, extra-pay status, and a reminder that recurring templates are copied into all 12 months. It does not add fields to the creation payload.
 
-The create button is enabled only when the required setup sections are ready: Starting point, Income, and Monthly plan. Recurring expenses remain optional for submission.
+The create button is enabled only when the required setup sections are ready: Starting point, Income, and Monthly plan. Growth and recurring expenses remain optional for submission.
 
-Currency labels on the setup page omit unit suffixes, while placeholder hints show the Euro symbol after the example amount. Editable currency inputs keep the raw text the user enters. `parseLocalizedNumber` converts localized input text back to a number for the live preview and `createAndPrefillYear` payload. The interest rate remains a plain percentage input.
+Currency labels on the setup page omit unit suffixes, while placeholder hints show the Euro symbol after the example amount. Editable currency inputs keep the raw text the user enters. `parseLocalizedNumber` converts localized input text back to a number for the live preview and `createAndPrefillYear` payload. The interest rate remains a plain percentage input; leaving it blank during setup stores `0`.
 
-The section stepper derives completed state from local form readiness and only includes the setup sections that users need to navigate: Starting point, Income, Monthly plan, and Recurring expenses. Readiness uses `hasSetupFieldValue`, so any non-empty input, including `0`, counts as entered data. Starting point is complete once the editable starting balance is filled or when the balance is derived from the previous year. Income requires salary and, when extra pays are enabled, the extra-pay amount. Monthly plan requires the three monthly currency values plus the interest rate. Recurring expenses are optional, so the stepper marks that item with a neutral dashed treatment while empty, then switches to the green completed state once at least one recurring expense exists.
+The section stepper derives completed state from local form readiness and only includes the setup sections that users need to navigate: Starting point, Income, Monthly plan, and Recurring expenses. Readiness uses `hasSetupFieldValue`, so any non-empty input, including `0`, counts as entered data. Starting point is complete once the editable starting balance is filled or when the balance is derived from the previous year. Income requires salary and, when extra pays are enabled, the extra-pay amount. Monthly plan requires only the three monthly currency values. Recurring expenses are optional, so the stepper marks that item with a neutral dashed treatment while empty, then switches to the green completed state once at least one recurring expense exists.
 
 When the starting balance is derived from the previous year, the setup input is read-only and displays a locale-formatted Euro amount via `formatCurrency` (for example, `1.234,56 €` in `es`). Submission still sends the numeric carry-over value, not the formatted string.
 
@@ -56,7 +56,7 @@ The following fields define the financial baseline for a year:
 | `monthlyInvestment` | Standard monthly savings/investment goal. | Prefills monthly `investment`. |
 | `monthlyHomeExpense` | Standard monthly housing/recurring expenses. | Prefills monthly `homeExpense`. |
 | `monthlyPersonalBudget` | Standard monthly discretionary budget. | Prefills monthly `personalExpense`. |
-| `interestRate` | Yearly interest rate for savings (decimal). | e.g., `0.02` for 2%. |
+| `interestRate` | Yearly interest rate for savings (decimal). | Optional during setup; blank setup input stores `0`. e.g., `0.02` for 2%. |
 
 ## Recurring Expense Templates
 

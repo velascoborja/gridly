@@ -47,6 +47,10 @@ type NumericField = (typeof NUMERIC_FIELDS)[number];
 type SetupStepId = SetupStep["id"];
 
 const parseNumber = parseLocalizedNumber;
+const parseOptionalPercentage = (value: string) => (hasSetupFieldValue(value) ? parseNumber(value) / 100 : 0);
+const setupMobileStepperQuery = "(max-width: 1023px)";
+const isSetupMobileStepper = () =>
+  typeof window !== "undefined" && window.matchMedia(setupMobileStepperQuery).matches;
 
 export function SetupPageClient({ year, derivedStartingBalance, previousYear, startingBalanceEditable }: Props) {
   const t = useTranslations("Setup");
@@ -82,9 +86,22 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [activeStep, setActiveStep] = useState<SetupStepId>("starting-point");
+  const [isMobileStepper, setIsMobileStepper] = useState(isSetupMobileStepper);
   const navRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    const mediaQuery = window.matchMedia(setupMobileStepperQuery);
+    const syncMobileStepper = () => setIsMobileStepper(mediaQuery.matches);
+
+    syncMobileStepper();
+    mediaQuery.addEventListener("change", syncMobileStepper);
+
+    return () => mediaQuery.removeEventListener("change", syncMobileStepper);
+  }, []);
+
+  useEffect(() => {
+    if (!isMobileStepper) return;
+
     const observerOptions = {
       root: null,
       rootMargin: "-10% 0px -80% 0px",
@@ -105,11 +122,10 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
     });
 
     return () => observer.disconnect();
-  }, []);
+  }, [isMobileStepper]);
 
   useEffect(() => {
-    // Only scroll the nav on mobile (where overflow-x-auto is applied)
-    if (window.innerWidth >= 1024) return;
+    if (!isMobileStepper) return;
 
     const activeLink = navRef.current?.querySelector(`a[href="#${activeStep}"]`);
     if (activeLink) {
@@ -119,7 +135,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
         inline: "center",
       });
     }
-  }, [activeStep]);
+  }, [activeStep, isMobileStepper]);
 
   const completedSteps = {
     "starting-point": startingBalanceEditable ? hasSetupFieldValue(values.startingBalance) : true,
@@ -129,8 +145,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
     "monthly-plan":
       hasSetupFieldValue(values.monthlyHomeExpense) &&
       hasSetupFieldValue(values.monthlyPersonalBudget) &&
-      hasSetupFieldValue(values.monthlyInvestment) &&
-      hasSetupFieldValue(values.interestRate),
+      hasSetupFieldValue(values.monthlyInvestment),
     "recurring-expenses": recurringExpenses.length > 0,
   } as Record<SetupStepId, boolean>;
   const canSubmit =
@@ -251,7 +266,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
         monthlyInvestment: parseNumber(values.monthlyInvestment),
         monthlyHomeExpense: parseNumber(values.monthlyHomeExpense),
         monthlyPersonalBudget: parseNumber(values.monthlyPersonalBudget),
-        interestRate: parseNumber(values.interestRate) / 100,
+        interestRate: parseOptionalPercentage(values.interestRate),
         recurringExpenses,
       };
 
@@ -315,7 +330,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
                 const isStepOptional = step.id === "recurring-expenses";
                 const isStepComplete = completedSteps[step.id];
                 const showOptionalState = isStepOptional && !isStepComplete;
-                const isActive = activeStep === step.id;
+                const isActive = isMobileStepper && activeStep === step.id;
 
                 return (
                 <li key={step.id}>
