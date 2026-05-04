@@ -36,6 +36,52 @@ test("setup numeric fields start empty and use translated placeholder hints", ()
   assert.doesNotMatch(source, /defaultValue: "0"/);
 });
 
+test("setup currency inputs keep raw user text while preserving numeric payloads", () => {
+  const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
+
+  assert.doesNotMatch(source, /formatCurrencyInputValue/);
+  assert.doesNotMatch(source, /handleCurrencyInputChange/);
+  assert.match(source, /const parseNumber = parseLocalizedNumber/);
+  assert.match(source, /parseNumber\(values\.estimatedSalary\)/);
+  assert.match(source, /parseNumber\(values\.startingBalance\)/);
+  assert.match(source, /parseNumber\(values\.estimatedExtraPayment\)/);
+});
+
+test("setup stepper marks each step complete when its section data is ready", () => {
+  const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /hasSetupFieldValue/);
+  assert.match(source, /const completedSteps = /);
+  assert.match(source, /completedSteps\[step\.id\]/);
+  assert.match(source, /bg-\[#15be53\]/);
+  assert.match(source, /border-\[#15be53\]/);
+  assert.match(source, /aria-current=\{isStepComplete \? "step" : undefined\}/);
+});
+
+test("setup stepper marks recurring expenses as optional instead of completed", () => {
+  const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /optional: true/);
+  assert.match(source, /const isStepOptional = step\.id === "recurring-expenses"/);
+  assert.match(source, /const isStepComplete = completedSteps\[step\.id\]/);
+  assert.match(source, /const showOptionalState = isStepOptional && !isStepComplete/);
+  assert.doesNotMatch(source, /optionalStep/);
+  assert.match(source, /"recurring-expenses": recurringExpenses\.length > 0/);
+  assert.match(source, /showOptionalState[\s\S]*border-dashed/);
+  assert.match(source, /showOptionalState[\s\S]*bg-\[#f6f9fc\]/);
+});
+
+test("setup submit buttons are enabled only when required sections are ready", () => {
+  const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /const canSubmit =\s/);
+  assert.match(source, /completedSteps\["starting-point"\]/);
+  assert.match(source, /completedSteps\.income/);
+  assert.match(source, /completedSteps\["monthly-plan"\]/);
+  assert.doesNotMatch(source.match(/const canSubmit = [\s\S]*?;/)?.[0] ?? "", /recurring-expenses/);
+  assert.match(source, /disabled=\{submitting \|\| !canSubmit\}/);
+});
+
 test("create year submission refreshes before returning to the selected route", () => {
   const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
 
@@ -50,7 +96,7 @@ test("setup screen uses guided section translation keys", () => {
   assert.match(source, /id: "income"/);
   assert.match(source, /id: "monthly-plan"/);
   assert.match(source, /id: "recurring-expenses"/);
-  assert.match(source, /id: "review-create"/);
+  assert.doesNotMatch(source.match(/const SETUP_STEPS = \[[\s\S]*?\] as const;/)?.[0] ?? "", /id: "review-create"/);
   assert.match(source, /t\("sections\.startingPoint\.title"\)/);
   assert.match(source, /t\("sections\.income\.title"\)/);
   assert.match(source, /t\("sections\.monthlyPlan\.title"\)/);

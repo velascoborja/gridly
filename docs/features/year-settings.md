@@ -26,6 +26,12 @@ The creation screen groups setup fields by financial purpose:
 
 The live preview is derived only from local form state. It shows the starting balance, monthly income, planned expenses, monthly investment, estimated monthly savings before interest, extra-pay status, and a reminder that recurring templates are copied into all 12 months. It does not add fields to the creation payload.
 
+The create button is enabled only when the required setup sections are ready: Starting point, Income, and Monthly plan. Recurring expenses remain optional for submission.
+
+Currency labels on the setup page omit unit suffixes, while placeholder hints show the Euro symbol after the example amount. Editable currency inputs keep the raw text the user enters. `parseLocalizedNumber` converts localized input text back to a number for the live preview and `createAndPrefillYear` payload. The interest rate remains a plain percentage input.
+
+The section stepper derives completed state from local form readiness and only includes the setup sections that users need to navigate: Starting point, Income, Monthly plan, and Recurring expenses. Readiness uses `hasSetupFieldValue`, so any non-empty input, including `0`, counts as entered data. Starting point is complete once the editable starting balance is filled or when the balance is derived from the previous year. Income requires salary and, when extra pays are enabled, the extra-pay amount. Monthly plan requires the three monthly currency values plus the interest rate. Recurring expenses are optional, so the stepper marks that item with a neutral dashed treatment while empty, then switches to the green completed state once at least one recurring expense exists.
+
 When the starting balance is derived from the previous year, the setup input is read-only and displays a locale-formatted Euro amount via `formatCurrency` (for example, `1.234,56 €` in `es`). Submission still sends the numeric carry-over value, not the formatted string.
 
 ## Navigation & Workspace Model

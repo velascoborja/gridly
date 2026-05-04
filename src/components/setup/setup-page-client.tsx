@@ -11,6 +11,8 @@ import { Input } from "@/components/ui/input";
 import { RecurringExpenseTemplateEditor } from "@/components/recurring-expenses/recurring-expense-template-editor";
 import { createAndPrefillYear } from "@/lib/server/actions/years";
 import type { RecurringExpenseInput } from "@/lib/recurring-expenses";
+import { parseLocalizedNumber } from "@/lib/currency-input";
+import { hasSetupFieldValue } from "@/lib/setup-readiness";
 import { cn, formatCurrency } from "@/lib/utils";
 
 interface Props {
@@ -20,12 +22,17 @@ interface Props {
   startingBalanceEditable: boolean;
 }
 
-const SETUP_STEPS = [
+type SetupStep = {
+  id: "starting-point" | "income" | "monthly-plan" | "recurring-expenses";
+  labelKey: string;
+  optional?: boolean;
+};
+
+const SETUP_STEPS: readonly SetupStep[] = [
   { id: "starting-point", labelKey: "steps.startingPoint" },
   { id: "income", labelKey: "steps.income" },
   { id: "monthly-plan", labelKey: "steps.monthlyPlan" },
-  { id: "recurring-expenses", labelKey: "steps.recurringExpenses" },
-  { id: "review-create", labelKey: "steps.reviewCreate" },
+  { id: "recurring-expenses", labelKey: "steps.recurringExpenses", optional: true },
 ] as const;
 
 const NUMERIC_FIELDS = [
@@ -37,11 +44,9 @@ const NUMERIC_FIELDS = [
 ] as const;
 
 type NumericField = (typeof NUMERIC_FIELDS)[number];
+type SetupStepId = SetupStep["id"];
 
-const parseNumber = (value: string) => {
-  const parsed = parseFloat(value.replace(",", "."));
-  return Number.isNaN(parsed) ? 0 : parsed;
-};
+const parseNumber = parseLocalizedNumber;
 
 export function SetupPageClient({ year, derivedStartingBalance, previousYear, startingBalanceEditable }: Props) {
   const t = useTranslations("Setup");
@@ -77,8 +82,25 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
+  const completedSteps = {
+    "starting-point": startingBalanceEditable ? hasSetupFieldValue(values.startingBalance) : true,
+    income:
+      hasSetupFieldValue(values.estimatedSalary) &&
+      (!hasExtraPayments || hasSetupFieldValue(values.estimatedExtraPayment)),
+    "monthly-plan":
+      hasSetupFieldValue(values.monthlyHomeExpense) &&
+      hasSetupFieldValue(values.monthlyPersonalBudget) &&
+      hasSetupFieldValue(values.monthlyInvestment) &&
+      hasSetupFieldValue(values.interestRate),
+    "recurring-expenses": recurringExpenses.length > 0,
+  } as Record<SetupStepId, boolean>;
+  const canSubmit =
+    completedSteps["starting-point"] &&
+    completedSteps.income &&
+    completedSteps["monthly-plan"];
+
   const summary = {
-    startingBalance: startingBalanceEditable ? parseNumber(values.startingBalance) : derivedStartingBalance,
+    startingBalance: parseNumber(values.startingBalance),
     monthlyIncome: parseNumber(values.estimatedSalary),
     plannedExpenses: parseNumber(values.monthlyHomeExpense) + parseNumber(values.monthlyPersonalBudget),
     monthlyInvestment: parseNumber(values.monthlyInvestment),
@@ -183,7 +205,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
     try {
       const payload = {
         year,
-        startingBalance: startingBalanceEditable ? parseNumber(values.startingBalance) : derivedStartingBalance,
+        startingBalance: parseNumber(values.startingBalance),
         estimatedSalary: parseNumber(values.estimatedSalary),
         hasExtraPayments,
         estimatedExtraPayment: hasExtraPayments ? parseNumber(values.estimatedExtraPayment) : 0,
@@ -249,19 +271,42 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
             className="sticky top-3 z-10 -mx-4 overflow-x-auto border-y border-[#e5edf5] bg-[#f6f9fc]/95 px-4 py-2 backdrop-blur lg:mx-0 lg:overflow-visible lg:rounded-lg lg:border lg:bg-white lg:p-2 lg:shadow-[0_15px_35px_0_rgba(23,23,23,0.06)]"
           >
             <ol className="flex min-w-max gap-2 lg:min-w-0 lg:flex-col">
-              {SETUP_STEPS.map((step, index) => (
+              {SETUP_STEPS.map((step, index) => {
+                const isStepOptional = step.id === "recurring-expenses";
+                const isStepComplete = completedSteps[step.id];
+                const showOptionalState = isStepOptional && !isStepComplete;
+
+                return (
                 <li key={step.id}>
                   <a
                     href={`#${step.id}`}
-                    className="flex h-10 items-center gap-2 rounded-md border border-transparent px-3 text-sm text-[#273951] transition-colors hover:border-[#d6d9fc] hover:bg-[#533afd]/[0.04] hover:text-[#533afd] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#533afd]/25"
+                    aria-current={isStepComplete ? "step" : undefined}
+                    className={cn(
+                      "flex h-10 items-center gap-2 rounded-md border px-3 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#533afd]/25",
+                      showOptionalState
+                        ? "border-dashed border-[#d6d9fc] bg-[#f6f9fc] text-[#64748d] hover:border-[#b9b9f9] hover:bg-[#533afd]/[0.04] hover:text-[#533afd]"
+                        : isStepComplete
+                        ? "border-[#15be53]/30 bg-[rgba(21,190,83,0.08)] text-[#108c3d] hover:border-[#15be53]/50 hover:bg-[rgba(21,190,83,0.12)]"
+                        : "border-transparent text-[#273951] hover:border-[#d6d9fc] hover:bg-[#533afd]/[0.04] hover:text-[#533afd]"
+                    )}
                   >
-                    <span className="flex size-5 shrink-0 items-center justify-center rounded border border-[#d6d9fc] bg-white text-[11px] tabular-nums text-[#533afd]">
+                    <span
+                      className={cn(
+                        "flex size-5 shrink-0 items-center justify-center rounded border text-[11px] tabular-nums",
+                        showOptionalState
+                          ? "border-dashed border-[#b9b9f9] bg-white text-[#64748d]"
+                          : isStepComplete
+                          ? "border-[#15be53] bg-[#15be53] text-white"
+                          : "border-[#d6d9fc] bg-white text-[#533afd]"
+                      )}
+                    >
                       {index + 1}
                     </span>
                     <span className="whitespace-nowrap">{t(step.labelKey)}</span>
                   </a>
                 </li>
-              ))}
+                );
+              })}
             </ol>
           </nav>
 
@@ -424,7 +469,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
                 <Button
                   type="submit"
                   className="h-11 w-full rounded-md bg-[#533afd] text-sm font-medium text-white hover:bg-[#4434d4]"
-                  disabled={submitting}
+                  disabled={submitting || !canSubmit}
                   aria-busy={submitting}
                 >
                   {submitting ? t("submitting") : t("submit")}
@@ -447,7 +492,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
                 <Button
                   type="submit"
                   className="h-11 w-full rounded-md bg-[#533afd] text-sm font-medium text-white hover:bg-[#4434d4]"
-                  disabled={submitting}
+                  disabled={submitting || !canSubmit}
                   aria-busy={submitting}
                 >
                   {submitting ? t("submitting") : t("submit")}
