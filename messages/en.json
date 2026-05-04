@@ -151,7 +151,7 @@
       },
       "growth": {
         "title": "Growth",
-        "description": "Add the annual rate Gridly will use to estimate interest. If left blank, the year is created with 0%."
+        "description": "Add the annual rate Gridly will use to estimate interest."
       },
       "recurringExpenses": {
         "title": "Recurring expenses",
@@ -202,6 +202,7 @@
     "interestRate": "Annual interest rate (%) (optional)",
     "interestRatePlaceholder": "E.g. 2.5",
     "startingBalancePlaceholder": "E.g. 12,500 €",
+    "growthCollapsedDescription": "Optional. Creates the year with 0% if you leave it closed.",
     "errorOnlyNextYear": "Only the next available exercise can be created.",
     "errorGeneric": "Could not create the year. Please check the data and try again.",
     "errorConnection": "Could not create the year. Please check the connection and try again.",

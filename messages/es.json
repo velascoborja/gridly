@@ -151,7 +151,7 @@
       },
       "growth": {
         "title": "Crecimiento",
-        "description": "Añade el tipo anual que Gridly usará para estimar intereses. Si lo dejas vacío, se creará con 0%."
+        "description": "Añade el tipo anual que Gridly usará para estimar intereses."
       },
       "recurringExpenses": {
         "title": "Gastos recurrentes",
@@ -202,6 +202,7 @@
     "interestRate": "Tipo de interés anual (%) (opcional)",
     "interestRatePlaceholder": "Ej. 2,5",
     "startingBalancePlaceholder": "Ej. 12.500 €",
+    "growthCollapsedDescription": "Opcional. Se crea con 0% si no lo abres.",
     "errorOnlyNextYear": "Solo puedes crear el siguiente ejercicio disponible.",
     "errorGeneric": "No se ha podido crear el año. Revisa los datos e inténtalo de nuevo.",
     "errorConnection": "No se ha podido crear el año. Revisa la conexión e inténtalo de nuevo.",

@@ -20,7 +20,7 @@ The creation screen groups setup fields by financial purpose:
 - **Starting point:** `startingBalance`, including a locked derived state when the balance comes from the previous year.
 - **Income:** `estimatedSalary`, `hasExtraPayments`, and `estimatedExtraPayment`.
 - **Monthly plan:** `monthlyHomeExpense`, `monthlyPersonalBudget`, and `monthlyInvestment`.
-- **Growth:** `interestRate`.
+- **Growth:** `interestRate`, exposed through a collapsed disclosure that users expand only if they want to set it.
 - **Recurring expenses:** the year recurring expense template editor.
 - **Review and create:** final error handling, live preview, and submit action.
 
@@ -28,7 +28,7 @@ The live preview is derived only from local form state. It shows the starting ba
 
 The create button is enabled only when the required setup sections are ready: Starting point, Income, and Monthly plan. Growth and recurring expenses remain optional for submission.
 
-Currency labels on the setup page omit unit suffixes, while placeholder hints show the Euro symbol after the example amount. Editable currency inputs keep the raw text the user enters. `parseLocalizedNumber` converts localized input text back to a number for the live preview and `createAndPrefillYear` payload. The interest rate remains a plain percentage input; leaving it blank during setup stores `0`.
+Currency labels on the setup page omit unit suffixes, while placeholder hints show the Euro symbol after the example amount. Editable currency inputs keep the raw text the user enters. `parseLocalizedNumber` converts localized input text back to a number for the live preview and `createAndPrefillYear` payload. The interest rate remains a plain percentage input inside a collapsed disclosure; leaving it blank during setup stores `0`.
 
 The section stepper derives completed state from local form readiness and only includes the setup sections that users need to navigate: Starting point, Income, Monthly plan, and Recurring expenses. Readiness uses `hasSetupFieldValue`, so any non-empty input, including `0`, counts as entered data. Starting point is complete once the editable starting balance is filled or when the balance is derived from the previous year. Income requires salary and, when extra pays are enabled, the extra-pay amount. Monthly plan requires only the three monthly currency values. Recurring expenses are optional, so the stepper marks that item with a neutral dashed treatment while empty, then switches to the green completed state once at least one recurring expense exists.
 

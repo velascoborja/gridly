@@ -117,6 +117,15 @@ test("setup treats annual interest rate as optional for creating a year", () => 
   assert.match(source, /interestRate: parseOptionalPercentage\(values\.interestRate\)/);
 });
 
+test("setup growth section is collapsed by default and expands explicitly", () => {
+  const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /const \[isGrowthExpanded, setIsGrowthExpanded\] = useState\(false\)/);
+  assert.match(source, /aria-expanded=\{isGrowthExpanded\}/);
+  assert.match(source, /hidden=\{!isGrowthExpanded\}/);
+  assert.match(source, /t\("sections\.growth\.description"\)/);
+});
+
 test("create year submission refreshes before returning to the selected route", () => {
   const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
 

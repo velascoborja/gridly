@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, type FormEvent, useEffect, useRef } from "react";
+import { ChevronDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -86,6 +87,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [activeStep, setActiveStep] = useState<SetupStepId>("starting-point");
+  const [isGrowthExpanded, setIsGrowthExpanded] = useState(false);
   const [isMobileStepper, setIsMobileStepper] = useState(isSetupMobileStepper);
   const navRef = useRef<HTMLElement>(null);
   const fullyVisibleStepRatios = useRef(new Map<SetupStepId, number>());
@@ -498,13 +500,36 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
             </Card>
 
             <Card className="rounded-lg border-[#d6d9fc] bg-white shadow-[rgba(50,50,93,0.18)_0px_24px_40px_-30px,rgba(0,0,0,0.08)_0px_14px_28px_-18px]">
-              <CardHeader className="space-y-2 pb-4">
-                <CardTitle className="text-2xl font-light text-[#061b31]">{t("sections.growth.title")}</CardTitle>
-                <CardDescription className="text-sm leading-6 text-[#64748d]">
-                  {t("sections.growth.description")}
-                </CardDescription>
+              <CardHeader className="space-y-0 pb-4">
+                <button
+                  type="button"
+                  className="flex w-full items-center justify-between gap-4 rounded-md text-left outline-none transition-colors hover:bg-[#533afd]/[0.04] focus-visible:ring-2 focus-visible:ring-[#533afd]/20"
+                  aria-expanded={isGrowthExpanded}
+                  aria-controls="growth-setup-panel"
+                  onClick={() => setIsGrowthExpanded((current) => !current)}
+                >
+                  <span className="space-y-1">
+                    <CardTitle className="text-2xl font-light text-[#061b31]">
+                      {t("sections.growth.title")}
+                    </CardTitle>
+                    <CardDescription className="text-sm leading-6 text-[#64748d]">
+                      {t("sections.growth.description")}
+                    </CardDescription>
+                  </span>
+                  <ChevronDown
+                    aria-hidden="true"
+                    className={cn(
+                      "size-5 shrink-0 text-[#533afd] transition-transform duration-200",
+                      isGrowthExpanded && "rotate-180"
+                    )}
+                  />
+                </button>
               </CardHeader>
-              <CardContent>
+              <CardContent
+                id="growth-setup-panel"
+                hidden={!isGrowthExpanded}
+                className="grid gap-4 pt-0"
+              >
                 {renderNumericInput(numericFieldByKey.interestRate)}
               </CardContent>
             </Card>
