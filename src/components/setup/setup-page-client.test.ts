@@ -71,6 +71,15 @@ test("setup stepper marks recurring expenses as optional instead of completed", 
   assert.match(source, /showOptionalState[\s\S]*bg-\[#f6f9fc\]/);
 });
 
+test("setup mobile stepper sticks on an opaque top band", () => {
+  const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /sticky top-0/);
+  assert.match(source, /bg-\[#f6f9fc\]/);
+  assert.match(source, /lg:top-3/);
+  assert.doesNotMatch(source, /bg-\[#f6f9fc\]\/95/);
+});
+
 test("setup submit buttons are enabled only when required sections are ready", () => {
   const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
 

@@ -268,7 +268,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
         <form onSubmit={handleSubmit} className="grid gap-4 lg:grid-cols-[12rem_minmax(0,1fr)_20rem] lg:items-start">
           <nav
             aria-label={t("stepperLabel")}
-            className="sticky top-3 z-10 -mx-4 overflow-x-auto border-y border-[#e5edf5] bg-[#f6f9fc]/95 px-4 py-2 backdrop-blur lg:mx-0 lg:overflow-visible lg:rounded-lg lg:border lg:bg-white lg:p-2 lg:shadow-[0_15px_35px_0_rgba(23,23,23,0.06)]"
+            className="sticky top-0 z-10 -mx-4 overflow-x-auto border-y border-[#e5edf5] bg-[#f6f9fc] px-4 py-2 shadow-[0_8px_20px_rgba(15,23,42,0.05)] lg:top-3 lg:mx-0 lg:overflow-visible lg:rounded-lg lg:border lg:bg-white lg:p-2 lg:shadow-[0_15px_35px_0_rgba(23,23,23,0.06)]"
           >
             <ol className="flex min-w-max gap-2 lg:min-w-0 lg:flex-col">
               {SETUP_STEPS.map((step, index) => {
