@@ -105,7 +105,7 @@ export function UserMenu({ email, name, image, active, variant = "header", onSet
         <p className="truncate text-xs text-muted-foreground">{email}</p>
       </div>
       {image && (
-        <div className="relative hidden size-9 overflow-hidden rounded-full border border-border/50 shadow-sm md:block">
+        <div className="relative size-9 overflow-hidden rounded-full border border-border/50 shadow-sm">
           <Image 
             src={image} 
             alt={name ?? ""} 
