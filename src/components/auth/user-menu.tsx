@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { LogOut, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 import {
   Dialog,
   DialogClose,
@@ -20,12 +21,13 @@ import {
 interface Props {
   email?: string | null;
   name?: string | null;
+  image?: string | null;
   active?: boolean;
   variant?: "header" | "footer";
   onSettingsSelect?: () => void;
 }
 
-export function UserMenu({ email, name, active, variant = "header", onSettingsSelect }: Props) {
+export function UserMenu({ email, name, image, active, variant = "header", onSettingsSelect }: Props) {
   const t = useTranslations("Common");
   const handleSettingsNavigate = (event: { preventDefault: () => void }) => {
     if (!onSettingsSelect) return;
@@ -37,7 +39,19 @@ export function UserMenu({ email, name, active, variant = "header", onSettingsSe
   if (variant === "footer") {
     return (
       <div className="flex w-full max-w-sm flex-col gap-3 items-center">
-        <div className="mb-2 text-center">
+        <div className="mb-2 flex flex-col items-center text-center">
+          {image && (
+            <div className="relative mb-2 size-12 overflow-hidden rounded-full border border-border/50 shadow-sm">
+              <Image 
+                src={image} 
+                alt={name ?? ""} 
+                fill
+                className="object-cover"
+                unoptimized
+                referrerPolicy="no-referrer"
+              />
+            </div>
+          )}
           <p className="text-sm font-medium text-foreground">{name ?? t("account")}</p>
           <p className="text-xs text-muted-foreground">{email}</p>
         </div>
@@ -90,6 +104,18 @@ export function UserMenu({ email, name, active, variant = "header", onSettingsSe
         <p className="truncate text-sm font-medium text-foreground">{name ?? t("account")}</p>
         <p className="truncate text-xs text-muted-foreground">{email}</p>
       </div>
+      {image && (
+        <div className="relative hidden size-9 overflow-hidden rounded-full border border-border/50 shadow-sm md:block">
+          <Image 
+            src={image} 
+            alt={name ?? ""} 
+            fill
+            className="object-cover"
+            unoptimized
+            referrerPolicy="no-referrer"
+          />
+        </div>
+      )}
       <Link
         href="/settings"
         onNavigate={handleSettingsNavigate}

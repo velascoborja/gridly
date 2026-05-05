@@ -12,6 +12,7 @@ interface Props {
   user: {
     email?: string | null;
     name?: string | null;
+    image?: string | null;
   };
   onMonthViewSelect?: () => void;
   onSummaryViewSelect?: () => void;
@@ -38,6 +39,7 @@ export function AppShell({
             <UserMenu
               email={user.email}
               name={user.name}
+              image={user.image}
               active={view === "settings"}
               onSettingsSelect={onSettingsSelect}
             />

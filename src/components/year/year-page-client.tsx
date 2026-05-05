@@ -25,6 +25,7 @@ interface Props {
   user: {
     email?: string | null;
     name?: string | null;
+    image?: string | null;
   };
 }
 
