@@ -59,6 +59,7 @@ Every async action must provide immediate feedback before awaiting:
 - Use `aria-busy`, `disabled`, clear pending text, spinner, skeleton, progress, or optimistic UI.
 - Keep destructive actions guarded by confirmation and show pending while deletion is in progress.
 - On success, update local UI immediately or navigate with an obvious transition.
+- **Next.js Cache Invalidation:** Call `router.refresh()` after successful client-side mutations (`fetch`, `POST`, `PATCH`, `DELETE`) to invalidate the Client-Side Router Cache and prevent stale data when navigating back.
 - On failure, clear pending state and show a visible, actionable error.
 
 Never leave a user wondering whether a click registered. A console log is not user feedback.
@@ -80,15 +81,20 @@ Local shell navigation:
 </Link>
 ```
 
-Async button:
+Async button with Next.js refresh:
 
 ```tsx
+const router = useRouter();
 const [isSaving, setIsSaving] = useState(false);
 
 async function save() {
   setIsSaving(true);
   try {
-    await update();
+    const res = await fetch("/api/update", { method: "PATCH", ... });
+    if (res.ok) {
+      updateLocalUI(await res.json());
+      router.refresh(); // Keeps router cache in sync
+    }
   } catch {
     setError("No se ha podido guardar.");
   } finally {
