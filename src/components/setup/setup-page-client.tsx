@@ -94,7 +94,15 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
 
   useEffect(() => {
     const mediaQuery = window.matchMedia(setupMobileStepperQuery);
-    const syncMobileStepper = () => setIsMobileStepper(mediaQuery.matches);
+    const syncMobileStepper = () => {
+      const matches = mediaQuery.matches;
+      setIsMobileStepper(matches);
+
+      if (matches) {
+        fullyVisibleStepRatios.current.clear();
+        setActiveStep(SETUP_STEPS[0].id);
+      }
+    };
 
     syncMobileStepper();
     mediaQuery.addEventListener("change", syncMobileStepper);
@@ -104,6 +112,8 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
 
   useEffect(() => {
     if (!isMobileStepper) return;
+
+    fullyVisibleStepRatios.current.clear();
 
     const observerOptions = {
       root: null,
@@ -335,7 +345,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
                 const isStepOptional = step.id === "recurring-expenses";
                 const isStepComplete = completedSteps[step.id];
                 const showOptionalState = isStepOptional && !isStepComplete;
-                const isActive = isMobileStepper && activeStep === step.id;
+                const isActive = activeStep === step.id;
 
                 return (
                 <li key={step.id}>
@@ -344,25 +354,23 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
                     aria-current={isActive ? "step" : undefined}
                     className={cn(
                       "flex h-10 items-center gap-2 rounded-md border px-3 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#533afd]/25",
-                      isActive
-                        ? "border-[#533afd] bg-[#533afd]/[0.04] text-[#533afd]"
-                        : showOptionalState
+                      showOptionalState
                         ? "border-dashed border-[#d6d9fc] bg-[#f6f9fc] text-[#64748d] hover:border-[#b9b9f9] hover:bg-[#533afd]/[0.04] hover:text-[#533afd]"
                         : isStepComplete
                         ? "border-[#15be53]/30 bg-[rgba(21,190,83,0.08)] text-[#108c3d] hover:border-[#15be53]/50 hover:bg-[rgba(21,190,83,0.12)]"
-                        : "border-transparent text-[#273951] hover:border-[#d6d9fc] hover:bg-[#533afd]/[0.04] hover:text-[#533afd]"
+                        : "border-transparent text-[#273951] hover:border-[#d6d9fc] hover:bg-[#533afd]/[0.04] hover:text-[#533afd]",
+                      isActive && "max-lg:border-solid max-lg:border-[#533afd] max-lg:bg-[#533afd]/[0.04] max-lg:text-[#533afd]"
                     )}
                   >
                     <span
                       className={cn(
                         "flex size-5 shrink-0 items-center justify-center rounded border text-[11px] tabular-nums",
-                        isActive
-                          ? "border-[#533afd] bg-[#533afd] text-white"
-                          : showOptionalState
+                        showOptionalState
                           ? "border-dashed border-[#b9b9f9] bg-white text-[#64748d]"
                           : isStepComplete
                           ? "border-[#15be53] bg-[#15be53] text-white"
-                          : "border-[#d6d9fc] bg-white text-[#533afd]"
+                          : "border-[#d6d9fc] bg-white text-[#533afd]",
+                        isActive && "max-lg:border-solid max-lg:border-[#533afd] max-lg:bg-[#533afd] max-lg:text-white"
                       )}
                     >
                       {index + 1}

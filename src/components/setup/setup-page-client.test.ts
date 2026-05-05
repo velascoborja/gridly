@@ -86,7 +86,24 @@ test("setup scroll-linked active step is mobile-only", () => {
   assert.match(source, /const setupMobileStepperQuery = "\(max-width: 1023px\)"/);
   assert.match(source, /const \[isMobileStepper, setIsMobileStepper\]/);
   assert.match(source, /if \(!isMobileStepper\) return/);
-  assert.match(source, /const isActive = isMobileStepper && activeStep === step\.id/);
+  assert.match(source, /max-lg:border-\[#533afd\]/);
+});
+
+test("setup mobile stepper selects the first step when entering the screen", () => {
+  const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
+  const mobileSync = source.match(/const syncMobileStepper = \(\) => \{[\s\S]*?mediaQuery\.addEventListener/)?.[0] ?? "";
+
+  assert.match(mobileSync, /if \(matches\) \{/);
+  assert.match(mobileSync, /fullyVisibleStepRatios\.current\.clear\(\);/);
+  assert.match(mobileSync, /setActiveStep\(SETUP_STEPS\[0\]\.id\);/);
+});
+
+test("setup mobile active step styling does not wait for matchMedia state", () => {
+  const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /const isActive = activeStep === step\.id/);
+  assert.match(source, /isActive && "max-lg:border-solid max-lg:border-\[#533afd\]/);
+  assert.doesNotMatch(source, /const isActive = isMobileStepper && activeStep === step\.id/);
 });
 
 test("setup scroll-linked active step follows the first fully visible card", () => {
