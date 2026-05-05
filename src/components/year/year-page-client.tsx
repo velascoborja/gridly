@@ -5,7 +5,7 @@ import { AnnualView } from "@/components/annual/annual-view";
 import { AppShell } from "@/components/layout/app-shell";
 import { MonthOverview } from "@/components/monthly/month-overview";
 import { SettingsForm } from "@/components/settings/settings-form";
-import { usePathname } from "@/i18n/routing";
+import { usePathname, useRouter } from "@/i18n/routing";
 import type { YearData } from "@/lib/types";
 import {
   type YearRouteView,
@@ -58,11 +58,17 @@ export function YearPageClient({
   user,
 }: Props) {
   const pathname = usePathname();
+  const router = useRouter();
   const initialState = getInitialStateFromPathname(pathname, yearData.config.year, initialMonth, initialView);
   const [currentYearData, setCurrentYearData] = useState<YearData>(yearData);
   const [selectedMonth, setSelectedMonth] = useState(() => initialState.month);
   const [selectedView, setSelectedView] = useState<YearRouteView>(() => initialState.view);
   const routePrefix = getYearRoutePrefix(pathname, currentYearData.config.year);
+
+  const handleYearDataChange = useCallback((newData: YearData) => {
+    setCurrentYearData(newData);
+    router.refresh();
+  }, [router]);
 
   useEffect(() => {
     setCurrentYearData(yearData);
@@ -133,14 +139,14 @@ export function YearPageClient({
         <AnnualView
           yearData={currentYearData}
           startingBalanceEditable={startingBalanceEditable}
-          onYearDataChange={setCurrentYearData}
+          onYearDataChange={handleYearDataChange}
         />
       ) : (
         <MonthOverview
           yearData={currentYearData}
           monthNumber={selectedMonth}
           onMonthSelect={handleMonthSelect}
-          onYearDataChange={setCurrentYearData}
+          onYearDataChange={handleYearDataChange}
         />
       )}
     </AppShell>
