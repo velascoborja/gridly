@@ -66,6 +66,7 @@ export function SettingsForm() {
         }
         
         console.log("Language updated in DB successfully:", nextLocale);
+        router.refresh();
       } catch (err) {
         console.error("Failed to update language in DB:", err);
       }
