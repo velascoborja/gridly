@@ -379,7 +379,7 @@
     "createYear": "Crear año {year}",
     "currentYear": "Actual"
   },
-  "EvolutionDashboard": {
+  "Evolution": {
     "eyebrow": "Evolución histórica",
     "title": "Evolución financiera",
     "description": "Compara el saldo, el ahorro y la inversión entre todos tus años registrados.",
