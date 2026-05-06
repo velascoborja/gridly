@@ -18,7 +18,7 @@ function formatPercent(value: number, locale: string) {
 }
 
 export function EvolutionDetailTable({ metrics }: Props) {
-  const t = useTranslations("Evolution.table");
+  const t = useTranslations("EvolutionDashboard.table");
   const locale = useLocale();
 
   return (

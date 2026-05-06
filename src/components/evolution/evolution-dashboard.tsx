@@ -11,7 +11,7 @@ interface Props {
 }
 
 export function EvolutionDashboard({ metrics }: Props) {
-  const t = useTranslations("Evolution");
+  const t = useTranslations("EvolutionDashboard");
   const summary = summarizeEvolutionMetrics(metrics);
 
   return (

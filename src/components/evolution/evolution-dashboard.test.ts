@@ -5,6 +5,7 @@ import { readFileSync } from "node:fs";
 test("evolution dashboard composes KPI cards, charts, and detail table", () => {
   const source = readFileSync(new URL("./evolution-dashboard.tsx", import.meta.url), "utf8");
 
+  assert.match(source, /EvolutionDashboard/);
   assert.match(source, /EvolutionKpiCards/);
   assert.match(source, /EvolutionCharts/);
   assert.match(source, /EvolutionDetailTable/);

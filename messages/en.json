@@ -379,7 +379,7 @@
     "createYear": "Create {year}",
     "currentYear": "Current"
   },
-  "Evolution": {
+  "EvolutionDashboard": {
     "eyebrow": "Historical evolution",
     "title": "Financial evolution",
     "description": "Compare balance, savings, and investment across every recorded year.",

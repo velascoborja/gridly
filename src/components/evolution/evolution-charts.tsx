@@ -15,7 +15,7 @@ function axisCurrency(value: number) {
 }
 
 export function EvolutionCharts({ metrics }: Props) {
-  const t = useTranslations("Evolution.charts");
+  const t = useTranslations("EvolutionDashboard.charts");
   const locale = useLocale();
 
   return (
