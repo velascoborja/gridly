@@ -373,10 +373,53 @@
   "Nav": {
     "months": "Months",
     "annualSummary": "Year",
+    "evolution": "Evolution",
+    "evolutionUnavailable": "Available once you have more than one recorded year.",
     "yearLabel": "Year",
     "createYear": "Create {year}",
     "currentYear": "Current"
-
+  },
+  "Evolution": {
+    "eyebrow": "Historical evolution",
+    "title": "Financial evolution",
+    "description": "Compare balance, savings, and investment across every recorded year.",
+    "kpis": {
+      "latestFinalBalance": "Current final balance",
+      "latestFinalBalanceNote": "Closing balance of the latest recorded year",
+      "totalSaved": "Total saved",
+      "totalSavedNote": "Accumulated balance growth",
+      "accumulatedInvested": "Accumulated invested",
+      "accumulatedInvestedNote": "Total invested across all years",
+      "bestYear": "Best year",
+      "bestYearNote": "Savings generated: {amount}",
+      "bestYearEmpty": "No comparable years",
+      "notAvailable": "Not available"
+    },
+    "charts": {
+      "balanceTitle": "Final balance evolution",
+      "balanceDescription": "Closing balance for each recorded year.",
+      "balanceLabel": "Final balance",
+      "savedTitle": "Savings per year",
+      "savedDescription": "Difference between starting and final balance.",
+      "savedLabel": "Savings",
+      "investedTitle": "Investment per year",
+      "investedDescription": "Sum of recorded monthly investment.",
+      "investedLabel": "Investment"
+    },
+    "table": {
+      "title": "Year detail",
+      "description": "Compact view of balances, savings, investment, income, and expenses.",
+      "year": "Year",
+      "startingBalance": "Starting balance",
+      "finalBalance": "Final balance",
+      "savedAmount": "Savings",
+      "investedAmount": "Investment",
+      "accumulatedInvested": "Accumulated invested",
+      "totalIncome": "Income",
+      "totalExpenses": "Expenses",
+      "savingsRate": "Savings rate",
+      "notAvailable": "N/A"
+    }
   },
   "Export": {
     "expenses": "EXPENSES",

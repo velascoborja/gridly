@@ -373,10 +373,53 @@
   "Nav": {
     "months": "Meses",
     "annualSummary": "Año",
+    "evolution": "Evolución",
+    "evolutionUnavailable": "Disponible cuando tengas más de un año registrado.",
     "yearLabel": "Año",
     "createYear": "Crear año {year}",
     "currentYear": "Actual"
-
+  },
+  "Evolution": {
+    "eyebrow": "Evolución histórica",
+    "title": "Evolución financiera",
+    "description": "Compara el saldo, el ahorro y la inversión entre todos tus años registrados.",
+    "kpis": {
+      "latestFinalBalance": "Saldo final actual",
+      "latestFinalBalanceNote": "Cierre del último año registrado",
+      "totalSaved": "Ahorro total",
+      "totalSavedNote": "Crecimiento de saldo acumulado",
+      "accumulatedInvested": "Inversión acumulada",
+      "accumulatedInvestedNote": "Suma invertida en todos los años",
+      "bestYear": "Mejor año",
+      "bestYearNote": "Ahorro generado: {amount}",
+      "bestYearEmpty": "Sin años comparables",
+      "notAvailable": "No disponible"
+    },
+    "charts": {
+      "balanceTitle": "Evolución del saldo final",
+      "balanceDescription": "Saldo de cierre de cada año registrado.",
+      "balanceLabel": "Saldo final",
+      "savedTitle": "Ahorro por año",
+      "savedDescription": "Variación entre saldo inicial y saldo final.",
+      "savedLabel": "Ahorro",
+      "investedTitle": "Inversión por año",
+      "investedDescription": "Suma de la inversión mensual registrada.",
+      "investedLabel": "Inversión"
+    },
+    "table": {
+      "title": "Detalle por año",
+      "description": "Lectura compacta de saldos, ahorro, inversión, ingresos y gastos.",
+      "year": "Año",
+      "startingBalance": "Saldo inicial",
+      "finalBalance": "Saldo final",
+      "savedAmount": "Ahorro",
+      "investedAmount": "Inversión",
+      "accumulatedInvested": "Inversión acumulada",
+      "totalIncome": "Ingresos",
+      "totalExpenses": "Gastos",
+      "savingsRate": "Tasa de ahorro",
+      "notAvailable": "N/D"
+    }
   },
   "Export": {
     "expenses": "GASTOS",
