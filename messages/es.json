@@ -386,6 +386,8 @@
     "totalWealth": "Patrimonio total estimado",
     "totalWealthNote": "Saldo actual + inversión acumulada",
     "kpis": {
+      "averageSavingsPerYear": "Ahorro promedio anual",
+      "averageSavingsPerYearNote": "Media del ahorro entre todos los años registrados",
       "latestFinalBalance": "Saldo final actual",
       "latestFinalBalanceNote": "Cierre del último año registrado",
       "totalSaved": "Ahorro total",

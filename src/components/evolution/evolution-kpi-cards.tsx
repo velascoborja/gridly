@@ -1,6 +1,6 @@
 "use client";
 
-import { Award, Landmark, PiggyBank, TrendingUp } from "lucide-react";
+import { Award, CalendarDays, Landmark, PiggyBank, TrendingUp } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Card, CardContent } from "@/components/ui/card";
 import type { EvolutionSummary } from "@/lib/evolution";
@@ -36,6 +36,13 @@ export function EvolutionKpiCards({ summary }: Props) {
       className: "text-primary",
     },
     {
+      label: t("averageSavingsPerYear"),
+      value: formatCurrency(summary.averageSavingsPerYear, locale),
+      note: t("averageSavingsPerYearNote"),
+      Icon: CalendarDays,
+      className: summary.averageSavingsPerYear >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400",
+    },
+    {
       label: t("bestYear"),
       value: summary.bestYear ? String(summary.bestYear.year) : t("notAvailable"),
       note: summary.bestYear ? t("bestYearNote", { amount: formatCurrency(summary.bestYear.savedAmount, locale) }) : t("bestYearEmpty"),
@@ -45,7 +52,7 @@ export function EvolutionKpiCards({ summary }: Props) {
   ];
 
   return (
-    <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
       {cards.map(({ label, value, note, Icon, className }) => (
         <Card key={label} className="border-border/70 bg-card/90 shadow-sm">
           <CardContent className="p-4">

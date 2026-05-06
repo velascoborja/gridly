@@ -386,6 +386,8 @@
     "totalWealth": "Estimated total wealth",
     "totalWealthNote": "Current balance + accumulated investment",
     "kpis": {
+      "averageSavingsPerYear": "Average annual savings",
+      "averageSavingsPerYearNote": "Mean savings across all recorded years",
       "latestFinalBalance": "Current final balance",
       "latestFinalBalanceNote": "Closing balance of the latest recorded year",
       "totalSaved": "Total saved",
