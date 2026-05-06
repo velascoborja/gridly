@@ -10,8 +10,10 @@ While `YearConfig` handles recurring fixed costs, `Additional Entries` allow use
 
 Each entry consists of:
 - `label`: A description of the transaction.
-- `amount`: The financial value (stored as numeric in DB).
+- `amount`: The financial value. It is exposed to TypeScript as a number after server-side parsing.
 - `type`: Either `income` or `expense`.
+
+`label` and `amount` are protected at rest when `FINANCIAL_DATA_ENCRYPTION_KEY` is configured. The database stores them as text so rows can contain either legacy plaintext values or encrypted `enc:v1:` payloads. API responses decrypt values before sending them back to the client.
 
 ## UI & Implementation
 

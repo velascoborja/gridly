@@ -49,7 +49,7 @@ Gridly follows a premium, fintech-inspired visual system (Stripe-like) documente
 - **Extra Pays:** Months 6 (June) and 12 (December) automatically get an `additionalPayslip` equal to the `estimatedSalary`.
 - **Month Chain:** Savings = totalIncome - totalExpenses. Each month's `startingBalance` = previous month's `endingBalance`.
 - **Data Initialization:** The prefill endpoint (`POST /api/years/[year]/prefill`) overwrites all 12 months based on `YearConfig`.
-- **Currency:** Amounts are `number` in TS, `numeric` (string) in DB. Defaults to `es-ES` (Euro).
+- **Currency:** Amounts are `number` in TS and protected text in DB. Defaults to `es-ES` (Euro).
 
 ## Development Conventions
 
@@ -73,5 +73,6 @@ When changing any of the features listed below, update the related documentation
 - [Balance & Interest Logic](docs/features/calculations-engine.md): The mathematical engine behind the month-over-month financial chain.
 - [Yearly Carry-over](docs/features/balance-carry-over.md): Automatic synchronization of balances across consecutive years.
 - [Data Export](docs/features/data-export.md): Excel workbook generation for offline analysis and data portability.
+- [Financial Data Privacy](docs/features/financial-data-privacy.md): Optional encryption-at-rest for financial values and operation labels.
 - [Internationalization](docs/features/internationalization.md): Implementation details for multi-language support and routing.
 - [App Icons & Web App Metadata](docs/features/app-icons.md): Browser, manifest, and iOS Safari icon asset conventions.

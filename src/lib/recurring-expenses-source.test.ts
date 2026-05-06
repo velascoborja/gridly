@@ -27,7 +27,9 @@ test("year data hydrates recurring templates and monthly recurring rows", () => 
   assert.match(source, /yearRecurringExpenses/);
   assert.match(source, /monthlyRecurringExpenses/);
   assert.match(source, /recurringExpenses: sortRecurringExpensesAsc/);
-  assert.match(source, /recurringExpenses: sortRecurringExpensesAsc\(recurringTemplates/);
+  assert.match(source, /recurringTemplates\.map/);
+  assert.match(source, /revealFinancialText\(entry\.label\)/);
+  assert.match(source, /revealFinancialText\(entry\.amount\)/);
 });
 
 test("API routes expose annual template and monthly recurring expense mutations", () => {

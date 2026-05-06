@@ -4,6 +4,20 @@ import { eq } from "drizzle-orm";
 import { getYearNumberForYearId, propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getSessionUser } from "@/lib/server/session";
 import { getOwnedMonth } from "@/lib/server/ownership";
+import { parseProtectedFinancialNumber, protectFinancialNumber } from "@/lib/server/financial-data-privacy";
+
+function publicMonthRow(row: typeof months.$inferSelect) {
+  return {
+    ...row,
+    homeExpense: String(parseProtectedFinancialNumber(row.homeExpense)),
+    personalExpense: String(parseProtectedFinancialNumber(row.personalExpense)),
+    investment: String(parseProtectedFinancialNumber(row.investment)),
+    payslip: String(parseProtectedFinancialNumber(row.payslip)),
+    additionalPayslip: String(parseProtectedFinancialNumber(row.additionalPayslip)),
+    interests: String(parseProtectedFinancialNumber(row.interests)),
+    personalRemaining: String(parseProtectedFinancialNumber(row.personalRemaining)),
+  };
+}
 
 export async function PATCH(
   request: Request,
@@ -40,7 +54,7 @@ export async function PATCH(
   const updates: Partial<typeof months.$inferInsert> = {};
   for (const field of fields) {
     if (body[field] !== undefined) {
-      (updates as Record<string, string>)[field] = String(body[field]);
+      (updates as Record<string, string>)[field] = protectFinancialNumber(body[field]);
       const manualOverrideField = manualOverrideFields[field as keyof typeof manualOverrideFields];
       if (manualOverrideField && body[manualOverrideField] === undefined) {
         updates[manualOverrideField] = true;
@@ -71,5 +85,5 @@ export async function PATCH(
     await propagateYearCarryOver(user.id, yearNumber);
   }
 
-  return Response.json(updated);
+  return Response.json(publicMonthRow(updated));
 }

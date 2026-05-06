@@ -9,6 +9,7 @@ import {
   sortRecurringExpensesAsc,
 } from "@/lib/recurring-expenses";
 import type { YearData } from "@/lib/types";
+import { parseProtectedFinancialNumber, revealFinancialText } from "./financial-data-privacy";
 import { pickDefaultYear } from "./year-navigation";
 
 export async function getYearData(userId: string, year: number): Promise<YearData | null> {
@@ -65,20 +66,28 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
       id: month.id,
       yearId: month.yearId,
       month: month.month,
-      homeExpense: parseFloat(month.homeExpense),
+      homeExpense: parseProtectedFinancialNumber(month.homeExpense),
       homeExpenseManualOverride: month.homeExpenseManualOverride,
-      personalExpense: parseFloat(month.personalExpense),
+      personalExpense: parseProtectedFinancialNumber(month.personalExpense),
       personalExpenseManualOverride: month.personalExpenseManualOverride,
-      investment: parseFloat(month.investment),
+      investment: parseProtectedFinancialNumber(month.investment),
       investmentManualOverride: month.investmentManualOverride,
-      payslip: parseFloat(month.payslip),
+      payslip: parseProtectedFinancialNumber(month.payslip),
       payslipManualOverride: month.payslipManualOverride,
-      additionalPayslip: parseFloat(month.additionalPayslip),
+      additionalPayslip: parseProtectedFinancialNumber(month.additionalPayslip),
       additionalPayslipManualOverride: month.additionalPayslipManualOverride,
-      interests: parseFloat(month.interests),
+      interests: parseProtectedFinancialNumber(month.interests),
       interestsManualOverride: month.interestsManualOverride,
-      personalRemaining: parseFloat(month.personalRemaining),
-      recurringExpenses: sortRecurringExpensesAsc(recurringExpenses.map(parseMonthlyRecurringExpense)),
+      personalRemaining: parseProtectedFinancialNumber(month.personalRemaining),
+      recurringExpenses: sortRecurringExpensesAsc(
+        recurringExpenses.map((entry) =>
+          parseMonthlyRecurringExpense({
+            ...entry,
+            label: revealFinancialText(entry.label),
+            amount: revealFinancialText(entry.amount),
+          })
+        )
+      ),
       additionalExpenses: sortAdditionalEntriesDesc(
         entries
           .filter((entry) => entry.type === "expense")
@@ -86,8 +95,8 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
             id: entry.id,
             monthId: entry.monthId,
             type: "expense" as const,
-            label: entry.label,
-            amount: parseFloat(entry.amount),
+            label: revealFinancialText(entry.label),
+            amount: parseProtectedFinancialNumber(entry.amount),
           }))
       ),
       additionalIncomes: sortAdditionalEntriesDesc(
@@ -97,8 +106,8 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
             id: entry.id,
             monthId: entry.monthId,
             type: "income" as const,
-            label: entry.label,
-            amount: parseFloat(entry.amount),
+            label: revealFinancialText(entry.label),
+            amount: parseProtectedFinancialNumber(entry.amount),
           }))
       ),
     };
@@ -108,20 +117,28 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
     config: {
       id: yearRow.id,
       year: yearRow.year,
-      startingBalance: parseFloat(yearRow.startingBalance),
-      estimatedSalary: parseFloat(yearRow.estimatedSalary),
+      startingBalance: parseProtectedFinancialNumber(yearRow.startingBalance),
+      estimatedSalary: parseProtectedFinancialNumber(yearRow.estimatedSalary),
       hasExtraPayments: yearRow.hasExtraPayments,
-      estimatedExtraPayment: parseFloat(yearRow.estimatedExtraPayment),
-      monthlyInvestment: parseFloat(yearRow.monthlyInvestment),
-      monthlyHomeExpense: parseFloat(yearRow.monthlyHomeExpense),
-      monthlyPersonalBudget: parseFloat(yearRow.monthlyPersonalBudget),
-      interestRate: parseFloat(yearRow.interestRate),
+      estimatedExtraPayment: parseProtectedFinancialNumber(yearRow.estimatedExtraPayment),
+      monthlyInvestment: parseProtectedFinancialNumber(yearRow.monthlyInvestment),
+      monthlyHomeExpense: parseProtectedFinancialNumber(yearRow.monthlyHomeExpense),
+      monthlyPersonalBudget: parseProtectedFinancialNumber(yearRow.monthlyPersonalBudget),
+      interestRate: parseProtectedFinancialNumber(yearRow.interestRate),
     },
-    recurringExpenses: sortRecurringExpensesAsc(recurringTemplates.map(parseYearRecurringExpense)),
+    recurringExpenses: sortRecurringExpensesAsc(
+      recurringTemplates.map((entry) =>
+        parseYearRecurringExpense({
+          ...entry,
+          label: revealFinancialText(entry.label),
+          amount: revealFinancialText(entry.amount),
+        })
+      )
+    ),
     months: computeMonthChain(
       rawMonths,
-      parseFloat(yearRow.startingBalance),
-      parseFloat(yearRow.interestRate)
+      parseProtectedFinancialNumber(yearRow.startingBalance),
+      parseProtectedFinancialNumber(yearRow.interestRate)
     ),
   };
 }

@@ -7,6 +7,15 @@ import { getOwnedYear } from "@/lib/server/ownership";
 import { getYearNumberForYearId, propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getSessionUser } from "@/lib/server/session";
 import { getYearData } from "@/lib/server/year-data";
+import { protectFinancialNumber, protectFinancialText, revealFinancialText } from "@/lib/server/financial-data-privacy";
+
+function publicYearRecurringExpense(row: typeof yearRecurringExpenses.$inferSelect) {
+  return parseYearRecurringExpense({
+    ...row,
+    label: revealFinancialText(row.label),
+    amount: revealFinancialText(row.amount),
+  });
+}
 
 function parseApplyFromMonth(value: unknown): number {
   const month = Number(value ?? 1);
@@ -33,7 +42,7 @@ export async function GET(
     .where(eq(yearRecurringExpenses.yearId, yearRow.id))
     .orderBy(asc(yearRecurringExpenses.sortOrder), asc(yearRecurringExpenses.id));
 
-  return Response.json(sortRecurringExpensesAsc(rows.map(parseYearRecurringExpense)));
+  return Response.json(sortRecurringExpensesAsc(rows.map(publicYearRecurringExpense)));
 }
 
 export async function PUT(
@@ -64,8 +73,8 @@ export async function PUT(
           .values(
             normalized.map((entry) => ({
               yearId: yearRow.id,
-              label: entry.label,
-              amount: String(entry.amount),
+              label: protectFinancialText(entry.label),
+              amount: protectFinancialNumber(entry.amount),
               sortOrder: entry.sortOrder,
             }))
           )
@@ -112,7 +121,7 @@ export async function PUT(
 
   const yearData = await getYearData(user.id, yearNum);
   return Response.json({
-    recurringExpenses: sortRecurringExpensesAsc(templates.map(parseYearRecurringExpense)),
+    recurringExpenses: sortRecurringExpensesAsc(templates.map(publicYearRecurringExpense)),
     yearData,
   });
 }

@@ -5,6 +5,20 @@ import { propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { deriveStartingBalance, shouldAllowYearCreation } from "@/lib/server/year-planning";
 import { getSessionUser } from "@/lib/server/session";
 import { getYearData } from "@/lib/server/year-data";
+import { parseProtectedFinancialNumber, protectFinancialNumber, protectFinancialText } from "@/lib/server/financial-data-privacy";
+
+function publicYearRow(row: typeof years.$inferSelect) {
+  return {
+    ...row,
+    startingBalance: String(parseProtectedFinancialNumber(row.startingBalance)),
+    estimatedSalary: String(parseProtectedFinancialNumber(row.estimatedSalary)),
+    estimatedExtraPayment: String(parseProtectedFinancialNumber(row.estimatedExtraPayment)),
+    monthlyInvestment: String(parseProtectedFinancialNumber(row.monthlyInvestment)),
+    monthlyHomeExpense: String(parseProtectedFinancialNumber(row.monthlyHomeExpense)),
+    monthlyPersonalBudget: String(parseProtectedFinancialNumber(row.monthlyPersonalBudget)),
+    interestRate: String(parseProtectedFinancialNumber(row.interestRate)),
+  };
+}
 
 export async function GET() {
   const user = await getSessionUser();
@@ -74,14 +88,14 @@ export async function POST(request: Request) {
   const [row] = await db.insert(years).values({
     userId: user.id,
     year,
-    startingBalance: String(derivedStartingBalance),
-    estimatedSalary: String(estimatedSalary),
+    startingBalance: protectFinancialNumber(derivedStartingBalance),
+    estimatedSalary: protectFinancialNumber(estimatedSalary),
     hasExtraPayments: Boolean(hasExtraPayments),
-    estimatedExtraPayment: String(estimatedExtraPayment),
-    monthlyInvestment: String(monthlyInvestment),
-    monthlyHomeExpense: String(monthlyHomeExpense),
-    monthlyPersonalBudget: String(monthlyPersonalBudget),
-    interestRate: String(interestRate),
+    estimatedExtraPayment: protectFinancialNumber(estimatedExtraPayment),
+    monthlyInvestment: protectFinancialNumber(monthlyInvestment),
+    monthlyHomeExpense: protectFinancialNumber(monthlyHomeExpense),
+    monthlyPersonalBudget: protectFinancialNumber(monthlyPersonalBudget),
+    interestRate: protectFinancialNumber(interestRate),
   }).returning();
 
   const recurringValues = Array.isArray(recurringExpenses)
@@ -89,10 +103,15 @@ export async function POST(request: Request) {
         .map((entry, index) => ({
           yearId: row.id,
           label: String(entry.label ?? "").trim(),
-          amount: String(Number(entry.amount) || 0),
+          amount: Number(entry.amount) || 0,
           sortOrder: index,
         }))
         .filter((entry) => entry.label.length > 0)
+        .map((entry) => ({
+          ...entry,
+          label: protectFinancialText(entry.label),
+          amount: protectFinancialNumber(entry.amount),
+        }))
     : [];
 
   if (recurringValues.length > 0) {
@@ -101,5 +120,5 @@ export async function POST(request: Request) {
 
   await propagateYearCarryOver(user.id, year);
 
-  return Response.json(row, { status: 201 });
+  return Response.json(publicYearRow(row), { status: 201 });
 }

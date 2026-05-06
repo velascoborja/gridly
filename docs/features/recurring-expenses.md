@@ -9,8 +9,8 @@ Recurring expenses let users define named monthly expenses that repeat across a 
 - **Setup editor:** `src/components/setup/setup-page-client.tsx` collects recurring expense templates during year creation.
 - **Annual editor:** `src/components/annual/year-config-form.tsx` lets users edit the authoritative template list from Annual Summary.
 - **Monthly section:** `src/components/monthly/recurring-expenses-list.tsx` renders recurring expenses inside `src/components/monthly/fixed-expenses-card.tsx`. Users can edit or delete recurring expenses for the selected month only.
-- **Template table:** `year_recurring_expenses` stores year-level defaults.
-- **Monthly table:** `monthly_recurring_expenses` stores editable per-month copies.
+- **Template table:** `year_recurring_expenses` stores year-level defaults. Labels and amounts are protected at rest when financial data privacy is enabled.
+- **Monthly table:** `monthly_recurring_expenses` stores editable per-month copies. Labels and amounts are protected at rest when financial data privacy is enabled.
 
 ## Implementation Details
 
@@ -18,6 +18,8 @@ During setup, `createAndPrefillYear` in `src/lib/server/actions/years.ts` saves 
 
 Annual template updates use `PUT /api/years/[year]/recurring-expenses`. This endpoint replaces the template list, deletes all monthly recurring expense rows for that year, recreates them from the new template, and propagates downstream year carry-over.
 After the annual editor receives the updated `yearData`, it refreshes the current App Router route cache so returning from setup or another route keeps the recalculated recurring expense totals.
+
+Server write paths use `protectFinancialText` and `protectFinancialNumber` before saving labels and amounts. Server reads decrypt values before building `YearData` or API responses, so components and calculations continue to receive plain labels and numbers.
 
 Monthly changes use:
 

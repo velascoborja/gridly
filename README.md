@@ -52,6 +52,10 @@ Gridly now uses Google sign-in for all private financial data.
 - Existing legacy data is assigned to `velascoborja@gmail.com`.
 - New users start with an empty account and configure their own year on first access.
 
+### Financial data privacy
+
+Set `FINANCIAL_DATA_ENCRYPTION_KEY` to encrypt financial values and operation labels before they are stored in the database. Without this key, Gridly keeps the previous plaintext storage behavior for compatibility. Existing plaintext rows remain readable and are protected when rewritten through normal app flows.
+
 ### First use
 
 1. Create a year — enter your starting balance, estimated salary, monthly investment target, home expense, personal budget, and interest rate.

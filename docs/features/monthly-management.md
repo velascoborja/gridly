@@ -18,6 +18,7 @@ The Monthly View (`/locale/[year]/[month]`) is the primary workspace for users. 
 
 ### Data Persistence
 - Client-side edits to fields (e.g., `payslip`, `homeExpense`) are saved via `PATCH /api/months/[monthId]`.
+- Monthly financial values are stored as protected text in the database. Server routes use the financial privacy helpers to encrypt new writes when `FINANCIAL_DATA_ENCRYPTION_KEY` is configured and decrypt values before returning `YearData` or mutation responses.
 - Setup-backed monthly fields track explicit manual override flags: `payslipManualOverride`, `additionalPayslipManualOverride`, `homeExpenseManualOverride`, `personalExpenseManualOverride`, and `investmentManualOverride`. User edits set the related flag to `true`; reset actions clear it to `false`.
 - Recurring expense edit/delete operations are saved via `/api/months/[monthId]/recurring-expenses/[entryId]`.
 - Additional income and expense entries can be moved between months from the month view. Dragging an entry onto a different month tab persists through `PATCH /api/months/[monthId]/entries/[entryId]` with a target `monthId`.
@@ -36,6 +37,7 @@ Monthly recurring expense rows live in `monthly_recurring_expenses`.
 - Rows copied from the annual template keep `yearRecurringExpenseId`.
 - Monthly changes affect only the selected month.
 - If the annual template list is later saved from Annual Summary, all monthly recurring expense rows for the year are replaced from the updated template.
+- Labels and amounts are encrypted at rest when financial data privacy is enabled. They are decrypted on the server before the monthly UI receives them.
 
 ### Interest Calculation
 - Monthly interest is calculated based on the `Starting Balance` and the `YearConfig.interestRate`.

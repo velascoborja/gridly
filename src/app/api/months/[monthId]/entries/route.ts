@@ -3,6 +3,15 @@ import { additionalEntries } from "@/db/schema";
 import { getYearNumberForYearId, propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getSessionUser } from "@/lib/server/session";
 import { getOwnedMonth } from "@/lib/server/ownership";
+import { parseProtectedFinancialNumber, protectFinancialNumber, protectFinancialText, revealFinancialText } from "@/lib/server/financial-data-privacy";
+
+function publicEntryRow(row: typeof additionalEntries.$inferSelect) {
+  return {
+    ...row,
+    label: revealFinancialText(row.label),
+    amount: String(parseProtectedFinancialNumber(row.amount)),
+  };
+}
 
 export async function POST(
   request: Request,
@@ -33,8 +42,8 @@ export async function POST(
   const [entry] = await db.insert(additionalEntries).values({
     monthId: ownedMonth.id,
     type,
-    label,
-    amount: String(amount),
+    label: protectFinancialText(String(label)),
+    amount: protectFinancialNumber(amount),
   }).returning();
 
   const yearNumber = await getYearNumberForYearId(ownedMonth.yearId);
@@ -42,5 +51,5 @@ export async function POST(
     await propagateYearCarryOver(user.id, yearNumber);
   }
 
-  return Response.json(entry, { status: 201 });
+  return Response.json(publicEntryRow(entry), { status: 201 });
 }

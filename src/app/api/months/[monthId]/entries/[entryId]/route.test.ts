@@ -12,7 +12,7 @@ test("entry PATCH supports moving an entry to another owned month in the same ye
 });
 
 test("entry PATCH keeps existing label and amount edits while validating the source entry", () => {
-  assert.match(source, /if \(body\.label !== undefined\) updates\.label = body\.label/);
-  assert.match(source, /if \(body\.amount !== undefined\) updates\.amount = String\(body\.amount\)/);
+  assert.match(source, /if \(body\.label !== undefined\) updates\.label = protectFinancialText\(String\(body\.label\)\)/);
+  assert.match(source, /if \(body\.amount !== undefined\) updates\.amount = protectFinancialNumber\(body\.amount\)/);
   assert.match(source, /entry\.monthId !== month\.id/);
 });

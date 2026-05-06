@@ -5,6 +5,15 @@ import { parseMonthlyRecurringExpense } from "@/lib/recurring-expenses";
 import { getOwnedMonth, getOwnedRecurringExpense } from "@/lib/server/ownership";
 import { getYearNumberForYearId, propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getSessionUser } from "@/lib/server/session";
+import { protectFinancialNumber, protectFinancialText, revealFinancialText } from "@/lib/server/financial-data-privacy";
+
+function publicRecurringExpense(row: typeof monthlyRecurringExpenses.$inferSelect) {
+  return parseMonthlyRecurringExpense({
+    ...row,
+    label: revealFinancialText(row.label),
+    amount: revealFinancialText(row.amount),
+  });
+}
 
 export async function PATCH(
   request: Request,
@@ -24,8 +33,8 @@ export async function PATCH(
 
   const body = await request.json();
   const updates: Partial<typeof monthlyRecurringExpenses.$inferInsert> = {};
-  if (body.label !== undefined) updates.label = String(body.label).trim();
-  if (body.amount !== undefined) updates.amount = String(Number(body.amount) || 0);
+  if (body.label !== undefined) updates.label = protectFinancialText(String(body.label).trim());
+  if (body.amount !== undefined) updates.amount = protectFinancialNumber(Number(body.amount) || 0);
   if (body.sortOrder !== undefined) updates.sortOrder = Number(body.sortOrder) || 0;
 
   const [updated] = await db
@@ -39,7 +48,7 @@ export async function PATCH(
     await propagateYearCarryOver(user.id, yearNumber);
   }
 
-  return Response.json(parseMonthlyRecurringExpense(updated));
+  return Response.json(publicRecurringExpense(updated));
 }
 
 export async function DELETE(

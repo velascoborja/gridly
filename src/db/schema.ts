@@ -1,4 +1,4 @@
-import { pgTable, serial, integer, numeric, text, timestamp, unique, primaryKey, boolean } from "drizzle-orm/pg-core";
+import { pgTable, serial, integer, text, timestamp, unique, primaryKey, boolean } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -74,14 +74,14 @@ export const years = pgTable("years", {
   id: serial("id").primaryKey(),
   userId: text("user_id").references(() => users.id, { onDelete: "cascade" }),
   year: integer("year").notNull(),
-  startingBalance: numeric("starting_balance", { precision: 12, scale: 2 }).notNull().default("0"),
-  estimatedSalary: numeric("estimated_salary", { precision: 12, scale: 2 }).notNull().default("0"),
+  startingBalance: text("starting_balance").notNull().default("0"),
+  estimatedSalary: text("estimated_salary").notNull().default("0"),
   hasExtraPayments: boolean("has_extra_payments").notNull().default(false),
-  estimatedExtraPayment: numeric("estimated_extra_payment", { precision: 12, scale: 2 }).notNull().default("0"),
-  monthlyInvestment: numeric("monthly_investment", { precision: 12, scale: 2 }).notNull().default("0"),
-  monthlyHomeExpense: numeric("monthly_home_expense", { precision: 12, scale: 2 }).notNull().default("0"),
-  monthlyPersonalBudget: numeric("monthly_personal_budget", { precision: 12, scale: 2 }).notNull().default("0"),
-  interestRate: numeric("interest_rate", { precision: 5, scale: 4 }).notNull().default("0"),
+  estimatedExtraPayment: text("estimated_extra_payment").notNull().default("0"),
+  monthlyInvestment: text("monthly_investment").notNull().default("0"),
+  monthlyHomeExpense: text("monthly_home_expense").notNull().default("0"),
+  monthlyPersonalBudget: text("monthly_personal_budget").notNull().default("0"),
+  interestRate: text("interest_rate").notNull().default("0"),
   createdAt: timestamp("created_at").defaultNow(),
 }, (t) => [unique().on(t.userId, t.year)]);
 
@@ -93,19 +93,19 @@ export const months = pgTable(
       .notNull()
       .references(() => years.id, { onDelete: "cascade" }),
     month: integer("month").notNull(), // 1-12
-    homeExpense: numeric("home_expense", { precision: 12, scale: 2 }).notNull().default("0"),
-    personalExpense: numeric("personal_expense", { precision: 12, scale: 2 }).notNull().default("0"),
-    investment: numeric("investment", { precision: 12, scale: 2 }).notNull().default("0"),
+    homeExpense: text("home_expense").notNull().default("0"),
+    personalExpense: text("personal_expense").notNull().default("0"),
+    investment: text("investment").notNull().default("0"),
     investmentManualOverride: boolean("investment_manual_override").notNull().default(false),
-    payslip: numeric("payslip", { precision: 12, scale: 2 }).notNull().default("0"),
+    payslip: text("payslip").notNull().default("0"),
     payslipManualOverride: boolean("payslip_manual_override").notNull().default(false),
-    additionalPayslip: numeric("additional_payslip", { precision: 12, scale: 2 }).notNull().default("0"),
+    additionalPayslip: text("additional_payslip").notNull().default("0"),
     additionalPayslipManualOverride: boolean("additional_payslip_manual_override").notNull().default(false),
-    interests: numeric("interests", { precision: 12, scale: 2 }).notNull().default("0"),
+    interests: text("interests").notNull().default("0"),
     interestsManualOverride: boolean("interests_manual_override").notNull().default(false),
     homeExpenseManualOverride: boolean("home_expense_manual_override").notNull().default(false),
     personalExpenseManualOverride: boolean("personal_expense_manual_override").notNull().default(false),
-    personalRemaining: numeric("personal_remaining", { precision: 12, scale: 2 }).notNull().default("0"),
+    personalRemaining: text("personal_remaining").notNull().default("0"),
     createdAt: timestamp("created_at").defaultNow(),
   },
   (t) => [unique().on(t.yearId, t.month)]
@@ -118,7 +118,7 @@ export const additionalEntries = pgTable("additional_entries", {
     .references(() => months.id, { onDelete: "cascade" }),
   type: text("type").notNull(), // 'income' | 'expense'
   label: text("label").notNull(),
-  amount: numeric("amount", { precision: 12, scale: 2 }).notNull().default("0"),
+  amount: text("amount").notNull().default("0"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -128,7 +128,7 @@ export const yearRecurringExpenses = pgTable("year_recurring_expenses", {
     .notNull()
     .references(() => years.id, { onDelete: "cascade" }),
   label: text("label").notNull(),
-  amount: numeric("amount", { precision: 12, scale: 2 }).notNull().default("0"),
+  amount: text("amount").notNull().default("0"),
   sortOrder: integer("sort_order").notNull().default(0),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -141,7 +141,7 @@ export const monthlyRecurringExpenses = pgTable("monthly_recurring_expenses", {
   yearRecurringExpenseId: integer("year_recurring_expense_id")
     .references(() => yearRecurringExpenses.id, { onDelete: "set null" }),
   label: text("label").notNull(),
-  amount: numeric("amount", { precision: 12, scale: 2 }).notNull().default("0"),
+  amount: text("amount").notNull().default("0"),
   sortOrder: integer("sort_order").notNull().default(0),
   createdAt: timestamp("created_at").defaultNow(),
 });

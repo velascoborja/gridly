@@ -11,6 +11,7 @@ import { computeMonthChain, estimatedMonthData } from "@/lib/calculations";
 import type { YearConfig } from "@/lib/types";
 import type { RecurringExpenseInput } from "@/lib/recurring-expenses";
 import { revalidatePath } from "next/cache";
+import { protectFinancialNumber, protectFinancialText } from "@/lib/server/financial-data-privacy";
 
 export async function createAndPrefillYear(data: {
   year: number;
@@ -53,14 +54,14 @@ export async function createAndPrefillYear(data: {
     .values({
       userId: user.id,
       year: data.year,
-      startingBalance: String(finalStartingBalance),
-      estimatedSalary: String(data.estimatedSalary),
+      startingBalance: protectFinancialNumber(finalStartingBalance),
+      estimatedSalary: protectFinancialNumber(data.estimatedSalary),
       hasExtraPayments: data.hasExtraPayments,
-      estimatedExtraPayment: String(data.estimatedExtraPayment),
-      monthlyInvestment: String(data.monthlyInvestment),
-      monthlyHomeExpense: String(data.monthlyHomeExpense),
-      monthlyPersonalBudget: String(data.monthlyPersonalBudget),
-      interestRate: String(data.interestRate),
+      estimatedExtraPayment: protectFinancialNumber(data.estimatedExtraPayment),
+      monthlyInvestment: protectFinancialNumber(data.monthlyInvestment),
+      monthlyHomeExpense: protectFinancialNumber(data.monthlyHomeExpense),
+      monthlyPersonalBudget: protectFinancialNumber(data.monthlyPersonalBudget),
+      interestRate: protectFinancialNumber(data.interestRate),
     })
     .returning();
 
@@ -70,10 +71,15 @@ export async function createAndPrefillYear(data: {
       .map((entry, index) => ({
         yearId: yearRow.id,
         label: String(entry.label ?? "").trim(),
-        amount: String(Number(entry.amount) || 0),
+        amount: Number(entry.amount) || 0,
         sortOrder: index,
       }))
-      .filter((entry) => entry.label.length > 0);
+      .filter((entry) => entry.label.length > 0)
+      .map((entry) => ({
+        ...entry,
+        label: protectFinancialText(entry.label),
+        amount: protectFinancialNumber(entry.amount),
+      }));
 
     if (recurringValues.length > 0) {
       await db.insert(yearRecurringExpenses).values(recurringValues);
@@ -107,14 +113,14 @@ export async function createAndPrefillYear(data: {
   const monthValues = computedMonths.map((month) => ({
     yearId: yearRow.id,
     month: month.month,
-    homeExpense: String(month.homeExpense),
-    personalExpense: String(month.personalExpense),
-    investment: String(month.investment),
-    payslip: String(month.payslip),
-    additionalPayslip: String(month.additionalPayslip),
-    interests: String(month.interests),
+    homeExpense: protectFinancialNumber(month.homeExpense),
+    personalExpense: protectFinancialNumber(month.personalExpense),
+    investment: protectFinancialNumber(month.investment),
+    payslip: protectFinancialNumber(month.payslip),
+    additionalPayslip: protectFinancialNumber(month.additionalPayslip),
+    interests: protectFinancialNumber(month.interests),
     interestsManualOverride: month.interestsManualOverride,
-    personalRemaining: String(month.personalRemaining),
+    personalRemaining: protectFinancialNumber(month.personalRemaining),
   }));
 
   const insertedMonths = await db.insert(months).values(monthValues).returning();

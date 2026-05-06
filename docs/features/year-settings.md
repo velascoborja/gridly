@@ -100,9 +100,10 @@ Annual Summary also includes the recurring expense template editor.
 ## Implementation Details
 
 ### Currency Handling
-- **Database:** Stored as `numeric(12, 2)` (PostgreSQL).
-- **TypeScript:** Converted to `number` for calculations and back to `string` for DB operations.
+- **Database:** Financial values are stored as `text` so they can hold either legacy numeric text or encrypted payloads.
+- **TypeScript:** Server reads convert values to `number` for calculations and write them back through the financial privacy helpers.
 - **Formatting:** Use `formatCurrency` from `@/lib/utils`.
+- **Privacy:** When `FINANCIAL_DATA_ENCRYPTION_KEY` is configured, year setup values and recurring expense template labels/amounts are encrypted before storage. See [Financial Data Privacy](./financial-data-privacy.md).
 
 ### Month Prefill Logic
 The setup prefill logic in `createAndPrefillYear` follows these rules:

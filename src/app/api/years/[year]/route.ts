@@ -6,19 +6,33 @@ import { propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getYearData, getYearsForUser } from "@/lib/server/year-data";
 import { getSessionUser } from "@/lib/server/session";
 import { getOwnedYear } from "@/lib/server/ownership";
+import { parseProtectedFinancialNumber, protectFinancialNumber } from "@/lib/server/financial-data-privacy";
 
 function yearConfigFromRow(row: typeof years.$inferSelect): YearConfig {
   return {
     id: row.id,
     year: row.year,
-    startingBalance: parseFloat(row.startingBalance),
-    estimatedSalary: parseFloat(row.estimatedSalary),
+    startingBalance: parseProtectedFinancialNumber(row.startingBalance),
+    estimatedSalary: parseProtectedFinancialNumber(row.estimatedSalary),
     hasExtraPayments: row.hasExtraPayments,
-    estimatedExtraPayment: parseFloat(row.estimatedExtraPayment),
-    monthlyInvestment: parseFloat(row.monthlyInvestment),
-    monthlyHomeExpense: parseFloat(row.monthlyHomeExpense),
-    monthlyPersonalBudget: parseFloat(row.monthlyPersonalBudget),
-    interestRate: parseFloat(row.interestRate),
+    estimatedExtraPayment: parseProtectedFinancialNumber(row.estimatedExtraPayment),
+    monthlyInvestment: parseProtectedFinancialNumber(row.monthlyInvestment),
+    monthlyHomeExpense: parseProtectedFinancialNumber(row.monthlyHomeExpense),
+    monthlyPersonalBudget: parseProtectedFinancialNumber(row.monthlyPersonalBudget),
+    interestRate: parseProtectedFinancialNumber(row.interestRate),
+  };
+}
+
+function publicYearRow(row: typeof years.$inferSelect) {
+  return {
+    ...row,
+    startingBalance: String(parseProtectedFinancialNumber(row.startingBalance)),
+    estimatedSalary: String(parseProtectedFinancialNumber(row.estimatedSalary)),
+    estimatedExtraPayment: String(parseProtectedFinancialNumber(row.estimatedExtraPayment)),
+    monthlyInvestment: String(parseProtectedFinancialNumber(row.monthlyInvestment)),
+    monthlyHomeExpense: String(parseProtectedFinancialNumber(row.monthlyHomeExpense)),
+    monthlyPersonalBudget: String(parseProtectedFinancialNumber(row.monthlyPersonalBudget)),
+    interestRate: String(parseProtectedFinancialNumber(row.interestRate)),
   };
 }
 
@@ -31,17 +45,17 @@ async function applyYearConfigToStoredMonths(yearId: number, config: YearConfig,
   await db
     .update(months)
     .set({
-      homeExpense: String(config.monthlyHomeExpense),
+      homeExpense: protectFinancialNumber(config.monthlyHomeExpense),
       homeExpenseManualOverride: false,
-      personalExpense: String(config.monthlyPersonalBudget),
+      personalExpense: protectFinancialNumber(config.monthlyPersonalBudget),
       personalExpenseManualOverride: false,
-      investment: String(config.monthlyInvestment),
+      investment: protectFinancialNumber(config.monthlyInvestment),
       investmentManualOverride: false,
-      payslip: String(config.estimatedSalary),
+      payslip: protectFinancialNumber(config.estimatedSalary),
       payslipManualOverride: false,
-      additionalPayslip: "0",
+      additionalPayslip: protectFinancialNumber(0),
       additionalPayslipManualOverride: false,
-      interests: "0",
+      interests: protectFinancialNumber(0),
       interestsManualOverride: false,
     })
     .where(and(eq(months.yearId, yearId), gte(months.month, applyFromMonth)));
@@ -49,7 +63,7 @@ async function applyYearConfigToStoredMonths(yearId: number, config: YearConfig,
   if (config.hasExtraPayments) {
     await db
       .update(months)
-      .set({ additionalPayslip: String(config.estimatedExtraPayment) })
+      .set({ additionalPayslip: protectFinancialNumber(config.estimatedExtraPayment) })
       .where(and(eq(months.yearId, yearId), gte(months.month, applyFromMonth), inArray(months.month, [6, 12])));
   }
 }
@@ -100,18 +114,18 @@ export async function PATCH(
   }
 
   const updates: Partial<typeof years.$inferInsert> = {};
-  if (body.startingBalance !== undefined) updates.startingBalance = String(body.startingBalance);
-  if (body.estimatedSalary !== undefined) updates.estimatedSalary = String(body.estimatedSalary);
+  if (body.startingBalance !== undefined) updates.startingBalance = protectFinancialNumber(body.startingBalance);
+  if (body.estimatedSalary !== undefined) updates.estimatedSalary = protectFinancialNumber(body.estimatedSalary);
   if (body.hasExtraPayments !== undefined) updates.hasExtraPayments = Boolean(body.hasExtraPayments);
-  if (body.estimatedExtraPayment !== undefined) updates.estimatedExtraPayment = String(body.estimatedExtraPayment);
-  if (body.monthlyInvestment !== undefined) updates.monthlyInvestment = String(body.monthlyInvestment);
-  if (body.monthlyHomeExpense !== undefined) updates.monthlyHomeExpense = String(body.monthlyHomeExpense);
-  if (body.monthlyPersonalBudget !== undefined) updates.monthlyPersonalBudget = String(body.monthlyPersonalBudget);
-  if (body.interestRate !== undefined) updates.interestRate = String(body.interestRate);
+  if (body.estimatedExtraPayment !== undefined) updates.estimatedExtraPayment = protectFinancialNumber(body.estimatedExtraPayment);
+  if (body.monthlyInvestment !== undefined) updates.monthlyInvestment = protectFinancialNumber(body.monthlyInvestment);
+  if (body.monthlyHomeExpense !== undefined) updates.monthlyHomeExpense = protectFinancialNumber(body.monthlyHomeExpense);
+  if (body.monthlyPersonalBudget !== undefined) updates.monthlyPersonalBudget = protectFinancialNumber(body.monthlyPersonalBudget);
+  if (body.interestRate !== undefined) updates.interestRate = protectFinancialNumber(body.interestRate);
 
   const [updated] = await db.update(years).set(updates).where(eq(years.id, yearRow.id)).returning();
   await applyYearConfigToStoredMonths(yearRow.id, yearConfigFromRow(updated), applyFromMonth);
 
   await propagateYearCarryOver(user.id, yearNum);
-  return Response.json(updated);
+  return Response.json(publicYearRow(updated));
 }

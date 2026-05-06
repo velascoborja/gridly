@@ -4,6 +4,15 @@ import { eq } from "drizzle-orm";
 import { getYearNumberForYearId, propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getSessionUser } from "@/lib/server/session";
 import { getOwnedEntry, getOwnedMonth } from "@/lib/server/ownership";
+import { parseProtectedFinancialNumber, protectFinancialNumber, protectFinancialText, revealFinancialText } from "@/lib/server/financial-data-privacy";
+
+function publicEntryRow(row: typeof additionalEntries.$inferSelect) {
+  return {
+    ...row,
+    label: revealFinancialText(row.label),
+    amount: String(parseProtectedFinancialNumber(row.amount)),
+  };
+}
 
 export async function PATCH(
   request: Request,
@@ -20,8 +29,8 @@ export async function PATCH(
   const body = await request.json();
 
   const updates: Partial<typeof additionalEntries.$inferInsert> = {};
-  if (body.label !== undefined) updates.label = body.label;
-  if (body.amount !== undefined) updates.amount = String(body.amount);
+  if (body.label !== undefined) updates.label = protectFinancialText(String(body.label));
+  if (body.amount !== undefined) updates.amount = protectFinancialNumber(body.amount);
 
   const entry = await getOwnedEntry(user.id, id);
   if (!month || !entry || entry.monthId !== month.id) return Response.json({ error: "Entry not found" }, { status: 404 });
@@ -49,7 +58,7 @@ export async function PATCH(
     await propagateYearCarryOver(user.id, yearNumber);
   }
 
-  return Response.json(updated);
+  return Response.json(publicEntryRow(updated));
 }
 
 export async function DELETE(

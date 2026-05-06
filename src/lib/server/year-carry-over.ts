@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { years } from "@/db/schema";
 import { deriveStartingBalance } from "@/lib/server/year-planning";
 import { getYearData, getYearsForUser } from "@/lib/server/year-data";
+import { protectFinancialNumber } from "@/lib/server/financial-data-privacy";
 
 export async function propagateYearCarryOver(userId: string, startYear: number) {
   const sortedYears = (await getYearsForUser(userId)).sort((a, b) => a - b);
@@ -18,7 +19,7 @@ export async function propagateYearCarryOver(userId: string, startYear: number) 
 
     await db
       .update(years)
-      .set({ startingBalance: String(startingBalance) })
+      .set({ startingBalance: protectFinancialNumber(startingBalance) })
       .where(and(eq(years.userId, userId), eq(years.year, year)));
 
     previousYearData = await getYearData(userId, year);
