@@ -5,7 +5,7 @@ import { AnnualView } from "@/components/annual/annual-view";
 import { AppShell } from "@/components/layout/app-shell";
 import { MonthOverview } from "@/components/monthly/month-overview";
 import { SettingsForm } from "@/components/settings/settings-form";
-import { usePathname, useRouter } from "@/i18n/routing";
+import { usePathname } from "@/i18n/routing";
 import type { YearData } from "@/lib/types";
 import {
   type YearRouteView,
@@ -15,8 +15,6 @@ import {
   buildYearSummaryHref,
   buildSettingsHref,
 } from "@/lib/year-routes";
-
-type InYearRouteView = Exclude<YearRouteView, "evolution">;
 
 interface Props {
   yearData: YearData;
@@ -36,7 +34,7 @@ function getInitialStateFromPathname(
   currentYear: number,
   fallbackMonth: number,
   fallbackView: "overview" | "summary"
-): { month: number; view: InYearRouteView } {
+): { month: number; view: YearRouteView } {
   const pathnameState = parseYearRoutePathname(pathname);
   if (pathnameState?.view === "evolution") {
     return {
@@ -67,17 +65,11 @@ export function YearPageClient({
   user,
 }: Props) {
   const pathname = usePathname();
-  const router = useRouter();
   const initialState = getInitialStateFromPathname(pathname, yearData.config.year, initialMonth, initialView);
   const [currentYearData, setCurrentYearData] = useState<YearData>(yearData);
   const [selectedMonth, setSelectedMonth] = useState(() => initialState.month);
-  const [selectedView, setSelectedView] = useState<InYearRouteView>(() => initialState.view);
+  const [selectedView, setSelectedView] = useState<YearRouteView>(() => initialState.view);
   const routePrefix = getYearRoutePrefix(pathname, currentYearData.config.year);
-
-  const handleYearDataChange = useCallback((newData: YearData) => {
-    setCurrentYearData(newData);
-    router.refresh();
-  }, [router]);
 
   useEffect(() => {
     setCurrentYearData(yearData);
@@ -149,14 +141,14 @@ export function YearPageClient({
         <AnnualView
           yearData={currentYearData}
           startingBalanceEditable={startingBalanceEditable}
-          onYearDataChange={handleYearDataChange}
+          onYearDataChange={setCurrentYearData}
         />
       ) : (
         <MonthOverview
           yearData={currentYearData}
           monthNumber={selectedMonth}
           onMonthSelect={handleMonthSelect}
-          onYearDataChange={handleYearDataChange}
+          onYearDataChange={setCurrentYearData}
         />
       )}
     </AppShell>

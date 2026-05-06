@@ -28,7 +28,7 @@ test("authenticated year nav tabs cancel Next navigation when handled locally", 
 
   assert.match(navSource, /onNavigate/, "nav selector tabs should use Next's client navigation hook");
   assert.match(navSource, /event\.preventDefault\(\)/, "local tab handlers should prevent the route navigation");
-  assert.match(navSource, /tab\.key === "overview" \? onMonthViewSelect : onSummaryViewSelect/, "tabs should select the matching local handler");
+  assert.match(navSource, /tab\.key === "overview" \? onMonthViewSelect : tab\.key === "summary" \? onSummaryViewSelect : undefined/, "tabs should select the matching local handler");
   assert.match(navSource, /handler\(\)/, "local tab handler should run after navigation is cancelled");
   assert.match(navSource, /buildSetupHrefFromPathname/, "create-year navigation should preserve the selected return route");
   assert.match(routesSource, /redirect=\$\{encodeURIComponent\(returnPath\)\}/, "create-year redirect should encode the current month or summary route");
