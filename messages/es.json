@@ -383,6 +383,8 @@
     "eyebrow": "Evolución histórica",
     "title": "Evolución financiera",
     "description": "Compara el saldo, el ahorro y la inversión entre todos tus años registrados.",
+    "totalWealth": "Patrimonio total estimado",
+    "totalWealthNote": "Saldo actual + inversión acumulada",
     "kpis": {
       "latestFinalBalance": "Saldo final actual",
       "latestFinalBalanceNote": "Cierre del último año registrado",

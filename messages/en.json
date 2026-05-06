@@ -383,6 +383,8 @@
     "eyebrow": "Historical evolution",
     "title": "Financial evolution",
     "description": "Compare balance, savings, and investment across every recorded year.",
+    "totalWealth": "Estimated total wealth",
+    "totalWealthNote": "Current balance + accumulated investment",
     "kpis": {
       "latestFinalBalance": "Current final balance",
       "latestFinalBalanceNote": "Closing balance of the latest recorded year",

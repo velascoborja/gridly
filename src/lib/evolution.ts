@@ -16,6 +16,7 @@ export interface EvolutionSummary {
   latestFinalBalance: number;
   totalSaved: number;
   accumulatedInvested: number;
+  totalWealth: number;
   bestYear: {
     year: number;
     savedAmount: number;
@@ -60,10 +61,13 @@ export function summarizeEvolutionMetrics(metrics: EvolutionYearMetric[]): Evolu
     return currentBest;
   }, null);
 
+  const latestFinalBalance = latest?.finalBalance ?? 0;
+  const accumulatedInvested = latest?.accumulatedInvested ?? 0;
   return {
-    latestFinalBalance: latest?.finalBalance ?? 0,
+    latestFinalBalance,
     totalSaved: metrics.reduce((sum, metric) => sum + metric.savedAmount, 0),
-    accumulatedInvested: latest?.accumulatedInvested ?? 0,
+    accumulatedInvested,
+    totalWealth: latestFinalBalance + accumulatedInvested,
     bestYear: best ? { year: best.year, savedAmount: best.savedAmount } : null,
   };
 }
