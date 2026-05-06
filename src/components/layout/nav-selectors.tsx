@@ -17,12 +17,13 @@ import {
   buildYearMonthHref,
   buildYearSummaryHref,
   buildSetupHrefFromPathname,
+  buildEvolutionHref,
 } from "@/lib/year-routes";
 
 interface Props {
   currentYear: number;
   currentMonth: number | null;
-  view: "overview" | "summary" | "settings";
+  view: "overview" | "summary" | "settings" | "evolution";
   years: number[];
   monthPathPrefix?: string;
   summaryPathPrefix?: string;
@@ -51,7 +52,8 @@ export function NavSelectors({
   const calendarYear = new Date().getFullYear();
   const showCurrentYearMarker = years.length > 1;
   const nextCreatableYear = getNextCreatableYear(years, currentYear);
-  const activeMainView = view === "summary" ? "summary" : view === "settings" ? null : "overview";
+  const activeMainView = view === "summary" ? "summary" : view === "evolution" ? "evolution" : view === "settings" ? null : "overview";
+  const showYearControls = !hideYearSelector && view !== "evolution";
 
   const handleYearChange = (val: string | null) => {
     if (!val) return;
@@ -62,17 +64,19 @@ export function NavSelectors({
 
   const monthHref = buildYearMonthHref(monthPathPrefix, currentYear, selectedMonth);
   const summaryHref = buildYearSummaryHref(summaryPathPrefix, currentYear);
+  const evolutionHref = buildEvolutionHref(undefined);
   const createYearHref = buildSetupHrefFromPathname(nextCreatableYear, pathname, currentYear, selectedMonth, view);
 
   const mainTabs = [
-    { label: t("months"), key: "overview" as const, href: monthHref },
-    { label: t("annualSummary"), key: "summary" as const, href: summaryHref },
+    { label: t("months"), key: "overview" as const, href: monthHref, disabled: false },
+    { label: t("annualSummary"), key: "summary" as const, href: summaryHref, disabled: false },
+    { label: t("evolution"), key: "evolution" as const, href: evolutionHref, disabled: years.length < 2 },
   ];
 
   return (
     <div className="flex w-full min-w-0 justify-center md:justify-end">
       <div className="flex max-w-full flex-wrap items-center justify-center gap-2 md:justify-end md:gap-3">
-        {!hideYearSelector && (
+        {showYearControls && (
           <div className="flex shrink-0 items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
             <span className="sr-only md:not-sr-only">{t("yearLabel")}</span>
             <Select value={String(currentYear)} onValueChange={handleYearChange}>
@@ -112,11 +116,24 @@ export function NavSelectors({
           <div className="flex flex-wrap justify-center gap-1">
             {mainTabs.map((tab) => {
               const active = activeMainView === tab.key;
+              if (tab.disabled) {
+                return (
+                  <span
+                    key={tab.key}
+                    aria-disabled="true"
+                    title={t("evolutionUnavailable")}
+                    className="inline-flex cursor-not-allowed items-center rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground/50 sm:px-4 sm:py-2"
+                  >
+                    {tab.label}
+                  </span>
+                );
+              }
               return (
                 <Link
                   key={tab.key}
                   href={tab.href}
                   onNavigate={(event) => {
+                    if (tab.key === "evolution") return;
                     const handler = tab.key === "overview" ? onMonthViewSelect : onSummaryViewSelect;
                     if (!handler) return;
 

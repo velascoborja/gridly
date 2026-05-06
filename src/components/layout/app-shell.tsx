@@ -7,7 +7,7 @@ import { BaseAppShell } from "./base-app-shell";
 interface Props {
   currentYear: number;
   currentMonth: number | null;
-  view: "overview" | "summary" | "settings";
+  view: "overview" | "summary" | "settings" | "evolution";
   years: number[];
   user: {
     email?: string | null;
