@@ -374,7 +374,8 @@
     "months": "Months",
     "annualSummary": "Annual Summary",
     "yearLabel": "Year",
-    "createYear": "Create {year}"
+    "createYear": "Create {year}",
+    "currentYear": "Current"
 
   },
   "Export": {

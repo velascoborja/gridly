@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { BrushCleaning, Check, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { sanitizeNumericInput } from "@/lib/currency-input";
 import { cn, formatCurrency } from "@/lib/utils";
 
 interface InlineEditFieldProps {
@@ -163,17 +164,31 @@ export function InlineEditField({
           className="col-span-2 grid min-w-0 grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2"
           aria-busy={saving}
         >
-          <input
-            ref={inputRef}
-            className={`h-10 min-w-0 rounded-md border bg-background px-3 text-right text-sm outline-none transition-colors focus:ring-4 focus:ring-ring/20 ${error ? "border-destructive" : "border-border"}`}
-            value={inputVal}
-            onChange={(e) => { setInputVal(e.target.value); setError(false); }}
-            onBlur={handleBlur}
-            onKeyDown={handleKeyDown}
-            disabled={saving}
-            type="text"
-            inputMode="decimal"
-          />
+          <div className="relative min-w-0">
+            <input
+              ref={inputRef}
+              className={`h-10 w-full min-w-0 rounded-md border bg-background px-3 pr-8 text-right text-sm outline-none transition-colors focus:ring-4 focus:ring-ring/20 ${error ? "border-destructive" : "border-border"}`}
+              value={inputVal}
+              onChange={(e) => {
+                setInputVal(sanitizeNumericInput(e.target.value));
+                setError(false);
+              }}
+              onBlur={handleBlur}
+              onKeyDown={handleKeyDown}
+              disabled={saving}
+              type="text"
+              inputMode="decimal"
+            />
+            <span
+              aria-hidden="true"
+              className={cn(
+                "pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground transition-opacity",
+                inputVal.trim() ? "opacity-100" : "opacity-0"
+              )}
+            >
+              €
+            </span>
+          </div>
           <Button
             ref={saveButtonRef}
             size="icon-lg"

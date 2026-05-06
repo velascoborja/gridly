@@ -5,6 +5,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { RecurringExpenseInput } from "@/lib/recurring-expenses";
+import { cn } from "@/lib/utils";
 
 interface Props {
   entries: RecurringExpenseInput[];
@@ -12,6 +13,7 @@ interface Props {
   disabled?: boolean;
   title: string;
   description: string;
+  showCurrencySuffix?: boolean;
 }
 
 export function RecurringExpenseTemplateEditor({
@@ -20,6 +22,7 @@ export function RecurringExpenseTemplateEditor({
   disabled = false,
   title,
   description,
+  showCurrencySuffix = false,
 }: Props) {
   const t = useTranslations("RecurringExpenses.editor");
 
@@ -67,17 +70,27 @@ export function RecurringExpenseTemplateEditor({
               onChange={(event) => updateEntry(index, { label: event.target.value })}
               className="h-10 text-sm"
             />
-            <Input
-              value={entry.amount === 0 ? "" : String(entry.amount)}
-              placeholder="0.00"
-              inputMode="decimal"
-              disabled={disabled}
-              onChange={(event) => {
-                const amount = parseFloat(event.target.value.replace(",", "."));
-                updateEntry(index, { amount: Number.isNaN(amount) ? 0 : amount });
-              }}
-              className="h-10 text-right text-sm"
-            />
+            <div className="relative">
+              <Input
+                value={entry.amount === 0 ? "" : String(entry.amount)}
+                placeholder="0.00"
+                inputMode="decimal"
+                disabled={disabled}
+                onChange={(event) => {
+                  const amount = parseFloat(event.target.value.replace(/€/g, "").replace(",", "."));
+                  updateEntry(index, { amount: Number.isNaN(amount) ? 0 : amount });
+                }}
+                className={cn("h-10 text-right text-sm", showCurrencySuffix && "pr-8")}
+              />
+              {showCurrencySuffix ? (
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground"
+                >
+                  €
+                </span>
+              ) : null}
+            </div>
             <Button
               type="button"
               variant="ghost"

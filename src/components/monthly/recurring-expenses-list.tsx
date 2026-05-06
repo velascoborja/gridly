@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { sanitizeNumericInput } from "@/lib/currency-input";
 import { sortRecurringExpensesAsc } from "@/lib/recurring-expenses";
 import { cn, formatCurrency } from "@/lib/utils";
 import type { RecurringExpense } from "@/lib/types";
@@ -90,7 +91,7 @@ export function RecurringExpensesList({ monthId, entries, onEntriesChange, readO
               <Input
                 className="h-8 w-full text-right text-sm sm:w-28"
                 value={editAmount}
-                onChange={(e) => setEditAmount(e.target.value)}
+                onChange={(e) => setEditAmount(sanitizeNumericInput(e.target.value))}
                 disabled={savingId === entry.id}
                 inputMode="decimal"
               />

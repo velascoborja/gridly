@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { RecurringExpenseTemplateEditor } from "@/components/recurring-expenses/recurring-expense-template-editor";
 import { createAndPrefillYear } from "@/lib/server/actions/years";
 import type { RecurringExpenseInput } from "@/lib/recurring-expenses";
-import { parseLocalizedNumber } from "@/lib/currency-input";
+import { parseLocalizedNumber, sanitizeNumericInput } from "@/lib/currency-input";
 import { hasSetupFieldValue } from "@/lib/setup-readiness";
 import { cn, formatCurrency } from "@/lib/utils";
 
@@ -52,6 +52,8 @@ const parseOptionalPercentage = (value: string) => (hasSetupFieldValue(value) ? 
 const setupMobileStepperQuery = "(max-width: 1023px)";
 const isSetupMobileStepper = () =>
   typeof window !== "undefined" && window.matchMedia(setupMobileStepperQuery).matches;
+const setupInputClassName =
+  "h-11 rounded-md border-[#e5edf5] px-3 text-sm text-[#061b31] shadow-none focus-visible:ring-[#533afd]/20";
 
 export function SetupPageClient({ year, derivedStartingBalance, previousYear, startingBalanceEditable }: Props) {
   const t = useTranslations("Setup");
@@ -181,6 +183,51 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
     estimatedExtraPayment: parseNumber(values.estimatedExtraPayment),
   };
 
+  const renderCurrencyInput = ({
+    key,
+    label,
+    placeholder,
+    disabled = submitting,
+  }: {
+    key: string;
+    label: string;
+    placeholder: string;
+    disabled?: boolean;
+  }) => {
+    const value = values[key] ?? "";
+
+    return (
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-[#273951]" htmlFor={key}>
+          {label}
+        </label>
+        <div className="relative">
+          <Input
+            id={key}
+            type="text"
+            inputMode="decimal"
+            value={value}
+            onChange={(event) =>
+              setValues((prev) => ({ ...prev, [key]: sanitizeNumericInput(event.target.value) }))
+            }
+            placeholder={placeholder}
+            disabled={disabled}
+            className={cn(setupInputClassName, "pr-8")}
+          />
+          <span
+            aria-hidden="true"
+            className={cn(
+              "pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#64748d] transition-opacity",
+              value.trim() ? "opacity-100" : "opacity-0"
+            )}
+          >
+            €
+          </span>
+        </div>
+      </div>
+    );
+  };
+
   const renderNumericInput = (field: { key: NumericField; label: string; placeholder: string }) => (
     <div className="space-y-2">
       <label className="text-sm font-medium text-[#273951]" htmlFor={field.key}>
@@ -191,10 +238,10 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
         type="text"
         inputMode="decimal"
         value={values[field.key]}
-        onChange={(event) => setValues((prev) => ({ ...prev, [field.key]: event.target.value }))}
+        onChange={(event) => setValues((prev) => ({ ...prev, [field.key]: sanitizeNumericInput(event.target.value) }))}
         placeholder={field.placeholder}
         disabled={submitting}
-        className="h-11 rounded-md border-[#e5edf5] px-3 text-sm text-[#061b31] shadow-none focus-visible:ring-[#533afd]/20"
+        className={setupInputClassName}
       />
     </div>
   );
@@ -392,19 +439,27 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
-                <label className="text-sm font-medium text-[#273951]" htmlFor="startingBalance">
-                  {startingBalanceEditable ? t("startingBalanceLabel") : t("startingBalanceDerived")}
-                </label>
-                <Input
-                  id="startingBalance"
-                  type="text"
-                  inputMode="decimal"
-                  value={startingBalanceEditable ? values.startingBalance : formatCurrency(derivedStartingBalance, locale)}
-                  onChange={(event) => setValues((prev) => ({ ...prev, startingBalance: event.target.value }))}
-                  placeholder={t("startingBalancePlaceholder")}
-                  disabled={submitting || !startingBalanceEditable}
-                  className="h-11 rounded-md border-[#e5edf5] px-3 text-sm text-[#061b31] shadow-none focus-visible:ring-[#533afd]/20"
-                />
+                {startingBalanceEditable ? (
+                  renderCurrencyInput({
+                    key: "startingBalance",
+                    label: t("startingBalanceLabel"),
+                    placeholder: t("startingBalancePlaceholder"),
+                  })
+                ) : (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-[#273951]" htmlFor="startingBalance">
+                      {t("startingBalanceDerived")}
+                    </label>
+                    <Input
+                      id="startingBalance"
+                      type="text"
+                      inputMode="decimal"
+                      value={formatCurrency(derivedStartingBalance, locale)}
+                      disabled
+                      className={setupInputClassName}
+                    />
+                  </div>
+                )}
                 {!startingBalanceEditable ? (
                   <p className="text-sm leading-6 text-[#64748d]">
                     {t("startingBalanceNote", { previousYear: previousYear ?? "" })}
@@ -421,7 +476,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {renderNumericInput(numericFieldByKey.estimatedSalary)}
+                {renderCurrencyInput(numericFieldByKey.estimatedSalary)}
 
                 <div className="rounded-lg border border-[#e5edf5] bg-[#f6f9fc] p-4">
                   <label className="flex items-start justify-between gap-4">
@@ -471,21 +526,12 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
                   >
                     <div className="overflow-hidden px-1 pb-2">
                       <div className="border-t border-[#e5edf5] pt-4">
-                        <label className="block text-sm font-medium leading-5 text-[#273951]" htmlFor="estimatedExtraPayment">
-                          {t("estimatedExtraPayment")}
-                        </label>
-                        <Input
-                          id="estimatedExtraPayment"
-                          type="text"
-                          inputMode="decimal"
-                          value={values.estimatedExtraPayment}
-                          onChange={(event) =>
-                            setValues((prev) => ({ ...prev, estimatedExtraPayment: event.target.value }))
-                          }
-                          placeholder={t("estimatedExtraPaymentPlaceholder")}
-                          disabled={submitting || !hasExtraPayments}
-                          className="mt-2 h-11 rounded-md border-[#e5edf5] px-3 text-sm text-[#061b31] shadow-none focus-visible:ring-[#533afd]/20"
-                        />
+                        {renderCurrencyInput({
+                          key: "estimatedExtraPayment",
+                          label: t("estimatedExtraPayment"),
+                          placeholder: t("estimatedExtraPaymentPlaceholder"),
+                          disabled: submitting || !hasExtraPayments,
+                        })}
                       </div>
                     </div>
                   </div>
@@ -501,9 +547,9 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid gap-4 md:grid-cols-3">
-                {renderNumericInput(numericFieldByKey.monthlyHomeExpense)}
-                {renderNumericInput(numericFieldByKey.monthlyPersonalBudget)}
-                {renderNumericInput(numericFieldByKey.monthlyInvestment)}
+                {renderCurrencyInput(numericFieldByKey.monthlyHomeExpense)}
+                {renderCurrencyInput(numericFieldByKey.monthlyPersonalBudget)}
+                {renderCurrencyInput(numericFieldByKey.monthlyInvestment)}
               </CardContent>
             </Card>
 
@@ -549,6 +595,7 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
                 disabled={submitting}
                 title={t("sections.recurringExpenses.title")}
                 description={t("sections.recurringExpenses.description")}
+                showCurrencySuffix
               />
             </div>
 

@@ -374,7 +374,8 @@
     "months": "Meses",
     "annualSummary": "Resumen anual",
     "yearLabel": "Año",
-    "createYear": "Crear año {year}"
+    "createYear": "Crear año {year}",
+    "currentYear": "Actual"
 
   },
   "Export": {

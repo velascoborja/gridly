@@ -18,6 +18,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { sortAdditionalEntriesDesc, sumAdditionalEntries } from "@/lib/additional-entries";
+import { sanitizeNumericInput } from "@/lib/currency-input";
 import { cn, formatCurrency } from "@/lib/utils";
 import type { AdditionalEntry } from "@/lib/types";
 
@@ -89,9 +90,11 @@ export function AdditionalEntriesCard({
     onEntryDragEnd?.();
   };
 
+  const parseAmountInput = (value: string) => parseFloat(value.replace(",", "."));
+
   const handleAdd = async () => {
     if (isAdding) return;
-    const amount = parseFloat(newAmount.replace(",", "."));
+    const amount = parseAmountInput(newAmount);
     if (!newLabel.trim() || isNaN(amount)) return;
 
     setIsAdding(true);
@@ -125,7 +128,7 @@ export function AdditionalEntriesCard({
 
   const handleEdit = async (id: number) => {
     if (savingId === id) return;
-    const amount = parseFloat(editAmount.replace(",", "."));
+    const amount = parseAmountInput(editAmount);
     if (!editLabel.trim() || isNaN(amount)) return;
 
     setSavingId(id);
@@ -147,6 +150,38 @@ export function AdditionalEntriesCard({
       setSavingId(null);
     }
   };
+
+  const renderAmountInput = ({
+    value,
+    onChange,
+    disabled,
+    onKeyDown,
+    placeholder,
+  }: {
+    value: string;
+    onChange: (value: string) => void;
+    disabled: boolean;
+    onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => void;
+    placeholder?: string;
+  }) => (
+    <div className="relative w-full sm:w-28">
+      <Input
+        className="h-9 w-full pr-8 text-right text-sm"
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange(sanitizeNumericInput(e.target.value))}
+        disabled={disabled}
+        onKeyDown={onKeyDown}
+        inputMode="decimal"
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground"
+      >
+        €
+      </span>
+    </div>
+  );
 
   return (
     <Card size="sm" className="border-border/70 bg-card/95 shadow-sm shadow-black/5">
@@ -185,18 +220,16 @@ export function AdditionalEntriesCard({
                   }}
                   autoFocus
                 />
-                <Input
-                  className="h-9 w-full text-right text-sm sm:w-28"
-                  placeholder="0.00"
-                  value={newAmount}
-                  onChange={(e) => setNewAmount(e.target.value)}
-                  disabled={isAdding}
-                  onKeyDown={(e) => {
+                {renderAmountInput({
+                  value: newAmount,
+                  onChange: setNewAmount,
+                  disabled: isAdding,
+                  placeholder: "0.00",
+                  onKeyDown: (e) => {
                     if (e.key === "Enter") handleAdd();
                     if (e.key === "Escape" && !isAdding) closeAddForm();
-                  }}
-                  inputMode="decimal"
-                />
+                  },
+                })}
                 <Button size="sm" className="h-9 w-full px-3 sm:w-auto" onClick={handleAdd} disabled={isAdding}>
                   {isAdding ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
                   {isAdding ? t("adding") : t("add")}
@@ -238,17 +271,15 @@ export function AdditionalEntriesCard({
                     }}
                     autoFocus
                   />
-                  <Input
-                    className="h-9 w-full text-right text-sm sm:w-28"
-                    value={editAmount}
-                    onChange={(e) => setEditAmount(e.target.value)}
-                    disabled={savingId === entry.id}
-                    onKeyDown={(e) => {
+                  {renderAmountInput({
+                    value: editAmount,
+                    onChange: setEditAmount,
+                    disabled: savingId === entry.id,
+                    onKeyDown: (e) => {
                       if (e.key === "Enter") handleEdit(entry.id);
                       if (e.key === "Escape" && savingId !== entry.id) setEditingId(null);
-                    }}
-                    inputMode="decimal"
-                  />
+                    },
+                  })}
                   <Button size="sm" className="h-9 w-full px-3 sm:w-auto" onClick={() => handleEdit(entry.id)} disabled={savingId === entry.id}>
                     {savingId === entry.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
                     {savingId === entry.id ? t("saving") : common("save")}

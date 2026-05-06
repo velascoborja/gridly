@@ -16,6 +16,7 @@ Each entry consists of:
 ## UI & Implementation
 
 - **Components:** `AdditionalEntriesCard` (src/components/monthly/additional-entries-card.tsx) manages the list, creation, editing, deletion, and move affordances for additional entries.
+- **Amount inputs:** Creation and edit forms keep numeric text in component state, show an in-input Euro suffix as soon as the amount field is editable, and sanitize typed or pasted text through `sanitizeNumericInput`, keeping only digits plus `,` and `.` decimal separators before parsing the amount sent to the API.
 - **API Endpoints:**
     - `POST /api/months/[monthId]/entries`: Create a new entry.
     - `PATCH /api/months/[monthId]/entries/[entryId]`: Edit an entry label/amount or move it to another month by sending `monthId`.

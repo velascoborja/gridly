@@ -19,6 +19,7 @@ test("setup submits recurring expense templates with the year config", () => {
   const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
 
   assert.match(source, /RecurringExpenseTemplateEditor/);
+  assert.match(source, /showCurrencySuffix/);
   assert.match(source, /const \[recurringExpenses, setRecurringExpenses\]/);
   assert.match(source, /recurringExpenses,/);
 });
@@ -36,15 +37,26 @@ test("setup numeric fields start empty and use translated placeholder hints", ()
   assert.doesNotMatch(source, /defaultValue: "0"/);
 });
 
-test("setup currency inputs keep raw user text while preserving numeric payloads", () => {
+test("setup currency inputs show a Euro suffix while preserving numeric payloads", () => {
   const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
 
-  assert.doesNotMatch(source, /formatCurrencyInputValue/);
-  assert.doesNotMatch(source, /handleCurrencyInputChange/);
+  assert.match(source, /renderCurrencyInput/);
+  assert.match(source, />\s*€\s*<\/span>/);
+  assert.match(source, /value\.trim\(\)/);
+  assert.match(source, /pr-8/);
   assert.match(source, /const parseNumber = parseLocalizedNumber/);
   assert.match(source, /parseNumber\(values\.estimatedSalary\)/);
   assert.match(source, /parseNumber\(values\.startingBalance\)/);
   assert.match(source, /parseNumber\(values\.estimatedExtraPayment\)/);
+  assert.doesNotMatch(source.match(/renderCurrencyInput[\s\S]*?const renderNumericInput/)?.[0] ?? "", /interestRate/);
+});
+
+test("setup amount inputs reject non numeric characters while typing", () => {
+  const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /sanitizeNumericInput/);
+  assert.match(source.match(/renderCurrencyInput[\s\S]*?const renderNumericInput/)?.[0] ?? "", /sanitizeNumericInput/);
+  assert.match(source.match(/renderNumericInput[\s\S]*?const summaryRows/)?.[0] ?? "", /sanitizeNumericInput/);
 });
 
 test("setup stepper marks each step complete when its section data is ready", () => {

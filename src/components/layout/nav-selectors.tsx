@@ -48,6 +48,8 @@ export function NavSelectors({
   const pathname = usePathname();
   const t = useTranslations("Nav");
   const selectedMonth = currentMonth ?? new Date().getMonth() + 1;
+  const calendarYear = new Date().getFullYear();
+  const showCurrentYearMarker = years.length > 1;
   const nextCreatableYear = getNextCreatableYear(years, currentYear);
   const activeMainView = view === "summary" ? "summary" : view === "settings" ? null : "overview";
 
@@ -80,7 +82,12 @@ export function NavSelectors({
               <SelectContent>
                 {years.map((y) => (
                   <SelectItem key={y} value={String(y)}>
-                    {y}
+                    <span>{y}</span>
+                    {showCurrentYearMarker && y === calendarYear && (
+                      <span className="rounded border border-primary/20 bg-primary/[0.08] px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.12em] text-primary">
+                        {t("currentYear")}
+                      </span>
+                    )}
                   </SelectItem>
                 ))}
               </SelectContent>

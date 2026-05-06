@@ -18,11 +18,48 @@ test("inline fixed fields expose an explicit save button while editing", () => {
   assert.match(source, /saving \? tCommon\("saving"\) : tCommon\("save"\)/);
 });
 
+test("inline fixed field edit inputs show a Euro suffix while preserving numeric payloads", () => {
+  const source = readFileSync(new URL("./inline-edit-field.tsx", import.meta.url), "utf8");
+
+  assert.match(source, />\s*€\s*<\/span>/);
+  assert.match(source, /inputVal\.trim\(\)/);
+  assert.match(source, /defaultParseInputValue = \(input: string\) => parseFloat\(input\.replace\(",", "\."\)\)/);
+  assert.match(source, /pr-8/);
+});
+
+test("inline fixed amount inputs reject non numeric characters while editing", () => {
+  const source = readFileSync(new URL("./inline-edit-field.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /sanitizeNumericInput/);
+  assert.match(source, /setInputVal\(sanitizeNumericInput\(e\.target\.value\)\)/);
+});
+
 test("additional entry amounts remain direct edit triggers", () => {
   const source = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
 
   assert.match(source, /onClick=\{\(\) => openEditForm\(entry\)\}/);
   assert.match(source, /aria-label=\{`\$\{t\("edit"\)\} \$\{entry\.label\}`\}/);
+});
+
+test("additional entry amount inputs show a Euro suffix as soon as they are editable", () => {
+  const source = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /renderAmountInput/);
+  assert.match(source, />\s*€\s*<\/span>/);
+  assert.match(source, /const parseAmountInput = \(value: string\) => parseFloat\(value\.replace\(",", "\."\)\)/);
+  assert.match(source, /const amount = parseAmountInput\(newAmount\)/);
+  assert.match(source, /const amount = parseAmountInput\(editAmount\)/);
+  assert.match(source, /value: newAmount/);
+  assert.match(source, /value: editAmount/);
+  assert.doesNotMatch(source.match(/const renderAmountInput[\s\S]*?\n  \);\n/)?.[0] ?? "", /value\.trim\(\)/);
+  assert.doesNotMatch(source.match(/const renderAmountInput[\s\S]*?\n  \);\n/)?.[0] ?? "", /opacity-0/);
+});
+
+test("additional entry amount inputs reject non numeric characters while editing", () => {
+  const source = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /sanitizeNumericInput/);
+  assert.match(source.match(/const renderAmountInput[\s\S]*?\n  \);\n/)?.[0] ?? "", /sanitizeNumericInput/);
 });
 
 test("fixed editor reveal animates without an extra parent stack gap", () => {
@@ -143,6 +180,13 @@ test("fixed expenses card embeds recurring expenses without month-level add", ()
   assert.doesNotMatch(listSource, /method: "POST"/);
   assert.doesNotMatch(listSource, /addEntry/);
   assert.match(listSource, /deletingId === entry\.id/);
+});
+
+test("monthly recurring expense amount inputs reject non numeric characters while editing", () => {
+  const source = readFileSync(new URL("./recurring-expenses-list.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /sanitizeNumericInput/);
+  assert.match(source, /setEditAmount\(sanitizeNumericInput\(e\.target\.value\)\)/);
 });
 
 test("monthly edits update client state without clearing the route cache", () => {

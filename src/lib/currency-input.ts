@@ -1,3 +1,7 @@
+export function sanitizeNumericInput(value: string): string {
+  return value.replace(/[^\d,.]/g, "");
+}
+
 export function parseLocalizedNumber(value: string): number {
   const cleaned = value
     .replace(/[^\d,.-]/g, "")

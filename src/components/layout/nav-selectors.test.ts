@@ -10,6 +10,19 @@ test("create year navigation derives its redirect from the current browser path"
   assert.match(source, /const createYearHref = buildSetupHrefFromPathname\(nextCreatableYear, pathname/);
 });
 
+test("year selector marks the real current year when multiple years are available", () => {
+  const source = readFileSync(new URL("./nav-selectors.tsx", import.meta.url), "utf8");
+  const spanish = JSON.parse(readFileSync(new URL("../../../messages/es.json", import.meta.url), "utf8"));
+  const english = JSON.parse(readFileSync(new URL("../../../messages/en.json", import.meta.url), "utf8"));
+
+  assert.match(source, /const calendarYear = new Date\(\)\.getFullYear\(\)/);
+  assert.match(source, /const showCurrentYearMarker = years\.length > 1/);
+  assert.match(source, /y === calendarYear/);
+  assert.match(source, /t\("currentYear"\)/);
+  assert.equal(spanish.Nav.currentYear, "Actual");
+  assert.equal(english.Nav.currentYear, "Current");
+});
+
 test("public hero exposes the A+B hybrid landing structure", () => {
   const source = readFileSync(new URL("../landing/public-hero.tsx", import.meta.url), "utf8");
 

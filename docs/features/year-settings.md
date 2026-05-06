@@ -28,7 +28,7 @@ The live preview is derived only from local form state. It shows the starting ba
 
 The create button is enabled only when the required setup sections are ready: Starting point, Income, and Monthly plan. Growth and recurring expenses remain optional for submission.
 
-Currency labels on the setup page omit unit suffixes, while placeholder hints show the Euro symbol after the example amount. Editable currency inputs keep the raw text the user enters. `parseLocalizedNumber` converts localized input text back to a number for the live preview and `createAndPrefillYear` payload. The interest rate remains a plain percentage input inside a collapsed disclosure; leaving it blank during setup stores `0`.
+Currency labels on the setup page omit unit suffixes, while placeholder hints show the Euro symbol after the example amount. Editable setup currency inputs keep the numeric text in form state and show an in-input Euro suffix once the user enters a value. Recurring expense template amount inputs show the Euro suffix as soon as the amount field is editable. Setup amount inputs sanitize typed or pasted text through `sanitizeNumericInput`, keeping only digits plus `,` and `.` decimal separators before storing the value. `parseLocalizedNumber` converts localized input text back to a number for the live preview and `createAndPrefillYear` payload. The interest rate remains a plain percentage input inside a collapsed disclosure; leaving it blank during setup stores `0`.
 
 The section stepper derives completed state from local form readiness and only includes the setup sections that users need to navigate: Starting point, Income, Monthly plan, and Recurring expenses. Readiness uses `hasSetupFieldValue`, so any non-empty input, including `0`, counts as entered data. Starting point is complete once the editable starting balance is filled or when the balance is derived from the previous year. Income requires salary and, when extra pays are enabled, the extra-pay amount. Monthly plan requires only the three monthly currency values. Recurring expenses are optional, so the stepper marks that item with a neutral dashed treatment while empty, then switches to the green completed state once at least one recurring expense exists.
 
@@ -42,6 +42,7 @@ Gridly employs an "In-Year Workspace" model to manage the complex financial stat
 - **Pure Local Navigation:** Switching between months or views (summary/settings) uses `window.history.pushState()`. This avoids server-side data refetching, allowing the UI to remain responsive and preserve unsaved client-side recalculations.
 - **Route Synchronization:** The `YearPageClient` listens for `popstate` events and uses `parseYearRoutePathname` from `src/lib/year-routes.ts` to keep the UI tabs and the URL in sync.
 - **Server Navigation:** Changing the *year* (e.g., from 2024 to 2025) or going to the landing page uses standard Next.js router transitions, as these require entirely new data sets or different layouts.
+- **Current Year Marker:** When more than one year is available, `NavSelectors` marks the real calendar year in the year selector with a localized compact badge (`Nav.currentYear`). The marker is informational only; it does not change the selected year or default routing.
 
 ## Configuration Fields (YearConfig)
 
