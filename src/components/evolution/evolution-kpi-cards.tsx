@@ -11,7 +11,7 @@ interface Props {
 }
 
 export function EvolutionKpiCards({ summary }: Props) {
-  const t = useTranslations("EvolutionDashboard.kpis");
+  const t = useTranslations("Evolution.kpis");
   const locale = useLocale();
   const cards = [
     {
