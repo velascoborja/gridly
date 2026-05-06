@@ -16,6 +16,8 @@ import {
   buildSettingsHref,
 } from "@/lib/year-routes";
 
+type InYearRouteView = Exclude<YearRouteView, "evolution">;
+
 interface Props {
   yearData: YearData;
   initialMonth: number;
@@ -34,8 +36,15 @@ function getInitialStateFromPathname(
   currentYear: number,
   fallbackMonth: number,
   fallbackView: "overview" | "summary"
-) {
+): { month: number; view: InYearRouteView } {
   const pathnameState = parseYearRoutePathname(pathname);
+  if (pathnameState?.view === "evolution") {
+    return {
+      month: fallbackMonth,
+      view: fallbackView,
+    };
+  }
+
   if (pathnameState && pathnameState.year === currentYear) {
     return {
       month: pathnameState.month ?? fallbackMonth,
@@ -62,7 +71,7 @@ export function YearPageClient({
   const initialState = getInitialStateFromPathname(pathname, yearData.config.year, initialMonth, initialView);
   const [currentYearData, setCurrentYearData] = useState<YearData>(yearData);
   const [selectedMonth, setSelectedMonth] = useState(() => initialState.month);
-  const [selectedView, setSelectedView] = useState<YearRouteView>(() => initialState.view);
+  const [selectedView, setSelectedView] = useState<InYearRouteView>(() => initialState.view);
   const routePrefix = getYearRoutePrefix(pathname, currentYearData.config.year);
 
   const handleYearDataChange = useCallback((newData: YearData) => {
@@ -78,6 +87,7 @@ export function YearPageClient({
     function syncStateFromPathname(nextPathname: string) {
       const nextState = parseYearRoutePathname(nextPathname);
       if (!nextState) return;
+      if (nextState.view === "evolution") return;
       if (nextState.year !== null && nextState.year !== currentYearData.config.year) return;
 
       setSelectedView(nextState.view);
