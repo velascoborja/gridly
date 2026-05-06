@@ -6,6 +6,7 @@ import {
   buildYearMonthHref,
   buildYearSummaryHref,
   buildSettingsHref,
+  buildEvolutionHref,
   buildSetupHref,
   buildSetupHrefFromPathname,
 } from "./year-routes.ts";
@@ -25,6 +26,19 @@ describe("year-routes", () => {
       assert.deepEqual(parseYearRoutePathname("/es/settings"), { year: null, view: "settings", month: null });
     });
 
+    it("parses evolution route as a global year route view", () => {
+      assert.deepEqual(parseYearRoutePathname("/evolution"), {
+        year: null,
+        view: "evolution",
+        month: null,
+      });
+      assert.deepEqual(parseYearRoutePathname("/es/evolution"), {
+        year: null,
+        view: "evolution",
+        month: null,
+      });
+    });
+
     it("returns null for unknown paths", () => {
       assert.equal(parseYearRoutePathname("/about"), null);
     });
@@ -41,6 +55,10 @@ describe("year-routes", () => {
 
     it("extracts prefix from settings path", () => {
       assert.equal(getYearRoutePrefix("/es/settings", 2026), "/es");
+    });
+
+    it("extracts prefix from evolution path", () => {
+      assert.equal(getYearRoutePrefix("/es/evolution", 2026), "/es");
     });
 
     it("returns empty string if no prefix", () => {
@@ -65,6 +83,11 @@ describe("year-routes", () => {
       assert.equal(buildSettingsHref(""), "/settings");
     });
 
+    it("builds evolution href from route prefix", () => {
+      assert.equal(buildEvolutionHref(""), "/evolution");
+      assert.equal(buildEvolutionHref("/es"), "/es/evolution");
+    });
+
     it("buildSetupHref", () => {
       assert.equal(buildSetupHref(2027, "/2026/summary"), "/setup/2027?redirect=%2F2026%2Fsummary");
     });
@@ -81,6 +104,13 @@ describe("year-routes", () => {
 
     it("falls back to view state for unknown paths", () => {
       assert.equal(buildSetupHrefFromPathname(2027, "/es/settings", 2026, 4, "overview"), "/setup/2027?redirect=%2F2026%2F4");
+    });
+
+    it("setup return path falls back to current year when launched from evolution", () => {
+      assert.equal(
+        buildSetupHrefFromPathname(2027, "/es/evolution", 2026, 5, "evolution"),
+        "/setup/2027?redirect=%2F2026%2F5"
+      );
     });
   });
 });

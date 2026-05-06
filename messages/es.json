@@ -372,7 +372,7 @@
   },
   "Nav": {
     "months": "Meses",
-    "annualSummary": "Resumen anual",
+    "annualSummary": "Año",
     "yearLabel": "Año",
     "createYear": "Crear año {year}",
     "currentYear": "Actual"

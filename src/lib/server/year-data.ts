@@ -139,6 +139,12 @@ export async function getYearsForUser(userId: string): Promise<number[]> {
   return rows.map((row) => row.year);
 }
 
+export async function getAllYearDataForUser(userId: string): Promise<YearData[]> {
+  const userYears = await getYearsForUser(userId);
+  const yearData = await Promise.all(userYears.map((year) => getYearData(userId, year)));
+  return yearData.filter((data): data is YearData => data !== null);
+}
+
 export async function getAppRedirectPath(userId: string, currentYear: number) {
   const userYears = await getYearsForUser(userId);
   if (userYears.length === 0) {

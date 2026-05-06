@@ -1,8 +1,12 @@
-export type YearRouteView = "overview" | "summary" | "settings";
+export type YearRouteView = "overview" | "summary" | "settings" | "evolution";
 
 export function parseYearRoutePathname(pathname: string): { year: number | null; view: YearRouteView; month: number | null } | null {
   if (pathname.match(/\/settings$/)) {
     return { year: null, view: "settings", month: null };
+  }
+
+  if (pathname.match(/\/evolution$/)) {
+    return { year: null, view: "evolution", month: null };
   }
 
   const summaryMatch = pathname.match(/\/(\d+)\/summary$/);
@@ -25,6 +29,9 @@ export function getYearRoutePrefix(pathname: string, year: number): string {
   const settingsMatch = pathname.match(/^(.*)\/settings$/);
   if (settingsMatch) return settingsMatch[1];
 
+  const evolutionMatch = pathname.match(/^(.*)\/evolution$/);
+  if (evolutionMatch) return evolutionMatch[1];
+
   return "";
 }
 
@@ -38,6 +45,10 @@ export function buildYearSummaryHref(prefix: string | undefined, year: number): 
 
 export function buildSettingsHref(prefix: string): string {
   return prefix ? `${prefix}/settings` : "/settings";
+}
+
+export function buildEvolutionHref(prefix: string | undefined): string {
+  return `${prefix ?? ""}/evolution`;
 }
 
 export function buildSetupHref(nextYear: number, returnPath: string): string {

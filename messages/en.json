@@ -372,7 +372,7 @@
   },
   "Nav": {
     "months": "Months",
-    "annualSummary": "Annual Summary",
+    "annualSummary": "Year",
     "yearLabel": "Year",
     "createYear": "Create {year}",
     "currentYear": "Current"
