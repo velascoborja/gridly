@@ -75,3 +75,4 @@ When changing any of the features listed below, update the related documentation
 - [Data Export](docs/features/data-export.md): Excel workbook generation for offline analysis and data portability.
 - [Internationalization](docs/features/internationalization.md): Implementation details for multi-language support and routing.
 - [App Icons & Web App Metadata](docs/features/app-icons.md): Browser, manifest, and iOS Safari icon asset conventions.
+- [Evolution Dashboard](docs/features/evolution-dashboard.md): Multi-year balance, savings, and investment analytics.

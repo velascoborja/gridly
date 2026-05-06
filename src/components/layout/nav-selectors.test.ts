@@ -69,3 +69,14 @@ test("evolution page loads all years and guards direct one-year access", () => {
   assert.match(source, /view="evolution"/);
   assert.match(source, /<EvolutionDashboard metrics=\{metrics\} \/>/);
 });
+
+test("feature docs include evolution dashboard documentation", () => {
+  const agents = readFileSync(new URL("../../../AGENTS.md", import.meta.url), "utf8");
+  const docs = readFileSync(new URL("../../../docs/features/evolution-dashboard.md", import.meta.url), "utf8");
+
+  assert.match(agents, /docs\/features\/evolution-dashboard\.md/);
+  assert.match(docs, /# Feature: Evolution Dashboard/);
+  assert.match(docs, /Evolución/);
+  assert.match(docs, /`savedAmount`: `finalBalance - startingBalance`/);
+  assert.match(docs, /Disponible cuando tengas más de un año registrado/);
+});
