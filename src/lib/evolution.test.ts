@@ -117,6 +117,36 @@ test("deriveEvolutionMetrics excludes years without a December month", () => {
   assert.deepEqual(metrics.map((metric) => metric.year), [2025]);
 });
 
+test("deriveEvolutionMetrics sorts years ascending before accumulating investments", () => {
+  const metrics = deriveEvolutionMetrics([
+    yearData(2026, 2000, [month({ month: 12, investment: 300, endingBalance: 2600 })]),
+    yearData(2024, 1000, [month({ month: 12, investment: 100, endingBalance: 1300 })]),
+    yearData(2025, 1300, [month({ month: 12, investment: 200, endingBalance: 2000 })]),
+  ]);
+
+  assert.deepEqual(metrics.map((metric) => ({
+    year: metric.year,
+    investedAmount: metric.investedAmount,
+    accumulatedInvested: metric.accumulatedInvested,
+  })), [
+    {
+      year: 2024,
+      investedAmount: 100,
+      accumulatedInvested: 100,
+    },
+    {
+      year: 2025,
+      investedAmount: 200,
+      accumulatedInvested: 300,
+    },
+    {
+      year: 2026,
+      investedAmount: 300,
+      accumulatedInvested: 600,
+    },
+  ]);
+});
+
 test("summarizeEvolutionMetrics derives dashboard totals and best year", () => {
   const metrics = deriveEvolutionMetrics([
     yearData(2024, 1000, [month({ month: 12, investment: 100, totalIncome: 1000, endingBalance: 1300 })]),
@@ -131,5 +161,14 @@ test("summarizeEvolutionMetrics derives dashboard totals and best year", () => {
       year: 2025,
       savedAmount: 600,
     },
+  });
+});
+
+test("summarizeEvolutionMetrics returns zero totals and null best year for empty metrics", () => {
+  assert.deepEqual(summarizeEvolutionMetrics([]), {
+    latestFinalBalance: 0,
+    totalSaved: 0,
+    accumulatedInvested: 0,
+    bestYear: null,
   });
 });
