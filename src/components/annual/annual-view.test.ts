@@ -47,6 +47,17 @@ test("year page lets annual summary update shared year data", () => {
   assert.match(source, /<AnnualView[\s\S]*onYearDataChange=\{setCurrentYearData\}/);
 });
 
+test("year route has a dedicated loading skeleton inside the app shell", () => {
+  const source = readFileSync(new URL("../../app/[locale]/[year]/loading.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /BaseAppShell/);
+  assert.match(source, /aria-busy="true"/);
+  assert.match(source, /surface-depth-floating/);
+  assert.match(source, /xl:grid-cols-\[minmax\(0,1\.6fr\)_minmax\(18rem,0\.85fr\)\]/);
+  assert.match(source, /md:grid-cols-2/);
+  assert.match(source, /ChartSkeleton/);
+});
+
 test("year page uses native history for in-year view changes without server navigation", () => {
   const source = readFileSync(new URL("../year/year-page-client.tsx", import.meta.url), "utf8");
 
