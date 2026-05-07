@@ -139,8 +139,13 @@ export async function getYearsForUser(userId: string): Promise<number[]> {
   return rows.map((row) => row.year);
 }
 
-export async function getAllYearDataForUser(userId: string): Promise<YearData[]> {
-  const userYears = await getYearsForUser(userId);
+export async function getAllYearDataForUser(
+  userId: string,
+  options: { maxYear?: number } = {}
+): Promise<YearData[]> {
+  const userYears = (await getYearsForUser(userId)).filter(
+    (year) => options.maxYear === undefined || year <= options.maxYear
+  );
   const yearData = await Promise.all(userYears.map((year) => getYearData(userId, year)));
   return yearData.filter((data): data is YearData => data !== null);
 }

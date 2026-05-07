@@ -50,6 +50,7 @@ export function NavSelectors({
   const t = useTranslations("Nav");
   const selectedMonth = currentMonth ?? new Date().getMonth() + 1;
   const calendarYear = new Date().getFullYear();
+  const evolutionYears = years.filter((year) => year <= calendarYear);
   const showCurrentYearMarker = years.length > 1;
   const nextCreatableYear = getNextCreatableYear(years, currentYear);
   const activeMainView = view === "summary" ? "summary" : view === "evolution" ? "evolution" : view === "settings" ? null : "overview";
@@ -70,7 +71,7 @@ export function NavSelectors({
   const mainTabs = [
     { label: t("months"), key: "overview" as const, href: monthHref, disabled: false },
     { label: t("annualSummary"), key: "summary" as const, href: summaryHref, disabled: false },
-    { label: t("evolution"), key: "evolution" as const, href: evolutionHref, disabled: years.length < 2 },
+    { label: t("evolution"), key: "evolution" as const, href: evolutionHref, disabled: evolutionYears.length < 2 },
   ];
 
   return (
@@ -134,7 +135,7 @@ export function NavSelectors({
                   href={tab.href}
                   onNavigate={(event) => {
                     if (tab.key === "evolution") return;
-                    const handler = tab.key === "overview" ? onMonthViewSelect : onSummaryViewSelect;
+                    const handler = tab.key === "overview" ? onMonthViewSelect : tab.key === "summary" ? onSummaryViewSelect : undefined;
                     if (!handler) return;
 
                     event.preventDefault();

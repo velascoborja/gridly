@@ -13,18 +13,19 @@ export default async function EvolutionPage({
 }) {
   const { locale } = await params;
   const user = await requireSessionUser();
+  const now = new Date();
+  const calendarYear = now.getFullYear();
   const [years, allYearData] = await Promise.all([
     getYearsForUser(user.id),
-    getAllYearDataForUser(user.id),
+    getAllYearDataForUser(user.id, { maxYear: calendarYear }),
   ]);
   const metrics = deriveEvolutionMetrics(allYearData);
 
   if (metrics.length < 2) {
-    redirect({ href: await getAppRedirectPath(user.id, new Date().getFullYear()), locale });
+    redirect({ href: await getAppRedirectPath(user.id, calendarYear), locale });
   }
 
-  const now = new Date();
-  const currentYear = pickDefaultYear(years, now.getFullYear());
+  const currentYear = pickDefaultYear(years, calendarYear);
 
   return (
     <AppShell

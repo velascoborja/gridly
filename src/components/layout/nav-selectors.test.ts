@@ -47,7 +47,8 @@ test("navigation includes evolution tab with disabled state for single-year user
 
   assert.match(navSource, /buildEvolutionHref/);
   assert.match(navSource, /const evolutionHref = buildEvolutionHref/);
-  assert.match(navSource, /disabled: years\.length < 2/);
+  assert.match(navSource, /const evolutionYears = years\.filter\(\(year\) => year <= calendarYear\)/);
+  assert.match(navSource, /disabled: evolutionYears\.length < 2/);
   assert.match(navSource, /title=\{t\("evolutionUnavailable"\)\}/);
 });
 
@@ -58,16 +59,24 @@ test("navigation handles evolution active state and hides year selector", () => 
   assert.match(navSource, /const showYearControls = !hideYearSelector && view !== "evolution"/);
 });
 
-test("evolution page loads all years and guards direct one-year access", () => {
+test("evolution page loads current and previous years and guards direct one-year access", () => {
   const source = readFileSync(new URL("../../app/[locale]/evolution/page.tsx", import.meta.url), "utf8");
 
-  assert.match(source, /getAllYearDataForUser/);
+  assert.match(source, /const calendarYear = now\.getFullYear\(\)/);
+  assert.match(source, /getAllYearDataForUser\(user\.id, \{ maxYear: calendarYear \}\)/);
   assert.match(source, /deriveEvolutionMetrics/);
   assert.match(source, /metrics\.length < 2/);
   assert.match(source, /const \{ locale \} = await params/);
-  assert.match(source, /redirect\(\{ href: await getAppRedirectPath/);
+  assert.match(source, /redirect\(\{ href: await getAppRedirectPath\(user\.id, calendarYear\), locale \}\)/);
   assert.match(source, /view="evolution"/);
   assert.match(source, /<EvolutionDashboard metrics=\{metrics\} \/>/);
+});
+
+test("all-year data loader can ignore future years", () => {
+  const source = readFileSync(new URL("../../lib/server/year-data.ts", import.meta.url), "utf8");
+
+  assert.match(source, /options: \{ maxYear\?: number \} = \{\}/);
+  assert.match(source, /year <= options\.maxYear/);
 });
 
 test("feature docs include evolution dashboard documentation", () => {
@@ -78,5 +87,5 @@ test("feature docs include evolution dashboard documentation", () => {
   assert.match(docs, /# Feature: Evolution Dashboard/);
   assert.match(docs, /Evolución/);
   assert.match(docs, /`savedAmount`: `finalBalance - startingBalance`/);
-  assert.match(docs, /Disponible cuando tengas más de un año registrado/);
+  assert.match(docs, /current and previous years/);
 });
