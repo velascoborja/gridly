@@ -2,6 +2,18 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
+test("setup route has a dedicated loading skeleton that mirrors the create-year screen", () => {
+  const source = readFileSync(new URL("../../app/[locale]/setup/[year]/loading.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /SetupLoading/);
+  assert.match(source, /aria-busy="true"/);
+  assert.match(source, /grid gap-4 lg:grid-cols-\[12rem_minmax\(0,1fr\)_20rem\]/);
+  assert.match(source, /StepSkeleton/);
+  assert.match(source, /FieldSkeleton/);
+  assert.match(source, /ReviewSkeleton/);
+  assert.match(source, /grid gap-4 md:grid-cols-3/);
+});
+
 test("extra payments toggle uses an animated switch and reveal", () => {
   const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
 
