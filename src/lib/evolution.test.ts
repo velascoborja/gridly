@@ -230,6 +230,7 @@ test("summarizeEvolutionMetrics derives dashboard totals and best year", () => {
     latestFinalBalance: 1900,
     totalSaved: 900,
     averageSavingsPerYear: 450,
+    averageSavingsRate: 0.3,
     accumulatedInvested: 350,
     totalWealth: 2250,
     bestYear: {
@@ -244,6 +245,7 @@ test("summarizeEvolutionMetrics returns zero totals and null best year for empty
     latestFinalBalance: 0,
     totalSaved: 0,
     averageSavingsPerYear: 0,
+    averageSavingsRate: null,
     accumulatedInvested: 0,
     totalWealth: 0,
     bestYear: null,

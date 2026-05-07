@@ -22,11 +22,13 @@ function MoneyInput({
   value,
   onChange,
   disabled,
+  placeholder = "0.00",
 }: {
   id: string;
   value: string;
   onChange: (value: string) => void;
   disabled: boolean;
+  placeholder?: string;
 }) {
   return (
     <div className="relative">
@@ -34,7 +36,7 @@ function MoneyInput({
         className="h-9 pr-8"
         id={id}
         inputMode="decimal"
-        placeholder="0.00"
+        placeholder={placeholder}
         value={value}
         onChange={(event) => onChange(event.target.value)}
         disabled={disabled}
@@ -144,6 +146,7 @@ export function HistoricalYearDialog({ open, mode, historicalYear, onOpenChange 
               id="historical-year"
               className="h-9"
               inputMode="numeric"
+              placeholder={t("yearPlaceholder")}
               value={values.year}
               onChange={(event) => setValues((prev) => ({ ...prev, year: event.target.value.replace(/\D/g, "") }))}
               disabled={submitting}
@@ -151,15 +154,15 @@ export function HistoricalYearDialog({ open, mode, historicalYear, onOpenChange 
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground" htmlFor="historical-starting-balance">{t("startingBalance")}</label>
-            <MoneyInput id="historical-starting-balance" value={values.startingBalance} onChange={(value) => updateCurrency("startingBalance", value)} disabled={submitting} />
+            <MoneyInput id="historical-starting-balance" value={values.startingBalance} onChange={(value) => updateCurrency("startingBalance", value)} disabled={submitting} placeholder={t("startingBalancePlaceholder")} />
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground" htmlFor="historical-final-balance">{t("finalBalance")}</label>
-            <MoneyInput id="historical-final-balance" value={values.finalBalance} onChange={(value) => updateCurrency("finalBalance", value)} disabled={submitting} />
+            <MoneyInput id="historical-final-balance" value={values.finalBalance} onChange={(value) => updateCurrency("finalBalance", value)} disabled={submitting} placeholder={t("finalBalancePlaceholder")} />
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground" htmlFor="historical-invested-amount">{t("investedAmount")}</label>
-            <MoneyInput id="historical-invested-amount" value={values.investedAmount} onChange={(value) => updateCurrency("investedAmount", value)} disabled={submitting} />
+            <MoneyInput id="historical-invested-amount" value={values.investedAmount} onChange={(value) => updateCurrency("investedAmount", value)} disabled={submitting} placeholder={t("investedAmountPlaceholder")} />
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground" htmlFor="historical-savings-rate">
@@ -171,7 +174,7 @@ export function HistoricalYearDialog({ open, mode, historicalYear, onOpenChange 
                 className="h-9 pr-8"
                 id="historical-savings-rate"
                 inputMode="decimal"
-                placeholder="0.0"
+                placeholder={t("savingsRatePlaceholder")}
                 value={values.savingsRate}
                 onChange={(event) => setValues((prev) => ({ ...prev, savingsRate: sanitizeNumericInput(event.target.value) }))}
                 disabled={submitting}

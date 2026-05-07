@@ -26,14 +26,14 @@ export function EvolutionDashboard({ metrics, historicalYears }: Props) {
   const showEmptyState = metrics.length < 2;
 
   return (
-    <div className="space-y-5">
-      <section className="surface-depth-floating rounded-lg border border-primary/20 bg-linear-to-b from-primary/[0.08] via-card/98 to-card/95 px-5 py-5 md:px-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div className="space-y-4 sm:space-y-5">
+      <section className="surface-depth-floating rounded-lg border border-primary/20 bg-linear-to-b from-primary/[0.08] via-card/98 to-card/95 px-4 py-4 sm:px-5 sm:py-5 md:px-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
               {t("eyebrow")}
             </p>
-            <h1 className="mt-2 text-3xl font-light tracking-[-0.04em] text-foreground md:text-4xl">
+            <h1 className="mt-1.5 text-2xl font-light tracking-[-0.04em] text-foreground sm:mt-2 sm:text-3xl md:text-4xl">
               {t("title")}
             </h1>
           </div>
@@ -46,17 +46,17 @@ export function EvolutionDashboard({ metrics, historicalYears }: Props) {
             {t("addHistoricalYear")}
           </Button>
         </div>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+        <p className="mt-1.5 hidden max-w-2xl text-sm leading-6 text-muted-foreground sm:mt-2 sm:block">
           {t("description")}
         </p>
-        <div className="mt-5 rounded-lg border border-primary/25 bg-primary/[0.06] px-5 py-4">
+        <div className="mt-4 rounded-lg border border-primary/25 bg-primary/[0.06] px-4 py-3 sm:mt-5 sm:px-5 sm:py-4">
           <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-primary">
             {t("totalWealth")}
           </p>
-          <p className="finance-number mt-2 text-4xl font-light tracking-[-0.04em] text-primary md:text-5xl">
+          <p className="finance-number mt-1.5 text-3xl font-light tracking-[-0.04em] text-primary sm:mt-2 sm:text-4xl md:text-5xl">
             {formatCurrency(summary.totalWealth, locale)}
           </p>
-          <p className="mt-2 text-xs text-muted-foreground">{t("totalWealthNote")}</p>
+          <p className="mt-1.5 text-xs text-muted-foreground sm:mt-2">{t("totalWealthNote")}</p>
         </div>
         <EvolutionKpiCards summary={summary} />
       </section>

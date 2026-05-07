@@ -10,14 +10,27 @@ interface Props {
   summary: EvolutionSummary;
 }
 
+function formatPercent(value: number, locale: string) {
+  return new Intl.NumberFormat(locale, {
+    style: "percent",
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  }).format(value);
+}
+
 export function EvolutionKpiCards({ summary }: Props) {
   const t = useTranslations("Evolution.kpis");
   const locale = useLocale();
+  const savingsRateTag =
+    summary.averageSavingsRate !== null
+      ? t("totalSavedSavingsRate", { rate: formatPercent(summary.averageSavingsRate, locale) })
+      : t("totalSavedSavingsRateEmpty");
   const cards = [
     {
       label: t("latestFinalBalance"),
       value: formatCurrency(summary.latestFinalBalance, locale),
       note: t("latestFinalBalanceNote"),
+      tag: undefined as string | undefined,
       Icon: Landmark,
       className: "text-primary",
     },
@@ -25,6 +38,7 @@ export function EvolutionKpiCards({ summary }: Props) {
       label: t("totalSaved"),
       value: formatCurrency(summary.totalSaved, locale),
       note: t("totalSavedNote"),
+      tag: savingsRateTag,
       Icon: TrendingUp,
       className: summary.totalSaved >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400",
     },
@@ -52,18 +66,21 @@ export function EvolutionKpiCards({ summary }: Props) {
   ];
 
   return (
-    <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-      {cards.map(({ label, value, note, Icon, className }) => (
-        <Card key={label} className="border-border/70 bg-card/90 shadow-sm">
-          <CardContent className="p-4">
-            <div className="flex items-start justify-between gap-3">
-              <p className="text-sm font-medium text-muted-foreground">{label}</p>
-              <Icon className="h-4 w-4 text-primary" />
+    <div className="mt-5 flex flex-wrap justify-center gap-3">
+      {cards.map(({ label, value, note, tag, Icon, className }) => (
+        <Card key={label} className="w-[calc(50%-6px)] border-border/70 bg-card/90 shadow-sm md:w-[calc(33.333%-8px)] xl:w-[calc(20%-9.6px)]">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-start justify-between gap-2">
+              <p className="text-xs font-medium leading-4 text-muted-foreground sm:text-sm">{label}</p>
+              <Icon className="h-3.5 w-3.5 shrink-0 text-primary sm:h-4 sm:w-4" />
             </div>
-            <p className={`mt-3 finance-number text-2xl font-light tracking-[-0.04em] md:text-3xl ${className}`}>
+            <p className={`mt-2 finance-number text-xl font-light tracking-[-0.04em] sm:text-2xl lg:text-3xl ${className}`}>
               {value}
             </p>
-            <p className="mt-2 text-xs leading-5 text-muted-foreground">{note}</p>
+            <p className="mt-1.5 text-xs leading-4 text-muted-foreground sm:mt-2 sm:leading-5">{note}</p>
+            {tag && (
+              <p className="mt-1.5 text-xs font-medium text-primary/80">{tag}</p>
+            )}
           </CardContent>
         </Card>
       ))}

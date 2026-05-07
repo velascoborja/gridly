@@ -21,16 +21,17 @@ export function EvolutionCharts({ metrics }: Props) {
   const balanceData = metrics.map((m) => ({ ...m, totalWealth: m.finalBalance + m.accumulatedInvested }));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <Card className="border-border/70 bg-card/90 shadow-sm">
         <CardHeader className="space-y-1 pb-2">
           <CardTitle className="text-base font-light tracking-[-0.02em]">{t("balanceTitle")}</CardTitle>
           <p className="text-sm leading-5 text-muted-foreground">{t("balanceDescription")}</p>
         </CardHeader>
         <CardContent className="pt-0">
-          <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
-            <ResponsiveContainer width="100%" height={280}>
-              <LineChart data={balanceData} margin={{ top: 6, right: 8, bottom: 0, left: 8 }}>
+          <div className="rounded-lg border border-border/60 bg-muted/20 p-2 sm:p-3">
+            <div className="h-[200px] sm:h-[280px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={balanceData} margin={{ top: 6, right: 4, bottom: 0, left: 4 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border/80" />
                 <XAxis dataKey="year" tick={{ fontSize: 11 }} />
                 <YAxis tickFormatter={axisCurrency} tick={{ fontSize: 11 }} width={44} />
@@ -41,20 +42,22 @@ export function EvolutionCharts({ metrics }: Props) {
                 <Line name={t("totalWealthLabel")} type="monotone" dataKey="totalWealth" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} stroke="var(--color-chart-4)" strokeDasharray="2 2" />
               </LineChart>
             </ResponsiveContainer>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
         <Card className="border-border/70 bg-card/90 shadow-sm">
           <CardHeader className="space-y-1 pb-2">
             <CardTitle className="text-base font-light tracking-[-0.02em]">{t("savedTitle")}</CardTitle>
             <p className="text-sm leading-5 text-muted-foreground">{t("savedDescription")}</p>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
-              <ResponsiveContainer width="100%" height={240}>
-                <BarChart data={metrics} margin={{ top: 6, right: 8, bottom: 0, left: 8 }}>
+            <div className="rounded-lg border border-border/60 bg-muted/20 p-2 sm:p-3">
+              <div className="h-[180px] sm:h-[240px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={metrics} margin={{ top: 6, right: 4, bottom: 0, left: 4 }}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-border/80" />
                   <XAxis dataKey="year" tick={{ fontSize: 11 }} />
                   <YAxis tickFormatter={axisCurrency} tick={{ fontSize: 11 }} width={44} />
@@ -66,6 +69,7 @@ export function EvolutionCharts({ metrics }: Props) {
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -76,9 +80,10 @@ export function EvolutionCharts({ metrics }: Props) {
             <p className="text-sm leading-5 text-muted-foreground">{t("investedDescription")}</p>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
-              <ResponsiveContainer width="100%" height={240}>
-                <BarChart data={metrics} margin={{ top: 6, right: 8, bottom: 0, left: 8 }}>
+            <div className="rounded-lg border border-border/60 bg-muted/20 p-2 sm:p-3">
+              <div className="h-[180px] sm:h-[240px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={metrics} margin={{ top: 6, right: 4, bottom: 0, left: 4 }}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-border/80" />
                   <XAxis dataKey="year" tick={{ fontSize: 11 }} />
                   <YAxis tickFormatter={axisCurrency} tick={{ fontSize: 11 }} width={44} />
@@ -86,6 +91,7 @@ export function EvolutionCharts({ metrics }: Props) {
                   <Bar name={t("investedLabel")} dataKey="investedAmount" fill="hsl(var(--primary))" radius={[3, 3, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
+              </div>
             </div>
           </CardContent>
         </Card>
