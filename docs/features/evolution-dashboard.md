@@ -6,25 +6,23 @@ The Evolution Dashboard is the read-only multi-year analytics view for Gridly. I
 
 The main navigation shows `Meses`, `Año`, and `Evolución`.
 
-`Evolución` is always visible. When a user has fewer than two configured years up to the current calendar year, the tab is disabled and displays this hint on hover, focus, or tap:
+`Evolución` is always visible and enabled for authenticated users with a configured Gridly year. This is intentional even when there is only one full year, because the Evolution screen is where users can add summary-only historical imports.
 
-`Disponible cuando tengas más de un año registrado hasta el año actual.`
-
-Once the user has two or more configured years up to the current calendar year, the tab links to `/{locale}/evolution`. The year selector is hidden on this route because the dashboard compares the current and previous years, excluding future configured years.
+The tab links to `/{locale}/evolution`. The year selector is hidden on this route because the dashboard compares all eligible Evolution sources up to the current calendar year, excluding future configured years.
 
 ## Data Loading
 
-The route loads configured years for the authenticated user on the server with `maxYear` set to the current calendar year. It derives compact dashboard metrics from computed `YearData` values and does not reuse `YearPageClient`, which is scoped to a single selected year. Future configured years are intentionally excluded from the analytics until they become the current year.
+The route loads configured years and historical imports for the authenticated user on the server with `maxYear` set to the current calendar year. It derives compact dashboard metrics from normalized Evolution sources and does not reuse `YearPageClient`, which is scoped to a single selected year. Future configured years are intentionally excluded from the analytics until they become the current year.
 
-If the computed metrics result in fewer than two years (e.g. only one year has a December month), the page server component redirects to the default year route. This is a server-side guard independent of the nav tab being disabled.
+If the computed metrics result in fewer than two years, the route still renders. The client dashboard shows an empty state with the historical import action so single-year users can add pre-Gridly history from the same screen.
 
 ## Computation Layer
 
 `src/lib/evolution.ts` exports two functions:
 
-**`deriveEvolutionMetrics(years: YearData[]): EvolutionYearMetric[]`**
+**`deriveEvolutionMetrics(sources: EvolutionMetricSource[]): EvolutionYearMetric[]`**
 
-Sorts years chronologically and produces one `EvolutionYearMetric` per year supplied by the route. Years without a December month are skipped. `accumulatedInvested` is a running total that carries forward across eligible years in chronological order.
+Sorts Gridly and historical sources chronologically and produces one `EvolutionYearMetric` per eligible source supplied by the route. Gridly years without a December month are skipped. `accumulatedInvested` is a running total that carries forward across eligible years in chronological order.
 
 **`summarizeEvolutionMetrics(metrics: EvolutionYearMetric[]): EvolutionSummary`**
 
@@ -39,16 +37,21 @@ Collapses the per-year metrics into a single summary object used by the KPI card
 
 ## Metric Definitions (`EvolutionYearMetric`)
 
+- `source`: `gridly` for full Gridly years, `historical` for summary-only imports.
 - `startingBalance`: the year's configured starting balance.
 - `finalBalance`: December ending balance.
 - `savedAmount`: `finalBalance - startingBalance`.
 - `investedAmount`: sum of monthly `investment` for that year.
 - `accumulatedInvested`: running sum of `investedAmount` up to and including that year.
-- `totalIncome`: sum of monthly total income.
-- `totalExpenses`: sum of monthly total expenses.
-- `savingsRate`: `savedAmount / totalIncome`, or `null` when income is zero or negative.
+- `totalIncome`: sum of monthly total income for Gridly years, or `null` for historical imports.
+- `totalExpenses`: sum of monthly total expenses for Gridly years, or `null` for historical imports.
+- `savingsRate`: `savedAmount / totalIncome`, or `null` when income is zero, negative, or unavailable.
 
 Annual savings intentionally means cash balance growth. Investment remains a separate metric because Gridly counts monthly investment inside expenses.
+
+## Historical Imports
+
+Evolution can include both full Gridly years and summary-only historical imports. Historical imports are limited to years before the earliest full Gridly year and are intended for pre-Gridly history. They provide starting balance, final balance, and invested amount, while income, expenses, and savings rate remain unavailable.
 
 ## UI Components
 
@@ -57,7 +60,8 @@ Annual savings intentionally means cash balance growth. Investment remains a sep
 | `EvolutionDashboard` | `evolution-dashboard.tsx` | Root client component; owns layout and calls `summarizeEvolutionMetrics` |
 | `EvolutionKpiCards` | `evolution-kpi-cards.tsx` | Five summary KPI cards |
 | `EvolutionCharts` | `evolution-charts.tsx` | Three charts |
-| `EvolutionDetailTable` | `evolution-detail-table.tsx` | Full year-by-year data table |
+| `EvolutionDetailTable` | `evolution-detail-table.tsx` | Full year-by-year data table with historical row actions |
+| `HistoricalYearDialog` | `historical-year-dialog.tsx` | Add/edit form for summary-only historical imports |
 
 ### KPI Cards
 
@@ -79,7 +83,11 @@ Y-axes on all charts are formatted as `Xk` (thousands).
 
 ### Detail Table
 
-Displays all `EvolutionYearMetric` fields for each eligible year: year, starting balance, final balance, saved amount, invested amount, accumulated invested, total income, total expenses, and savings rate. Savings rate is shown as a percentage with one decimal place, or `—` when `null`.
+Displays all `EvolutionYearMetric` fields for each eligible year: source, year, starting balance, final balance, saved amount, invested amount, accumulated invested, total income, total expenses, and savings rate. Savings rate is shown as a percentage with one decimal place, or `—` when `null`. Historical rows expose edit and delete actions; full Gridly years remain read-only from this table.
+
+### Empty State
+
+When there are fewer than two metric rows, `EvolutionDashboard` replaces the charts and detail table with an empty state. The header KPIs remain visible, and the empty state explains that a single year is not enough for a useful trend. The primary action opens `HistoricalYearDialog`, letting the user add a summary-only historical import without leaving Evolution.
 
 ## Loading State
 
@@ -87,4 +95,4 @@ Displays all `EvolutionYearMetric` fields for each eligible year: year, starting
 
 ## Out Of Scope
 
-The first version does not include forecasting, planning controls, scenario comparisons, editing, or export.
+The first version does not include forecasting, planning controls, scenario comparisons, or export.

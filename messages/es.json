@@ -375,16 +375,60 @@
     "annualSummary": "Año",
     "evolution": "Evolución",
     "evolutionUnavailable": "Disponible cuando tengas más de un año registrado hasta el año actual.",
+    "historicalYearUnavailable": "Disponible solo para años añadidos con seguimiento mensual en Gridly.",
     "yearLabel": "Año",
     "createYear": "Crear año {year}",
-    "currentYear": "Actual"
+    "currentYear": "Actual",
+    "historicalYear": "Histórico"
   },
   "Evolution": {
     "eyebrow": "Evolución histórica",
     "title": "Evolución financiera",
     "description": "Compara el saldo, el ahorro y la inversión entre el año actual y los anteriores.",
+    "addHistoricalYear": "Añadir año histórico",
     "totalWealth": "Patrimonio total estimado",
     "totalWealthNote": "Saldo actual + inversión acumulada",
+    "source": {
+      "gridly": "Gridly",
+      "historical": "Histórico"
+    },
+    "emptyState": {
+      "eyebrow": "Histórico pendiente",
+      "title": "Añade años históricos para comparar",
+      "description": "Con un solo año, la evolución todavía no tiene una tendencia útil. Añade un año anterior resumido para activar la comparación sin crear meses ni afectar la cadena de saldos."
+    },
+    "historicalYearForm": {
+      "createTitle": "Añadir año histórico",
+      "editTitle": "Editar año histórico",
+      "description": "Añade datos anuales agregados de antes de usar Gridly.",
+      "year": "Año",
+      "startingBalance": "Saldo inicial",
+      "finalBalance": "Saldo final del año",
+      "investedAmount": "Importe total invertido",
+      "savedPreview": "Ahorro total",
+      "create": "Añadir",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "submitting": "Guardando...",
+      "errors": {
+        "missingGridlyYear": "Primero necesitas tener al menos un año completo en Gridly.",
+        "invalidYear": "Introduce un año válido.",
+        "yearNotBeforeFirstGridlyYear": "El año histórico debe ser anterior al primer año completo en Gridly.",
+        "yearAlreadyExistsAsGridly": "Ese año ya existe como año completo en Gridly.",
+        "duplicateHistoricalYear": "Ese año histórico ya existe.",
+        "invalidStartingBalance": "Introduce un saldo inicial válido.",
+        "invalidFinalBalance": "Introduce un saldo final válido.",
+        "invalidInvestedAmount": "La inversión debe ser cero o mayor.",
+        "connection": "No se ha podido guardar. Revisa la conexión e inténtalo de nuevo.",
+        "generic": "No se ha podido guardar el año histórico."
+      }
+    },
+    "deleteHistoricalYear": {
+      "title": "¿Eliminar año histórico?",
+      "description": "Se eliminará {year} de la evolución. No afecta a ningún año completo de Gridly.",
+      "confirm": "Eliminar",
+      "cancel": "Cancelar"
+    },
     "kpis": {
       "averageSavingsPerYear": "Ahorro promedio anual",
       "averageSavingsPerYearNote": "Media del ahorro entre el año actual y los anteriores",
@@ -413,6 +457,11 @@
     "table": {
       "title": "Detalle por año",
       "description": "Lectura compacta de saldos, ahorro, inversión, ingresos y gastos.",
+      "sourceLabel": "Origen",
+      "source": {
+        "gridly": "Gridly",
+        "historical": "Histórico"
+      },
       "year": "Año",
       "startingBalance": "Saldo inicial",
       "finalBalance": "Saldo final",
@@ -422,6 +471,9 @@
       "totalIncome": "Ingresos",
       "totalExpenses": "Gastos",
       "savingsRate": "Tasa de ahorro",
+      "actions": "Acciones",
+      "editHistoricalYear": "Editar año histórico {year}",
+      "deleteHistoricalYear": "Eliminar año histórico {year}",
       "notAvailable": "N/D"
     }
   },

@@ -16,8 +16,8 @@ test("year selector marks the real current year when multiple years are availabl
   const english = JSON.parse(readFileSync(new URL("../../../messages/en.json", import.meta.url), "utf8"));
 
   assert.match(source, /const calendarYear = new Date\(\)\.getFullYear\(\)/);
-  assert.match(source, /const showCurrentYearMarker = years\.length > 1/);
-  assert.match(source, /y === calendarYear/);
+  assert.match(source, /const showCurrentYearMarker = yearOptions\.length > 1/);
+  assert.match(source, /option\.year === calendarYear/);
   assert.match(source, /t\("currentYear"\)/);
   assert.equal(spanish.Nav.currentYear, "Actual");
   assert.equal(english.Nav.currentYear, "Current");
@@ -42,14 +42,13 @@ test("landing messages include refined public copy", () => {
   assert.equal(english.Landing.annualStory.extraPayMarker, "Extra pay");
 });
 
-test("navigation includes evolution tab with disabled state for single-year users", () => {
+test("navigation keeps evolution tab enabled for single-year users", () => {
   const navSource = readFileSync(new URL("./nav-selectors.tsx", import.meta.url), "utf8");
 
   assert.match(navSource, /buildEvolutionHref/);
   assert.match(navSource, /const evolutionHref = buildEvolutionHref/);
-  assert.match(navSource, /const evolutionYears = years\.filter\(\(year\) => year <= calendarYear\)/);
-  assert.match(navSource, /disabled: evolutionYears\.length < 2/);
-  assert.match(navSource, /title=\{t\("evolutionUnavailable"\)\}/);
+  assert.doesNotMatch(navSource, /disabled: evolutionYears\.length < 2/);
+  assert.doesNotMatch(navSource, /evolutionUnavailable/);
 });
 
 test("navigation handles evolution active state and hides year selector", () => {
@@ -59,17 +58,30 @@ test("navigation handles evolution active state and hides year selector", () => 
   assert.match(navSource, /const showYearControls = !hideYearSelector && view !== "evolution"/);
 });
 
-test("evolution page loads current and previous years and guards direct one-year access", () => {
+test("evolution page loads sources and allows single-year access for historical imports", () => {
   const source = readFileSync(new URL("../../app/[locale]/evolution/page.tsx", import.meta.url), "utf8");
 
   assert.match(source, /const calendarYear = now\.getFullYear\(\)/);
-  assert.match(source, /getAllYearDataForUser\(user\.id, \{ maxYear: calendarYear \}\)/);
+  assert.match(source, /getEvolutionSourcesForUser\(user\.id, calendarYear\)/);
+  assert.match(source, /getHistoricalYearsForUser\(user\.id, \{ maxYear: calendarYear \}\)/);
   assert.match(source, /deriveEvolutionMetrics/);
-  assert.match(source, /metrics\.length < 2/);
-  assert.match(source, /const \{ locale \} = await params/);
-  assert.match(source, /redirect\(\{ href: await getAppRedirectPath\(user\.id, calendarYear\), locale \}\)/);
+  assert.doesNotMatch(source, /metrics\.length < 2/);
+  assert.doesNotMatch(source, /redirect\(/);
   assert.match(source, /view="evolution"/);
-  assert.match(source, /<EvolutionDashboard metrics=\{metrics\} \/>/);
+  assert.match(source, /<EvolutionDashboard metrics=\{metrics\} historicalYears=\{historicalRows\} \/>/);
+});
+
+test("navigation accepts sourced year options and disables full-year views for historical selections", () => {
+  const source = readFileSync(new URL("./nav-selectors.tsx", import.meta.url), "utf8");
+  const spanish = JSON.parse(readFileSync(new URL("../../../messages/es.json", import.meta.url), "utf8"));
+  const english = JSON.parse(readFileSync(new URL("../../../messages/en.json", import.meta.url), "utf8"));
+
+  assert.match(source, /YearOption/);
+  assert.match(source, /selectedYearOption\?\.source === "historical"/);
+  assert.match(source, /historicalYearUnavailable/);
+  assert.match(source, /getGridlyYears/);
+  assert.equal(spanish.Nav.historicalYearUnavailable, "Disponible solo para años añadidos con seguimiento mensual en Gridly.");
+  assert.equal(english.Nav.historicalYearUnavailable, "Available only for years added with monthly tracking in Gridly.");
 });
 
 test("all-year data loader can ignore future years", () => {
@@ -87,5 +99,5 @@ test("feature docs include evolution dashboard documentation", () => {
   assert.match(docs, /# Feature: Evolution Dashboard/);
   assert.match(docs, /Evolución/);
   assert.match(docs, /`savedAmount`: `finalBalance - startingBalance`/);
-  assert.match(docs, /current and previous years/);
+  assert.match(docs, /all eligible Evolution sources/);
 });

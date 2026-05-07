@@ -53,13 +53,13 @@ function yearData(year: number, startingBalance: number, months: MonthData[]): Y
 
 test("deriveEvolutionMetrics calculates cash savings separately from investments", () => {
   const metrics = deriveEvolutionMetrics([
-    yearData(2024, 1000, [
+    { source: "gridly", yearData: yearData(2024, 1000, [
       month({ month: 1, investment: 100, totalIncome: 1500, totalExpenses: 900, endingBalance: 1600 }),
       month({ month: 12, investment: 200, totalIncome: 1700, totalExpenses: 1200, endingBalance: 2500 }),
-    ]),
-    yearData(2025, 2500, [
+    ]) },
+    { source: "gridly", yearData: yearData(2025, 2500, [
       month({ month: 12, investment: 300, totalIncome: 2000, totalExpenses: 1400, endingBalance: 3300 }),
-    ]),
+    ]) },
   ]);
 
   assert.deepEqual(metrics.map((metric) => ({
@@ -100,9 +100,9 @@ test("deriveEvolutionMetrics calculates cash savings separately from investments
 
 test("deriveEvolutionMetrics returns null savings rate when income is zero", () => {
   const [metric] = deriveEvolutionMetrics([
-    yearData(2024, 500, [
+    { source: "gridly", yearData: yearData(2024, 500, [
       month({ month: 12, totalIncome: 0, totalExpenses: 100, endingBalance: 400 }),
-    ]),
+    ]) },
   ]);
 
   assert.equal(metric.savingsRate, null);
@@ -110,8 +110,8 @@ test("deriveEvolutionMetrics returns null savings rate when income is zero", () 
 
 test("deriveEvolutionMetrics excludes years without a December month", () => {
   const metrics = deriveEvolutionMetrics([
-    yearData(2024, 1000, [month({ month: 11, endingBalance: 1100 })]),
-    yearData(2025, 1100, [month({ month: 12, endingBalance: 1300 })]),
+    { source: "gridly", yearData: yearData(2024, 1000, [month({ month: 11, endingBalance: 1100 })]) },
+    { source: "gridly", yearData: yearData(2025, 1100, [month({ month: 12, endingBalance: 1300 })]) },
   ]);
 
   assert.deepEqual(metrics.map((metric) => metric.year), [2025]);
@@ -119,9 +119,9 @@ test("deriveEvolutionMetrics excludes years without a December month", () => {
 
 test("deriveEvolutionMetrics sorts years ascending before accumulating investments", () => {
   const metrics = deriveEvolutionMetrics([
-    yearData(2026, 2000, [month({ month: 12, investment: 300, endingBalance: 2600 })]),
-    yearData(2024, 1000, [month({ month: 12, investment: 100, endingBalance: 1300 })]),
-    yearData(2025, 1300, [month({ month: 12, investment: 200, endingBalance: 2000 })]),
+    { source: "gridly", yearData: yearData(2026, 2000, [month({ month: 12, investment: 300, endingBalance: 2600 })]) },
+    { source: "gridly", yearData: yearData(2024, 1000, [month({ month: 12, investment: 100, endingBalance: 1300 })]) },
+    { source: "gridly", yearData: yearData(2025, 1300, [month({ month: 12, investment: 200, endingBalance: 2000 })]) },
   ]);
 
   assert.deepEqual(metrics.map((metric) => ({
@@ -147,13 +147,63 @@ test("deriveEvolutionMetrics sorts years ascending before accumulating investmen
   ]);
 });
 
+test("deriveEvolutionMetrics merges gridly and historical sources chronologically", () => {
+  const metrics = deriveEvolutionMetrics([
+    { source: "gridly", yearData: yearData(2024, 1000, [month({ month: 12, investment: 200, totalIncome: 2000, totalExpenses: 1200, endingBalance: 1800 })]) },
+    { source: "historical", year: 2022, startingBalance: 500, finalBalance: 900, investedAmount: 100 },
+    { source: "historical", year: 2023, startingBalance: 900, finalBalance: 750, investedAmount: 50 },
+  ]);
+
+  assert.deepEqual(metrics.map((metric) => ({
+    source: metric.source,
+    year: metric.year,
+    savedAmount: metric.savedAmount,
+    investedAmount: metric.investedAmount,
+    accumulatedInvested: metric.accumulatedInvested,
+    totalIncome: metric.totalIncome,
+    totalExpenses: metric.totalExpenses,
+    savingsRate: metric.savingsRate,
+  })), [
+    {
+      source: "historical",
+      year: 2022,
+      savedAmount: 400,
+      investedAmount: 100,
+      accumulatedInvested: 100,
+      totalIncome: null,
+      totalExpenses: null,
+      savingsRate: null,
+    },
+    {
+      source: "historical",
+      year: 2023,
+      savedAmount: -150,
+      investedAmount: 50,
+      accumulatedInvested: 150,
+      totalIncome: null,
+      totalExpenses: null,
+      savingsRate: null,
+    },
+    {
+      source: "gridly",
+      year: 2024,
+      savedAmount: 800,
+      investedAmount: 200,
+      accumulatedInvested: 350,
+      totalIncome: 2000,
+      totalExpenses: 1200,
+      savingsRate: 800 / 2000,
+    },
+  ]);
+});
+
 test("getAllYearDataForUser callers can exclude future years before deriving metrics", () => {
   const eligibleYears = [
     yearData(2025, 1000, [month({ month: 12, investment: 100, endingBalance: 1400 })]),
     yearData(2026, 1400, [month({ month: 12, investment: 200, endingBalance: 2100 })]),
     yearData(2027, 2100, [month({ month: 12, investment: 300, endingBalance: 2900 })]),
   ].filter((data) => data.config.year <= 2026);
-  const metrics = deriveEvolutionMetrics(eligibleYears);
+  const metrics = deriveEvolutionMetrics(eligibleYears.map((data) => ({ source: "gridly" as const, yearData: data })));
 
   assert.deepEqual(metrics.map((metric) => ({
     year: metric.year,
@@ -172,8 +222,8 @@ test("getAllYearDataForUser callers can exclude future years before deriving met
 
 test("summarizeEvolutionMetrics derives dashboard totals and best year", () => {
   const metrics = deriveEvolutionMetrics([
-    yearData(2024, 1000, [month({ month: 12, investment: 100, totalIncome: 1000, endingBalance: 1300 })]),
-    yearData(2025, 1300, [month({ month: 12, investment: 250, totalIncome: 2000, endingBalance: 1900 })]),
+    { source: "gridly", yearData: yearData(2024, 1000, [month({ month: 12, investment: 100, totalIncome: 1000, endingBalance: 1300 })]) },
+    { source: "gridly", yearData: yearData(2025, 1300, [month({ month: 12, investment: 250, totalIncome: 2000, endingBalance: 1900 })]) },
   ]);
 
   assert.deepEqual(summarizeEvolutionMetrics(metrics), {

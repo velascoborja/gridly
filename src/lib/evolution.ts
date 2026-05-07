@@ -1,14 +1,25 @@
 import type { YearData } from "./types";
 
+export type EvolutionMetricSource =
+  | { source: "gridly"; yearData: YearData }
+  | {
+      source: "historical";
+      year: number;
+      startingBalance: number;
+      finalBalance: number;
+      investedAmount: number;
+    };
+
 export interface EvolutionYearMetric {
+  source: "gridly" | "historical";
   year: number;
   startingBalance: number;
   finalBalance: number;
   savedAmount: number;
   investedAmount: number;
   accumulatedInvested: number;
-  totalIncome: number;
-  totalExpenses: number;
+  totalIncome: number | null;
+  totalExpenses: number | null;
   savingsRate: number | null;
 }
 
@@ -24,12 +35,34 @@ export interface EvolutionSummary {
   } | null;
 }
 
-export function deriveEvolutionMetrics(years: YearData[]): EvolutionYearMetric[] {
-  const sortedYears = [...years].sort((a, b) => a.config.year - b.config.year);
+export function deriveEvolutionMetrics(sources: EvolutionMetricSource[]): EvolutionYearMetric[] {
+  const sortedSources = [...sources].sort((a, b) => {
+    const aYear = a.source === "gridly" ? a.yearData.config.year : a.year;
+    const bYear = b.source === "gridly" ? b.yearData.config.year : b.year;
+    return aYear - bYear;
+  });
   let accumulatedInvested = 0;
   const metrics: EvolutionYearMetric[] = [];
 
-  for (const yearData of sortedYears) {
+  for (const source of sortedSources) {
+    if (source.source === "historical") {
+      accumulatedInvested += source.investedAmount;
+      metrics.push({
+        source: "historical",
+        year: source.year,
+        startingBalance: source.startingBalance,
+        finalBalance: source.finalBalance,
+        savedAmount: source.finalBalance - source.startingBalance,
+        investedAmount: source.investedAmount,
+        accumulatedInvested,
+        totalIncome: null,
+        totalExpenses: null,
+        savingsRate: null,
+      });
+      continue;
+    }
+
+    const yearData = source.yearData;
     const december = yearData.months.find((month) => month.month === 12);
     if (!december) continue;
 
@@ -40,6 +73,7 @@ export function deriveEvolutionMetrics(years: YearData[]): EvolutionYearMetric[]
     accumulatedInvested += investedAmount;
 
     metrics.push({
+      source: "gridly",
       year: yearData.config.year,
       startingBalance: yearData.config.startingBalance,
       finalBalance: december.endingBalance,

@@ -69,3 +69,26 @@ export interface YearData {
   recurringExpenses: YearRecurringExpense[];
   months: MonthData[];
 }
+
+export interface HistoricalYear {
+  id: number;
+  userId: string;
+  year: number;
+  startingBalance: number;
+  finalBalance: number;
+  investedAmount: number;
+  createdAt: Date | null;
+  updatedAt: Date | null;
+}
+
+export interface HistoricalYearInput {
+  year: number;
+  startingBalance: number;
+  finalBalance: number;
+  investedAmount: number;
+}
+
+export interface YearOption {
+  year: number;
+  source: "gridly" | "historical";
+}

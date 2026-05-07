@@ -2,7 +2,8 @@
 
 import { useRouter, usePathname, Link } from "@/i18n/routing";
 import { buttonVariants } from "@/components/ui/button";
-import { getNextCreatableYear } from "@/lib/server/year-navigation";
+import { getGridlyYears, getNextCreatableYearFromOptions } from "@/lib/server/year-navigation";
+import type { YearOption } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -24,7 +25,7 @@ interface Props {
   currentYear: number;
   currentMonth: number | null;
   view: "overview" | "summary" | "settings" | "evolution";
-  years: number[];
+  years: number[] | YearOption[];
   monthPathPrefix?: string;
   summaryPathPrefix?: string;
   hideCreateYear?: boolean;
@@ -50,15 +51,25 @@ export function NavSelectors({
   const t = useTranslations("Nav");
   const selectedMonth = currentMonth ?? new Date().getMonth() + 1;
   const calendarYear = new Date().getFullYear();
-  const evolutionYears = years.filter((year) => year <= calendarYear);
-  const showCurrentYearMarker = years.length > 1;
-  const nextCreatableYear = getNextCreatableYear(years, currentYear);
+  const yearOptions: YearOption[] = years.map((entry) =>
+    typeof entry === "number" ? { year: entry, source: "gridly" } : entry
+  );
+  const gridlyYears = getGridlyYears(yearOptions);
+  const selectedYearOption = yearOptions.find((option) => option.year === currentYear);
+  const isHistoricalYearSelected = selectedYearOption?.source === "historical";
+  const showCurrentYearMarker = yearOptions.length > 1 && gridlyYears.length > 0;
+  const nextCreatableYear = getNextCreatableYearFromOptions(yearOptions, currentYear);
   const activeMainView = view === "summary" ? "summary" : view === "evolution" ? "evolution" : view === "settings" ? null : "overview";
   const showYearControls = !hideYearSelector && view !== "evolution";
 
   const handleYearChange = (val: string | null) => {
     if (!val) return;
     const y = parseInt(val, 10);
+    const option = yearOptions.find((candidate) => candidate.year === y);
+    if (option?.source === "historical") {
+      router.push(buildEvolutionHref(undefined));
+      return;
+    }
     if (view === "summary") router.push(buildYearSummaryHref(summaryPathPrefix, y));
     else router.push(buildYearMonthHref(monthPathPrefix, y, selectedMonth));
   };
@@ -69,9 +80,9 @@ export function NavSelectors({
   const createYearHref = buildSetupHrefFromPathname(nextCreatableYear, pathname, currentYear, selectedMonth, view);
 
   const mainTabs = [
-    { label: t("months"), key: "overview" as const, href: monthHref, disabled: false },
-    { label: t("annualSummary"), key: "summary" as const, href: summaryHref, disabled: false },
-    { label: t("evolution"), key: "evolution" as const, href: evolutionHref, disabled: evolutionYears.length < 2 },
+    { label: t("months"), key: "overview" as const, href: monthHref, disabled: isHistoricalYearSelected, disabledTitle: t("historicalYearUnavailable") },
+    { label: t("annualSummary"), key: "summary" as const, href: summaryHref, disabled: isHistoricalYearSelected, disabledTitle: t("historicalYearUnavailable") },
+    { label: t("evolution"), key: "evolution" as const, href: evolutionHref, disabled: false, disabledTitle: "" },
   ];
 
   return (
@@ -85,10 +96,15 @@ export function NavSelectors({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {years.map((y) => (
-                  <SelectItem key={y} value={String(y)}>
-                    <span>{y}</span>
-                    {showCurrentYearMarker && y === calendarYear && (
+                {yearOptions.map((option) => (
+                  <SelectItem key={`${option.source}-${option.year}`} value={String(option.year)}>
+                    <span>{option.year}</span>
+                    {option.source === "historical" && (
+                      <span className="rounded border border-border bg-muted px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                        {t("historicalYear")}
+                      </span>
+                    )}
+                    {showCurrentYearMarker && option.year === calendarYear && (
                       <span className="rounded border border-primary/20 bg-primary/[0.08] px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.12em] text-primary">
                         {t("currentYear")}
                       </span>
@@ -122,7 +138,7 @@ export function NavSelectors({
                   <span
                     key={tab.key}
                     aria-disabled="true"
-                    title={t("evolutionUnavailable")}
+                    title={tab.disabledTitle}
                     className="inline-flex cursor-not-allowed items-center rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground/50 sm:px-4 sm:py-2"
                   >
                     {tab.label}

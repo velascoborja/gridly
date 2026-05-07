@@ -3,12 +3,13 @@
 import { NavSelectors } from "./nav-selectors";
 import { UserMenu } from "@/components/auth/user-menu";
 import { BaseAppShell } from "./base-app-shell";
+import type { YearOption } from "@/lib/types";
 
 interface Props {
   currentYear: number;
   currentMonth: number | null;
   view: "overview" | "summary" | "settings" | "evolution";
-  years: number[];
+  years: number[] | YearOption[];
   user: {
     email?: string | null;
     name?: string | null;

@@ -375,16 +375,60 @@
     "annualSummary": "Year",
     "evolution": "Evolution",
     "evolutionUnavailable": "Available once you have more than one recorded year up to the current year.",
+    "historicalYearUnavailable": "Available only for years added with monthly tracking in Gridly.",
     "yearLabel": "Year",
     "createYear": "Create {year}",
-    "currentYear": "Current"
+    "currentYear": "Current",
+    "historicalYear": "Historical"
   },
   "Evolution": {
     "eyebrow": "Historical evolution",
     "title": "Financial evolution",
     "description": "Compare balance, savings, and investment across the current and previous years.",
+    "addHistoricalYear": "Add historical year",
     "totalWealth": "Estimated total wealth",
     "totalWealthNote": "Current balance + accumulated investment",
+    "source": {
+      "gridly": "Gridly",
+      "historical": "Historical"
+    },
+    "emptyState": {
+      "eyebrow": "History needed",
+      "title": "Add historical years to compare",
+      "description": "With one year, Evolution does not have a useful trend yet. Add a summarized earlier year to enable comparison without creating months or affecting the balance chain."
+    },
+    "historicalYearForm": {
+      "createTitle": "Add historical year",
+      "editTitle": "Edit historical year",
+      "description": "Add aggregate annual data from before you used Gridly.",
+      "year": "Year",
+      "startingBalance": "Starting balance",
+      "finalBalance": "Final balance",
+      "investedAmount": "Total invested amount",
+      "savedPreview": "Total savings",
+      "create": "Add",
+      "save": "Save",
+      "cancel": "Cancel",
+      "submitting": "Saving...",
+      "errors": {
+        "missingGridlyYear": "You need at least one full Gridly year first.",
+        "invalidYear": "Enter a valid year.",
+        "yearNotBeforeFirstGridlyYear": "The historical year must be before your first full Gridly year.",
+        "yearAlreadyExistsAsGridly": "That year already exists as a full Gridly year.",
+        "duplicateHistoricalYear": "That historical year already exists.",
+        "invalidStartingBalance": "Enter a valid starting balance.",
+        "invalidFinalBalance": "Enter a valid final balance.",
+        "invalidInvestedAmount": "Investment must be zero or greater.",
+        "connection": "Could not save. Check your connection and try again.",
+        "generic": "Could not save the historical year."
+      }
+    },
+    "deleteHistoricalYear": {
+      "title": "Delete historical year?",
+      "description": "{year} will be removed from Evolution. Full Gridly years are not affected.",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    },
     "kpis": {
       "averageSavingsPerYear": "Average annual savings",
       "averageSavingsPerYearNote": "Mean savings across the current and previous years",
@@ -413,6 +457,11 @@
     "table": {
       "title": "Year detail",
       "description": "Compact view of balances, savings, investment, income, and expenses.",
+      "sourceLabel": "Source",
+      "source": {
+        "gridly": "Gridly",
+        "historical": "Historical"
+      },
       "year": "Year",
       "startingBalance": "Starting balance",
       "finalBalance": "Final balance",
@@ -422,6 +471,9 @@
       "totalIncome": "Income",
       "totalExpenses": "Expenses",
       "savingsRate": "Savings rate",
+      "actions": "Actions",
+      "editHistoricalYear": "Edit historical year {year}",
+      "deleteHistoricalYear": "Delete historical year {year}",
       "notAvailable": "N/A"
     }
   },

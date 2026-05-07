@@ -85,6 +85,19 @@ export const years = pgTable("years", {
   createdAt: timestamp("created_at").defaultNow(),
 }, (t) => [unique().on(t.userId, t.year)]);
 
+export const historicalYears = pgTable("historical_years", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  year: integer("year").notNull(),
+  startingBalance: numeric("starting_balance", { precision: 12, scale: 2 }).notNull().default("0"),
+  finalBalance: numeric("final_balance", { precision: 12, scale: 2 }).notNull().default("0"),
+  investedAmount: numeric("invested_amount", { precision: 12, scale: 2 }).notNull().default("0"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (t) => [unique().on(t.userId, t.year)]);
+
 export const months = pgTable(
   "months",
   {

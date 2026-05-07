@@ -1,0 +1,78 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {
+  deriveHistoricalSavedAmount,
+  parseHistoricalYearPayload,
+  serializeHistoricalYearMoney,
+  validateHistoricalYearEligibility,
+} from "./historical-years.ts";
+
+test("parseHistoricalYearPayload accepts finite money values and allows negative savings", () => {
+  const parsed = parseHistoricalYearPayload({
+    year: 2022,
+    startingBalance: 5000,
+    finalBalance: 4250,
+    investedAmount: 1200,
+  });
+
+  assert.deepEqual(parsed, {
+    year: 2022,
+    startingBalance: 5000,
+    finalBalance: 4250,
+    investedAmount: 1200,
+  });
+  assert.equal(deriveHistoricalSavedAmount(parsed), -750);
+});
+
+test("parseHistoricalYearPayload rejects invalid year and invested amount", () => {
+  assert.equal(
+    parseHistoricalYearPayload({ year: 2022.5, startingBalance: 0, finalBalance: 1, investedAmount: 0 }).error,
+    "invalidYear"
+  );
+  assert.equal(
+    parseHistoricalYearPayload({ year: 2022, startingBalance: 0, finalBalance: 1, investedAmount: -1 }).error,
+    "invalidInvestedAmount"
+  );
+});
+
+test("validateHistoricalYearEligibility enforces pre-Gridly-only imports", () => {
+  assert.equal(validateHistoricalYearEligibility({ year: 2023, gridlyYears: [], historicalYears: [] }), "missingGridlyYear");
+  assert.equal(
+    validateHistoricalYearEligibility({ year: 2024, gridlyYears: [2024], historicalYears: [] }),
+    "yearAlreadyExistsAsGridly"
+  );
+  assert.equal(
+    validateHistoricalYearEligibility({ year: 2025, gridlyYears: [2024], historicalYears: [] }),
+    "yearNotBeforeFirstGridlyYear"
+  );
+  assert.equal(
+    validateHistoricalYearEligibility({ year: 2023, gridlyYears: [2024], historicalYears: [2023] }),
+    "duplicateHistoricalYear"
+  );
+  assert.equal(
+    validateHistoricalYearEligibility({
+      year: 2023,
+      gridlyYears: [2024],
+      historicalYears: [2023],
+      currentHistoricalYear: 2023,
+    }),
+    null
+  );
+});
+
+test("serializeHistoricalYearMoney converts numeric fields to Drizzle numeric strings", () => {
+  assert.deepEqual(
+    serializeHistoricalYearMoney({
+      year: 2022,
+      startingBalance: 1000.5,
+      finalBalance: 1200.25,
+      investedAmount: 300,
+    }),
+    {
+      year: 2022,
+      startingBalance: "1000.50",
+      finalBalance: "1200.25",
+      investedAmount: "300.00",
+    }
+  );
+});
