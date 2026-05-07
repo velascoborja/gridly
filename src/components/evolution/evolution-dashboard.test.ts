@@ -11,6 +11,17 @@ test("evolution dashboard composes KPI cards, charts, and detail table", () => {
   assert.match(source, /summarizeEvolutionMetrics/);
 });
 
+test("evolution loading state keeps the app shell and mirrors dashboard sections", () => {
+  const source = readFileSync(new URL("../../app/[locale]/evolution/loading.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /BaseAppShell/);
+  assert.match(source, /aria-busy="true"/);
+  assert.match(source, /surface-depth-floating/);
+  assert.match(source, /xl:grid-cols-5/);
+  assert.match(source, /md:grid-cols-2/);
+  assert.match(source, /min-w-\[860px\]/);
+});
+
 test("evolution charts include final balance, savings, and investment series", () => {
   const source = readFileSync(new URL("./evolution-charts.tsx", import.meta.url), "utf8");
 

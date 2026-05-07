@@ -80,7 +80,7 @@ Displays all `EvolutionYearMetric` fields for every recorded year: year, startin
 
 ## Loading State
 
-`loading.tsx` renders three skeleton blocks matching the approximate layout of the header/KPI section, the two secondary charts, and the detail table.
+`loading.tsx` renders inside `BaseAppShell` so the app background, sticky header, wordmark, and navigation area remain stable while the server loads all years. The skeleton mirrors the final dashboard structure: hero/header copy, total wealth stripe, five KPI cards, the primary balance chart, two secondary charts, and the detail table grid.
 
 ## Out Of Scope
 
