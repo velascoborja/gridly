@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { Bar, BarChart, CartesianGrid, Cell, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { EvolutionYearMetric } from "@/lib/evolution";
 import { formatCurrency } from "@/lib/utils";
@@ -18,6 +18,8 @@ export function EvolutionCharts({ metrics }: Props) {
   const t = useTranslations("Evolution.charts");
   const locale = useLocale();
 
+  const balanceData = metrics.map((m) => ({ ...m, totalWealth: m.finalBalance + m.accumulatedInvested }));
+
   return (
     <div className="space-y-6">
       <Card className="border-border/70 bg-card/90 shadow-sm">
@@ -28,12 +30,15 @@ export function EvolutionCharts({ metrics }: Props) {
         <CardContent className="pt-0">
           <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
             <ResponsiveContainer width="100%" height={280}>
-              <LineChart data={metrics} margin={{ top: 6, right: 8, bottom: 0, left: 8 }}>
+              <LineChart data={balanceData} margin={{ top: 6, right: 8, bottom: 0, left: 8 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border/80" />
                 <XAxis dataKey="year" tick={{ fontSize: 11 }} />
                 <YAxis tickFormatter={axisCurrency} tick={{ fontSize: 11 }} width={44} />
                 <Tooltip formatter={(value) => formatCurrency(Number(value), locale)} />
-                <Line name={t("balanceLabel")} type="monotone" dataKey="finalBalance" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} className="stroke-primary" />
+                <Legend wrapperStyle={{ fontSize: 11, paddingTop: 8 }} />
+                <Line name={t("balanceLabel")} type="monotone" dataKey="finalBalance" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} stroke="var(--color-primary)" />
+                <Line name={t("accumulatedInvestedLabel")} type="monotone" dataKey="accumulatedInvested" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} stroke="var(--color-chart-2)" strokeDasharray="5 3" />
+                <Line name={t("totalWealthLabel")} type="monotone" dataKey="totalWealth" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} stroke="var(--color-chart-4)" strokeDasharray="2 2" />
               </LineChart>
             </ResponsiveContainer>
           </div>

@@ -8,11 +8,11 @@ Imports are allowed only when the user already has at least one full Gridly year
 
 ## Stored Fields
 
-Historical imports store `year`, `startingBalance`, `finalBalance`, and `investedAmount`. `savedAmount` is derived as `finalBalance - startingBalance`, so negative savings are valid. `investedAmount` must be zero or greater.
+Historical imports store `year`, `startingBalance`, `finalBalance`, `investedAmount`, and an optional `savingsRate`. `savedAmount` is derived as `finalBalance - startingBalance`, so negative savings are valid. `investedAmount` must be zero or greater. `savingsRate` is stored as a decimal (0–1) and entered by the user as a percentage (0–100); when set it is shown directly in the Evolution table instead of the "unavailable" placeholder.
 
 ## Evolution Behavior
 
-Evolution merges historical imports and full Gridly years in chronological order. Historical rows contribute to final balance, saved amount, invested amount, accumulated invested amount, total saved, and total wealth. Historical rows do not have monthly income, monthly expenses, or savings-rate data, so those fields are shown as unavailable.
+Evolution merges historical imports and full Gridly years in chronological order. Historical rows contribute to final balance, saved amount, invested amount, accumulated invested amount, total saved, and total wealth. Historical rows do not have monthly income or monthly expenses data, so those fields are shown as unavailable. The savings rate is shown when it has been manually set; otherwise it appears as unavailable.
 
 The Evolution route remains reachable when a user has only one full Gridly year. In that state, the dashboard shows an empty state with the add-historical-year action so users can create the historical comparison source they need.
 

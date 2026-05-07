@@ -75,7 +75,7 @@ Five cards derived from `EvolutionSummary`:
 
 ### Charts
 
-1. **Final Balance (LineChart)** — Year-over-year final balance trend. One data point per year.
+1. **Final Balance (LineChart)** — Year-over-year trend with three lines: `finalBalance` (primary color), `accumulatedInvested` (teal, dashed), and `totalWealth` = `finalBalance + accumulatedInvested` (orange, dotted). A legend labels each line. One data point per year.
 2. **Savings per Year (BarChart)** — `savedAmount` per year. Bars are green when `savedAmount ≥ 0` and red when negative.
 3. **Investment per Year (BarChart)** — `investedAmount` per year in primary color.
 

@@ -77,6 +77,7 @@ export interface HistoricalYear {
   startingBalance: number;
   finalBalance: number;
   investedAmount: number;
+  savingsRate: number | null;
   createdAt: Date | null;
   updatedAt: Date | null;
 }
@@ -86,6 +87,7 @@ export interface HistoricalYearInput {
   startingBalance: number;
   finalBalance: number;
   investedAmount: number;
+  savingsRate: number | null;
 }
 
 export interface YearOption {

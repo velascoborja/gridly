@@ -65,6 +65,7 @@ export function HistoricalYearDialog({ open, mode, historicalYear, onOpenChange 
     startingBalance: "",
     finalBalance: "",
     investedAmount: "",
+    savingsRate: "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -77,6 +78,9 @@ export function HistoricalYearDialog({ open, mode, historicalYear, onOpenChange 
       startingBalance: historicalYear ? String(historicalYear.startingBalance) : "",
       finalBalance: historicalYear ? String(historicalYear.finalBalance) : "",
       investedAmount: historicalYear ? String(historicalYear.investedAmount) : "",
+      savingsRate: historicalYear?.savingsRate !== null && historicalYear?.savingsRate !== undefined
+        ? String(Math.round(historicalYear.savingsRate * 10000) / 100)
+        : "",
     });
   }, [historicalYear, open]);
 
@@ -87,11 +91,15 @@ export function HistoricalYearDialog({ open, mode, historicalYear, onOpenChange 
     setSubmitting(true);
     setError("");
 
+    const rawSavingsRate = values.savingsRate.trim();
+    const savingsRate = rawSavingsRate === "" ? null : parseLocalizedNumber(rawSavingsRate) / 100;
+
     const payload = {
       year: Number(values.year),
       startingBalance: parseLocalizedNumber(values.startingBalance),
       finalBalance: parseLocalizedNumber(values.finalBalance),
       investedAmount: parseLocalizedNumber(values.investedAmount),
+      savingsRate,
     };
     const url = mode === "edit" && historicalYear ? `/api/historical-years/${historicalYear.id}` : "/api/historical-years";
     const method = mode === "edit" ? "PATCH" : "POST";
@@ -152,6 +160,29 @@ export function HistoricalYearDialog({ open, mode, historicalYear, onOpenChange 
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground" htmlFor="historical-invested-amount">{t("investedAmount")}</label>
             <MoneyInput id="historical-invested-amount" value={values.investedAmount} onChange={(value) => updateCurrency("investedAmount", value)} disabled={submitting} />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-foreground" htmlFor="historical-savings-rate">
+              {t("savingsRate")}
+              <span className="ml-1.5 text-xs font-normal text-muted-foreground">{t("savingsRateOptional")}</span>
+            </label>
+            <div className="relative">
+              <Input
+                className="h-9 pr-8"
+                id="historical-savings-rate"
+                inputMode="decimal"
+                placeholder="0.0"
+                value={values.savingsRate}
+                onChange={(event) => setValues((prev) => ({ ...prev, savingsRate: sanitizeNumericInput(event.target.value) }))}
+                disabled={submitting}
+              />
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground/70"
+              >
+                %
+              </span>
+            </div>
           </div>
           <div className="rounded-md border border-primary/20 bg-primary/[0.05] px-3 py-2 text-sm leading-5">
             <span className="text-muted-foreground">{t("savedPreview")}</span>

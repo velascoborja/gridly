@@ -68,17 +68,17 @@ export function EvolutionDetailTable({ metrics, historicalYears, onEditHistorica
           <table className="min-w-[960px] w-full text-left text-sm">
             <thead className="bg-muted/40 text-xs uppercase tracking-[0.12em] text-muted-foreground">
               <tr>
-                <th className="px-3 py-3 font-medium">{t("sourceLabel")}</th>
-                <th className="px-3 py-3 font-medium">{t("year")}</th>
-                <th className="px-3 py-3 font-medium">{t("startingBalance")}</th>
-                <th className="px-3 py-3 font-medium">{t("finalBalance")}</th>
-                <th className="px-3 py-3 font-medium">{t("savedAmount")}</th>
-                <th className="px-3 py-3 font-medium">{t("investedAmount")}</th>
-                <th className="px-3 py-3 font-medium">{t("accumulatedInvested")}</th>
-                <th className="px-3 py-3 font-medium">{t("totalIncome")}</th>
-                <th className="px-3 py-3 font-medium">{t("totalExpenses")}</th>
-                <th className="px-3 py-3 font-medium">{t("savingsRate")}</th>
-                <th className="px-3 py-3 font-medium">{t("actions")}</th>
+                <th className="px-3 py-3 font-medium text-center">{t("sourceLabel")}</th>
+                <th className="px-3 py-3 font-medium text-center">{t("year")}</th>
+                <th className="px-3 py-3 font-medium text-center">{t("startingBalance")}</th>
+                <th className="px-3 py-3 font-medium text-center">{t("finalBalance")}</th>
+                <th className="px-3 py-3 font-medium text-center">{t("savedAmount")}</th>
+                <th className="px-3 py-3 font-medium text-center">{t("investedAmount")}</th>
+                <th className="px-3 py-3 font-medium text-center">{t("accumulatedInvested")}</th>
+                <th className="px-3 py-3 font-medium text-center">{t("totalIncome")}</th>
+                <th className="px-3 py-3 font-medium text-center">{t("totalExpenses")}</th>
+                <th className="px-3 py-3 font-medium text-center">{t("savingsRate")}</th>
+                <th className="px-3 py-3 font-medium text-center">{t("actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/60">
@@ -87,19 +87,19 @@ export function EvolutionDetailTable({ metrics, historicalYears, onEditHistorica
 
                 return (
                   <tr key={`${metric.source}-${metric.year}`} className="bg-card/70">
-                    <td className="px-3 py-3 text-muted-foreground">{t(`source.${metric.source}`)}</td>
-                    <td className="px-3 py-3 font-medium text-foreground">{metric.year}</td>
-                    <td className="px-3 py-3 finance-number">{formatCurrency(metric.startingBalance, locale)}</td>
-                    <td className="px-3 py-3 finance-number">{formatCurrency(metric.finalBalance, locale)}</td>
-                    <td className="px-3 py-3 finance-number">{formatCurrency(metric.savedAmount, locale)}</td>
-                    <td className="px-3 py-3 finance-number">{formatCurrency(metric.investedAmount, locale)}</td>
-                    <td className="px-3 py-3 finance-number">{formatCurrency(metric.accumulatedInvested, locale)}</td>
-                    <td className="px-3 py-3 finance-number">{formatOptionalCurrency(metric.totalIncome, locale, t("notAvailable"))}</td>
-                    <td className="px-3 py-3 finance-number">{formatOptionalCurrency(metric.totalExpenses, locale, t("notAvailable"))}</td>
-                    <td className="px-3 py-3 finance-number">
+                    <td className="px-3 py-3 text-center text-muted-foreground">{t(`source.${metric.source}`)}</td>
+                    <td className="px-3 py-3 text-center font-medium text-foreground">{metric.year}</td>
+                    <td className="px-3 py-3 text-center finance-number">{formatCurrency(metric.startingBalance, locale)}</td>
+                    <td className="px-3 py-3 text-center finance-number">{formatCurrency(metric.finalBalance, locale)}</td>
+                    <td className="px-3 py-3 text-center finance-number">{formatCurrency(metric.savedAmount, locale)}</td>
+                    <td className="px-3 py-3 text-center finance-number">{formatCurrency(metric.investedAmount, locale)}</td>
+                    <td className="px-3 py-3 text-center finance-number">{formatCurrency(metric.accumulatedInvested, locale)}</td>
+                    <td className="px-3 py-3 text-center finance-number">{formatOptionalCurrency(metric.totalIncome, locale, t("notAvailable"))}</td>
+                    <td className="px-3 py-3 text-center finance-number">{formatOptionalCurrency(metric.totalExpenses, locale, t("notAvailable"))}</td>
+                    <td className="px-3 py-3 text-center finance-number">
                       {metric.savingsRate === null ? t("notAvailable") : formatPercent(metric.savingsRate, locale)}
                     </td>
-                    <td className="px-3 py-3">
+                    <td className="px-3 py-3 text-center">
                       {historicalYear ? (
                         <div className="flex items-center gap-1">
                           <Button

@@ -405,6 +405,8 @@
       "startingBalance": "Saldo inicial",
       "finalBalance": "Saldo final del año",
       "investedAmount": "Importe total invertido",
+      "savingsRate": "Tasa de ahorro",
+      "savingsRateOptional": "(opcional)",
       "savedPreview": "Ahorro total",
       "create": "Añadir",
       "save": "Guardar",
@@ -419,6 +421,7 @@
         "invalidStartingBalance": "Introduce un saldo inicial válido.",
         "invalidFinalBalance": "Introduce un saldo final válido.",
         "invalidInvestedAmount": "La inversión debe ser cero o mayor.",
+        "invalidSavingsRate": "La tasa de ahorro debe estar entre 0 y 100.",
         "connection": "No se ha podido guardar. Revisa la conexión e inténtalo de nuevo.",
         "generic": "No se ha podido guardar el año histórico."
       }
@@ -445,8 +448,10 @@
     },
     "charts": {
       "balanceTitle": "Evolución del saldo final",
-      "balanceDescription": "Saldo de cierre de cada año registrado.",
+      "balanceDescription": "Saldo de cierre, inversión acumulada y patrimonio total estimado por año.",
       "balanceLabel": "Saldo final",
+      "accumulatedInvestedLabel": "Inversión acumulada",
+      "totalWealthLabel": "Patrimonio total estimado",
       "savedTitle": "Ahorro por año",
       "savedDescription": "Variación entre saldo inicial y saldo final.",
       "savedLabel": "Ahorro",

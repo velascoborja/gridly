@@ -8,6 +8,7 @@ export type EvolutionMetricSource =
       startingBalance: number;
       finalBalance: number;
       investedAmount: number;
+      savingsRate: number | null;
     };
 
 export interface EvolutionYearMetric {
@@ -57,7 +58,7 @@ export function deriveEvolutionMetrics(sources: EvolutionMetricSource[]): Evolut
         accumulatedInvested,
         totalIncome: null,
         totalExpenses: null,
-        savingsRate: null,
+        savingsRate: source.savingsRate,
       });
       continue;
     }

@@ -516,9 +516,9 @@ export function MonthOverview({
         )}
       >
         <CardContent className="px-6 py-3">
-          <div className="flex flex-col items-center gap-8 text-center md:flex-row md:items-center md:justify-between md:text-left">
+          <div className="flex flex-col items-center gap-8 text-center lg:flex-row lg:items-center lg:justify-between lg:text-left">
             {/* Left: Identification */}
-            <div className="flex flex-col items-center gap-4 sm:gap-8 md:flex-row">
+            <div className="flex flex-col items-center gap-4 sm:gap-8 lg:flex-row">
               <div>
                 <h2 className="text-2xl font-bold tracking-tight capitalize">
                   {formatMonthName(month.month, locale)} {config.year}
@@ -569,7 +569,7 @@ export function MonthOverview({
                 </div>
               </div>
               
-              <div className="hidden h-12 w-px bg-white/10 md:block" />
+              <div className="hidden h-12 w-px bg-white/10 lg:block" />
 
               {/* Center: Primary KPIs */}
               <div className="flex gap-8">
@@ -589,16 +589,16 @@ export function MonthOverview({
             </div>
 
             {/* Right: Secondary Stats */}
-            <div className="flex w-full justify-center gap-6 border-t border-white/10 pt-4 md:w-auto md:border-l md:border-t-0 md:pl-8 md:pt-0">
-              <div className="space-y-1 md:text-right">
+            <div className="flex w-full justify-center gap-6 border-t border-white/10 pt-4 lg:w-auto lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
+              <div className="space-y-1 lg:text-right">
                 <p className="text-xs uppercase tracking-widest text-white/30 font-bold">Inicial</p>
                 <p className="text-base font-medium tabular-nums text-white/80">{formatCurrency(month.startingBalance, locale)}</p>
               </div>
-              <div className="space-y-1 md:text-right">
+              <div className="space-y-1 lg:text-right">
                 <p className="text-xs uppercase tracking-widest text-white/30 font-bold">Ingresos</p>
                 <p className="text-base font-medium tabular-nums text-emerald-400/80">{formatCurrency(month.totalIncome, locale)}</p>
               </div>
-              <div className="space-y-1 md:text-right">
+              <div className="space-y-1 lg:text-right">
                 <p className="text-xs uppercase tracking-widest text-white/30 font-bold">Gastos</p>
                 <p className="text-base font-medium tabular-nums text-rose-400/80">{formatCurrency(month.totalExpenses, locale)}</p>
               </div>

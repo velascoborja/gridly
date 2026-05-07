@@ -8,7 +8,8 @@ export type HistoricalYearValidationError =
   | "duplicateHistoricalYear"
   | "invalidStartingBalance"
   | "invalidFinalBalance"
-  | "invalidInvestedAmount";
+  | "invalidInvestedAmount"
+  | "invalidSavingsRate";
 
 export type HistoricalYearPayloadResult =
   | HistoricalYearInput
@@ -24,13 +25,22 @@ export function parseHistoricalYearPayload(payload: unknown): HistoricalYearPayl
   const startingBalance = body.startingBalance;
   const finalBalance = body.finalBalance;
   const investedAmount = body.investedAmount;
+  const savingsRate = body.savingsRate;
 
   if (typeof year !== "number" || !Number.isInteger(year)) return { error: "invalidYear" };
   if (!isFiniteCurrencyValue(startingBalance)) return { error: "invalidStartingBalance" };
   if (!isFiniteCurrencyValue(finalBalance)) return { error: "invalidFinalBalance" };
   if (!isFiniteCurrencyValue(investedAmount) || investedAmount < 0) return { error: "invalidInvestedAmount" };
 
-  return { year, startingBalance, finalBalance, investedAmount };
+  let parsedSavingsRate: number | null = null;
+  if (savingsRate !== null && savingsRate !== undefined) {
+    if (typeof savingsRate !== "number" || !Number.isFinite(savingsRate) || savingsRate < 0 || savingsRate > 1) {
+      return { error: "invalidSavingsRate" };
+    }
+    parsedSavingsRate = savingsRate;
+  }
+
+  return { year, startingBalance, finalBalance, investedAmount, savingsRate: parsedSavingsRate };
 }
 
 export function validateHistoricalYearEligibility({
@@ -71,5 +81,6 @@ export function serializeHistoricalYearMoney(input: HistoricalYearInput) {
     startingBalance: input.startingBalance.toFixed(2),
     finalBalance: input.finalBalance.toFixed(2),
     investedAmount: input.investedAmount.toFixed(2),
+    savingsRate: input.savingsRate !== null ? input.savingsRate.toFixed(4) : null,
   };
 }

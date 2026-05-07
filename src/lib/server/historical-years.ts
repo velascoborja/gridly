@@ -19,6 +19,7 @@ export function parseHistoricalYearRow(row: typeof historicalYears.$inferSelect)
     startingBalance: parseFloat(row.startingBalance),
     finalBalance: parseFloat(row.finalBalance),
     investedAmount: parseFloat(row.investedAmount),
+    savingsRate: row.savingsRate !== null && row.savingsRate !== undefined ? parseFloat(row.savingsRate) : null,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   };
@@ -128,6 +129,7 @@ export async function getEvolutionSourcesForUser(userId: string, maxYear: number
       startingBalance: row.startingBalance,
       finalBalance: row.finalBalance,
       investedAmount: row.investedAmount,
+      savingsRate: row.savingsRate,
     })),
     ...gridlyYearData.map((yearData): EvolutionMetricSource => ({ source: "gridly", yearData })),
   ].sort((a, b) => {

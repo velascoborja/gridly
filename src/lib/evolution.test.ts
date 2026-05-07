@@ -150,8 +150,8 @@ test("deriveEvolutionMetrics sorts years ascending before accumulating investmen
 test("deriveEvolutionMetrics merges gridly and historical sources chronologically", () => {
   const metrics = deriveEvolutionMetrics([
     { source: "gridly", yearData: yearData(2024, 1000, [month({ month: 12, investment: 200, totalIncome: 2000, totalExpenses: 1200, endingBalance: 1800 })]) },
-    { source: "historical", year: 2022, startingBalance: 500, finalBalance: 900, investedAmount: 100 },
-    { source: "historical", year: 2023, startingBalance: 900, finalBalance: 750, investedAmount: 50 },
+    { source: "historical", year: 2022, startingBalance: 500, finalBalance: 900, investedAmount: 100, savingsRate: null },
+    { source: "historical", year: 2023, startingBalance: 900, finalBalance: 750, investedAmount: 50, savingsRate: null },
   ]);
 
   assert.deepEqual(metrics.map((metric) => ({

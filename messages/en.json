@@ -405,6 +405,8 @@
       "startingBalance": "Starting balance",
       "finalBalance": "Final balance",
       "investedAmount": "Total invested amount",
+      "savingsRate": "Savings rate",
+      "savingsRateOptional": "(optional)",
       "savedPreview": "Total savings",
       "create": "Add",
       "save": "Save",
@@ -419,6 +421,7 @@
         "invalidStartingBalance": "Enter a valid starting balance.",
         "invalidFinalBalance": "Enter a valid final balance.",
         "invalidInvestedAmount": "Investment must be zero or greater.",
+        "invalidSavingsRate": "Savings rate must be between 0 and 100.",
         "connection": "Could not save. Check your connection and try again.",
         "generic": "Could not save the historical year."
       }
@@ -445,8 +448,10 @@
     },
     "charts": {
       "balanceTitle": "Final balance evolution",
-      "balanceDescription": "Closing balance for each recorded year.",
+      "balanceDescription": "Closing balance, accumulated investment, and estimated total wealth per year.",
       "balanceLabel": "Final balance",
+      "accumulatedInvestedLabel": "Accumulated investment",
+      "totalWealthLabel": "Estimated total wealth",
       "savedTitle": "Savings per year",
       "savedDescription": "Difference between starting and final balance.",
       "savedLabel": "Savings",
