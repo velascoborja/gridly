@@ -233,10 +233,10 @@ test("summarizeEvolutionMetrics derives dashboard totals and best year", () => {
     averageSavingsRate: 0.3,
     accumulatedInvested: 350,
     totalWealth: 2250,
-    bestYear: {
-      year: 2025,
-      savedAmount: 600,
-    },
+    topYears: [
+      { year: 2025, savedAmount: 600 },
+      { year: 2024, savedAmount: 300 },
+    ],
   });
 });
 
@@ -248,6 +248,6 @@ test("summarizeEvolutionMetrics returns zero totals and null best year for empty
     averageSavingsRate: null,
     accumulatedInvested: 0,
     totalWealth: 0,
-    bestYear: null,
+    topYears: [],
   });
 });

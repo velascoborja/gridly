@@ -31,10 +31,10 @@ export interface EvolutionSummary {
   averageSavingsRate: number | null;
   accumulatedInvested: number;
   totalWealth: number;
-  bestYear: {
+  topYears: Array<{
     year: number;
     savedAmount: number;
-  } | null;
+  }>;
 }
 
 export function deriveEvolutionMetrics(sources: EvolutionMetricSource[]): EvolutionYearMetric[] {
@@ -107,10 +107,10 @@ export function calcEstimatedPortfolioValues(
 
 export function summarizeEvolutionMetrics(metrics: EvolutionYearMetric[]): EvolutionSummary {
   const latest = metrics.at(-1);
-  const best = metrics.reduce<EvolutionYearMetric | null>((currentBest, metric) => {
-    if (!currentBest || metric.savedAmount > currentBest.savedAmount) return metric;
-    return currentBest;
-  }, null);
+  const topYears = [...metrics]
+    .sort((a, b) => b.savedAmount - a.savedAmount)
+    .slice(0, 3)
+    .map(({ year, savedAmount }) => ({ year, savedAmount }));
 
   const latestFinalBalance = latest?.finalBalance ?? 0;
   const accumulatedInvested = latest?.accumulatedInvested ?? 0;
@@ -127,6 +127,6 @@ export function summarizeEvolutionMetrics(metrics: EvolutionYearMetric[]): Evolu
     averageSavingsRate,
     accumulatedInvested,
     totalWealth: latestFinalBalance + accumulatedInvested,
-    bestYear: best ? { year: best.year, savedAmount: best.savedAmount } : null,
+    topYears,
   };
 }

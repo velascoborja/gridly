@@ -470,6 +470,7 @@
       "bestYear": "Mejor año",
       "bestYearNote": "Ahorro generado: {amount}",
       "bestYearEmpty": "Sin años comparables",
+      "bestYearRunnerUp": "{year}: {amount}",
       "notAvailable": "No disponible"
     },
     "charts": {

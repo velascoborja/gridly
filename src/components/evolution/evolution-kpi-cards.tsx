@@ -48,12 +48,17 @@ export function EvolutionKpiCards({ summary, estimatedPortfolioValue, returnRate
         className: "text-primary",
       };
 
+  const bestYearRunnerUps = summary.topYears.slice(1).map((y) =>
+    t("bestYearRunnerUp", { year: String(y.year), amount: formatCurrency(y.savedAmount, locale) })
+  );
+
   const cards = [
     {
       label: t("latestFinalBalance"),
       value: formatCurrency(summary.latestFinalBalance, locale),
       note: t("latestFinalBalanceNote"),
       tag: undefined as string | undefined,
+      subItems: undefined as string[] | undefined,
       Icon: Landmark,
       className: "text-primary",
     },
@@ -62,23 +67,26 @@ export function EvolutionKpiCards({ summary, estimatedPortfolioValue, returnRate
       value: formatCurrency(summary.totalSaved, locale),
       note: t("totalSavedNote"),
       tag: undefined as string | undefined,
+      subItems: undefined as string[] | undefined,
       Icon: TrendingUp,
       className: summary.totalSaved >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400",
     },
-    investedCard,
+    { ...investedCard, subItems: undefined as string[] | undefined },
     {
       label: t("averageSavingsPerYear"),
       value: formatCurrency(summary.averageSavingsPerYear, locale),
       note: t("averageSavingsPerYearNote"),
       tag: savingsRateTag,
+      subItems: undefined as string[] | undefined,
       Icon: CalendarDays,
       className: summary.averageSavingsPerYear >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400",
     },
     {
       label: t("bestYear"),
-      value: summary.bestYear ? String(summary.bestYear.year) : t("notAvailable"),
-      note: summary.bestYear ? t("bestYearNote", { amount: formatCurrency(summary.bestYear.savedAmount, locale) }) : t("bestYearEmpty"),
+      value: summary.topYears[0] ? String(summary.topYears[0].year) : t("notAvailable"),
+      note: summary.topYears[0] ? t("bestYearNote", { amount: formatCurrency(summary.topYears[0].savedAmount, locale) }) : t("bestYearEmpty"),
       tag: undefined as string | undefined,
+      subItems: bestYearRunnerUps.length > 0 ? bestYearRunnerUps : undefined,
       Icon: Award,
       className: "text-foreground",
     },
@@ -86,7 +94,7 @@ export function EvolutionKpiCards({ summary, estimatedPortfolioValue, returnRate
 
   return (
     <div className="mt-5 flex flex-wrap justify-center gap-3">
-      {cards.map(({ label, value, note, tag, Icon, className }) => (
+      {cards.map(({ label, value, note, tag, subItems, Icon, className }) => (
         <Card key={label} className="w-[calc(50%-6px)] border-border/70 bg-card/90 shadow-sm md:w-[calc(33.333%-8px)] xl:w-[calc(20%-9.6px)]">
           <CardContent className="p-3 sm:p-4">
             <div className="flex items-start justify-between gap-2">
@@ -99,6 +107,13 @@ export function EvolutionKpiCards({ summary, estimatedPortfolioValue, returnRate
             <p className="mt-1.5 text-xs leading-4 text-muted-foreground sm:mt-2 sm:leading-5">{note}</p>
             {tag && (
               <p className="mt-1.5 text-xs font-medium text-primary/80">{tag}</p>
+            )}
+            {subItems && subItems.length > 0 && (
+              <div className="mt-2 space-y-0.5 border-t border-border/50 pt-2">
+                {subItems.map((item) => (
+                  <p key={item} className="text-xs text-muted-foreground/70">{item}</p>
+                ))}
+              </div>
             )}
           </CardContent>
         </Card>

@@ -470,6 +470,7 @@
       "bestYear": "Best year",
       "bestYearNote": "Savings generated: {amount}",
       "bestYearEmpty": "No comparable years",
+      "bestYearRunnerUp": "{year}: {amount}",
       "notAvailable": "Not available"
     },
     "charts": {
