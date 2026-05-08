@@ -8,6 +8,8 @@ import { formatCurrency } from "@/lib/utils";
 
 interface Props {
   summary: EvolutionSummary;
+  estimatedPortfolioValue?: number | null;
+  returnRate?: number | null;
 }
 
 function formatPercent(value: number, locale: string) {
@@ -18,13 +20,34 @@ function formatPercent(value: number, locale: string) {
   }).format(value);
 }
 
-export function EvolutionKpiCards({ summary }: Props) {
+export function EvolutionKpiCards({ summary, estimatedPortfolioValue, returnRate }: Props) {
   const t = useTranslations("Evolution.kpis");
   const locale = useLocale();
   const savingsRateTag =
     summary.averageSavingsRate !== null
       ? t("totalSavedSavingsRate", { rate: formatPercent(summary.averageSavingsRate, locale) })
       : t("totalSavedSavingsRateEmpty");
+
+  const hasEstimate = estimatedPortfolioValue != null && returnRate != null;
+
+  const investedCard = hasEstimate
+    ? {
+        label: t("estimatedPortfolioValue"),
+        value: formatCurrency(estimatedPortfolioValue, locale),
+        note: t("estimatedPortfolioValueNote", { rate: returnRate }),
+        tag: t("estimatedPortfolioInvestedTag", { amount: formatCurrency(summary.accumulatedInvested, locale) }),
+        Icon: PiggyBank,
+        className: "text-primary",
+      }
+    : {
+        label: t("accumulatedInvested"),
+        value: formatCurrency(summary.accumulatedInvested, locale),
+        note: t("accumulatedInvestedNote"),
+        tag: undefined as string | undefined,
+        Icon: PiggyBank,
+        className: "text-primary",
+      };
+
   const cards = [
     {
       label: t("latestFinalBalance"),
@@ -42,17 +65,12 @@ export function EvolutionKpiCards({ summary }: Props) {
       Icon: TrendingUp,
       className: summary.totalSaved >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400",
     },
-    {
-      label: t("accumulatedInvested"),
-      value: formatCurrency(summary.accumulatedInvested, locale),
-      note: t("accumulatedInvestedNote"),
-      Icon: PiggyBank,
-      className: "text-primary",
-    },
+    investedCard,
     {
       label: t("averageSavingsPerYear"),
       value: formatCurrency(summary.averageSavingsPerYear, locale),
       note: t("averageSavingsPerYearNote"),
+      tag: undefined as string | undefined,
       Icon: CalendarDays,
       className: summary.averageSavingsPerYear >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400",
     },
@@ -60,6 +78,7 @@ export function EvolutionKpiCards({ summary }: Props) {
       label: t("bestYear"),
       value: summary.bestYear ? String(summary.bestYear.year) : t("notAvailable"),
       note: summary.bestYear ? t("bestYearNote", { amount: formatCurrency(summary.bestYear.savedAmount, locale) }) : t("bestYearEmpty"),
+      tag: undefined as string | undefined,
       Icon: Award,
       className: "text-foreground",
     },

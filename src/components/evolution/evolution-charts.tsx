@@ -8,17 +8,26 @@ import { formatCurrency } from "@/lib/utils";
 
 interface Props {
   metrics: EvolutionYearMetric[];
+  estimatedValues?: { year: number; estimatedPortfolioValue: number }[] | null;
 }
 
 function axisCurrency(value: number) {
   return `${(value / 1000).toFixed(0)}k`;
 }
 
-export function EvolutionCharts({ metrics }: Props) {
+export function EvolutionCharts({ metrics, estimatedValues }: Props) {
   const t = useTranslations("Evolution.charts");
   const locale = useLocale();
 
-  const balanceData = metrics.map((m) => ({ ...m, totalWealth: m.finalBalance + m.accumulatedInvested }));
+  const balanceData = metrics.map((m, idx) => {
+    const ep = estimatedValues?.[idx]?.estimatedPortfolioValue;
+    return {
+      ...m,
+      totalWealth: m.finalBalance + m.accumulatedInvested,
+      estimatedPortfolioValue: ep,
+      estimatedTotalWealth: ep !== undefined ? m.finalBalance + ep : undefined,
+    };
+  });
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -38,8 +47,17 @@ export function EvolutionCharts({ metrics }: Props) {
                 <Tooltip formatter={(value) => formatCurrency(Number(value), locale)} />
                 <Legend wrapperStyle={{ fontSize: 11, paddingTop: 8 }} />
                 <Line name={t("balanceLabel")} type="monotone" dataKey="finalBalance" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} stroke="var(--color-primary)" />
-                <Line name={t("accumulatedInvestedLabel")} type="monotone" dataKey="accumulatedInvested" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} stroke="var(--color-chart-2)" strokeDasharray="5 3" />
-                <Line name={t("totalWealthLabel")} type="monotone" dataKey="totalWealth" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} stroke="var(--color-chart-4)" strokeDasharray="2 2" />
+                {estimatedValues ? (
+                  <>
+                    <Line name={t("estimatedPortfolioLabel")} type="monotone" dataKey="estimatedPortfolioValue" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} stroke="var(--color-chart-2)" strokeDasharray="5 3" />
+                    <Line name={t("estimatedTotalWealthLabel")} type="monotone" dataKey="estimatedTotalWealth" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} stroke="var(--color-chart-4)" strokeDasharray="2 2" />
+                  </>
+                ) : (
+                  <>
+                    <Line name={t("accumulatedInvestedLabel")} type="monotone" dataKey="accumulatedInvested" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} stroke="var(--color-chart-2)" strokeDasharray="5 3" />
+                    <Line name={t("totalWealthLabel")} type="monotone" dataKey="totalWealth" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} stroke="var(--color-chart-4)" strokeDasharray="2 2" />
+                  </>
+                )}
               </LineChart>
             </ResponsiveContainer>
             </div>

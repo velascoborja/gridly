@@ -1,16 +1,19 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { summarizeEvolutionMetrics, type EvolutionYearMetric } from "@/lib/evolution";
+import { Input } from "@/components/ui/input";
+import { calcEstimatedPortfolioValues, summarizeEvolutionMetrics, type EvolutionYearMetric } from "@/lib/evolution";
 import type { HistoricalYear } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
 import { EvolutionCharts } from "./evolution-charts";
 import { EvolutionDetailTable } from "./evolution-detail-table";
 import { HistoricalYearDialog } from "./historical-year-dialog";
 import { EvolutionKpiCards } from "./evolution-kpi-cards";
+
+const STORAGE_KEY = "evolution_return_rate";
 
 interface Props {
   metrics: EvolutionYearMetric[];
@@ -23,7 +26,45 @@ export function EvolutionDashboard({ metrics, historicalYears }: Props) {
   const summary = summarizeEvolutionMetrics(metrics);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingHistoricalYear, setEditingHistoricalYear] = useState<HistoricalYear | null>(null);
+  const [returnRate, setReturnRate] = useState<number | null>(null);
   const showEmptyState = metrics.length < 2;
+
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored !== null) {
+      const parsed = parseFloat(stored);
+      if (!isNaN(parsed)) setReturnRate(parsed);
+    }
+  }, []);
+
+  function handleRateChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const raw = e.target.value;
+    if (raw === "") {
+      setReturnRate(null);
+      localStorage.removeItem(STORAGE_KEY);
+    } else {
+      const parsed = parseFloat(raw);
+      if (!isNaN(parsed)) {
+        setReturnRate(parsed);
+        localStorage.setItem(STORAGE_KEY, String(parsed));
+      }
+    }
+  }
+
+  const estimatedValues =
+    returnRate !== null && metrics.length > 0
+      ? calcEstimatedPortfolioValues(metrics, returnRate)
+      : null;
+
+  const latestEstimatedPortfolio = estimatedValues?.at(-1)?.estimatedPortfolioValue ?? null;
+  const displayedWealth =
+    latestEstimatedPortfolio !== null
+      ? summary.latestFinalBalance + latestEstimatedPortfolio
+      : summary.totalWealth;
+  const wealthNote =
+    returnRate !== null
+      ? t("totalWealthNoteWithRate", { rate: returnRate })
+      : t("totalWealthNote");
 
   return (
     <div className="space-y-4 sm:space-y-5">
@@ -54,11 +95,38 @@ export function EvolutionDashboard({ metrics, historicalYears }: Props) {
             {t("totalWealth")}
           </p>
           <p className="finance-number mt-1.5 text-3xl font-light tracking-[-0.04em] text-primary sm:mt-2 sm:text-4xl md:text-5xl">
-            {formatCurrency(summary.totalWealth, locale)}
+            {formatCurrency(displayedWealth, locale)}
           </p>
-          <p className="mt-1.5 text-xs text-muted-foreground sm:mt-2">{t("totalWealthNote")}</p>
+          <p className="mt-1.5 text-xs text-muted-foreground sm:mt-2">{wealthNote}</p>
+          <div className="mt-3 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 border-t border-primary/15 pt-3">
+            <label
+              htmlFor="evolution-return-rate"
+              className="text-xs font-medium text-muted-foreground"
+            >
+              {t("returnRateLabel")}
+            </label>
+            <div className="flex items-center gap-1.5">
+              <Input
+                id="evolution-return-rate"
+                type="number"
+                min="-100"
+                max="1000"
+                step="0.1"
+                value={returnRate ?? ""}
+                onChange={handleRateChange}
+                placeholder={t("returnRatePlaceholder")}
+                className="h-7 w-20 px-2 text-right text-xs"
+              />
+              <span className="text-xs text-muted-foreground">%</span>
+            </div>
+            <span className="text-xs text-muted-foreground">{t("returnRateNote")}</span>
+          </div>
         </div>
-        <EvolutionKpiCards summary={summary} />
+        <EvolutionKpiCards
+          summary={summary}
+          estimatedPortfolioValue={latestEstimatedPortfolio}
+          returnRate={returnRate}
+        />
       </section>
 
       {showEmptyState ? (
@@ -85,7 +153,7 @@ export function EvolutionDashboard({ metrics, historicalYears }: Props) {
         </section>
       ) : (
         <>
-          <EvolutionCharts metrics={metrics} />
+          <EvolutionCharts metrics={metrics} estimatedValues={estimatedValues} />
           <EvolutionDetailTable
             metrics={metrics}
             historicalYears={historicalYears}

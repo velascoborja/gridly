@@ -18,7 +18,7 @@ If the computed metrics result in fewer than two years, the route still renders.
 
 ## Computation Layer
 
-`src/lib/evolution.ts` exports two functions:
+`src/lib/evolution.ts` exports three functions:
 
 **`deriveEvolutionMetrics(sources: EvolutionMetricSource[]): EvolutionYearMetric[]`**
 
@@ -34,6 +34,10 @@ Collapses the per-year metrics into a single summary object used by the KPI card
 - `accumulatedInvested`: `accumulatedInvested` of the most recent eligible year.
 - `totalWealth`: latest eligible final balance plus accumulated invested.
 - `bestYear`: the year with the highest `savedAmount`. `null` when there are no years.
+
+**`calcEstimatedPortfolioValues(metrics: EvolutionYearMetric[], annualReturnRatePct: number)`**
+
+Returns a per-year array of `{ year, estimatedPortfolioValue }`. For each year Y, `estimatedPortfolioValue` is the sum of all `investedAmount` values up to and including year Y, each compounded forward from its investment year to Y at the given annual rate: `investedAmount * (1 + rate/100)^(Y - investmentYear)`. Used when the user has entered a return rate assumption.
 
 ## Metric Definitions (`EvolutionYearMetric`)
 
@@ -69,13 +73,22 @@ Five cards derived from `EvolutionSummary`:
 
 1. **Latest Balance** (`latestFinalBalance`) — December ending balance of the most recent eligible year.
 2. **Total Saved** (`totalSaved`) — Cumulative savings across eligible years. Value is colored green when ≥ 0, red when negative.
-3. **Accumulated Investment** (`accumulatedInvested`) — Invested total up to the current year.
+3. **Accumulated Investment / Estimated Portfolio** — Without a return rate: shows raw `accumulatedInvested`. When a return rate is set: shows `estimatedPortfolioValue` (compounded estimate) as the primary value, with the raw invested amount shown as a tag underneath.
 4. **Average Annual Savings** (`averageSavingsPerYear`) — Mean savings across eligible years.
 5. **Best Year** (`bestYear`) — The year with the highest `savedAmount`. Shows the year number as the primary value and the saved amount in the note. Displays "N/A" when undefined.
 
+### Investment Return Rate
+
+The user can enter an annual return rate (%) directly in the Total Wealth box. The value is persisted in `localStorage` under the key `evolution_return_rate`. When set:
+
+- The Total Wealth figure updates to `latestFinalBalance + estimatedPortfolioValue` (instead of raw `accumulatedInvested`).
+- The wealth note changes to describe the assumed rate.
+- Card 3 shows the estimated portfolio value.
+- The balance chart swaps its accumulated-investment and wealth lines for estimated equivalents.
+
 ### Charts
 
-1. **Final Balance (LineChart)** — Year-over-year trend with three lines: `finalBalance` (primary color), `accumulatedInvested` (teal, dashed), and `totalWealth` = `finalBalance + accumulatedInvested` (orange, dotted). A legend labels each line. One data point per year.
+1. **Final Balance (LineChart)** — Year-over-year trend. Without a return rate: three lines — `finalBalance` (primary), `accumulatedInvested` (teal, dashed), `totalWealth` (orange, dotted). With a return rate: `finalBalance` (primary), `estimatedPortfolioValue` (teal, dashed), `estimatedTotalWealth` (orange, dotted). A legend labels each line.
 2. **Savings per Year (BarChart)** — `savedAmount` per year. Bars are green when `savedAmount ≥ 0` and red when negative.
 3. **Investment per Year (BarChart)** — `investedAmount` per year in primary color.
 

@@ -91,6 +91,20 @@ export function deriveEvolutionMetrics(sources: EvolutionMetricSource[]): Evolut
   return metrics;
 }
 
+export function calcEstimatedPortfolioValues(
+  metrics: EvolutionYearMetric[],
+  annualReturnRatePct: number
+): { year: number; estimatedPortfolioValue: number }[] {
+  return metrics.map((_, idx) => {
+    const viewYear = metrics[idx].year;
+    const estimatedPortfolioValue = metrics.slice(0, idx + 1).reduce((sum, m) => {
+      const yearsGrown = viewYear - m.year;
+      return sum + m.investedAmount * Math.pow(1 + annualReturnRatePct / 100, yearsGrown);
+    }, 0);
+    return { year: viewYear, estimatedPortfolioValue };
+  });
+}
+
 export function summarizeEvolutionMetrics(metrics: EvolutionYearMetric[]): EvolutionSummary {
   const latest = metrics.at(-1);
   const best = metrics.reduce<EvolutionYearMetric | null>((currentBest, metric) => {
