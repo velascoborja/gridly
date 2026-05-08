@@ -7,6 +7,7 @@ import { getYearData, getYearsForUser } from "@/lib/server/year-data";
 import { getSessionUser } from "@/lib/server/session";
 import { getOwnedYear } from "@/lib/server/ownership";
 
+
 function yearConfigFromRow(row: typeof years.$inferSelect): YearConfig {
   return {
     id: row.id,
@@ -114,4 +115,30 @@ export async function PATCH(
 
   await propagateYearCarryOver(user.id, yearNum);
   return Response.json(updated);
+}
+
+export async function DELETE(
+  _request: Request,
+  { params }: { params: Promise<{ year: string }> }
+) {
+  const user = await getSessionUser();
+  if (!user?.id) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { year } = await params;
+  const yearNum = parseInt(year, 10);
+
+  const yearRow = await getOwnedYear(user.id, yearNum);
+  if (!yearRow) return Response.json({ error: "Year not found" }, { status: 404 });
+
+  await db.delete(years).where(eq(years.id, yearRow.id));
+
+  const remainingYears = (await getYearsForUser(user.id)).sort((a, b) => a - b);
+  const precedingYear = remainingYears.filter((y) => y < yearNum).at(-1);
+  if (precedingYear !== undefined) {
+    await propagateYearCarryOver(user.id, precedingYear);
+  }
+
+  return Response.json({ ok: true });
 }

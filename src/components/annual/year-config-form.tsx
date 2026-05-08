@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { Loader2 } from "lucide-react";
+import { AlertCircle, Loader2, Trash2 } from "lucide-react";
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { RecurringExpenseTemplateEditor } from "@/components/recurring-expenses/recurring-expense-template-editor";
 import { useRouter } from "@/i18n/routing";
@@ -17,6 +17,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { InlineEditField } from "@/components/monthly/inline-edit-field";
 import {
   Select,
@@ -69,10 +70,41 @@ export function YearConfigForm({
   const [recurringDialogOpen, setRecurringDialogOpen] = useState(false);
   const [pendingOverwrite, setPendingOverwrite] = useState<PendingOverwrite | null>(null);
   const [applyFromMonth, setApplyFromMonth] = useState(1);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteStep, setDeleteStep] = useState<"impact" | "typed">("impact");
+  const [deleteConfirmationText, setDeleteConfirmationText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   useEffect(() => {
     setRecurringDraft(recurringExpenses.map((entry) => ({ label: entry.label, amount: entry.amount })));
   }, [recurringExpenses]);
+  const requiredDeletePhrase = String(config.year);
+  const canConfirmDeletion = deleteConfirmationText.trim() === requiredDeletePhrase;
+
+  function handleDeleteDialogOpenChange(open: boolean) {
+    if (isDeleting) return;
+    setDeleteDialogOpen(open);
+    if (!open) {
+      setDeleteStep("impact");
+      setDeleteConfirmationText("");
+      setDeleteError("");
+    }
+  }
+
+  async function handleDeleteYear() {
+    setDeleteError("");
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`/api/years/${config.year}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete");
+      router.replace("/");
+    } catch {
+      setDeleteError(t("deleteYearError"));
+      setIsDeleting(false);
+    }
+  }
+
   const displayedHasExtraPayments = optimisticExtraPayments ?? config.hasExtraPayments;
   const isSavingField = (field: keyof YearConfig) => savingFields.has(field);
   const monthFormatter = new Intl.DateTimeFormat(locale, { month: "long" });
@@ -419,6 +451,108 @@ export function YearConfigForm({
               </AlertDialogContent>
             </AlertDialog>
           </div>
+
+          <section className="rounded-lg border border-destructive/20 bg-destructive/[0.02] p-4 shadow-sm">
+            <div className="mb-4 flex items-center gap-2 text-destructive">
+              <AlertCircle className="size-4 shrink-0" />
+              <h3 className="text-sm font-medium">{t("deleteYearDangerZoneTitle")}</h3>
+            </div>
+            <p className="mb-4 text-sm leading-6 text-muted-foreground">
+              {t("deleteYearDangerZoneDescription")}
+            </p>
+            <AlertDialog open={deleteDialogOpen} onOpenChange={handleDeleteDialogOpenChange}>
+              <AlertDialogTrigger
+                render={
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    disabled={isDeleting}
+                    className="gap-2 rounded-xl shadow-sm"
+                  >
+                    <Trash2 className="size-4" />
+                    {t("deleteYear")}
+                  </Button>
+                }
+              />
+              <AlertDialogContent>
+                {deleteStep === "impact" ? (
+                  <>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>{t("deleteYearTitle", { year: config.year })}</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        {t("deleteYearDialogDescription", { year: config.year })}
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel disabled={isDeleting}>
+                        {t("recurringExpensesCancel")}
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        variant="destructive"
+                        onClick={() => setDeleteStep("typed")}
+                        disabled={isDeleting}
+                        className="gap-2"
+                      >
+                        <AlertCircle className="size-4" />
+                        {t("deleteYearContinue")}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </>
+                ) : (
+                  <>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>{t("deleteYearSecondTitle")}</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        {t("deleteYearSecondDescription", { year: config.year, phrase: requiredDeletePhrase })}
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <div className="space-y-2">
+                      <label
+                        htmlFor="delete-year-confirmation"
+                        className="text-sm font-medium text-foreground"
+                      >
+                        {t("deleteYearConfirmationLabel")}
+                      </label>
+                      <Input
+                        id="delete-year-confirmation"
+                        value={deleteConfirmationText}
+                        onChange={(event) => setDeleteConfirmationText(event.target.value)}
+                        disabled={isDeleting}
+                        autoComplete="off"
+                        aria-describedby="delete-year-confirmation-hint"
+                      />
+                      <p
+                        id="delete-year-confirmation-hint"
+                        className="text-xs text-muted-foreground"
+                      >
+                        {t("deleteYearConfirmationHint", { phrase: requiredDeletePhrase })}
+                      </p>
+                    </div>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel disabled={isDeleting}>
+                        {t("recurringExpensesCancel")}
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        variant="destructive"
+                        onClick={() => void handleDeleteYear()}
+                        disabled={isDeleting || !canConfirmDeletion}
+                        aria-busy={isDeleting}
+                        className="gap-2"
+                      >
+                        <Trash2 className="size-4" />
+                        {isDeleting ? t("deleteYearDeleting") : t("deleteYear")}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </>
+                )}
+              </AlertDialogContent>
+            </AlertDialog>
+            {deleteError ? (
+              <p className="mt-3 text-sm text-destructive" role="alert">
+                {deleteError}
+              </p>
+            ) : null}
+          </section>
         </div>
       </div>
     </div>

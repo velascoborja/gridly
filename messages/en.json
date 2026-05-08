@@ -114,7 +114,19 @@
       "sectionMonthlyAllocation": "Monthly allocation",
       "sectionMonthlyAllocationDescription": "Groups the fixed amounts repeated every month.",
       "sectionGrowth": "Growth",
-      "sectionGrowthDescription": "Controls the annual return used to project interest."
+      "sectionGrowthDescription": "Controls the annual return used to project interest.",
+      "deleteYear": "Delete exercise",
+      "deleteYearDangerZoneTitle": "Danger zone",
+      "deleteYearDangerZoneDescription": "Deleting the exercise will permanently remove all 12 months, recurring expenses, and every entry recorded. This action cannot be undone.",
+      "deleteYearTitle": "Delete exercise {year}?",
+      "deleteYearDialogDescription": "This will delete all 12 months, recurring expenses, and every entry in {year}. If later exercises exist, their starting balance will be recalculated automatically.",
+      "deleteYearContinue": "Continue",
+      "deleteYearSecondTitle": "Final confirmation",
+      "deleteYearSecondDescription": "To permanently delete exercise {year}, type {phrase}.",
+      "deleteYearConfirmationLabel": "Confirmation text",
+      "deleteYearConfirmationHint": "Type {phrase} to enable deletion.",
+      "deleteYearDeleting": "Deleting...",
+      "deleteYearError": "Could not delete the exercise. Check the connection and try again."
     }
   },
   "Setup": {

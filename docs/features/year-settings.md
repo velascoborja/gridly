@@ -118,3 +118,16 @@ The setup prefill logic in `createAndPrefillYear` follows these rules:
 ### Interest Calculation
 Interests are typically calculated based on the `interestRate` and the monthly balance, unless manually overridden.
 When a year setup value is saved from the annual summary, monthly interest overrides are cleared so the updated annual setup controls the projected balance chain.
+
+## Year Deletion
+
+A year and all its data can be permanently deleted from the Year Configuration panel in the Annual Summary.
+
+- **Endpoint:** `DELETE /api/years/[year]`.
+- **Ownership:** The API validates that the requesting user owns the year before deleting.
+- **Cascade:** Deleting a year cascades to all 12 months, recurring expense templates, monthly recurring expense copies, and additional entries via DB foreign key `onDelete: "cascade"`.
+- **Carry-over repair:** After deletion the API finds the nearest preceding year (if any) and calls `propagateYearCarryOver` so that any later years have their starting balances recalculated from the updated chain.
+- **UI flow:** Two-step confirmation dialog (identical pattern to account deletion):
+  1. **Impact step** — describes what will be deleted irreversibly.
+  2. **Typed confirmation step** — user must type the year number (e.g., `2026`) to unlock the final delete button.
+- **Post-deletion navigation:** The client navigates to the locale root (`/`), which redirects to the next available year or the landing page.

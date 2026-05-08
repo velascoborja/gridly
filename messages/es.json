@@ -114,7 +114,19 @@
       "sectionMonthlyAllocation": "Distribución mensual",
       "sectionMonthlyAllocationDescription": "Agrupa los importes fijos que se repiten cada mes.",
       "sectionGrowth": "Crecimiento",
-      "sectionGrowthDescription": "Controla la rentabilidad anual usada para proyectar intereses."
+      "sectionGrowthDescription": "Controla la rentabilidad anual usada para proyectar intereses.",
+      "deleteYear": "Eliminar ejercicio",
+      "deleteYearDangerZoneTitle": "Zona de peligro",
+      "deleteYearDangerZoneDescription": "Eliminar el ejercicio borrará definitivamente los 12 meses, los gastos recurrentes y todas las entradas registradas. Esta acción no se puede deshacer.",
+      "deleteYearTitle": "¿Eliminar el ejercicio {year}?",
+      "deleteYearDialogDescription": "Se eliminarán los 12 meses, los gastos recurrentes y todas las entradas de {year}. Si hay ejercicios posteriores, su saldo inicial se recalculará automáticamente.",
+      "deleteYearContinue": "Continuar",
+      "deleteYearSecondTitle": "Última confirmación",
+      "deleteYearSecondDescription": "Para confirmar que quieres eliminar el ejercicio {year} definitivamente, escribe {phrase}.",
+      "deleteYearConfirmationLabel": "Texto de confirmación",
+      "deleteYearConfirmationHint": "Escribe {phrase} para activar la eliminación.",
+      "deleteYearDeleting": "Eliminando...",
+      "deleteYearError": "No se ha podido eliminar el ejercicio. Revisa la conexión e inténtalo de nuevo."
     }
   },
   "Setup": {
