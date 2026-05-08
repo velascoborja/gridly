@@ -129,6 +129,10 @@ export async function DELETE(
   const { year } = await params;
   const yearNum = parseInt(year, 10);
 
+  if (yearNum <= new Date().getFullYear()) {
+    return Response.json({ error: "Only future years can be deleted" }, { status: 403 });
+  }
+
   const yearRow = await getOwnedYear(user.id, yearNum);
   if (!yearRow) return Response.json({ error: "Year not found" }, { status: 404 });
 

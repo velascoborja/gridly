@@ -79,6 +79,7 @@ export function YearConfigForm({
   useEffect(() => {
     setRecurringDraft(recurringExpenses.map((entry) => ({ label: entry.label, amount: entry.amount })));
   }, [recurringExpenses]);
+  const isFutureYear = config.year > new Date().getFullYear();
   const requiredDeletePhrase = String(config.year);
   const canConfirmDeletion = deleteConfirmationText.trim() === requiredDeletePhrase;
 
@@ -452,7 +453,7 @@ export function YearConfigForm({
             </AlertDialog>
           </div>
 
-          <section className="rounded-lg border border-destructive/20 bg-destructive/[0.02] p-4 shadow-sm">
+          {isFutureYear ? <section className="rounded-lg border border-destructive/20 bg-destructive/[0.02] p-4 shadow-sm">
             <div className="mb-4 flex items-center gap-2 text-destructive">
               <AlertCircle className="size-4 shrink-0" />
               <h3 className="text-sm font-medium">{t("deleteYearDangerZoneTitle")}</h3>
@@ -552,7 +553,7 @@ export function YearConfigForm({
                 {deleteError}
               </p>
             ) : null}
-          </section>
+          </section> : null}
         </div>
       </div>
     </div>
