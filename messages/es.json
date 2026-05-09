@@ -244,6 +244,35 @@
       "deleteEntry": "Eliminar gasto recurrente {label}"
     }
   },
+  "FAQ": {
+    "title": "Preguntas frecuentes",
+    "items": [
+      {
+        "question": "¿Qué es Gridly?",
+        "answer": "Gridly es un planificador financiero personal que conecta tus ingresos, gastos y ahorro mensual en un ejercicio anual claro. Gestiona las pagas extra automáticamente y permite exportar el año completo a Excel."
+      },
+      {
+        "question": "¿Cómo registro mis ingresos y gastos mensuales?",
+        "answer": "Cada mes tiene su propia vista donde introduces el salario, los gastos fijos como alquiler y suministros, y cualquier movimiento adicional. Gridly calcula el ahorro mensual y el saldo final de forma automática."
+      },
+      {
+        "question": "¿Cómo funciona con las pagas extra?",
+        "answer": "Gridly añade automáticamente una paga extra en junio y en diciembre, equivalente a tu salario estimado. Esto refleja el convenio habitual de 14 pagas anuales en el mercado laboral español."
+      },
+      {
+        "question": "¿Puedo ver cómo evoluciona mi ahorro a lo largo del año?",
+        "answer": "Sí. El panel de Evolución muestra tu saldo, ahorro e inversiones en varios años en formato gráfico, para que puedas seguir tu progreso financiero a largo plazo de un vistazo."
+      },
+      {
+        "question": "¿Gridly es gratuito?",
+        "answer": "Sí, Gridly es gratuito. Inicia sesión con tu cuenta de Google y empieza a planificar tus finanzas de inmediato, sin necesidad de tarjeta de crédito."
+      },
+      {
+        "question": "¿Puedo exportar mis datos financieros?",
+        "answer": "Sí. Puedes exportar cualquier año como un libro de Excel con el desglose mensual, totales y gráficos, listo para revisar sin conexión o para compartir."
+      }
+    ]
+  },
   "Landing": {
     "heroEyebrow": "Planificador financiero anual",
     "heroTitle": "Planifica tu año financiero mes a mes.",

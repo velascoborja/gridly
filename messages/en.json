@@ -244,6 +244,35 @@
       "deleteEntry": "Remove recurring expense {label}"
     }
   },
+  "FAQ": {
+    "title": "Frequently asked questions",
+    "items": [
+      {
+        "question": "What is Gridly?",
+        "answer": "Gridly is a personal finance tracker that connects your monthly income, expenses and savings into a clear annual picture. It handles extra pay periods automatically and lets you export your full year to Excel."
+      },
+      {
+        "question": "How do I track my monthly income and expenses?",
+        "answer": "Each month has its own view where you enter your salary, fixed expenses like rent and utilities, and any additional one-off transactions. Gridly calculates your monthly savings and ending balance automatically."
+      },
+      {
+        "question": "How does Gridly handle extra pay periods?",
+        "answer": "Gridly automatically adds an extra payslip in June and December, matching your estimated salary. This reflects the standard Spanish employment convention of 14 pay periods per year."
+      },
+      {
+        "question": "Can I see how my savings evolve over the year?",
+        "answer": "Yes. The Evolution dashboard shows your balance, savings and investments across multiple years in chart form, so you can track your long-term financial progress at a glance."
+      },
+      {
+        "question": "Is Gridly free?",
+        "answer": "Yes, Gridly is free to use. Sign in with your Google account and start planning your finances immediately — no credit card required."
+      },
+      {
+        "question": "Can I export my financial data?",
+        "answer": "Yes. You can export any year as a fully formatted Excel workbook with monthly breakdowns, totals and charts, ready for offline review or sharing."
+      }
+    ]
+  },
   "Landing": {
     "heroEyebrow": "Annual finance planner",
     "heroTitle": "Plan your financial year month by month.",
