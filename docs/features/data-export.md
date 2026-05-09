@@ -11,6 +11,7 @@ Users can export their entire year's data into a formatted Excel workbook. This 
 - **Library:** Uses `ExcelJS` to generate the `.xlsx` file.
 - **API:** `GET /api/years/[year]/export`.
 - **Localization:** The export logic respects the user's locale (Spanish or English) for sheet names and labels.
+- **Sensitive text:** Exports use `getYearData`, so encrypted labels are decrypted on the server before workbook generation. The exported workbook keeps the same user-visible labels as the app UI.
 
 ## Workbook Structure
 

@@ -96,3 +96,4 @@ When changing any of the features listed below, update the related documentation
 - [App Icons & Web App Metadata](docs/features/app-icons.md): Browser, manifest, and iOS Safari icon asset conventions.
 - [Evolution Dashboard](docs/features/evolution-dashboard.md): Multi-year balance, savings, and investment analytics.
 - [Historical Year Imports](docs/features/historical-year-imports.md): Summary-only pre-Gridly annual imports used by Evolution.
+- [Sensitive Text Encryption](docs/features/sensitive-text-encryption.md): Application-level encryption for identity and free-text fields stored in the database.

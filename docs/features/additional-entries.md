@@ -22,6 +22,7 @@ Each entry consists of:
     - `PATCH /api/months/[monthId]/entries/[entryId]`: Edit an entry label/amount or move it to another month by sending `monthId`.
     - `DELETE /api/months/[monthId]/entries/[entryId]`: Remove an entry.
 - **Moving Entries:** In editable monthly views, additional income and expense rows can be dragged onto another month in the month strip. Moving changes the entry's owning month only; it does not copy or duplicate the entry. Moves are restricted to months in the same year.
+- **Sensitive text:** Additional entry labels are encrypted at rest. API routes encrypt labels before database writes and decrypt labels before returning existing `AdditionalEntry` response shapes to the client.
 - **Integration:** The sum of all additional income and expenses is automatically factored into the `totalIncome` and `totalExpenses` calculations in `src/lib/calculations.ts`.
 
 ## Year Summary View
