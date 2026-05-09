@@ -293,6 +293,11 @@
       "totalExpenses": "Total expenses",
       "monthlySavings": "Monthly savings",
       "endingBalance": "Ending balance"
+    },
+    "footer": {
+      "copyright": "© 2026 Borja Velasco",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service"
     }
   },
   "Demo": {
@@ -539,5 +544,77 @@
     "additionalPayslip": "Extra pay",
     "interests": "Interests",
     "personalRemaining": "Personal surplus"
+  },
+  "Privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: May 9, 2026",
+    "controller": {
+      "title": "Data Controller",
+      "body": "Borja Velasco is the controller of your personal data. For any enquiry, contact privacy@appgridly.com."
+    },
+    "data": {
+      "title": "Data We Collect",
+      "body": "Via Google OAuth we collect your name, email address, and profile picture. We also store the financial data you enter directly: income, expenses, savings, and monthly balances."
+    },
+    "basis": {
+      "title": "Legal Basis",
+      "body": "Processing is based on contract performance (Art. 6(1)(b) GDPR). The data is necessary to provide the financial tracking service."
+    },
+    "retention": {
+      "title": "Retention",
+      "body": "Your data is kept for as long as your account is active. When you delete your account from the app settings, all data is permanently and irrecoverably erased."
+    },
+    "recipients": {
+      "title": "Recipients",
+      "body": "We only share data with providers necessary to deliver the service: Google LLC (authentication via OAuth) and Neon (Databricks) (database hosting)."
+    },
+    "rights": {
+      "title": "Your Rights",
+      "body": "You have the right to access, rectify, erase, restrict processing, and port your data. You can delete your account directly from the app settings. For any other request, write to privacy@appgridly.com. You may also lodge a complaint with the Spanish Data Protection Agency at aepd.es."
+    },
+    "changes": {
+      "title": "Changes to This Policy",
+      "body": "Material changes will be communicated through the app. Continued use of the service after notification constitutes acceptance."
+    }
+  },
+  "Terms": {
+    "title": "Terms of Service",
+    "lastUpdated": "Last updated: May 9, 2026",
+    "description": {
+      "title": "Service Description",
+      "body": "Gridly is a personal finance tracking tool. It does not constitute financial, tax, or investment advice."
+    },
+    "age": {
+      "title": "Minimum Age",
+      "body": "You must be at least 16 years old to use Gridly."
+    },
+    "use": {
+      "title": "Acceptable Use",
+      "body": "Gridly is intended for personal use only. Scraping, unauthorized access, or any use that violates the law or harms others is prohibited."
+    },
+    "account": {
+      "title": "Your Account",
+      "body": "You are responsible for the security of your Google account. One account per person is permitted."
+    },
+    "availability": {
+      "title": "Service Availability",
+      "body": "The service is provided as-is. The operator may modify, suspend, or discontinue the service at any time, with reasonable prior notice where possible."
+    },
+    "liability": {
+      "title": "Limitation of Liability",
+      "body": "Gridly is an individually developed personal project provided without warranties of any kind. The operator is not liable for financial decisions made based on data from the app."
+    },
+    "law": {
+      "title": "Governing Law",
+      "body": "These terms are governed by the laws of Spain. Any disputes shall be submitted to the courts of Spain."
+    },
+    "changes": {
+      "title": "Changes to Terms",
+      "body": "Material changes will be communicated through the app. Continued use of the service constitutes acceptance of the updated terms."
+    },
+    "contact": {
+      "title": "Contact",
+      "body": "For any questions related to these terms, contact us at privacy@appgridly.com."
+    }
   }
 }
