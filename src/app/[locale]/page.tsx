@@ -20,6 +20,7 @@ const LOCALE_META = {
       "ahorro mensual",
       "nómina pagas extra",
     ],
+    ogLocale: "es_ES",
   },
   en: {
     title: "Gridly — Personal Finance Tracker",
@@ -32,6 +33,7 @@ const LOCALE_META = {
       "salary tracker",
       "savings tracker",
     ],
+    ogLocale: "en_US",
   },
 } as const;
 
@@ -59,6 +61,7 @@ export async function generateMetadata({
       title: meta.title,
       description: meta.description,
       url: `${BASE_URL}/${locale}`,
+      locale: meta.ogLocale,
     },
     twitter: {
       title: meta.title,

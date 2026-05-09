@@ -50,7 +50,12 @@ test("layout exports openGraph metadata for the landing page", async () => {
     /siteName\s*:\s*['"]Gridly['"]/,
     "openGraph siteName should be Gridly"
   );
-  assert.match(layout, /es_ES/, "openGraph locale should be es_ES");
+});
+
+test("landing page generateMetadata sets locale-specific openGraph locale", async () => {
+  const page = await readSource("src/app/[locale]/page.tsx");
+  assert.match(page, /es_ES/, "ES landing page should set openGraph locale to es_ES");
+  assert.match(page, /en_US/, "EN landing page should set openGraph locale to en_US");
 });
 
 test("layout exports twitter card metadata", async () => {
