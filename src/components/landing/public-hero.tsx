@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { getDemoHref } from "@/lib/demo/demo-year";
 import { cn } from "@/lib/utils";
+import { FAQSection } from "./faq-section";
 
 interface PublicHeroProps {
   accountDeleted?: boolean;
@@ -213,6 +214,8 @@ export function PublicHero({ accountDeleted = false, authError = false }: Public
             </article>
           ))}
         </section>
+
+        <FAQSection />
 
         <footer className="mt-10 flex items-center gap-4 text-xs font-light text-[#64748d] lg:mt-14">
           <span>{t("footer.copyright", { year: new Date().getFullYear() })}</span>
