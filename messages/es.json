@@ -293,6 +293,11 @@
       "totalExpenses": "Gastos totales",
       "monthlySavings": "Ahorro del mes",
       "endingBalance": "Saldo final"
+    },
+    "footer": {
+      "copyright": "© 2026 Borja Velasco",
+      "privacy": "Política de privacidad",
+      "terms": "Términos de uso"
     }
   },
   "Demo": {
@@ -539,5 +544,77 @@
     "additionalPayslip": "Paga extra",
     "interests": "Intereses",
     "personalRemaining": "Sobrante propios"
+  },
+  "Privacy": {
+    "title": "Política de Privacidad",
+    "lastUpdated": "Última actualización: 9 de mayo de 2026",
+    "controller": {
+      "title": "Responsable del tratamiento",
+      "body": "Borja Velasco es el responsable del tratamiento de tus datos personales. Para cualquier consulta, contacta en privacy@appgridly.com."
+    },
+    "data": {
+      "title": "Datos que recopilamos",
+      "body": "A través de Google OAuth recopilamos tu nombre, dirección de correo electrónico y foto de perfil. Además, almacenamos los datos financieros que introduces directamente: ingresos, gastos, ahorros y saldos mensuales."
+    },
+    "basis": {
+      "title": "Base legal",
+      "body": "El tratamiento se basa en la ejecución del contrato (Art. 6.1.b RGPD). Los datos son necesarios para prestarte el servicio de seguimiento financiero."
+    },
+    "retention": {
+      "title": "Conservación",
+      "body": "Tus datos se conservan mientras tu cuenta esté activa. Al eliminar tu cuenta desde los ajustes de la aplicación, todos tus datos se borran de forma definitiva e irrecuperable."
+    },
+    "recipients": {
+      "title": "Destinatarios",
+      "body": "Compartimos datos únicamente con los proveedores necesarios para prestar el servicio: Google LLC (autenticación mediante OAuth) y Neon (Databricks) (alojamiento de la base de datos)."
+    },
+    "rights": {
+      "title": "Tus derechos",
+      "body": "Tienes derecho a acceder, rectificar, suprimir, limitar el tratamiento y portar tus datos. Puedes eliminar tu cuenta directamente desde los ajustes de la aplicación. Para cualquier otra solicitud, escribe a privacy@appgridly.com. También puedes presentar una reclamación ante la Agencia Española de Protección de Datos en aepd.es."
+    },
+    "changes": {
+      "title": "Cambios en esta política",
+      "body": "Los cambios materiales se comunicarán a través de la aplicación. El uso continuado del servicio tras la notificación implica la aceptación."
+    }
+  },
+  "Terms": {
+    "title": "Términos de uso",
+    "lastUpdated": "Última actualización: 9 de mayo de 2026",
+    "description": {
+      "title": "Descripción del servicio",
+      "body": "Gridly es una herramienta personal de seguimiento de finanzas. No constituye asesoramiento financiero, fiscal ni de inversión."
+    },
+    "age": {
+      "title": "Edad mínima",
+      "body": "Para usar Gridly debes tener al menos 16 años."
+    },
+    "use": {
+      "title": "Uso aceptable",
+      "body": "Gridly está pensado para uso personal. Está prohibido el scraping, el acceso no autorizado o cualquier uso que infrinja la ley o perjudique a terceros."
+    },
+    "account": {
+      "title": "Tu cuenta",
+      "body": "Eres responsable de la seguridad de tu cuenta de Google. Se permite una cuenta por persona."
+    },
+    "availability": {
+      "title": "Disponibilidad del servicio",
+      "body": "El servicio se presta tal cual. El operador puede modificar, suspender o interrumpir el servicio en cualquier momento, con el aviso previo razonable cuando sea posible."
+    },
+    "liability": {
+      "title": "Limitación de responsabilidad",
+      "body": "Gridly es un proyecto personal desarrollado de forma individual, sin garantías de ningún tipo. El operador no se responsabiliza de las decisiones financieras tomadas a partir de los datos de la aplicación."
+    },
+    "law": {
+      "title": "Ley aplicable",
+      "body": "Estos términos se rigen por la legislación española. Cualquier litigio se someterá a los tribunales de España."
+    },
+    "changes": {
+      "title": "Cambios en los términos",
+      "body": "Los cambios materiales se comunicarán a través de la aplicación. El uso continuado del servicio implica la aceptación de los nuevos términos."
+    },
+    "contact": {
+      "title": "Contacto",
+      "body": "Para cualquier consulta relacionada con estos términos, contacta en privacy@appgridly.com."
+    }
   }
 }
