@@ -49,6 +49,7 @@ export const metadata: Metadata = {
     title: "Gridly",
     description: "Controla ingresos, gastos y ahorro con balances mensuales claros.",
     locale: "es_ES",
+    images: ["/opengraph-image.png"],
   },
   twitter: {
     card: "summary_large_image",
