@@ -295,7 +295,7 @@
       "endingBalance": "Ending balance"
     },
     "footer": {
-      "copyright": "© 2026 Borja Velasco",
+      "copyright": "© {year} Borja Velasco",
       "privacy": "Privacy Policy",
       "terms": "Terms of Service"
     }
@@ -570,7 +570,7 @@
     },
     "rights": {
       "title": "Your Rights",
-      "body": "You have the right to access, rectify, erase, restrict processing, and port your data. You can delete your account directly from the app settings. For any other request, write to privacy@appgridly.com. You may also lodge a complaint with the Spanish Data Protection Agency at aepd.es."
+      "body": "You have the right to access, rectify, erase, restrict processing, and port your data. You can delete your account directly from the app settings. For any other request, write to privacy@appgridly.com. You may also lodge a complaint with the Spanish Data Protection Agency at aepd.es. The right to object (Art. 21 GDPR) is limited during contract performance, as processing is necessary to provide the service."
     },
     "changes": {
       "title": "Changes to This Policy",

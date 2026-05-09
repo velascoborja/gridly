@@ -295,7 +295,7 @@
       "endingBalance": "Saldo final"
     },
     "footer": {
-      "copyright": "© 2026 Borja Velasco",
+      "copyright": "© {year} Borja Velasco",
       "privacy": "Política de privacidad",
       "terms": "Términos de uso"
     }
@@ -570,7 +570,7 @@
     },
     "rights": {
       "title": "Tus derechos",
-      "body": "Tienes derecho a acceder, rectificar, suprimir, limitar el tratamiento y portar tus datos. Puedes eliminar tu cuenta directamente desde los ajustes de la aplicación. Para cualquier otra solicitud, escribe a privacy@appgridly.com. También puedes presentar una reclamación ante la Agencia Española de Protección de Datos en aepd.es."
+      "body": "Tienes derecho a acceder, rectificar, suprimir, limitar el tratamiento y portar tus datos. Puedes eliminar tu cuenta directamente desde los ajustes de la aplicación. Para cualquier otra solicitud, escribe a privacy@appgridly.com. También puedes presentar una reclamación ante la Agencia Española de Protección de Datos en aepd.es. El derecho de oposición (Art. 21 RGPD) queda limitado durante la ejecución del contrato, dado que el tratamiento es necesario para prestarte el servicio."
     },
     "changes": {
       "title": "Cambios en esta política",
