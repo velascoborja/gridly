@@ -3,6 +3,7 @@ import { additionalEntries } from "@/db/schema";
 import { getYearNumberForYearId, propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getSessionUser } from "@/lib/server/session";
 import { getOwnedMonth } from "@/lib/server/ownership";
+import { parseProtectedAdditionalEntry, protectFreeTextLabel } from "@/lib/server/protected-finance-text";
 
 export async function POST(
   request: Request,
@@ -33,7 +34,7 @@ export async function POST(
   const [entry] = await db.insert(additionalEntries).values({
     monthId: ownedMonth.id,
     type,
-    label,
+    label: protectFreeTextLabel(label),
     amount: String(amount),
   }).returning();
 
@@ -42,5 +43,5 @@ export async function POST(
     await propagateYearCarryOver(user.id, yearNumber);
   }
 
-  return Response.json(entry, { status: 201 });
+  return Response.json(parseProtectedAdditionalEntry(entry), { status: 201 });
 }

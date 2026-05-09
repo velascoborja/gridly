@@ -11,6 +11,7 @@ import { computeMonthChain, estimatedMonthData } from "@/lib/calculations";
 import type { YearConfig } from "@/lib/types";
 import type { RecurringExpenseInput } from "@/lib/recurring-expenses";
 import { revalidatePath } from "next/cache";
+import { protectFreeTextLabel } from "@/lib/server/protected-finance-text";
 
 export async function createAndPrefillYear(data: {
   year: number;
@@ -67,13 +68,13 @@ export async function createAndPrefillYear(data: {
   // 2. Insert Recurring Expense Templates
   if (data.recurringExpenses.length > 0) {
     const recurringValues = data.recurringExpenses
+      .filter((entry) => String(entry.label ?? "").trim().length > 0)
       .map((entry, index) => ({
         yearId: yearRow.id,
-        label: String(entry.label ?? "").trim(),
+        label: protectFreeTextLabel(entry.label),
         amount: String(Number(entry.amount) || 0),
         sortOrder: index,
-      }))
-      .filter((entry) => entry.label.length > 0);
+      }));
 
     if (recurringValues.length > 0) {
       await db.insert(yearRecurringExpenses).values(recurringValues);

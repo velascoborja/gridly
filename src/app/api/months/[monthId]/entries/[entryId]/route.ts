@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { getYearNumberForYearId, propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getSessionUser } from "@/lib/server/session";
 import { getOwnedEntry, getOwnedMonth } from "@/lib/server/ownership";
+import { parseProtectedAdditionalEntry, protectFreeTextLabel } from "@/lib/server/protected-finance-text";
 
 export async function PATCH(
   request: Request,
@@ -20,7 +21,7 @@ export async function PATCH(
   const body = await request.json();
 
   const updates: Partial<typeof additionalEntries.$inferInsert> = {};
-  if (body.label !== undefined) updates.label = body.label;
+  if (body.label !== undefined) updates.label = protectFreeTextLabel(body.label);
   if (body.amount !== undefined) updates.amount = String(body.amount);
 
   const entry = await getOwnedEntry(user.id, id);
@@ -49,7 +50,7 @@ export async function PATCH(
     await propagateYearCarryOver(user.id, yearNumber);
   }
 
-  return Response.json(updated);
+  return Response.json(parseProtectedAdditionalEntry(updated));
 }
 
 export async function DELETE(

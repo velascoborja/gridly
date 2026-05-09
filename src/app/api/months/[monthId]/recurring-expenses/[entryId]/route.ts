@@ -1,7 +1,10 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { monthlyRecurringExpenses } from "@/db/schema";
-import { parseMonthlyRecurringExpense } from "@/lib/recurring-expenses";
+import {
+  parseProtectedMonthlyRecurringExpense,
+  protectFreeTextLabel,
+} from "@/lib/server/protected-finance-text";
 import { getOwnedMonth, getOwnedRecurringExpense } from "@/lib/server/ownership";
 import { getYearNumberForYearId, propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getSessionUser } from "@/lib/server/session";
@@ -24,7 +27,7 @@ export async function PATCH(
 
   const body = await request.json();
   const updates: Partial<typeof monthlyRecurringExpenses.$inferInsert> = {};
-  if (body.label !== undefined) updates.label = String(body.label).trim();
+  if (body.label !== undefined) updates.label = protectFreeTextLabel(body.label);
   if (body.amount !== undefined) updates.amount = String(Number(body.amount) || 0);
   if (body.sortOrder !== undefined) updates.sortOrder = Number(body.sortOrder) || 0;
 
@@ -39,7 +42,7 @@ export async function PATCH(
     await propagateYearCarryOver(user.id, yearNumber);
   }
 
-  return Response.json(parseMonthlyRecurringExpense(updated));
+  return Response.json(parseProtectedMonthlyRecurringExpense(updated));
 }
 
 export async function DELETE(

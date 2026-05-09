@@ -5,6 +5,7 @@ import { propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { deriveStartingBalance, shouldAllowYearCreation } from "@/lib/server/year-planning";
 import { getSessionUser } from "@/lib/server/session";
 import { getYearData } from "@/lib/server/year-data";
+import { protectFreeTextLabel } from "@/lib/server/protected-finance-text";
 
 export async function GET() {
   const user = await getSessionUser();
@@ -86,13 +87,13 @@ export async function POST(request: Request) {
 
   const recurringValues = Array.isArray(recurringExpenses)
     ? recurringExpenses
+        .filter((entry) => String(entry.label ?? "").trim().length > 0)
         .map((entry, index) => ({
           yearId: row.id,
-          label: String(entry.label ?? "").trim(),
+          label: protectFreeTextLabel(entry.label),
           amount: String(Number(entry.amount) || 0),
           sortOrder: index,
         }))
-        .filter((entry) => entry.label.length > 0)
     : [];
 
   if (recurringValues.length > 0) {

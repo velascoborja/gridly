@@ -3,11 +3,12 @@ import { db } from "@/db";
 import { additionalEntries, monthlyRecurringExpenses, months, yearRecurringExpenses, years } from "@/db/schema";
 import { sortAdditionalEntriesDesc } from "@/lib/additional-entries";
 import { computeMonthChain } from "@/lib/calculations";
+import { sortRecurringExpensesAsc } from "@/lib/recurring-expenses";
 import {
-  parseMonthlyRecurringExpense,
-  parseYearRecurringExpense,
-  sortRecurringExpensesAsc,
-} from "@/lib/recurring-expenses";
+  parseProtectedAdditionalEntry,
+  parseProtectedMonthlyRecurringExpense,
+  parseProtectedYearRecurringExpense,
+} from "@/lib/server/protected-finance-text";
 import type { YearData } from "@/lib/types";
 import { pickDefaultYear } from "./year-navigation";
 
@@ -78,28 +79,16 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
       interests: parseFloat(month.interests),
       interestsManualOverride: month.interestsManualOverride,
       personalRemaining: parseFloat(month.personalRemaining),
-      recurringExpenses: sortRecurringExpensesAsc(recurringExpenses.map(parseMonthlyRecurringExpense)),
+      recurringExpenses: sortRecurringExpensesAsc(recurringExpenses.map(parseProtectedMonthlyRecurringExpense)),
       additionalExpenses: sortAdditionalEntriesDesc(
         entries
           .filter((entry) => entry.type === "expense")
-          .map((entry) => ({
-            id: entry.id,
-            monthId: entry.monthId,
-            type: "expense" as const,
-            label: entry.label,
-            amount: parseFloat(entry.amount),
-          }))
+          .map(parseProtectedAdditionalEntry)
       ),
       additionalIncomes: sortAdditionalEntriesDesc(
         entries
           .filter((entry) => entry.type === "income")
-          .map((entry) => ({
-            id: entry.id,
-            monthId: entry.monthId,
-            type: "income" as const,
-            label: entry.label,
-            amount: parseFloat(entry.amount),
-          }))
+          .map(parseProtectedAdditionalEntry)
       ),
     };
   });
@@ -117,7 +106,7 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
       monthlyPersonalBudget: parseFloat(yearRow.monthlyPersonalBudget),
       interestRate: parseFloat(yearRow.interestRate),
     },
-    recurringExpenses: sortRecurringExpensesAsc(recurringTemplates.map(parseYearRecurringExpense)),
+    recurringExpenses: sortRecurringExpensesAsc(recurringTemplates.map(parseProtectedYearRecurringExpense)),
     months: computeMonthChain(
       rawMonths,
       parseFloat(yearRow.startingBalance),

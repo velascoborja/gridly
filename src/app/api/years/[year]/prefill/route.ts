@@ -68,6 +68,7 @@ export async function POST(
     .orderBy(asc(yearRecurringExpenses.sortOrder), asc(yearRecurringExpenses.id));
 
   if (templates.length > 0) {
+    // Template labels are already encrypted at rest; monthly copies keep the same protected payload.
     await db.insert(monthlyRecurringExpenses).values(
       inserted.flatMap((month) =>
         templates.map((template) => ({

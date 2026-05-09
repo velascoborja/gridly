@@ -2,7 +2,11 @@ import { asc, eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db } from "@/db";
 import { monthlyRecurringExpenses, months, yearRecurringExpenses } from "@/db/schema";
-import { normalizeRecurringExpenseInputs, parseYearRecurringExpense, sortRecurringExpensesAsc } from "@/lib/recurring-expenses";
+import { normalizeRecurringExpenseInputs, sortRecurringExpensesAsc } from "@/lib/recurring-expenses";
+import {
+  parseProtectedYearRecurringExpense,
+  protectFreeTextLabel,
+} from "@/lib/server/protected-finance-text";
 import { getOwnedYear } from "@/lib/server/ownership";
 import { getYearNumberForYearId, propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getSessionUser } from "@/lib/server/session";
@@ -33,7 +37,7 @@ export async function GET(
     .where(eq(yearRecurringExpenses.yearId, yearRow.id))
     .orderBy(asc(yearRecurringExpenses.sortOrder), asc(yearRecurringExpenses.id));
 
-  return Response.json(sortRecurringExpensesAsc(rows.map(parseYearRecurringExpense)));
+  return Response.json(sortRecurringExpensesAsc(rows.map(parseProtectedYearRecurringExpense)));
 }
 
 export async function PUT(
@@ -64,7 +68,7 @@ export async function PUT(
           .values(
             normalized.map((entry) => ({
               yearId: yearRow.id,
-              label: entry.label,
+              label: protectFreeTextLabel(entry.label),
               amount: String(entry.amount),
               sortOrder: entry.sortOrder,
             }))
@@ -112,7 +116,7 @@ export async function PUT(
 
   const yearData = await getYearData(user.id, yearNum);
   return Response.json({
-    recurringExpenses: sortRecurringExpensesAsc(templates.map(parseYearRecurringExpense)),
+    recurringExpenses: sortRecurringExpensesAsc(templates.map(parseProtectedYearRecurringExpense)),
     yearData,
   });
 }
