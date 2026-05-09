@@ -7,7 +7,7 @@ interface LegalShellProps {
 
 export function LegalShell({ children }: LegalShellProps) {
   return (
-    <div className="min-h-screen bg-[#fbfcff] text-foreground">
+    <div className="min-h-screen bg-[#fbfcff] text-[#061b31]">
       <header className="border-b border-[#e5edf5] bg-white px-4 py-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl">
           <Link href="/" className="group inline-flex items-center gap-2">

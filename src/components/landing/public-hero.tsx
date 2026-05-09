@@ -215,7 +215,7 @@ export function PublicHero({ accountDeleted = false, authError = false }: Public
         </section>
 
         <footer className="mt-10 flex items-center gap-4 text-xs font-light text-[#64748d] lg:mt-14">
-          <span>{t("footer.copyright")}</span>
+          <span>{t("footer.copyright", { year: new Date().getFullYear() })}</span>
           <Link href="/privacy" className="hover:text-[#061b31] transition-colors">
             {t("footer.privacy")}
           </Link>
