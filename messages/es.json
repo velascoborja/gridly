@@ -77,6 +77,12 @@
       "balanceLabel": "Saldo",
       "savingsLabel": "Ahorro"
     },
+    "additionalAverages": {
+      "expensesLabel": "Gasto adicional medio",
+      "expensesNote": "Media mensual de gastos variables adicionales sobre los 12 meses del año",
+      "incomeLabel": "Ingreso adicional medio",
+      "incomeNote": "Media mensual de ingresos variables adicionales sobre los 12 meses del año"
+    },
     "config": {
       "startingBalanceLabel": "Saldo inicial vinculado",
       "startingBalanceEditableLabel": "Saldo inicial del año",

@@ -77,6 +77,12 @@
       "balanceLabel": "Balance",
       "savingsLabel": "Savings"
     },
+    "additionalAverages": {
+      "expensesLabel": "Avg additional expenses",
+      "expensesNote": "Monthly average of variable additional expenses across all 12 months",
+      "incomeLabel": "Avg additional income",
+      "incomeNote": "Monthly average of variable additional income across all 12 months"
+    },
     "config": {
       "startingBalanceLabel": "Linked starting balance",
       "startingBalanceEditableLabel": "Year starting balance",
