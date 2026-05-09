@@ -34,4 +34,4 @@ These statistics appear as two stat cards on the year summary page, providing a 
 
 **Relevant Code:**
 - `avgAdditionalEntriesPerMonth()` in `src/lib/additional-entries.ts`: Calculates the yearly average for a given entry type.
-- `AdditionalEntriesAverages` component in `src/components/annual/additional-entries-averages.tsx`: Renders the stat cards with currency formatting and icon indicators (red for expenses, green for income).
+- `AdditionalEntriesAverages` component in `src/components/annual/additional-entries-averages.tsx`: Renders the stat cards with currency formatting and tone-coded icon indicators (rose/ArrowDownRight for expenses, emerald/ArrowUpRight for income, neutral/Minus when the value is zero).
