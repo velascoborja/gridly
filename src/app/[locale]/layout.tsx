@@ -17,6 +17,22 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const productionUrl = "https://appgridly.com";
+
+function withProtocol(url: string) {
+  return /^https?:\/\//.test(url) ? url : `https://${url}`;
+}
+
+function getMetadataBase() {
+  const appUrl =
+    process.env.NEXT_PUBLIC_APP_URL ??
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ??
+    process.env.VERCEL_URL ??
+    productionUrl;
+
+  return new URL(withProtocol(appUrl));
+}
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -26,7 +42,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
+  metadataBase: getMetadataBase(),
   applicationName: "Gridly",
   title: {
     default: "Gridly",
@@ -45,11 +61,20 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
+    url: "/",
     siteName: "Gridly",
     title: "Gridly",
     description: "Controla ingresos, gastos y ahorro con balances mensuales claros.",
     locale: "es_ES",
-    images: ["/opengraph-image.png"],
+    images: [
+      {
+        url: "/opengraph-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Gridly — Finanzas personales sin complicaciones",
+        type: "image/png",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",

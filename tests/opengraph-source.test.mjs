@@ -35,6 +35,21 @@ test("layout exports metadataBase for absolute URL resolution", async () => {
     /NEXT_PUBLIC_APP_URL/,
     "metadataBase should read from NEXT_PUBLIC_APP_URL env var"
   );
+  assert.match(
+    layout,
+    /VERCEL_PROJECT_PRODUCTION_URL/,
+    "metadataBase should support Vercel's production URL env var"
+  );
+  assert.match(
+    layout,
+    /https:\/\/appgridly\.com/,
+    "metadataBase should fall back to the production domain"
+  );
+  assert.doesNotMatch(
+    layout,
+    /localhost:3000/,
+    "metadataBase should not fall back to localhost in deployed metadata"
+  );
 });
 
 test("layout exports openGraph metadata for the landing page", async () => {
@@ -51,6 +66,9 @@ test("layout exports openGraph metadata for the landing page", async () => {
     "openGraph siteName should be Gridly"
   );
   assert.match(layout, /es_ES/, "openGraph locale should be es_ES");
+  assert.match(layout, /width\s*:\s*1200/, "openGraph image width should be declared");
+  assert.match(layout, /height\s*:\s*630/, "openGraph image height should be declared");
+  assert.match(layout, /type\s*:\s*['"]image\/png['"]/, "openGraph image type should be declared");
 });
 
 test("layout exports twitter card metadata", async () => {
