@@ -18,6 +18,18 @@ test("auth integration exports Auth.js entrypoints", async () => {
   assert.match(source, /claimLegacyYearsForUser/);
 });
 
+test("auth uses the Gridly encrypted Drizzle adapter", async () => {
+  const source = await readSource("src/auth.ts");
+  const adapterSource = await readSource("src/lib/server/auth-adapter.ts");
+
+  assert.match(source, /GridlyDrizzleAdapter/);
+  assert.doesNotMatch(source, /adapter:\s*DrizzleAdapter\(database/);
+  assert.match(adapterSource, /getUserByEmail/);
+  assert.match(adapterSource, /getEmailHash\(email\)/);
+  assert.match(adapterSource, /revealUserRead/);
+  assert.match(adapterSource, /protectUserWrite/);
+});
+
 test("year data helper exposes default-year selection", async () => {
   const source = await readSource("src/lib/server/year-data.ts");
 

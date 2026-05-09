@@ -20,4 +20,5 @@ test("legacy owner email is fixed to the approved account", async () => {
 
   assert.match(source, /LEGACY_OWNER_EMAIL/);
   assert.match(source, /velascoborja@gmail\.com/);
+  assert.match(source, /protectUserWrite/, "legacy owner creation should encrypt protected user fields");
 });
