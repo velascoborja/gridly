@@ -9,7 +9,19 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Terms" });
-  return { title: t("title") };
+  const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://appgridly.com";
+
+  return {
+    title: t("title"),
+    alternates: {
+      canonical: `${BASE_URL}/${locale}/terms`,
+      languages: {
+        es: `${BASE_URL}/es/terms`,
+        en: `${BASE_URL}/en/terms`,
+        "x-default": `${BASE_URL}/en/terms`,
+      },
+    },
+  };
 }
 
 export default async function TermsPage() {

@@ -9,7 +9,19 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Privacy" });
-  return { title: t("title") };
+  const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://appgridly.com";
+
+  return {
+    title: t("title"),
+    alternates: {
+      canonical: `${BASE_URL}/${locale}/privacy`,
+      languages: {
+        es: `${BASE_URL}/es/privacy`,
+        en: `${BASE_URL}/en/privacy`,
+        "x-default": `${BASE_URL}/en/privacy`,
+      },
+    },
+  };
 }
 
 export default async function PrivacyPage() {
