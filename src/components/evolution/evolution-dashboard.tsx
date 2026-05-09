@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,16 +26,16 @@ export function EvolutionDashboard({ metrics, historicalYears }: Props) {
   const summary = summarizeEvolutionMetrics(metrics);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingHistoricalYear, setEditingHistoricalYear] = useState<HistoricalYear | null>(null);
-  const [returnRate, setReturnRate] = useState<number | null>(null);
-  const showEmptyState = metrics.length < 2;
+  const [returnRate, setReturnRate] = useState<number | null>(() => {
+    if (typeof window === "undefined") return null;
 
-  useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored !== null) {
-      const parsed = parseFloat(stored);
-      if (!isNaN(parsed)) setReturnRate(parsed);
-    }
-  }, []);
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    if (stored === null) return null;
+
+    const parsed = parseFloat(stored);
+    return Number.isNaN(parsed) ? null : parsed;
+  });
+  const showEmptyState = metrics.length < 2;
 
   function handleRateChange(e: React.ChangeEvent<HTMLInputElement>) {
     const raw = e.target.value;
