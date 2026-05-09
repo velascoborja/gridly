@@ -17,6 +17,30 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const productionUrl = "https://appgridly.com";
+const openGraphImagePath = "/opengraph-image-gridly.png";
+
+function withProtocol(url: string) {
+  return /^https?:\/\//.test(url) ? url : `https://${url}`;
+}
+
+function getMetadataBase() {
+  const appUrl =
+    process.env.NEXT_PUBLIC_APP_URL ??
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ??
+    process.env.VERCEL_URL ??
+    productionUrl;
+
+  return new URL(withProtocol(appUrl));
+}
+
+function getOpenGraphImageUrl() {
+  return new URL(openGraphImagePath, getMetadataBase());
+}
+
+const metadataBase = getMetadataBase();
+const openGraphImageUrl = getOpenGraphImageUrl();
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -26,7 +50,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
+  metadataBase,
   applicationName: "Gridly",
   title: {
     default: "Gridly",
@@ -43,12 +67,22 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
+    url: "/",
     siteName: "Gridly",
-    images: ["/opengraph-image.png"],
+    images: [
+      {
+        url: openGraphImageUrl,
+        secureUrl: openGraphImageUrl,
+        width: 1200,
+        height: 630,
+        alt: "Gridly — Finanzas personales sin complicaciones",
+        type: "image/png",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    images: ["/opengraph-image.png"],
+    images: [openGraphImageUrl],
   },
 };
 
@@ -69,6 +103,7 @@ export default async function RootLayout({
   return (
     <html 
       lang={locale}
+      prefix="og: https://ogp.me/ns#"
       data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
