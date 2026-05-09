@@ -18,6 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 const productionUrl = "https://appgridly.com";
+const openGraphImageUrl = "/opengraph-image-gridly.png";
 
 function withProtocol(url: string) {
   return /^https?:\/\//.test(url) ? url : `https://${url}`;
@@ -68,7 +69,7 @@ export const metadata: Metadata = {
     locale: "es_ES",
     images: [
       {
-        url: "/opengraph-image.png",
+        url: openGraphImageUrl,
         width: 1200,
         height: 630,
         alt: "Gridly — Finanzas personales sin complicaciones",
@@ -80,7 +81,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Gridly",
     description: "Controla ingresos, gastos y ahorro con balances mensuales claros.",
-    images: ["/opengraph-image.png"],
+    images: [openGraphImageUrl],
   },
 };
 

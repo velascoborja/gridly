@@ -22,6 +22,11 @@ test("opengraph-image.png exists in public/ and is 1200×630", async () => {
   assert.deepEqual(pngSize(png), { width: 1200, height: 630 });
 });
 
+test("cache-busted Open Graph image exists in public/ and is 1200×630", async () => {
+  const png = await readBytes("public/opengraph-image-gridly.png");
+  assert.deepEqual(pngSize(png), { width: 1200, height: 630 });
+});
+
 test("opengraph-image.alt.txt provides descriptive alt text", async () => {
   const alt = await readSource("public/opengraph-image.alt.txt");
   assert.ok(alt.trim().length > 0, "alt text should not be empty");
@@ -81,7 +86,7 @@ test("layout exports twitter card metadata", async () => {
   );
   assert.match(
     layout,
-    /\/opengraph-image\.png/,
+    /\/opengraph-image-gridly\.png/,
     "twitter images should reference the og image"
   );
 });

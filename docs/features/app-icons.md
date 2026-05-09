@@ -13,7 +13,8 @@ Gridly uses Next.js App Router file-based metadata for primary app icons and kee
 - `src/app/apple-icon.png`: 180x180 Apple icon used by Next.js file-based metadata and linked as `rel="apple-touch-icon"`. This asset should not include baked-in transparent padding.
 - `public/apple-touch-icon.png`: Conventional 180x180 root fallback for Safari iOS surfaces that probe `/apple-touch-icon.png` directly. Keep it in sync with `src/app/apple-icon.png`.
 - `public/icon.svg`, `public/icon-192.png`, and `public/icon-512.png`: Manifest icons referenced by `src/app/manifest.ts`. These are metadata assets and should stay visually tight.
-- `public/opengraph-image.png`: 1200x630 social sharing image referenced by the App Router metadata configuration.
+- `public/opengraph-image.png`: Original 1200x630 social sharing image retained as a stable asset fallback.
+- `public/opengraph-image-gridly.png`: 1200x630 social sharing image referenced by the App Router metadata configuration. The distinct filename gives messaging app scrapers a fresh cache key when previous previews cached a failed image lookup.
 - `public/opengraph-image.alt.txt`: Descriptive source text for the social sharing image. Keep this aligned with the `openGraph.images[].alt` value in `src/app/[locale]/layout.tsx`.
 - `src/app/manifest.ts`: Web app manifest metadata for installable clients.
 - `src/app/[locale]/layout.tsx`: Shared metadata configuration for localized routes, including `metadataBase`, Open Graph, and Twitter card tags.
@@ -28,7 +29,7 @@ iOS Home Screen installation uses the generated Apple icon metadata correctly. S
 
 Browser tabs, bookmark previews, and Safari iOS bookmark previews already render icons inside their own constrained surfaces. If a metadata icon includes transparent padding or a large shadow around the artwork, the visible mark appears too small. The regression test checks that high-opacity pixels fill the full bitmap canvas and that the SVG metadata icons use the cropped viewBox.
 
-Open Graph and Twitter metadata use `metadataBase` from `src/app/[locale]/layout.tsx` to resolve `/opengraph-image.png` into an absolute URL. The URL priority is `NEXT_PUBLIC_APP_URL`, `VERCEL_PROJECT_PRODUCTION_URL`, `VERCEL_URL`, then `https://appgridly.com`. This prevents deployed social metadata from falling back to a localhost image URL when the public app URL environment variable is not configured.
+Open Graph and Twitter metadata use `metadataBase` from `src/app/[locale]/layout.tsx` to resolve `/opengraph-image-gridly.png` into an absolute URL. The URL priority is `NEXT_PUBLIC_APP_URL`, `VERCEL_PROJECT_PRODUCTION_URL`, `VERCEL_URL`, then `https://appgridly.com`. This prevents deployed social metadata from falling back to a localhost image URL when the public app URL environment variable is not configured.
 
 When updating the app icon, replace both Apple PNG files together and run:
 
