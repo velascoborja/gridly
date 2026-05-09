@@ -60,6 +60,25 @@ Gridly follows a premium, fintech-inspired visual system (Stripe-like) documente
 - **Styling:** Adhere to Tailwind CSS v4 and the visual tokens defined in `src/app/globals.css`. For any UI modification, consult `DESIGN.md` first and follow its rules for spacing, elevation, typography, colors, interactive states, and component styling.
 - **Numeric Handling:** Convert DB strings to `number` immediately after reading and back to `string` for DB operations.
 
+## Skills
+
+Project-specific skills live in `.agents/skills/<skill-name>/SKILL.md`. They are the **canonical source** for each skill.
+
+When adding a new skill to `.agents/skills/`:
+1. Create the full skill content in `.agents/skills/<skill-name>/SKILL.md`.
+2. Create a thin reference stub in `.claude/skills/<skill-name>/SKILL.md` that keeps the same `name` and `description` frontmatter but redirects to the canonical file:
+
+```markdown
+---
+name: <skill-name>
+description: <same description as the canonical skill>
+---
+
+This skill is defined in the canonical location. Read and follow `.agents/skills/<skill-name>/SKILL.md`.
+```
+
+Never duplicate skill content between the two directories — `.claude/skills/` stubs exist only so Claude Code's skill discovery finds them.
+
 ## Feature Documentation
 
 Detailed documentation for specific features can be found in `docs/features/`. Refer to these files for in-depth understanding of implementation logic and domain rules.
