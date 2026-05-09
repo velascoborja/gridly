@@ -104,7 +104,7 @@ test("historical year dialog money inputs show a persistent Euro hint", () => {
   assert.match(dialog, /function MoneyInput/);
   assert.match(dialog, /aria-hidden="true"/);
   assert.match(dialog, />\s*€\s*</);
-  assert.match(dialog, /placeholder="0\.00"/);
+  assert.match(dialog, /placeholder\s*=\s*["']0\.00["']/);
   assert.match(dialog, /text-muted-foreground\/70/);
   assert.doesNotMatch(dialog, /opacity-0/);
   assert.match(dialog, /pr-8/);
