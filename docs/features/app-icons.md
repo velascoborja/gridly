@@ -31,6 +31,8 @@ Browser tabs, bookmark previews, and Safari iOS bookmark previews already render
 
 Open Graph and Twitter metadata use `metadataBase` from `src/app/[locale]/layout.tsx` to resolve `/opengraph-image-gridly.png` into an absolute URL. The URL priority is `NEXT_PUBLIC_APP_URL`, `VERCEL_PROJECT_PRODUCTION_URL`, `VERCEL_URL`, then `https://appgridly.com`. This prevents deployed social metadata from falling back to a localhost image URL when the public app URL environment variable is not configured.
 
+The root `<html>` element includes the Open Graph RDFa prefix, and the image metadata declares both `og:image` and `og:image:secure_url` along with MIME type, dimensions, and alt text. This keeps the generated tags aligned with the Open Graph protocol while remaining compatible with older or stricter link-preview parsers.
+
 When updating the app icon, replace both Apple PNG files together and run:
 
 ```bash

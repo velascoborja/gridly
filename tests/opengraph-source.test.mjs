@@ -57,6 +57,15 @@ test("layout exports metadataBase for absolute URL resolution", async () => {
   );
 });
 
+test("layout marks HTML with the Open Graph RDFa prefix", async () => {
+  const layout = await readSource("src/app/[locale]/layout.tsx");
+  assert.match(
+    layout,
+    /prefix=["']og: https:\/\/ogp\.me\/ns#["']/,
+    "html should include the Open Graph RDFa prefix"
+  );
+});
+
 test("layout exports openGraph metadata for the landing page", async () => {
   const layout = await readSource("src/app/[locale]/layout.tsx");
   assert.match(layout, /openGraph\s*:/, "layout should export openGraph metadata");
@@ -71,6 +80,7 @@ test("layout exports openGraph metadata for the landing page", async () => {
     "openGraph siteName should be Gridly"
   );
   assert.match(layout, /es_ES/, "openGraph locale should be es_ES");
+  assert.match(layout, /secureUrl\s*:/, "openGraph image secure URL should be declared");
   assert.match(layout, /width\s*:\s*1200/, "openGraph image width should be declared");
   assert.match(layout, /height\s*:\s*630/, "openGraph image height should be declared");
   assert.match(layout, /type\s*:\s*['"]image\/png['"]/, "openGraph image type should be declared");
@@ -86,7 +96,7 @@ test("layout exports twitter card metadata", async () => {
   );
   assert.match(
     layout,
-    /\/opengraph-image-gridly\.png/,
+    /openGraphImageUrl/,
     "twitter images should reference the og image"
   );
 });

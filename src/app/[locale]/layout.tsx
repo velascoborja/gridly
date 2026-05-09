@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 const productionUrl = "https://appgridly.com";
-const openGraphImageUrl = "/opengraph-image-gridly.png";
+const openGraphImagePath = "/opengraph-image-gridly.png";
 
 function withProtocol(url: string) {
   return /^https?:\/\//.test(url) ? url : `https://${url}`;
@@ -34,6 +34,13 @@ function getMetadataBase() {
   return new URL(withProtocol(appUrl));
 }
 
+function getOpenGraphImageUrl() {
+  return new URL(openGraphImagePath, getMetadataBase());
+}
+
+const metadataBase = getMetadataBase();
+const openGraphImageUrl = getOpenGraphImageUrl();
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -43,7 +50,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: getMetadataBase(),
+  metadataBase,
   applicationName: "Gridly",
   title: {
     default: "Gridly",
@@ -70,6 +77,7 @@ export const metadata: Metadata = {
     images: [
       {
         url: openGraphImageUrl,
+        secureUrl: openGraphImageUrl,
         width: 1200,
         height: 630,
         alt: "Gridly — Finanzas personales sin complicaciones",
@@ -102,6 +110,7 @@ export default async function RootLayout({
   return (
     <html 
       lang={locale}
+      prefix="og: https://ogp.me/ns#"
       data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
