@@ -26,6 +26,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
   applicationName: "Gridly",
   title: {
     default: "Gridly",
@@ -41,6 +42,19 @@ export const metadata: Metadata = {
     capable: true,
     title: "Gridly",
     statusBarStyle: "default",
+  },
+  openGraph: {
+    type: "website",
+    siteName: "Gridly",
+    title: "Gridly",
+    description: "Controla ingresos, gastos y ahorro con balances mensuales claros.",
+    locale: "es_ES",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Gridly",
+    description: "Controla ingresos, gastos y ahorro con balances mensuales claros.",
+    images: ["/opengraph-image.png"],
   },
 };
 
