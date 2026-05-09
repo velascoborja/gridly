@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --test"
+    "test": "node --test",
+    "encrypt:backfill": "node scripts/backfill-sensitive-text-encryption.mjs"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.2",
