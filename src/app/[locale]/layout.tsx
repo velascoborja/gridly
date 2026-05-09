@@ -32,8 +32,6 @@ export const metadata: Metadata = {
     default: "Gridly",
     template: "%s · Gridly",
   },
-  description: "Controla ingresos, gastos y ahorro con balances mensuales claros.",
-  keywords: ["finanzas personales", "ahorro", "gastos", "ingresos", "nóminas"],
   referrer: "origin-when-cross-origin",
   creator: "Gridly",
   publisher: "Gridly",
@@ -46,15 +44,10 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "Gridly",
-    title: "Gridly",
-    description: "Controla ingresos, gastos y ahorro con balances mensuales claros.",
-    locale: "es_ES",
     images: ["/opengraph-image.png"],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Gridly",
-    description: "Controla ingresos, gastos y ahorro con balances mensuales claros.",
     images: ["/opengraph-image.png"],
   },
 };
