@@ -17,13 +17,13 @@ function pngSize(buffer) {
   };
 }
 
-test("opengraph-image.png exists at the locale route and is 1200×630", async () => {
-  const png = await readBytes("src/app/[locale]/opengraph-image.png");
+test("opengraph-image.png exists at the app root and is 1200×630", async () => {
+  const png = await readBytes("src/app/opengraph-image.png");
   assert.deepEqual(pngSize(png), { width: 1200, height: 630 });
 });
 
 test("opengraph-image.alt.txt provides descriptive alt text", async () => {
-  const alt = await readSource("src/app/[locale]/opengraph-image.alt.txt");
+  const alt = await readSource("src/app/opengraph-image.alt.txt");
   assert.ok(alt.trim().length > 0, "alt text should not be empty");
 });
 
