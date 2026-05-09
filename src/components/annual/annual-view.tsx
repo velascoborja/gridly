@@ -6,6 +6,7 @@ import { applyYearConfigToMonth, computeMonthChain } from "@/lib/calculations";
 import { KpiCards } from "./kpi-cards";
 import { BalanceChart } from "./balance-chart";
 import { SavingsChart } from "./savings-chart";
+import { AdditionalEntriesAverages } from "./additional-entries-averages";
 import type { YearData, YearConfig } from "@/lib/types";
 
 interface Props {
@@ -111,6 +112,8 @@ export function AnnualView({
         <BalanceChart months={months} />
         <SavingsChart months={months} />
       </div>
+
+      <AdditionalEntriesAverages months={months} />
     </div>
   );
 }
