@@ -47,6 +47,7 @@ export default async function DemoSummaryPage({
         summaryPathPrefix="/demo"
         hideCreateYear
         hideYearSelector
+        hideEvolution
       />
       <AnnualView
         yearData={getDemoYearData()}

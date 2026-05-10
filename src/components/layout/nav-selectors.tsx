@@ -30,6 +30,7 @@ interface Props {
   summaryPathPrefix?: string;
   hideCreateYear?: boolean;
   hideYearSelector?: boolean;
+  hideEvolution?: boolean;
   onMonthViewSelect?: () => void;
   onSummaryViewSelect?: () => void;
 }
@@ -43,6 +44,7 @@ export function NavSelectors({
   summaryPathPrefix,
   hideCreateYear = false,
   hideYearSelector = false,
+  hideEvolution = false,
   onMonthViewSelect,
   onSummaryViewSelect,
 }: Props) {
@@ -82,7 +84,7 @@ export function NavSelectors({
   const mainTabs = [
     { label: t("months"), key: "overview" as const, href: monthHref, disabled: isHistoricalYearSelected, disabledTitle: t("historicalYearUnavailable") },
     { label: t("annualSummary"), key: "summary" as const, href: summaryHref, disabled: isHistoricalYearSelected, disabledTitle: t("historicalYearUnavailable") },
-    { label: t("evolution"), key: "evolution" as const, href: evolutionHref, disabled: false, disabledTitle: "" },
+    ...(!hideEvolution ? [{ label: t("evolution"), key: "evolution" as const, href: evolutionHref, disabled: false, disabledTitle: "" }] : []),
   ];
 
   return (

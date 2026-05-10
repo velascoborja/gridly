@@ -1,4 +1,5 @@
-import type { AdditionalEntry, MonthData, RecurringExpense, YearConfig, YearData, YearRecurringExpense } from "../types";
+import { computeMonthChain, estimatedMonthData } from "../calculations.ts";
+import type { AdditionalEntry, RecurringExpense, YearConfig, YearData, YearRecurringExpense } from "../types";
 
 export const DEMO_YEAR = 2026;
 export const DEMO_MONTH = 4;
@@ -136,15 +137,15 @@ interface RawMonthData {
   yearId: number;
   month: number;
   homeExpense: number;
-  homeExpenseManualOverride: boolean;
+  homeExpenseManualOverride?: boolean;
   personalExpense: number;
-  personalExpenseManualOverride: boolean;
+  personalExpenseManualOverride?: boolean;
   investment: number;
-  investmentManualOverride: boolean;
+  investmentManualOverride?: boolean;
   payslip: number;
-  payslipManualOverride: boolean;
+  payslipManualOverride?: boolean;
   additionalPayslip: number;
-  additionalPayslipManualOverride: boolean;
+  additionalPayslipManualOverride?: boolean;
   interests: number;
   interestsManualOverride: boolean;
   personalRemaining: number;
@@ -153,74 +154,3 @@ interface RawMonthData {
   additionalIncomes: AdditionalEntry[];
 }
 
-function estimatedMonthData(month: number, config: YearConfig): Omit<RawMonthData, "id" | "yearId"> {
-  return {
-    month,
-    homeExpense: config.monthlyHomeExpense,
-    homeExpenseManualOverride: false,
-    personalExpense: config.monthlyPersonalBudget,
-    personalExpenseManualOverride: false,
-    investment: config.monthlyInvestment,
-    investmentManualOverride: false,
-    payslip: config.estimatedSalary,
-    payslipManualOverride: false,
-    additionalPayslip:
-      config.hasExtraPayments && (month === 6 || month === 12)
-        ? config.estimatedExtraPayment
-        : 0,
-    additionalPayslipManualOverride: false,
-    interests: 0,
-    interestsManualOverride: false,
-    personalRemaining: 0,
-    recurringExpenses: [],
-    additionalExpenses: [],
-    additionalIncomes: [],
-  };
-}
-
-function calculateMonthlyInterest(startingBalance: number, interestRate: number): number {
-  return round2((startingBalance * interestRate) / 12);
-}
-
-function totalIncome(month: RawMonthData): number {
-  const additionalSum = month.additionalIncomes.reduce((sum, entry) => sum + entry.amount, 0);
-  return month.payslip + month.additionalPayslip + month.interests + month.personalRemaining + additionalSum;
-}
-
-function totalExpenses(month: RawMonthData): number {
-  const additionalSum = month.additionalExpenses.reduce((sum, entry) => sum + entry.amount, 0);
-  const recurringSum = month.recurringExpenses.reduce((sum, entry) => sum + entry.amount, 0);
-  return month.homeExpense + month.personalExpense + month.investment + recurringSum + additionalSum;
-}
-
-function computeMonthChain(rawMonths: RawMonthData[], yearStartingBalance: number, interestRate = 0): MonthData[] {
-  let runningBalance = yearStartingBalance;
-
-  return [...rawMonths]
-    .sort((left, right) => left.month - right.month)
-    .map((month) => {
-      const startingBalance = runningBalance;
-      const interests = month.interestsManualOverride
-        ? month.interests
-        : calculateMonthlyInterest(startingBalance, interestRate);
-      const monthWithInterest = { ...month, interests };
-      const income = totalIncome(monthWithInterest);
-      const expenses = totalExpenses(monthWithInterest);
-      const savings = income - expenses;
-      const endingBalance = startingBalance + savings;
-      runningBalance = endingBalance;
-
-      return {
-        ...monthWithInterest,
-        totalIncome: income,
-        totalExpenses: expenses,
-        savings,
-        startingBalance,
-        endingBalance,
-      };
-    });
-}
-
-function round2(value: number): number {
-  return Math.round(value * 100) / 100;
-}

@@ -3,7 +3,7 @@
 import { useTranslations, useLocale } from "next-intl";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, formatMonthName } from "@/lib/utils";
 import type { MonthData } from "@/lib/types";
 
 interface Props {
@@ -14,14 +14,10 @@ export function SavingsChart({ months }: Props) {
   const t = useTranslations("Annual.charts");
   const locale = useLocale();
 
-  const data = months.map((m) => {
-    const date = new Date(2000, m.month - 1, 1);
-    const monthName = new Intl.DateTimeFormat(locale, { month: "short" }).format(date);
-    return {
-      name: monthName,
-      ahorro: m.savings,
-    };
-  });
+  const data = months.map((m) => ({
+    name: formatMonthName(m.month, locale, "short"),
+    ahorro: m.savings,
+  }));
 
   return (
     <Card className="border-border/70 bg-card/90 shadow-sm">
