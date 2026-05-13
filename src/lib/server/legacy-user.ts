@@ -2,9 +2,11 @@ import { eq, isNull } from "drizzle-orm";
 import { db } from "@/db";
 import { users, years } from "@/db/schema";
 
-export const LEGACY_OWNER_EMAIL = "velascoborja@gmail.com";
+export const LEGACY_OWNER_EMAIL = process.env.LEGACY_OWNER_EMAIL ?? "";
 
 export async function ensureLegacyOwner(email = LEGACY_OWNER_EMAIL) {
+  if (!email) return null;
+
   const existingUser = await db.query.users.findFirst({
     where: eq(users.email, email),
   });
@@ -15,7 +17,6 @@ export async function ensureLegacyOwner(email = LEGACY_OWNER_EMAIL) {
     .insert(users)
     .values({
       email,
-      name: "Borja Velasco",
     })
     .returning();
 

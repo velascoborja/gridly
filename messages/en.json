@@ -295,7 +295,7 @@
       "endingBalance": "Ending balance"
     },
     "footer": {
-      "copyright": "© {year} Borja Velasco",
+      "copyright": "© {year} Gridly",
       "privacy": "Privacy Policy",
       "terms": "Terms of Service"
     }
@@ -550,7 +550,7 @@
     "lastUpdated": "Last updated: May 9, 2026",
     "controller": {
       "title": "Data Controller",
-      "body": "Borja Velasco is the controller of your personal data. For any enquiry, contact privacy@appgridly.com."
+      "body": "Gridly is the controller of your personal data. For any enquiry, contact privacy@appgridly.com."
     },
     "data": {
       "title": "Data We Collect",

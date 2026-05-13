@@ -49,7 +49,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 Gridly now uses Google sign-in for all private financial data.
 
 - Set `AUTH_SECRET`, `AUTH_GOOGLE_ID`, and `AUTH_GOOGLE_SECRET` in your local environment.
-- Existing legacy data is assigned to `velascoborja@gmail.com`.
+- Existing legacy data is assigned to the email configured in `LEGACY_OWNER_EMAIL`.
 - New users start with an empty account and configure their own year on first access.
 
 ### First use
