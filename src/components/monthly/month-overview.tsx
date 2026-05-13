@@ -99,7 +99,7 @@ export function MonthOverview({
 
   useEffect(() => {
     setShowFixedEditors(readOnly);
-  }, [monthNumber, readOnly]);
+  }, [readOnly]);
 
   useEffect(() => {
     if (showFixedEditors) {
