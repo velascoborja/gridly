@@ -1,6 +1,7 @@
 import ExcelJS from "exceljs";
 import type { YearData } from "./types";
 import { formatMonthName } from "./utils";
+import { avgAdditionalEntriesPerMonth } from "./additional-entries";
 
 const EXPORT_MESSAGES = {
   en: {
@@ -249,10 +250,8 @@ function buildSummarySheet(
   const avgSavings = totalSaved / 12;
   const maxSavings = Math.max(...months.map((m) => m.savings));
   const totalInvested = months.reduce((s, m) => s + m.investment, 0);
-  const avgAdditionalExpenses =
-    months.reduce((s, m) => s + m.additionalExpenses.reduce((a, e) => a + e.amount, 0), 0) / 12;
-  const avgAdditionalIncomes =
-    months.reduce((s, m) => s + m.additionalIncomes.reduce((a, e) => a + e.amount, 0), 0) / 12;
+  const avgAdditionalExpenses = avgAdditionalEntriesPerMonth(months, "expense");
+  const avgAdditionalIncomes = avgAdditionalEntriesPerMonth(months, "income");
 
   let row = 1;
 

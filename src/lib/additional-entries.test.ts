@@ -31,6 +31,7 @@ function makeMonth(
       type: "expense" as const,
       label: "",
     })),
+    additionalExpenseGroups: [],
     additionalIncomes: additionalIncomes.map((e) => ({
       ...e,
       monthId: 1,

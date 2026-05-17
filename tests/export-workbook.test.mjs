@@ -26,6 +26,7 @@ async function transpileModuleToTemp(relativePath, outDir) {
 async function loadBuildWorkbook() {
   const outDir = await mkdtemp(join(process.cwd(), ".tmp-gridly-export-test-"));
   await transpileModuleToTemp("src/lib/utils.ts", outDir);
+  await transpileModuleToTemp("src/lib/additional-entries.ts", outDir);
   await transpileModuleToTemp("src/lib/export.ts", outDir);
   const modulePath = join(outDir, "lib", "export.cjs");
   const mod = await import(`file://${modulePath}`);
@@ -77,6 +78,7 @@ const yearData = {
       personalRemaining: 50,
       recurringExpenses: [],
       additionalExpenses: additionalExpense,
+      additionalExpenseGroups: [],
       additionalIncomes: additionalIncome,
       totalIncome,
       totalExpenses,
