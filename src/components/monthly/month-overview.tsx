@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Eye, EyeOff } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { buttonVariants } from "@/components/ui/button";
@@ -507,7 +507,7 @@ export function MonthOverview({
 
       <Card
         className={cn(
-          "mb-6 overflow-hidden border-white/10 text-white shadow-[0_30px_45px_-30px_rgba(50,50,93,0.45),0_18px_36px_-18px_rgba(0,0,0,0.22)] transition-colors duration-500",
+          "relative mb-6 overflow-hidden border-white/10 text-white shadow-[0_30px_45px_-30px_rgba(50,50,93,0.45),0_18px_36px_-18px_rgba(0,0,0,0.22)] transition-colors duration-500",
           isPastMonth
             ? "bg-gradient-to-br from-slate-900 via-[#0d253d] to-slate-950"
             : isSelectedMonthCurrent
@@ -516,6 +516,17 @@ export function MonthOverview({
         )}
       >
         <CardContent className="px-6 py-3">
+          {!isSelectedMonthCurrent && (
+            <Link
+              href={currentMonthRoute}
+              onClick={canHandleCurrentMonthLocally ? interceptMonthNavigation(today.getMonth() + 1) : undefined}
+              aria-label={tOverview("backToCurrentMonth")}
+              className="absolute top-3 right-4 inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-300/80 transition-all hover:border-emerald-400/50 hover:bg-emerald-400/20 hover:text-emerald-200 hover:shadow-[0_0_14px_rgba(52,211,153,0.15)]"
+            >
+              <ArrowLeft className="size-3" />
+              {formatMonthName(today.getMonth() + 1, locale)}
+            </Link>
+          )}
           <div className="flex flex-col items-center gap-8 text-center lg:flex-row lg:items-center lg:justify-between lg:text-left">
             {/* Left: Identification */}
             <div className="flex flex-col items-center gap-4 sm:gap-8 lg:flex-row">
@@ -538,19 +549,6 @@ export function MonthOverview({
                     isSelectedMonthCurrent ? "currentMonth" : isPastMonth ? "pastMonth" : isFutureMonth ? "futureMonth" : "activeMonth"
                   )}
 
-                  {!isSelectedMonthCurrent && (
-                    <>
-                      <span className="mx-1 opacity-40">•</span>
-                      <Link
-                        href={currentMonthRoute}
-                        onClick={canHandleCurrentMonthLocally ? interceptMonthNavigation(today.getMonth() + 1) : undefined}
-                        className="group inline-flex items-center gap-1 rounded-sm transition-colors hover:text-white"
-                      >
-                        <ChevronLeft className="size-3 opacity-70 transition-transform group-hover:-translate-x-0.5" />
-                        {tOverview("backToCurrentMonth")}
-                      </Link>
-                    </>
-                  )}
                 </div>
                 <div className="mt-2">
                   <button
