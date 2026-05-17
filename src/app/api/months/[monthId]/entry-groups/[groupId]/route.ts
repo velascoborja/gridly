@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { additionalEntryGroups } from "@/db/schema";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { getSessionUser } from "@/lib/server/session";
 import { getOwnedMonth, getOwnedGroup } from "@/lib/server/ownership";
 import { getYearNumberForYearId, propagateYearCarryOver } from "@/lib/server/year-carry-over";
