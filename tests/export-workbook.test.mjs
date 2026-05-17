@@ -75,6 +75,7 @@ const yearData = {
       bonus: 100,
       interests: 50,
       personalRemaining: 50,
+      recurringExpenses: [],
       additionalExpenses: additionalExpense,
       additionalIncomes: additionalIncome,
       totalIncome,
@@ -86,7 +87,7 @@ const yearData = {
   }),
 };
 
-test("excel export keeps monthly data and annual summary in one worksheet", async () => {
+test("excel export produces a 13-sheet workbook with summary first and one sheet per month", async () => {
   const { buildWorkbook, cleanup } = await loadBuildWorkbook();
 
   try {
@@ -95,22 +96,46 @@ test("excel export keeps monthly data and annual summary in one worksheet", asyn
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(buffer);
 
-    assert.equal(workbook.worksheets.length, 1);
+    // Should have 1 summary sheet + 12 month sheets
+    assert.equal(workbook.worksheets.length, 13);
 
-    const worksheet = workbook.worksheets[0];
-    const decemberRow = findRow(worksheet, (row) => worksheet.getCell(`A${row}`).value === "Diciembre 2026");
-    const summaryHeaderRow = findRow(
-      worksheet,
+    // First sheet is the annual summary named after the year
+    const summarySheet = workbook.worksheets[0];
+    assert.equal(summarySheet.name, "2026");
+
+    // Summary sheet has the KPI block header
+    const kpiHeaderRow = findRow(summarySheet, (row) => summarySheet.getCell(`A${row}`).value === "Resumen anual");
+    assert.ok(kpiHeaderRow > 0, "Summary sheet should have annual KPI block header");
+
+    // Summary sheet has the monthly breakdown table (Mes header)
+    const summaryTableRow = findRow(
+      summarySheet,
       (row) =>
-        worksheet.getCell(`A${row}`).value === "Mes" &&
-        worksheet.getCell(`B${row}`).value === "Saldo inicial" &&
-        worksheet.getCell(`F${row}`).value === "Saldo final",
+        summarySheet.getCell(`A${row}`).value === "Mes" &&
+        summarySheet.getCell(`B${row}`).value === "Saldo inicial" &&
+        summarySheet.getCell(`F${row}`).value === "Saldo final",
     );
-    const configHeaderRow = findRow(worksheet, (row) => worksheet.getCell(`A${row}`).value === "Configuración");
+    assert.ok(summaryTableRow > kpiHeaderRow, "Monthly breakdown table should appear after KPI block");
 
-    assert.ok(decemberRow > 0);
-    assert.ok(summaryHeaderRow > decemberRow);
-    assert.ok(configHeaderRow > summaryHeaderRow);
+    // Summary sheet has the config section
+    const configHeaderRow = findRow(summarySheet, (row) => summarySheet.getCell(`A${row}`).value === "Configuración");
+    assert.ok(configHeaderRow > summaryTableRow, "Config section should appear after monthly breakdown table");
+
+    // Month sheets exist with correct names
+    assert.equal(workbook.worksheets[1].name, "Enero");
+    assert.equal(workbook.worksheets[12].name, "Diciembre");
+
+    // December sheet has fixed and additional income subsections
+    const decemberSheet = workbook.worksheets[12];
+    const fixedIncomeRow = findRow(decemberSheet, (row) => {
+      const val = decemberSheet.getCell(`A${row}`).value;
+      return typeof val === "string" && val.includes("Ingresos fijos");
+    });
+    assert.ok(fixedIncomeRow > 0, "December sheet should have fixed income subsection");
+
+    // December sheet has additional income (Regalo entry for month 12)
+    const regaloRow = findRow(decemberSheet, (row) => decemberSheet.getCell(`A${row}`).value === "Regalo");
+    assert.ok(regaloRow > 0, "December sheet should show additional income entry 'Regalo'");
   } finally {
     await cleanup();
   }
