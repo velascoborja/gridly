@@ -119,65 +119,97 @@ function buildMonthSheet(
   const t = EXPORT_MESSAGES[locale];
   const sheetName = formatExportMonthName(month.month, locale);
   const ws = wb.addWorksheet(sheetName);
-  ws.columns = [{ width: 32 }, { width: 16 }];
+  ws.columns = [
+    { width: 28 }, // A: expense labels
+    { width: 14 }, // B: expense amounts
+    { width: 2 },  // C: spacer
+    { width: 28 }, // D: income labels
+    { width: 14 }, // E: income amounts
+  ];
 
   let row = 1;
 
   // Title
-  ws.mergeCells(`A${row}:B${row}`);
+  ws.mergeCells(`A${row}:E${row}`);
   const title = ws.getCell(`A${row}`);
   title.value = `${sheetName} ${year}`;
   title.font = { bold: true, size: 13 };
   title.alignment = { horizontal: "center" };
   row += 2;
 
-  // Expenses section
-  styleHeader(ws, `A${row}`, t.expenses);
-  row++;
+  const startRow = row;
+  let expRow = startRow;
+  let incRow = startRow;
 
-  subsectionLabel(ws, `A${row}`, t.fixedExpenses);
-  row++;
-  row = addMoneyRow(ws, row, t.homeExpense, month.homeExpense);
-  row = addMoneyRow(ws, row, t.personalExpense, month.personalExpense);
-  row = addMoneyRow(ws, row, t.investment, month.investment);
+  // Expenses (columns A-B)
+  styleHeader(ws, `A${expRow}`, t.expenses);
+  expRow++;
+
+  subsectionLabel(ws, `A${expRow}`, t.fixedExpenses);
+  expRow++;
+  ws.getCell(`A${expRow}`).value = t.homeExpense;
+  money(ws, `B${expRow}`, month.homeExpense);
+  expRow++;
+  ws.getCell(`A${expRow}`).value = t.personalExpense;
+  money(ws, `B${expRow}`, month.personalExpense);
+  expRow++;
+  ws.getCell(`A${expRow}`).value = t.investment;
+  money(ws, `B${expRow}`, month.investment);
+  expRow++;
   for (const entry of month.recurringExpenses ?? []) {
-    row = addMoneyRow(ws, row, entry.label, entry.amount);
+    ws.getCell(`A${expRow}`).value = entry.label;
+    money(ws, `B${expRow}`, entry.amount);
+    expRow++;
   }
 
-  subsectionLabel(ws, `A${row}`, t.additionalExpensesLabel);
-  row++;
+  subsectionLabel(ws, `A${expRow}`, t.additionalExpensesLabel);
+  expRow++;
   for (const entry of month.additionalExpenses) {
-    row = addMoneyRow(ws, row, entry.label, entry.amount);
+    ws.getCell(`A${expRow}`).value = entry.label;
+    money(ws, `B${expRow}`, entry.amount);
+    expRow++;
   }
 
-  styleHeader(ws, `A${row}`, t.totalExpenses);
-  money(ws, `B${row}`, month.totalExpenses);
-  row += 2;
+  styleHeader(ws, `A${expRow}`, t.totalExpenses);
+  money(ws, `B${expRow}`, month.totalExpenses);
+  expRow++;
 
-  // Income section
-  styleHeader(ws, `A${row}`, t.income);
-  row++;
+  // Income (columns D-E)
+  styleHeader(ws, `D${incRow}`, t.income);
+  incRow++;
 
-  subsectionLabel(ws, `A${row}`, t.fixedIncome);
-  row++;
-  row = addMoneyRow(ws, row, t.payslip, month.payslip);
+  subsectionLabel(ws, `D${incRow}`, t.fixedIncome);
+  incRow++;
+  ws.getCell(`D${incRow}`).value = t.payslip;
+  money(ws, `E${incRow}`, month.payslip);
+  incRow++;
   if (month.additionalPayslip > 0) {
-    row = addMoneyRow(ws, row, t.additionalPayslip, month.additionalPayslip);
+    ws.getCell(`D${incRow}`).value = t.additionalPayslip;
+    money(ws, `E${incRow}`, month.additionalPayslip);
+    incRow++;
   }
-  row = addMoneyRow(ws, row, t.interests, month.interests);
-  row = addMoneyRow(ws, row, t.personalRemaining, month.personalRemaining);
+  ws.getCell(`D${incRow}`).value = t.interests;
+  money(ws, `E${incRow}`, month.interests);
+  incRow++;
+  ws.getCell(`D${incRow}`).value = t.personalRemaining;
+  money(ws, `E${incRow}`, month.personalRemaining);
+  incRow++;
 
-  subsectionLabel(ws, `A${row}`, t.additionalIncomeLabel);
-  row++;
+  subsectionLabel(ws, `D${incRow}`, t.additionalIncomeLabel);
+  incRow++;
   for (const entry of month.additionalIncomes) {
-    row = addMoneyRow(ws, row, entry.label, entry.amount);
+    ws.getCell(`D${incRow}`).value = entry.label;
+    money(ws, `E${incRow}`, entry.amount);
+    incRow++;
   }
 
-  styleHeader(ws, `A${row}`, t.totalIncome);
-  money(ws, `B${row}`, month.totalIncome);
-  row += 2;
+  styleHeader(ws, `D${incRow}`, t.totalIncome);
+  money(ws, `E${incRow}`, month.totalIncome);
+  incRow++;
 
-  // Month summary
+  // Month summary below both sections
+  row = Math.max(expRow, incRow) + 1;
+
   label(ws, `A${row}`, t.startingBalance);
   money(ws, `B${row}`, month.startingBalance);
   row++;
@@ -206,7 +238,7 @@ function buildSummarySheet(
   ws.columns = [
     { width: 28 },
     { width: 14 },
-    { width: 4 },
+    { width: 14 },
     { width: 28 },
     { width: 14 },
     { width: 14 },
@@ -244,8 +276,22 @@ function buildSummarySheet(
   row = addMoneyRow(ws, row, t.averageSavings, avgSavings);
   row = addMoneyRow(ws, row, t.maxSavings, maxSavings);
   row = addMoneyRow(ws, row, t.totalInvested, totalInvested);
-  row = addMoneyRow(ws, row, t.avgAdditionalExpenses, avgAdditionalExpenses);
-  row = addMoneyRow(ws, row, t.avgAdditionalIncomes, avgAdditionalIncomes);
+
+  label(ws, `A${row}`, t.avgAdditionalExpenses);
+  const avgExpCell = ws.getCell(`B${row}`);
+  avgExpCell.value = avgAdditionalExpenses;
+  avgExpCell.numFmt = "#,##0.00€";
+  avgExpCell.alignment = { horizontal: "right" };
+  avgExpCell.font = { color: { argb: "FFC0392B" } };
+  row++;
+
+  label(ws, `A${row}`, t.avgAdditionalIncomes);
+  const avgIncCell = ws.getCell(`B${row}`);
+  avgIncCell.value = avgAdditionalIncomes;
+  avgIncCell.numFmt = "#,##0.00€";
+  avgIncCell.alignment = { horizontal: "right" };
+  avgIncCell.font = { color: { argb: "FF1E8449" } };
+  row++;
   row++;
 
   // Monthly breakdown table

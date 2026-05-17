@@ -17,11 +17,11 @@ Users can export their entire year's data into a formatted Excel workbook. This 
 The generated workbook contains 13 sheets:
 
 - **Sheet 1 (year number, e.g. "2025"):** Annual summary containing:
-    - KPI block: total saved, average savings, max savings, total invested, average additional expenses, average additional incomes.
+    - KPI block: total saved (color-coded green/red), average savings, max savings, total invested, average additional expenses (red), average additional incomes (green).
     - Month-by-month breakdown table (starting balance, total income, total expenses, savings, ending balance).
     - Year configuration values.
-- **Sheets 2–13 (localized month names):** One sheet per month with a vertical stacked layout:
-    - Expenses section: fixed expenses subsection (home, personal, investment, recurring expenses), then additional expenses subsection.
-    - Income section: fixed income subsection (salary, extra pay, interests, personal surplus), then additional income subsection.
-    - Month summary: starting balance, savings (color-coded green/red), ending balance.
+- **Sheets 2–13 (localized month names):** One sheet per month with a horizontal two-column layout:
+    - Left side (columns A–B): Expenses — fixed expenses subsection (home, personal, investment, recurring expenses), then additional expenses subsection, then total expenses.
+    - Right side (columns D–E): Income — fixed income subsection (salary, extra pay, interests, personal surplus), then additional income subsection, then total income.
+    - Month summary below both sections: starting balance, savings (color-coded green/red), ending balance.
 - Formatting: Professional styling with Stripe-inspired colors and numeric formatting.
