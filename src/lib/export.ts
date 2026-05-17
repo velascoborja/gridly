@@ -93,86 +93,107 @@ function label(ws: ExcelJS.Worksheet, cell: string, text: string) {
   ws.getCell(cell).value = text;
 }
 
+function subsectionLabel(ws: ExcelJS.Worksheet, cell: string, text: string) {
+  const c = ws.getCell(cell);
+  c.value = `— ${text} —`;
+  c.font = { italic: true, color: { argb: "FF888888" } };
+}
+
+function addMoneyRow(ws: ExcelJS.Worksheet, row: number, labelText: string, value: number): number {
+  label(ws, `A${row}`, labelText);
+  money(ws, `B${row}`, value);
+  return row + 1;
+}
+
 function formatExportMonthName(month: number, locale: "en" | "es") {
   const name = formatMonthName(month, locale);
   return name.charAt(0).toLocaleUpperCase(locale) + name.slice(1);
 }
 
-function writeMonthSection(
-  ws: ExcelJS.Worksheet,
+function buildMonthSheet(
+  wb: ExcelJS.Workbook,
   year: number,
   month: YearData["months"][number],
-  startRow: number,
   locale: "en" | "es",
 ) {
   const t = EXPORT_MESSAGES[locale];
   const sheetName = formatExportMonthName(month.month, locale);
+  const ws = wb.addWorksheet(sheetName);
+  ws.columns = [{ width: 32 }, { width: 16 }];
 
-  ws.mergeCells(`A${startRow}:E${startRow}`);
-  const title = ws.getCell(`A${startRow}`);
+  let row = 1;
+
+  // Title
+  ws.mergeCells(`A${row}:B${row}`);
+  const title = ws.getCell(`A${row}`);
   title.value = `${sheetName} ${year}`;
   title.font = { bold: true, size: 13 };
   title.alignment = { horizontal: "center" };
+  row += 2;
 
-  const headerRow = startRow + 2;
-  styleHeader(ws, `A${headerRow}`, t.expenses);
-  styleHeader(ws, `D${headerRow}`, t.income);
+  // Expenses section
+  styleHeader(ws, `A${row}`, t.expenses);
+  row++;
 
-  let expRow = headerRow + 1;
-  const addExpRow = (text: string, value: number) => {
-    label(ws, `A${expRow}`, text);
-    money(ws, `B${expRow}`, value);
-    expRow++;
-  };
-
-  addExpRow(t.homeExpense, month.homeExpense);
-  addExpRow(t.personalExpense, month.personalExpense);
-  addExpRow(t.investment, month.investment);
+  subsectionLabel(ws, `A${row}`, t.fixedExpenses);
+  row++;
+  row = addMoneyRow(ws, row, t.homeExpense, month.homeExpense);
+  row = addMoneyRow(ws, row, t.personalExpense, month.personalExpense);
+  row = addMoneyRow(ws, row, t.investment, month.investment);
   for (const entry of month.recurringExpenses ?? []) {
-    addExpRow(entry.label, entry.amount);
+    row = addMoneyRow(ws, row, entry.label, entry.amount);
   }
+
+  subsectionLabel(ws, `A${row}`, t.additionalExpensesLabel);
+  row++;
   for (const entry of month.additionalExpenses) {
-    addExpRow(entry.label, entry.amount);
+    row = addMoneyRow(ws, row, entry.label, entry.amount);
   }
 
-  let incRow = headerRow + 1;
-  const addIncRow = (text: string, value: number) => {
-    label(ws, `D${incRow}`, text);
-    money(ws, `E${incRow}`, value);
-    incRow++;
-  };
+  styleHeader(ws, `A${row}`, t.totalExpenses);
+  money(ws, `B${row}`, month.totalExpenses);
+  row += 2;
 
-  addIncRow(t.payslip, month.payslip);
-  if (month.additionalPayslip > 0) addIncRow(t.additionalPayslip, month.additionalPayslip);
-  addIncRow(t.interests, month.interests);
-  addIncRow(t.personalRemaining, month.personalRemaining);
+  // Income section
+  styleHeader(ws, `A${row}`, t.income);
+  row++;
+
+  subsectionLabel(ws, `A${row}`, t.fixedIncome);
+  row++;
+  row = addMoneyRow(ws, row, t.payslip, month.payslip);
+  if (month.additionalPayslip > 0) {
+    row = addMoneyRow(ws, row, t.additionalPayslip, month.additionalPayslip);
+  }
+  row = addMoneyRow(ws, row, t.interests, month.interests);
+  row = addMoneyRow(ws, row, t.personalRemaining, month.personalRemaining);
+
+  subsectionLabel(ws, `A${row}`, t.additionalIncomeLabel);
+  row++;
   for (const entry of month.additionalIncomes) {
-    addIncRow(entry.label, entry.amount);
+    row = addMoneyRow(ws, row, entry.label, entry.amount);
   }
 
-  const totalRow = Math.max(expRow, incRow) + 1;
-  styleHeader(ws, `A${totalRow}`, t.totalExpenses);
-  money(ws, `B${totalRow}`, month.totalExpenses);
-  styleHeader(ws, `D${totalRow}`, t.totalIncome);
-  money(ws, `E${totalRow}`, month.totalIncome);
+  styleHeader(ws, `A${row}`, t.totalIncome);
+  money(ws, `B${row}`, month.totalIncome);
+  row += 2;
 
-  const summaryRow = totalRow + 2;
-  label(ws, `A${summaryRow}`, t.startingBalance);
-  money(ws, `B${summaryRow}`, month.startingBalance);
+  // Month summary
+  label(ws, `A${row}`, t.startingBalance);
+  money(ws, `B${row}`, month.startingBalance);
+  row++;
 
-  label(ws, `A${summaryRow + 1}`, t.savings);
-  const savingsCell = ws.getCell(`B${summaryRow + 1}`);
+  label(ws, `A${row}`, t.savings);
+  const savingsCell = ws.getCell(`B${row}`);
   savingsCell.value = month.savings;
   savingsCell.numFmt = "#,##0.00€";
   savingsCell.font = { color: { argb: month.savings >= 0 ? "FF1E8449" : "FFC0392B" } };
+  row++;
 
-  label(ws, `A${summaryRow + 2}`, t.endingBalance);
-  const endCell = ws.getCell(`B${summaryRow + 2}`);
+  label(ws, `A${row}`, t.endingBalance);
+  const endCell = ws.getCell(`B${row}`);
   endCell.value = month.endingBalance;
   endCell.numFmt = "#,##0.00€";
   endCell.font = { bold: true };
-
-  return summaryRow + 2;
 }
 
 export async function buildWorkbook(yearData: YearData, locale: "en" | "es" = "es"): Promise<Buffer> {
