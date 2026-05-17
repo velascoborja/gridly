@@ -125,11 +125,22 @@ export const months = pgTable(
   (t) => [unique().on(t.yearId, t.month)]
 );
 
+export const additionalEntryGroups = pgTable("additional_entry_groups", {
+  id: serial("id").primaryKey(),
+  monthId: integer("month_id")
+    .notNull()
+    .references(() => months.id, { onDelete: "cascade" }),
+  label: text("label").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const additionalEntries = pgTable("additional_entries", {
   id: serial("id").primaryKey(),
   monthId: integer("month_id")
     .notNull()
     .references(() => months.id, { onDelete: "cascade" }),
+  groupId: integer("group_id")
+    .references(() => additionalEntryGroups.id, { onDelete: "cascade" }),
   type: text("type").notNull(), // 'income' | 'expense'
   label: text("label").notNull(),
   amount: numeric("amount", { precision: 12, scale: 2 }).notNull().default("0"),
