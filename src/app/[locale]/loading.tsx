@@ -1,13 +1,12 @@
 import Image from "next/image";
-import { Loader2 } from "lucide-react";
 
 export default function LocaleLoading() {
   return (
-    <main className="grid min-h-dvh place-items-center bg-[radial-gradient(circle_at_top_left,rgba(83,58,253,0.16),transparent_30%),radial-gradient(circle_at_top_right,rgba(20,184,166,0.12),transparent_28%),linear-gradient(180deg,rgba(248,250,252,0.98),rgba(255,255,255,1))] px-6 text-foreground">
-      <section
+    <main className="grid min-h-dvh place-items-center bg-[radial-gradient(ellipse_at_30%_20%,rgba(83,58,253,0.07)_0%,transparent_55%),radial-gradient(ellipse_at_75%_15%,rgba(20,184,166,0.05)_0%,transparent_48%),#ffffff] text-foreground">
+      <div
         aria-busy="true"
         aria-live="polite"
-        className="w-full max-w-sm rounded-[6px] border border-border/70 bg-background/90 px-6 py-7 text-center shadow-[0_30px_45px_-30px_rgba(50,50,93,0.25),0_18px_36px_-18px_rgba(0,0,0,0.1)] backdrop-blur"
+        className="flex flex-col items-center"
       >
         <Image
           src="/gridly-wordmark.svg"
@@ -15,16 +14,18 @@ export default function LocaleLoading() {
           width={216}
           height={64}
           priority
-          className="mx-auto mb-6 h-12 w-auto"
+          className="mb-6 h-10 w-auto"
         />
-        <p className="text-[0.8125rem] font-normal text-muted-foreground">
+        <div className="relative h-0.5 w-22 overflow-hidden rounded-full bg-[rgba(83,58,253,0.12)]">
+          <div className="animate-shimmer-slide absolute inset-y-0 w-[60%] rounded-full bg-[linear-gradient(90deg,transparent_0%,#533afd_40%,#665efd_70%,transparent_100%)]" />
+        </div>
+        <p
+          role="status"
+          className="animate-label-fade mt-3 text-[0.6875rem] text-muted-foreground/80"
+        >
           Preparando Gridly...
         </p>
-        <div role="status" className="mt-5 flex justify-center text-primary">
-          <Loader2 className="size-6 animate-spin" aria-hidden="true" />
-          <span className="sr-only">Preparando Gridly...</span>
-        </div>
-      </section>
+      </div>
     </main>
   );
 }

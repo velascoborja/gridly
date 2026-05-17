@@ -46,6 +46,18 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  --animate-shimmer-slide: shimmer-slide 1.7s cubic-bezier(0.4,0,0.6,1) infinite;
+  --animate-label-fade: label-fade 2.6s ease-in-out infinite;
+}
+
+@keyframes shimmer-slide {
+  0%   { transform: translateX(-150%); }
+  100% { transform: translateX(280%); }
+}
+
+@keyframes label-fade {
+  0%, 100% { opacity: 0; transform: translateY(3px); }
+  25%, 75%  { opacity: 1; transform: translateY(0); }
 }
 
 :root {
