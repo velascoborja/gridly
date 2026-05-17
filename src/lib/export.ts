@@ -196,6 +196,102 @@ function buildMonthSheet(
   endCell.font = { bold: true };
 }
 
+function buildSummarySheet(
+  wb: ExcelJS.Workbook,
+  yearData: YearData,
+  locale: "en" | "es",
+) {
+  const t = EXPORT_MESSAGES[locale];
+  const ws = wb.addWorksheet(String(yearData.config.year));
+  ws.columns = [
+    { width: 28 },
+    { width: 14 },
+    { width: 4 },
+    { width: 28 },
+    { width: 14 },
+    { width: 14 },
+  ];
+
+  const months = yearData.months;
+  const totalSaved = months.reduce((s, m) => s + m.savings, 0);
+  const avgSavings = totalSaved / 12;
+  const maxSavings = Math.max(...months.map((m) => m.savings));
+  const totalInvested = months.reduce((s, m) => s + m.investment, 0);
+  const avgAdditionalExpenses =
+    months.reduce((s, m) => s + m.additionalExpenses.reduce((a, e) => a + e.amount, 0), 0) / 12;
+  const avgAdditionalIncomes =
+    months.reduce((s, m) => s + m.additionalIncomes.reduce((a, e) => a + e.amount, 0), 0) / 12;
+
+  let row = 1;
+
+  // Year title
+  ws.getCell(`A${row}`).value = String(yearData.config.year);
+  ws.getCell(`A${row}`).font = { bold: true, size: 13 };
+  row += 2;
+
+  // KPI block
+  styleHeader(ws, `A${row}`, t.annualSummary);
+  row++;
+
+  // Total saved with color coding
+  label(ws, `A${row}`, t.totalSaved);
+  const totalSavedCell = ws.getCell(`B${row}`);
+  totalSavedCell.value = totalSaved;
+  totalSavedCell.numFmt = "#,##0.00€";
+  totalSavedCell.font = { color: { argb: totalSaved >= 0 ? "FF1E8449" : "FFC0392B" } };
+  row++;
+
+  row = addMoneyRow(ws, row, t.averageSavings, avgSavings);
+  row = addMoneyRow(ws, row, t.maxSavings, maxSavings);
+  row = addMoneyRow(ws, row, t.totalInvested, totalInvested);
+  row = addMoneyRow(ws, row, t.avgAdditionalExpenses, avgAdditionalExpenses);
+  row = addMoneyRow(ws, row, t.avgAdditionalIncomes, avgAdditionalIncomes);
+  row++;
+
+  // Monthly breakdown table
+  styleHeader(ws, `A${row}`, t.month);
+  styleHeader(ws, `B${row}`, t.startingBalance);
+  styleHeader(ws, `C${row}`, t.totalIncome);
+  styleHeader(ws, `D${row}`, t.totalExpenses);
+  styleHeader(ws, `E${row}`, t.savings);
+  styleHeader(ws, `F${row}`, t.endingBalance);
+  row++;
+
+  for (const month of months) {
+    ws.getCell(`A${row}`).value = formatExportMonthName(month.month, locale);
+    money(ws, `B${row}`, month.startingBalance);
+    money(ws, `C${row}`, month.totalIncome);
+    money(ws, `D${row}`, month.totalExpenses);
+    const savingsCell = ws.getCell(`E${row}`);
+    savingsCell.value = month.savings;
+    savingsCell.numFmt = "#,##0.00€";
+    savingsCell.font = { color: { argb: month.savings >= 0 ? "FF1E8449" : "FFC0392B" } };
+    money(ws, `F${row}`, month.endingBalance);
+    row++;
+  }
+
+  row++;
+
+  // Config section
+  styleHeader(ws, `A${row}`, t.configuration);
+  row++;
+
+  const cfg = yearData.config;
+  const cfgItems: [string, number][] = [
+    [t.estimatedSalary, cfg.estimatedSalary],
+    [t.monthlyInvestment, cfg.monthlyInvestment],
+    [t.monthlyHomeExpense, cfg.monthlyHomeExpense],
+    [t.monthlyPersonalBudget, cfg.monthlyPersonalBudget],
+    [t.interestRate, cfg.interestRate],
+  ];
+
+  for (const [text, value] of cfgItems) {
+    label(ws, `A${row}`, text);
+    money(ws, `B${row}`, value);
+    row++;
+  }
+}
+
 export async function buildWorkbook(yearData: YearData, locale: "en" | "es" = "es"): Promise<Buffer> {
   const wb = new ExcelJS.Workbook();
   wb.creator = "Gridly";
