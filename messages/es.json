@@ -381,7 +381,18 @@
       "moving": "Moviendo...",
       "confirmDeleteTitle": "¿Eliminar esta entrada?",
       "confirmDeleteDescription": "Se eliminará \"{label}\" de la lista. Esta acción no se puede deshacer.",
-      "confirmDeleteAction": "Eliminar"
+      "confirmDeleteAction": "Eliminar",
+      "addGroup": "Añadir grupo",
+      "groupNamePlaceholder": "Nombre del grupo",
+      "addingGroup": "Añadiendo...",
+      "addToGroup": "Añadir al grupo",
+      "noGroup": "Sin grupo",
+      "group": "Grupo",
+      "confirmDeleteGroupTitle": "¿Eliminar grupo?",
+      "confirmDeleteGroupDescription": "Se eliminará el grupo \"{label}\" y sus {count} gastos. Esta acción no se puede deshacer.",
+      "confirmDeleteGroupAction": "Eliminar grupo",
+      "deletingGroup": "Eliminando...",
+      "savingGroup": "Guardando..."
     },
     "summary": {
       "title": "Resumen",

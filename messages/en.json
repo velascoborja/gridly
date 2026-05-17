@@ -381,7 +381,18 @@
       "moving": "Moving...",
       "confirmDeleteTitle": "Delete this entry?",
       "confirmDeleteDescription": "\"{label}\" will be removed from the list. This action cannot be undone.",
-      "confirmDeleteAction": "Delete"
+      "confirmDeleteAction": "Delete",
+      "addGroup": "Add group",
+      "groupNamePlaceholder": "Group name",
+      "addingGroup": "Adding...",
+      "addToGroup": "Add to group",
+      "noGroup": "No group",
+      "group": "Group",
+      "confirmDeleteGroupTitle": "Delete group?",
+      "confirmDeleteGroupDescription": "Group \"{label}\" and its {count} expenses will be deleted. This action cannot be undone.",
+      "confirmDeleteGroupAction": "Delete group",
+      "deletingGroup": "Deleting...",
+      "savingGroup": "Saving..."
     },
     "summary": {
       "title": "Summary",
