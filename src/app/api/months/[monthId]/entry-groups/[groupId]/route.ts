@@ -2,19 +2,8 @@ import { db } from "@/db";
 import { additionalEntryGroups } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { getSessionUser } from "@/lib/server/session";
-import { getOwnedMonth } from "@/lib/server/ownership";
-
-async function getOwnedGroup(userId: string, monthId: number, groupId: number) {
-  const month = await getOwnedMonth(userId, monthId);
-  if (!month) return null;
-  const group = await db.query.additionalEntryGroups.findFirst({
-    where: and(
-      eq(additionalEntryGroups.id, groupId),
-      eq(additionalEntryGroups.monthId, month.id)
-    ),
-  });
-  return group ?? null;
-}
+import { getOwnedMonth, getOwnedGroup } from "@/lib/server/ownership";
+import { getYearNumberForYearId, propagateYearCarryOver } from "@/lib/server/year-carry-over";
 
 export async function PATCH(
   request: Request,
@@ -26,6 +15,9 @@ export async function PATCH(
   }
 
   const { monthId, groupId } = await params;
+  const month = await getOwnedMonth(user.id, parseInt(monthId, 10));
+  if (!month) return Response.json({ error: "Month not found" }, { status: 404 });
+
   const group = await getOwnedGroup(
     user.id,
     parseInt(monthId, 10),
@@ -45,6 +37,11 @@ export async function PATCH(
     .where(eq(additionalEntryGroups.id, group.id))
     .returning();
 
+  const yearNumber = await getYearNumberForYearId(month.yearId);
+  if (yearNumber !== null) {
+    await propagateYearCarryOver(user.id, yearNumber);
+  }
+
   return Response.json(updated);
 }
 
@@ -58,6 +55,9 @@ export async function DELETE(
   }
 
   const { monthId, groupId } = await params;
+  const month = await getOwnedMonth(user.id, parseInt(monthId, 10));
+  if (!month) return Response.json({ error: "Month not found" }, { status: 404 });
+
   const group = await getOwnedGroup(
     user.id,
     parseInt(monthId, 10),
@@ -68,6 +68,11 @@ export async function DELETE(
   await db
     .delete(additionalEntryGroups)
     .where(eq(additionalEntryGroups.id, group.id));
+
+  const yearNumber = await getYearNumberForYearId(month.yearId);
+  if (yearNumber !== null) {
+    await propagateYearCarryOver(user.id, yearNumber);
+  }
 
   return new Response(null, { status: 204 });
 }

@@ -2,6 +2,7 @@ import { db } from "@/db";
 import { additionalEntryGroups } from "@/db/schema";
 import { getSessionUser } from "@/lib/server/session";
 import { getOwnedMonth } from "@/lib/server/ownership";
+import { getYearNumberForYearId, propagateYearCarryOver } from "@/lib/server/year-carry-over";
 
 export async function POST(
   request: Request,
@@ -26,6 +27,11 @@ export async function POST(
     .insert(additionalEntryGroups)
     .values({ monthId: month.id, label })
     .returning();
+
+  const yearNumber = await getYearNumberForYearId(month.yearId);
+  if (yearNumber !== null) {
+    await propagateYearCarryOver(user.id, yearNumber);
+  }
 
   return Response.json(group, { status: 201 });
 }

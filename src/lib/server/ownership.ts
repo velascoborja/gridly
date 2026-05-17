@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { additionalEntries, monthlyRecurringExpenses, months, years } from "@/db/schema";
+import { additionalEntries, additionalEntryGroups, monthlyRecurringExpenses, months, years } from "@/db/schema";
 
 export function statusForAuth(isAuthenticated: boolean) {
   return isAuthenticated ? 200 : 401;
@@ -42,4 +42,16 @@ export async function getOwnedRecurringExpense(userId: string, entryId: number) 
     .where(and(eq(monthlyRecurringExpenses.id, entryId), eq(years.userId, userId)));
 
   return row[0]?.entry ?? null;
+}
+
+export async function getOwnedGroup(userId: string, monthId: number, groupId: number) {
+  const month = await getOwnedMonth(userId, monthId);
+  if (!month) return null;
+  const group = await db.query.additionalEntryGroups.findFirst({
+    where: and(
+      eq(additionalEntryGroups.id, groupId),
+      eq(additionalEntryGroups.monthId, month.id)
+    ),
+  });
+  return group ?? null;
 }
