@@ -295,59 +295,11 @@ function buildSummarySheet(
 export async function buildWorkbook(yearData: YearData, locale: "en" | "es" = "es"): Promise<Buffer> {
   const wb = new ExcelJS.Workbook();
   wb.creator = "Gridly";
-  const t = EXPORT_MESSAGES[locale];
 
-  const ws = wb.addWorksheet(String(yearData.config.year));
-  ws.columns = [
-    { width: 28 },
-    { width: 14 },
-    { width: 4 },
-    { width: 28 },
-    { width: 14 },
-    { width: 14 },
-  ];
-
-  let currentRow = 1;
+  buildSummarySheet(wb, yearData, locale);
   for (const month of yearData.months) {
-    currentRow = writeMonthSection(ws, yearData.config.year, month, currentRow, locale) + 3;
+    buildMonthSheet(wb, yearData.config.year, month, locale);
   }
-
-  styleHeader(ws, `A${currentRow}`, t.month);
-  styleHeader(ws, `B${currentRow}`, t.startingBalance);
-  styleHeader(ws, `C${currentRow}`, t.totalIncome);
-  styleHeader(ws, `D${currentRow}`, t.totalExpenses);
-  styleHeader(ws, `E${currentRow}`, t.savings);
-  styleHeader(ws, `F${currentRow}`, t.endingBalance);
-
-  yearData.months.forEach((month, index) => {
-    const row = currentRow + 1 + index;
-    ws.getCell(`A${row}`).value = formatExportMonthName(month.month, locale);
-    money(ws, `B${row}`, month.startingBalance);
-    money(ws, `C${row}`, month.totalIncome);
-    money(ws, `D${row}`, month.totalExpenses);
-    const savingsCell = ws.getCell(`E${row}`);
-    savingsCell.value = month.savings;
-    savingsCell.numFmt = "#,##0.00€";
-    savingsCell.font = { color: { argb: month.savings >= 0 ? "FF1E8449" : "FFC0392B" } };
-    money(ws, `F${row}`, month.endingBalance);
-  });
-
-  const configRow = currentRow + yearData.months.length + 2;
-  styleHeader(ws, `A${configRow}`, t.configuration);
-
-  const cfg = yearData.config;
-  const cfgItems = [
-    [t.estimatedSalary, cfg.estimatedSalary],
-    [t.monthlyInvestment, cfg.monthlyInvestment],
-    [t.monthlyHomeExpense, cfg.monthlyHomeExpense],
-    [t.monthlyPersonalBudget, cfg.monthlyPersonalBudget],
-    [t.interestRate, cfg.interestRate],
-  ] as [string, number][];
-
-  cfgItems.forEach(([text, value], index) => {
-    ws.getCell(`A${configRow + 1 + index}`).value = text;
-    money(ws, `B${configRow + 1 + index}`, value);
-  });
 
   const buf = await wb.xlsx.writeBuffer();
   return Buffer.from(buf as ArrayBuffer);
