@@ -14,14 +14,14 @@ export default function LocaleLoading() {
           width={216}
           height={64}
           priority
-          className="mb-6 h-10 w-auto"
+          className="mb-9 h-14 w-auto"
         />
-        <div className="relative h-0.5 w-22 overflow-hidden rounded-full bg-[rgba(83,58,253,0.12)]">
+        <div className="relative h-0.5 w-56 overflow-hidden rounded-full bg-[rgba(83,58,253,0.12)]">
           <div className="animate-shimmer-slide absolute inset-y-0 w-[60%] rounded-full bg-[linear-gradient(90deg,transparent_0%,#533afd_40%,#665efd_70%,transparent_100%)]" />
         </div>
         <p
           role="status"
-          className="animate-label-fade mt-3 text-[0.6875rem] text-muted-foreground/80"
+          className="animate-label-fade mt-4 text-[0.9375rem] text-muted-foreground/80"
         >
           Preparando Gridly...
         </p>
