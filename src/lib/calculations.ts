@@ -1,4 +1,4 @@
-import type { AdditionalEntry, MonthData, RecurringExpense, YearConfig } from "./types";
+import type { AdditionalEntry, AdditionalEntryGroup, MonthData, RecurringExpense, YearConfig } from "./types";
 
 interface RawMonthData {
   id: number;
@@ -18,7 +18,8 @@ interface RawMonthData {
   interestsManualOverride: boolean;
   personalRemaining: number;
   recurringExpenses?: RecurringExpense[];
-  additionalExpenses: AdditionalEntry[];
+  additionalExpenses: AdditionalEntry[];        // ungrouped only
+  additionalExpenseGroups: AdditionalEntryGroup[]; // grouped
   additionalIncomes: AdditionalEntry[];
 }
 
@@ -33,8 +34,12 @@ export function totalIncome(m: RawMonthData): number {
 
 export function totalExpenses(m: RawMonthData): number {
   const additionalSum = m.additionalExpenses.reduce((sum, e) => sum + e.amount, 0);
+  const groupedSum = m.additionalExpenseGroups.reduce(
+    (sum, g) => sum + g.entries.reduce((s, e) => s + e.amount, 0),
+    0
+  );
   const recurringSum = (m.recurringExpenses ?? []).reduce((sum, e) => sum + e.amount, 0);
-  return m.homeExpense + m.personalExpense + m.investment + recurringSum + additionalSum;
+  return m.homeExpense + m.personalExpense + m.investment + recurringSum + additionalSum + groupedSum;
 }
 
 export function savings(m: RawMonthData): number {
@@ -102,6 +107,7 @@ export function estimatedMonthData(month: number, config: YearConfig): Omit<RawM
     personalRemaining: 0,
     recurringExpenses: [],
     additionalExpenses: [],
+    additionalExpenseGroups: [],
     additionalIncomes: [],
   };
 }

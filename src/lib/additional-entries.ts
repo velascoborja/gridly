@@ -16,8 +16,15 @@ export function avgAdditionalEntriesPerMonth(
   type: "expense" | "income"
 ): number {
   const total = months.reduce((sum, m) => {
-    const entries = type === "expense" ? m.additionalExpenses : m.additionalIncomes;
-    return sum + sumAdditionalEntries(entries);
+    if (type === "income") {
+      return sum + sumAdditionalEntries(m.additionalIncomes);
+    }
+    const ungrouped = sumAdditionalEntries(m.additionalExpenses);
+    const grouped = m.additionalExpenseGroups.reduce(
+      (s, g) => s + sumAdditionalEntries(g.entries),
+      0
+    );
+    return sum + ungrouped + grouped;
   }, 0);
   return total / 12;
 }
