@@ -33,5 +33,29 @@ The year summary page displays average additional entries alongside the Balance 
 These statistics appear as two stat cards on the year summary page, providing a quick view of typical monthly variable transactions.
 
 **Relevant Code:**
-- `avgAdditionalEntriesPerMonth()` in `src/lib/additional-entries.ts`: Calculates the yearly average for a given entry type.
+- `avgAdditionalEntriesPerMonth()` in `src/lib/additional-entries.ts`: Calculates the yearly average for a given entry type (includes grouped entries for expense type).
 - `AdditionalEntriesAverages` component in `src/components/annual/additional-entries-averages.tsx`: Renders the stat cards with currency formatting and tone-coded icon indicators (rose/ArrowDownRight for expenses, emerald/ArrowUpRight for income, neutral/Minus when the value is zero).
+
+## Expense Groups
+
+Users can group related additional expenses within a month (e.g., "Viaje a Roma"). Groups are expenses-only and per-month.
+
+### Data
+- `additionalEntryGroups` table: `id`, `monthId`, `label`, `createdAt`. Cascade-deleted with their month.
+- `additionalEntries.groupId` (nullable FK → `additionalEntryGroups`): `null` = ungrouped.
+- `MonthData.additionalExpenses` contains only **ungrouped** expenses. `MonthData.additionalExpenseGroups` contains grouped expenses with their entries nested inside.
+- Both sets are summed into `totalExpenses` (see `calculations.ts`).
+
+### API
+- `POST /api/months/[monthId]/entry-groups` — create a group `{ label }`.
+- `PATCH /api/months/[monthId]/entry-groups/[groupId]` — rename `{ label }`.
+- `DELETE /api/months/[monthId]/entry-groups/[groupId]` — delete group and all its entries (DB cascade).
+- `PATCH /api/months/[monthId]/entries/[entryId]` — accepts `groupId: number | null` to move an entry into or out of a group.
+
+### UI
+- **`AdditionalEntryGroupRow`** (`src/components/monthly/additional-entry-group-row.tsx`): self-contained collapsed/expanded group row. Owns its own UI state (collapsed, rename, add-entry form, per-entry edit/delete).
+- Groups render above ungrouped entries in `AdditionalEntriesCard`.
+- Collapsed state resets on reload (UI-only state, not persisted).
+- Group name is editable inline: click the group label to rename, Enter or blur to save, Escape to cancel.
+- Deleting a group opens a confirmation dialog listing the group name and entry count.
+- Entries can be moved to/from groups via the group dropdown in the entry edit form (available in both `AdditionalEntryGroupRow` and `AdditionalEntriesCard`).
