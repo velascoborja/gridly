@@ -130,13 +130,13 @@ test("excel export produces a 13-sheet workbook with summary first and one sheet
     // December sheet has fixed and additional income subsections
     const decemberSheet = workbook.worksheets[12];
     const fixedIncomeRow = findRow(decemberSheet, (row) => {
-      const val = decemberSheet.getCell(`A${row}`).value;
+      const val = decemberSheet.getCell(`D${row}`).value;
       return typeof val === "string" && val.includes("Ingresos fijos");
     });
     assert.ok(fixedIncomeRow > 0, "December sheet should have fixed income subsection");
 
     // December sheet has additional income (Regalo entry for month 12)
-    const regaloRow = findRow(decemberSheet, (row) => decemberSheet.getCell(`A${row}`).value === "Regalo");
+    const regaloRow = findRow(decemberSheet, (row) => decemberSheet.getCell(`D${row}`).value === "Regalo");
     assert.ok(regaloRow > 0, "December sheet should show additional income entry 'Regalo'");
   } finally {
     await cleanup();

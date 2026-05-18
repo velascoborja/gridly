@@ -15,9 +15,11 @@ test("ownership helper defines guarded resource lookups", async () => {
   assert.match(source, /statusForAuth/);
 });
 
-test("legacy owner email is fixed to the approved account", async () => {
+test("legacy owner email is configured from the environment", async () => {
   const source = await readSource("src/lib/server/legacy-user.ts");
 
   assert.match(source, /LEGACY_OWNER_EMAIL/);
-  assert.match(source, /velascoborja@gmail\.com/);
+  assert.match(source, /process\.env\.LEGACY_OWNER_EMAIL/);
+  assert.match(source, /\?\? ""/);
+  assert.doesNotMatch(source, /velascoborja@gmail\.com/);
 });

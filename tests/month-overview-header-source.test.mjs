@@ -7,6 +7,10 @@ async function readSource(path) {
   return readFile(new URL(`../${path}`, import.meta.url), "utf8");
 }
 
+async function readJson(path) {
+  return JSON.parse(await readSource(path));
+}
+
 function findMonthOverviewFunction(sourceFile) {
   return sourceFile.statements.find(
     (statement) =>
@@ -121,6 +125,8 @@ function hasLegacyPeerCluster(node, sourceFile) {
 
 test("month overview header source exposes the revised summary labels", async () => {
   const source = await readSource("src/components/monthly/month-overview.tsx");
+  const messages = await readJson("messages/es.json");
+  const overviewMessages = messages.Monthly.overview;
   const sourceFile = ts.createSourceFile(
     "month-overview.tsx",
     source,
@@ -149,25 +155,30 @@ test("month overview header source exposes the revised summary labels", async ()
   collectCards(mainReturnExpression);
 
   const headerCard = cardCandidates.find((card) => {
-    const texts = [];
-    collectJsxTexts(card, sourceFile, texts);
-    return texts.includes("Inicial") && texts.includes("Saldo Final");
+    const cardSource = card.getText(sourceFile);
+    return cardSource.includes('tOverview("startingBalance")') && cardSource.includes('tOverview("endingBalance")');
   });
 
   assert.ok(headerCard, "expected to find the summary Card in the main return tree");
 
-  const texts = [];
-  collectJsxTexts(headerCard, sourceFile, texts);
+  const cardSource = headerCard.getText(sourceFile);
 
-  for (const label of ["Ahorro Neto", "Saldo Final", "Inicial", "Ingresos", "Gastos"]) {
-    assert.ok(texts.includes(label), `expected header card to include ${label}`);
+  const expectedKeys = ["netSavings", "endingBalance", "startingBalance", "totalIncome", "totalExpenses"];
+  for (const key of expectedKeys) {
+    assert.match(cardSource, new RegExp(`tOverview\\("${key}"\\)`), `expected header card to use ${key}`);
   }
+
+  assert.equal(overviewMessages.netSavings, "Ahorro neto");
+  assert.equal(overviewMessages.endingBalance, "Saldo final");
+  assert.equal(overviewMessages.startingBalance, "Saldo inicial");
+  assert.equal(overviewMessages.totalIncome, "Ingresos");
+  assert.equal(overviewMessages.totalExpenses, "Gastos");
 
   assert.ok(!hasLegacyPeerCluster(headerCard, sourceFile), "old equal-weight KPI layout should be removed from the header card");
 
-  const savingsPosition = texts.indexOf("Ahorro Neto");
-  const finalPosition = texts.indexOf("Saldo Final");
-  const initialPosition = texts.indexOf("Inicial");
+  const savingsPosition = cardSource.indexOf('tOverview("netSavings")');
+  const finalPosition = cardSource.indexOf('tOverview("endingBalance")');
+  const initialPosition = cardSource.indexOf('tOverview("startingBalance")');
 
   assert.notEqual(savingsPosition, -1);
   assert.notEqual(finalPosition, -1);
