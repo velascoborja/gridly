@@ -56,5 +56,10 @@ export function createEncryptedAdapter(
       }
       return null;
     },
+    async getSessionAndUser(sessionToken) {
+      const result = await base.getSessionAndUser!(sessionToken);
+      if (!result) return null;
+      return { session: result.session, user: decryptAdapterUser(result.user)! };
+    },
   };
 }
