@@ -12,7 +12,8 @@ function getKey(): Buffer {
 
 export function encryptField(plaintext: string): string {
   const key = getKey();
-  const iv = createHmac("sha256", key).update(plaintext).digest().slice(0, 12);
+  const ivKey = createHmac("sha256", key).update("iv-derivation").digest();
+  const iv = createHmac("sha256", ivKey).update(plaintext).digest().slice(0, 12);
   const cipher = createCipheriv("aes-256-gcm", key, iv);
   const ciphertext = Buffer.concat([cipher.update(plaintext, "utf8"), cipher.final()]);
   const authTag = cipher.getAuthTag();
@@ -23,12 +24,13 @@ export function decryptField(value: string): string {
   if (!value.startsWith(ENC_PREFIX)) return value;
   const key = getKey();
   const buf = Buffer.from(value.slice(ENC_PREFIX.length), "base64");
+  if (buf.length < 28) throw new Error("Encrypted field value is malformed or truncated");
   const iv = buf.subarray(0, 12);
   const authTag = buf.subarray(buf.length - 16);
   const ciphertext = buf.subarray(12, buf.length - 16);
   const decipher = createDecipheriv("aes-256-gcm", key, iv);
   decipher.setAuthTag(authTag);
-  return decipher.update(ciphertext) + decipher.final("utf8");
+  return Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString("utf8");
 }
 
 export function isEncrypted(value: string): boolean {
