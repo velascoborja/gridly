@@ -20,9 +20,10 @@ interface Props {
   onRecurringEntriesChange: (entries: RecurringExpense[]) => void;
   annualDefaults: Pick<YearConfig, "monthlyHomeExpense" | "monthlyPersonalBudget" | "monthlyInvestment">;
   readOnly?: boolean;
+  highlightId?: string | null;
 }
 
-export function FixedExpensesCard({ month, onUpdate, onRecurringEntriesChange, annualDefaults, readOnly = false }: Props) {
+export function FixedExpensesCard({ month, onUpdate, onRecurringEntriesChange, annualDefaults, readOnly = false, highlightId = null }: Props) {
   const t = useTranslations("Monthly.fixedExpenses");
   const tFixed = useTranslations("Monthly.fixed");
   const locale = useLocale();
@@ -86,6 +87,7 @@ export function FixedExpensesCard({ month, onUpdate, onRecurringEntriesChange, a
             entries={month.recurringExpenses}
             onEntriesChange={onRecurringEntriesChange}
             readOnly={readOnly}
+            highlightId={highlightId}
           />
         </div>
       </CardContent>
