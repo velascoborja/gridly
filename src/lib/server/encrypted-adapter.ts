@@ -7,6 +7,7 @@ function encryptAdapterUser(user: Omit<AdapterUser, "id">): Omit<AdapterUser, "i
     ...user,
     email: encryptField(user.email),
     name: user.name != null ? encryptField(user.name) : user.name,
+    image: user.image != null ? encryptField(user.image) : user.image,
   };
 }
 
@@ -17,6 +18,7 @@ function encryptAdapterUserPartial(
     ...user,
     ...(user.email != null ? { email: encryptField(user.email) } : {}),
     ...(user.name != null ? { name: encryptField(user.name) } : {}),
+    ...(user.image != null ? { image: encryptField(user.image) } : {}),
   };
 }
 
@@ -26,6 +28,7 @@ function decryptAdapterUser(user: AdapterUser | null | undefined): AdapterUser |
     ...user,
     email: decryptField(user.email),
     name: user.name != null ? decryptField(user.name) : user.name,
+    image: user.image != null ? decryptField(user.image) : user.image,
   };
 }
 
