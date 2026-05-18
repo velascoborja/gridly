@@ -557,6 +557,13 @@
     "interests": "Interests",
     "personalRemaining": "Personal surplus"
   },
+  "Search": {
+    "placeholder": "Search entries...",
+    "noResults": "No results",
+    "kindIncome": "Income",
+    "kindExpense": "Expense",
+    "kindRecurring": "Recurring"
+  },
   "Privacy": {
     "title": "Privacy Policy",
     "lastUpdated": "Last updated: May 9, 2026",

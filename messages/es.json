@@ -557,6 +557,13 @@
     "interests": "Intereses",
     "personalRemaining": "Sobrante propios"
   },
+  "Search": {
+    "placeholder": "Buscar entradas...",
+    "noResults": "Sin resultados",
+    "kindIncome": "Ingreso",
+    "kindExpense": "Gasto",
+    "kindRecurring": "Gasto fijo"
+  },
   "Privacy": {
     "title": "Política de Privacidad",
     "lastUpdated": "Última actualización: 9 de mayo de 2026",
