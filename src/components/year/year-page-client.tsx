@@ -1,12 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AnnualView } from "@/components/annual/annual-view";
 import { AppShell } from "@/components/layout/app-shell";
 import { MonthOverview } from "@/components/monthly/month-overview";
+import { SearchPalette } from "@/components/search/search-palette";
 import { SettingsForm } from "@/components/settings/settings-form";
 import { usePathname } from "@/i18n/routing";
 import type { YearData } from "@/lib/types";
+import type { SearchEntry } from "@/lib/search-index";
 import {
   type YearRouteView,
   parseYearRoutePathname,
@@ -70,6 +72,9 @@ export function YearPageClient({
   const [selectedMonth, setSelectedMonth] = useState(() => initialState.month);
   const [selectedView, setSelectedView] = useState<YearRouteView>(() => initialState.view);
   const routePrefix = getYearRoutePrefix(pathname, currentYearData.config.year);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [highlightId, setHighlightId] = useState<string | null>(null);
+  const highlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     setCurrentYearData(yearData);
@@ -100,6 +105,25 @@ export function YearPageClient({
     };
   }, [currentYearData.config.year, pathname]);
 
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setSearchOpen((prev) => !prev);
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (highlightTimerRef.current !== null) {
+        clearTimeout(highlightTimerRef.current);
+      }
+    };
+  }, []);
+
   const handleMonthSelect = useCallback((nextMonth: number) => {
     if (selectedView === "overview" && selectedMonth === nextMonth) return;
 
@@ -122,6 +146,24 @@ export function YearPageClient({
     window.history.pushState(null, "", buildSettingsHref(routePrefix));
   }, [routePrefix, selectedView]);
 
+  const handleSearchSelect = useCallback(
+    (entry: SearchEntry) => {
+      setSelectedMonth(entry.month);
+      setSelectedView("overview");
+      window.history.pushState(null, "", buildYearMonthHref(routePrefix, currentYearData.config.year, entry.month));
+
+      if (highlightTimerRef.current !== null) {
+        clearTimeout(highlightTimerRef.current);
+      }
+      setHighlightId(entry.id);
+      highlightTimerRef.current = setTimeout(() => {
+        setHighlightId(null);
+        highlightTimerRef.current = null;
+      }, 2000);
+    },
+    [currentYearData.config.year, routePrefix]
+  );
+
   return (
     <AppShell
       currentYear={currentYearData.config.year}
@@ -132,6 +174,7 @@ export function YearPageClient({
       onMonthViewSelect={() => handleMonthSelect(selectedMonth)}
       onSummaryViewSelect={handleSummarySelect}
       onSettingsSelect={handleSettingsSelect}
+      onSearchOpen={() => setSearchOpen(true)}
     >
       {selectedView === "settings" ? (
         <div className="mx-auto max-w-4xl py-6">
@@ -149,8 +192,15 @@ export function YearPageClient({
           monthNumber={selectedMonth}
           onMonthSelect={handleMonthSelect}
           onYearDataChange={setCurrentYearData}
+          highlightId={highlightId}
         />
       )}
+      <SearchPalette
+        yearData={currentYearData}
+        open={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        onSelect={handleSearchSelect}
+      />
     </AppShell>
   );
 }

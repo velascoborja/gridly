@@ -1,8 +1,10 @@
 "use client";
 
+import { Search } from "lucide-react";
 import { NavSelectors } from "./nav-selectors";
 import { UserMenu } from "@/components/auth/user-menu";
 import { BaseAppShell } from "./base-app-shell";
+import { Button } from "@/components/ui/button";
 import type { YearOption } from "@/lib/types";
 
 interface Props {
@@ -18,6 +20,7 @@ interface Props {
   onMonthViewSelect?: () => void;
   onSummaryViewSelect?: () => void;
   onSettingsSelect?: () => void;
+  onSearchOpen?: () => void;
   children: React.ReactNode;
 }
 
@@ -30,13 +33,25 @@ export function AppShell({
   onMonthViewSelect,
   onSummaryViewSelect,
   onSettingsSelect,
+  onSearchOpen,
   children,
 }: Props) {
   return (
     <BaseAppShell
       headerRightContent={
         <>
-          <div className="flex items-center justify-end justify-self-end">
+          <div className="flex items-center justify-end justify-self-end gap-2">
+            {onSearchOpen && (
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label="Search entries"
+                onClick={onSearchOpen}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <Search className="h-4 w-4" />
+              </Button>
+            )}
             <UserMenu
               email={user.email}
               name={user.name}
