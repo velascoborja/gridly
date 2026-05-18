@@ -1,6 +1,6 @@
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import type { Adapter, AdapterUser } from "@auth/core/adapters";
-import { encryptField, decryptField } from "./encryption";
+import { encryptField, decryptField, isEncrypted } from "./encryption";
 
 function encryptAdapterUser(user: Omit<AdapterUser, "id">): Omit<AdapterUser, "id"> {
   return {
@@ -36,7 +36,8 @@ export function createEncryptedAdapter(
   return {
     ...base,
     async createUser(data) {
-      return decryptAdapterUser(await base.createUser!(encryptAdapterUser(data) as AdapterUser))!;
+      // DrizzleAdapter accepts Omit<AdapterUser, "id"> at runtime despite the declared signature.
+      return decryptAdapterUser(await base.createUser!(encryptAdapterUser(data) as unknown as AdapterUser))!;
     },
     async updateUser(data) {
       return decryptAdapterUser(await base.updateUser!(encryptAdapterUserPartial(data)))!;
@@ -50,7 +51,10 @@ export function createEncryptedAdapter(
     async getUserByEmail(email) {
       const byEncrypted = await base.getUserByEmail!(encryptField(email));
       if (byEncrypted) return decryptAdapterUser(byEncrypted);
-      return decryptAdapterUser(await base.getUserByEmail!(email));
+      if (!isEncrypted(email)) {
+        return decryptAdapterUser(await base.getUserByEmail!(email));
+      }
+      return null;
     },
   };
 }
