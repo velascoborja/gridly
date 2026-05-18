@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { ChevronRight, FolderInput, Loader2, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -38,6 +38,7 @@ interface Props {
   onGroupDelete: (groupId: number) => void;
   onEntryGroupChanged: (entry: AdditionalEntry, toGroupId: number | null) => void;
   readOnly?: boolean;
+  highlightId?: string | null;
 }
 
 export function AdditionalEntryGroupRow({
@@ -48,6 +49,7 @@ export function AdditionalEntryGroupRow({
   onGroupDelete,
   onEntryGroupChanged,
   readOnly = false,
+  highlightId = null,
 }: Props) {
   const t = useTranslations("Monthly.additionalEntries");
   const common = useTranslations("Common");
@@ -73,6 +75,12 @@ export function AdditionalEntryGroupRow({
 
   const parseAmount = (v: string) => parseFloat(v.replace(",", "."));
   const groupTotal = group.entries.reduce((sum, e) => sum + e.amount, 0);
+
+  useEffect(() => {
+    if (highlightId && group.entries.some((e) => `entry-${e.id}` === highlightId)) {
+      setCollapsed(false);
+    }
+  }, [highlightId, group.entries]);
 
   const handleToggle = () => {
     if (!isEditingName) setCollapsed((c) => !c);
@@ -452,7 +460,8 @@ export function AdditionalEntryGroupRow({
                 key={entry.id}
                 className={cn(
                   "rounded-lg border border-transparent px-2 py-1.5 transition-all hover:border-border/70 hover:bg-muted/40",
-                  deletingId === entry.id && "pointer-events-none opacity-60"
+                  deletingId === entry.id && "pointer-events-none opacity-60",
+                  highlightId === `entry-${entry.id}` && "ring-2 ring-primary/40 bg-primary/5"
                 )}
               >
                 <div className="flex min-w-0 items-center justify-between gap-2">
