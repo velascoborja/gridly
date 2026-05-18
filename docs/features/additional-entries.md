@@ -55,6 +55,7 @@ Users can group related additional expenses within a month (e.g., "Viaje a Roma"
 ### UI
 - **`AdditionalEntryGroupRow`** (`src/components/monthly/additional-entry-group-row.tsx`): self-contained collapsed/expanded group row. Owns its own UI state (collapsed, rename, add-entry form, per-entry edit/delete).
 - Groups render above ungrouped entries in `AdditionalEntriesCard`.
+- Creating a group updates the mounted month state immediately, then calls `router.refresh()` to invalidate the App Router client cache for route restores after leaving and returning to the year workspace.
 - Collapsed state resets on reload (UI-only state, not persisted).
 - Group name is editable inline: click the group label to rename, Enter or blur to save, Escape to cancel.
 - Deleting a group opens a confirmation dialog listing the group name and entry count.

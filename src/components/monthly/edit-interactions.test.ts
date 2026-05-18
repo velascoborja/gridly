@@ -41,6 +41,14 @@ test("additional entry amounts remain direct edit triggers", () => {
   assert.match(source, /aria-label=\{`\$\{t\("edit"\)\} \$\{entry\.label\}`\}/);
 });
 
+test("additional expense group creation refreshes the app router cache after local state updates", () => {
+  const source = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /import \{ useRouter \} from "@\/i18n\/routing"/);
+  assert.match(source, /const router = useRouter\(\)/);
+  assert.match(source, /onGroupsChange\?\.\(\[\.\.\.groups, newGroup\]\);\s*router\.refresh\(\);/);
+});
+
 test("additional entry amount inputs show a Euro suffix as soon as they are editable", () => {
   const source = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
 
