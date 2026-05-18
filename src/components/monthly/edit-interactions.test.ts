@@ -41,6 +41,14 @@ test("additional entry amounts remain direct edit triggers", () => {
   assert.match(source, /aria-label=\{`\$\{t\("edit"\)\} \$\{entry\.label\}`\}/);
 });
 
+test("additional expense group creation refreshes the app router cache after local state updates", () => {
+  const source = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /import \{ useRouter \} from "@\/i18n\/routing"/);
+  assert.match(source, /const router = useRouter\(\)/);
+  assert.match(source, /onGroupsChange\?\.\(\[\.\.\.groups, newGroup\]\);\s*router\.refresh\(\);/);
+});
+
 test("additional entry amount inputs show a Euro suffix as soon as they are editable", () => {
   const source = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
 
@@ -244,4 +252,35 @@ test("additional entry rows move by drag and drop without a separate move button
   assert.doesNotMatch(entriesSource, /onEntryMove\?: \(entry: AdditionalEntry, targetMonthId: number\) => void/);
   assert.doesNotMatch(entriesSource, /t\("moveEntry"\)/);
   assert.doesNotMatch(overviewSource, /moveTargets=\{additionalEntryMoveTargets\}/);
+});
+
+test("additional expense group moves use a compact edit-row menu instead of selects", () => {
+  const entriesSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
+  const groupRowSource = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");
+  const esMessages = readFileSync(new URL("../../../messages/es.json", import.meta.url), "utf8");
+  const enMessages = readFileSync(new URL("../../../messages/en.json", import.meta.url), "utf8");
+
+  for (const source of [entriesSource, groupRowSource]) {
+    assert.match(source, /DropdownMenu/);
+    assert.match(source, /DropdownMenuRadioGroup/);
+    assert.match(source, /FolderInput/);
+    assert.match(source, /handleMoveToGroup/);
+    assert.match(source, /const \[movingToGroupId, setMovingToGroupId\] = useState<number \| null>\(null\)/);
+    assert.match(source, /size="icon-sm"/);
+    assert.doesNotMatch(source, /<select/);
+  }
+
+  assert.match(esMessages, /"moveToGroup": "Mover a grupo"/);
+  assert.match(enMessages, /"moveToGroup": "Move to group"/);
+});
+
+test("additional expense group delete loading action fits the compact dialog footer", () => {
+  const groupRowSource = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");
+
+  assert.match(
+    groupRowSource,
+    /group-data-\[size=sm\]\/alert-dialog-content:grid-cols-\[minmax\(0,0\.8fr\)_minmax\(0,1\.2fr\)\]/
+  );
+  assert.match(groupRowSource, /className="min-w-0 px-2 text-xs sm:text-sm"/);
+  assert.match(groupRowSource, /isDeletingGroup \? t\("deletingGroup"\) : t\("confirmDeleteGroupAction"\)/);
 });

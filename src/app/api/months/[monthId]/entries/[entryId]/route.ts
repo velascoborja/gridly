@@ -1,6 +1,6 @@
 import { db } from "@/db";
-import { additionalEntries } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { additionalEntries, additionalEntryGroups } from "@/db/schema";
+import { and, eq } from "drizzle-orm";
 import { getYearNumberForYearId, propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getSessionUser } from "@/lib/server/session";
 import { getOwnedEntry, getOwnedMonth } from "@/lib/server/ownership";
@@ -24,14 +24,14 @@ export async function PATCH(
   if (body.amount !== undefined) updates.amount = String(body.amount);
 
   const entry = await getOwnedEntry(user.id, id);
-  if (!month || !entry || entry.monthId !== month.id) return Response.json({ error: "Entry not found" }, { status: 404 });
+  if (!month || !entry || entry.monthId !== month.id)
+    return Response.json({ error: "Entry not found" }, { status: 404 });
 
   if (body.monthId !== undefined) {
     const targetMonthId = parseInt(String(body.monthId), 10);
     if (Number.isNaN(targetMonthId)) {
       return Response.json({ error: "Invalid target month" }, { status: 400 });
     }
-
     const targetMonth = await getOwnedMonth(user.id, targetMonthId);
     if (!targetMonth) {
       return Response.json({ error: "Target month not found" }, { status: 404 });
@@ -39,11 +39,36 @@ export async function PATCH(
     if (targetMonth.yearId !== month.yearId) {
       return Response.json({ error: "Target month must be in the same year" }, { status: 400 });
     }
-
     updates.monthId = targetMonth.id;
   }
 
-  const [updated] = await db.update(additionalEntries).set(updates).where(eq(additionalEntries.id, entry.id)).returning();
+  if (body.groupId !== undefined) {
+    if (body.groupId === null) {
+      updates.groupId = null;
+    } else {
+      const groupId = parseInt(String(body.groupId), 10);
+      if (Number.isNaN(groupId)) {
+        return Response.json({ error: "Invalid groupId" }, { status: 400 });
+      }
+      const group = await db.query.additionalEntryGroups.findFirst({
+        where: and(
+          eq(additionalEntryGroups.id, groupId),
+          eq(additionalEntryGroups.monthId, month.id)
+        ),
+      });
+      if (!group) {
+        return Response.json({ error: "Group not found" }, { status: 404 });
+      }
+      updates.groupId = groupId;
+    }
+  }
+
+  const [updated] = await db
+    .update(additionalEntries)
+    .set(updates)
+    .where(eq(additionalEntries.id, entry.id))
+    .returning();
+
   const yearNumber = await getYearNumberForYearId(month.yearId);
   if (yearNumber !== null) {
     await propagateYearCarryOver(user.id, yearNumber);

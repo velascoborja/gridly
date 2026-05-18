@@ -53,6 +53,7 @@ test("computeMonthChain auto-calculates interest from each month's starting bala
           interestsManualOverride: false,
           personalRemaining: 0,
           additionalExpenses: [],
+          additionalExpenseGroups: [],
           additionalIncomes: [],
         },
         {
@@ -69,6 +70,7 @@ test("computeMonthChain auto-calculates interest from each month's starting bala
           interestsManualOverride: true,
           personalRemaining: 0,
           additionalExpenses: [],
+          additionalExpenseGroups: [],
           additionalIncomes: [],
         },
       ],

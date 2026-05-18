@@ -1,5 +1,5 @@
 import { computeMonthChain, estimatedMonthData } from "../calculations.ts";
-import type { AdditionalEntry, RecurringExpense, YearConfig, YearData, YearRecurringExpense } from "../types";
+import type { AdditionalEntry, AdditionalEntryGroup, RecurringExpense, YearConfig, YearData, YearRecurringExpense } from "../types";
 
 export const DEMO_YEAR = 2026;
 export const DEMO_MONTH = 4;
@@ -32,6 +32,7 @@ export function getDemoYearData(): YearData {
     ...estimatedMonthData(index + 1, config),
     recurringExpenses: [],
     additionalExpenses: [],
+    additionalExpenseGroups: [],
     additionalIncomes: [],
   }));
 
@@ -151,6 +152,7 @@ interface RawMonthData {
   personalRemaining: number;
   recurringExpenses: RecurringExpense[];
   additionalExpenses: AdditionalEntry[];
+  additionalExpenseGroups: AdditionalEntryGroup[];
   additionalIncomes: AdditionalEntry[];
 }
 

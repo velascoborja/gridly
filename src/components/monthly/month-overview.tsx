@@ -14,7 +14,7 @@ import { sortRecurringExpensesAsc } from "@/lib/recurring-expenses";
 import { cn, formatCurrency, formatMonthName } from "@/lib/utils";
 import { computeMonthChain } from "@/lib/calculations";
 import { getHorizontalSwipeDirection } from "@/lib/mobile-swipe";
-import type { MonthData, YearData, AdditionalEntry, RecurringExpense } from "@/lib/types";
+import type { MonthData, YearData, AdditionalEntry, AdditionalEntryGroup, RecurringExpense } from "@/lib/types";
 
 interface Props {
   yearData: YearData;
@@ -84,6 +84,7 @@ export function MonthOverview({
   const [draggedEntry, setDraggedEntry] = useState<DraggedAdditionalEntry | null>(null);
   const [dragOverMonthId, setDragOverMonthId] = useState<number | null>(null);
   const [movingEntry, setMovingEntry] = useState<MovingAdditionalEntry | null>(null);
+  const monthsRef = useRef<MonthData[]>(initialYearData.months);
   const config = initialYearData.config;
   const yearRecurringExpenses = initialYearData.recurringExpenses;
   const today = new Date();
@@ -94,6 +95,7 @@ export function MonthOverview({
   const sortedMonths = [...months].sort((a, b) => a.month - b.month);
 
   useEffect(() => {
+    monthsRef.current = initialYearData.months;
     setMonths(initialYearData.months);
   }, [initialYearData]);
 
@@ -210,6 +212,19 @@ export function MonthOverview({
     return computeMonthChain(updated, config.startingBalance, config.interestRate);
   }, [config.interestRate, config.startingBalance]);
 
+  const commitMonthsChange = useCallback((update: (previousMonths: MonthData[]) => MonthData[]) => {
+    const recomputedMonths = recompute(update(monthsRef.current));
+    monthsRef.current = recomputedMonths;
+    setMonths(recomputedMonths);
+    if (onYearDataChange) {
+      onYearDataChange({
+        config,
+        recurringExpenses: yearRecurringExpenses,
+        months: recomputedMonths,
+      });
+    }
+  }, [config, onYearDataChange, recompute, yearRecurringExpenses]);
+
   const handleFixedUpdate = useCallback(async (field: string, value: number, options?: FixedUpdateOptions) => {
     if (!month) return;
     const res = await fetch(`/api/months/${month.id}`, {
@@ -219,8 +234,8 @@ export function MonthOverview({
     });
     if (!res.ok) throw new Error("Failed to update");
 
-    setMonths((prev) => {
-      const updated = prev.map((m) =>
+    commitMonthsChange((prev) =>
+      prev.map((m) =>
         m.id === month.id
           ? {
               ...m,
@@ -236,37 +251,19 @@ export function MonthOverview({
                   : {}),
             }
           : m
-      );
-      const recomputedMonths = recompute(updated);
-      if (onYearDataChange) {
-        onYearDataChange({
-        config,
-        recurringExpenses: yearRecurringExpenses,
-        months: recomputedMonths,
-      });
-      }
-      return recomputedMonths;
-    });
-  }, [config, month, onYearDataChange, recompute, yearRecurringExpenses]);
+      )
+    );
+  }, [commitMonthsChange, month]);
 
   const handleEntriesChange = useCallback((type: "income" | "expense", entries: AdditionalEntry[]) => {
-    setMonths((prev) => {
-      const updated = prev.map((m) => {
+    commitMonthsChange((prev) =>
+      prev.map((m) => {
         if (m.month !== monthNumber) return m;
         if (type === "expense") return { ...m, additionalExpenses: sortAdditionalEntriesDesc(entries) };
         return { ...m, additionalIncomes: sortAdditionalEntriesDesc(entries) };
-      });
-      const recomputedMonths = recompute(updated);
-      if (onYearDataChange) {
-        onYearDataChange({
-        config,
-        recurringExpenses: yearRecurringExpenses,
-        months: recomputedMonths,
-      });
-      }
-      return recomputedMonths;
-    });
-  }, [config, monthNumber, onYearDataChange, recompute, yearRecurringExpenses]);
+      })
+    );
+  }, [commitMonthsChange, monthNumber]);
 
   const handleAdditionalEntryMove = useCallback(async (
     entry: AdditionalEntry,
@@ -276,8 +273,9 @@ export function MonthOverview({
   ) => {
     if (sourceMonthId === targetMonthId || movingEntry?.entryId === entry.id) return;
 
-    const sourceMonth = months.find((item) => item.id === sourceMonthId);
-    const targetMonth = months.find((item) => item.id === targetMonthId);
+    const currentMonths = monthsRef.current;
+    const sourceMonth = currentMonths.find((item) => item.id === sourceMonthId);
+    const targetMonth = currentMonths.find((item) => item.id === targetMonthId);
     if (!sourceMonth || !targetMonth || sourceMonth.yearId !== targetMonth.yearId) return;
 
     const entryId = entry.id;
@@ -296,8 +294,8 @@ export function MonthOverview({
         amount: parseFloat(updated.amount),
       };
 
-      setMonths((prev) => {
-        const updatedMonths = prev.map((item) => {
+      commitMonthsChange((prev) =>
+        prev.map((item) => {
           const collectionKey = type === "expense" ? "additionalExpenses" : "additionalIncomes";
           if (item.id === sourceMonthId) {
             return {
@@ -315,23 +313,14 @@ export function MonthOverview({
             };
           }
           return item;
-        });
-        const recomputedMonths = recompute(updatedMonths);
-        if (onYearDataChange) {
-          onYearDataChange({
-            config,
-            recurringExpenses: yearRecurringExpenses,
-            months: recomputedMonths,
-          });
-        }
-        return recomputedMonths;
-      });
+        })
+      );
     } finally {
       setMovingEntry(null);
       setDraggedEntry(null);
       setDragOverMonthId(null);
     }
-  }, [config, months, movingEntry?.entryId, onYearDataChange, recompute, yearRecurringExpenses]);
+  }, [commitMonthsChange, movingEntry?.entryId]);
 
   const handleMonthDragOver = useCallback((targetMonthId: number) => (event: React.DragEvent<HTMLAnchorElement>) => {
     if (!draggedEntry || draggedEntry.sourceMonthId === targetMonthId || movingEntry) return;
@@ -351,22 +340,51 @@ export function MonthOverview({
     void handleAdditionalEntryMove(draggedEntry.entry, draggedEntry.type, draggedEntry.sourceMonthId, targetMonthId);
   }, [draggedEntry, handleAdditionalEntryMove]);
 
+  const handleGroupsChange = useCallback((groups: AdditionalEntryGroup[]) => {
+    commitMonthsChange((prev) =>
+      prev.map((m) => {
+        if (m.month !== monthNumber) return m;
+        return { ...m, additionalExpenseGroups: groups };
+      })
+    );
+  }, [commitMonthsChange, monthNumber]);
+
+  const handleEntryGroupChanged = useCallback((entry: AdditionalEntry, toGroupId: number | null) => {
+    commitMonthsChange((prev) =>
+      prev.map((m) => {
+        if (m.month !== monthNumber) return m;
+        const newUngrouped = m.additionalExpenses.filter((e) => e.id !== entry.id);
+        const newGroups = m.additionalExpenseGroups.map((g) => ({
+          ...g,
+          entries: g.entries.filter((e) => e.id !== entry.id),
+        }));
+        if (toGroupId === null) {
+          return {
+            ...m,
+            additionalExpenses: sortAdditionalEntriesDesc([...newUngrouped, entry]),
+            additionalExpenseGroups: newGroups,
+          };
+        }
+        return {
+          ...m,
+          additionalExpenses: newUngrouped,
+          additionalExpenseGroups: newGroups.map((g) =>
+            g.id === toGroupId
+              ? { ...g, entries: sortAdditionalEntriesDesc([...g.entries, entry]) }
+              : g
+          ),
+        };
+      })
+    );
+  }, [commitMonthsChange, monthNumber]);
+
   const handleRecurringExpensesChange = useCallback((entries: RecurringExpense[]) => {
-    setMonths((prev) => {
-      const updated = prev.map((m) =>
+    commitMonthsChange((prev) =>
+      prev.map((m) =>
         m.month === monthNumber ? { ...m, recurringExpenses: sortRecurringExpensesAsc(entries) } : m
-      );
-      const recomputedMonths = recompute(updated);
-      if (onYearDataChange) {
-        onYearDataChange({
-          config,
-          recurringExpenses: yearRecurringExpenses,
-          months: recomputedMonths,
-        });
-      }
-      return recomputedMonths;
-    });
-  }, [config, monthNumber, onYearDataChange, recompute, yearRecurringExpenses]);
+      )
+    );
+  }, [commitMonthsChange, monthNumber]);
 
   if (!month) {
     return (
@@ -659,6 +677,9 @@ export function MonthOverview({
           type="expense"
           entries={month.additionalExpenses}
           onEntriesChange={(entries) => handleEntriesChange("expense", entries)}
+          groups={month.additionalExpenseGroups}
+          onGroupsChange={handleGroupsChange}
+          onEntryGroupChanged={handleEntryGroupChanged}
           readOnly={readOnly}
           title={tOverview("additionalExpensesTitle")}
           movingEntryId={movingEntry?.entryId ?? null}

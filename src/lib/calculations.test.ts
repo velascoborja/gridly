@@ -30,6 +30,7 @@ const rawMonth = {
   personalRemaining: 50,
   recurringExpenses: [],
   additionalExpenses: [],
+  additionalExpenseGroups: [],
   additionalIncomes: [],
 };
 

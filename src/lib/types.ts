@@ -19,6 +19,13 @@ export interface AdditionalEntry {
   amount: number;
 }
 
+export interface AdditionalEntryGroup {
+  id: number;
+  monthId: number;
+  label: string;
+  entries: AdditionalEntry[];
+}
+
 export interface YearRecurringExpense {
   id: number;
   yearId: number;
@@ -54,7 +61,8 @@ export interface MonthData {
   interestsManualOverride: boolean;
   personalRemaining: number;
   recurringExpenses: RecurringExpense[];
-  additionalExpenses: AdditionalEntry[];
+  additionalExpenses: AdditionalEntry[];           // ungrouped expenses only
+  additionalExpenseGroups: AdditionalEntryGroup[]; // grouped expenses
   additionalIncomes: AdditionalEntry[];
   // computed
   totalIncome: number;

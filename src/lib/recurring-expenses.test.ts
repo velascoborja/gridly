@@ -34,6 +34,7 @@ test("total expenses include recurring expenses", () => {
       personalRemaining: 0,
       recurringExpenses,
       additionalExpenses: [{ id: 10, monthId: 1, type: "expense", label: "Cena", amount: 60 }],
+      additionalExpenseGroups: [],
       additionalIncomes: [],
     }),
     2085
@@ -57,6 +58,7 @@ test("month chain includes recurring expenses in savings and downstream balances
         personalRemaining: 0,
         recurringExpenses,
         additionalExpenses: [],
+        additionalExpenseGroups: [],
         additionalIncomes: [],
       },
       {
@@ -73,6 +75,7 @@ test("month chain includes recurring expenses in savings and downstream balances
         personalRemaining: 0,
         recurringExpenses: [],
         additionalExpenses: [],
+        additionalExpenseGroups: [],
         additionalIncomes: [],
       },
     ],
