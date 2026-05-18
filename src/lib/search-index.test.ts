@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { buildSearchIndex, filterSearchIndex } from "./search-index.ts";
-import type { MonthData, YearData } from "./types.ts";
+import type { YearData } from "./types.ts";
 
 function makeYearData(): YearData {
   return {
