@@ -1,6 +1,6 @@
 import { and, asc, eq, inArray } from "drizzle-orm";
 import { db } from "@/db";
-import { additionalEntries, monthlyRecurringExpenses, months, yearRecurringExpenses, years } from "@/db/schema";
+import { additionalEntries, additionalEntryGroups, monthlyRecurringExpenses, months, yearRecurringExpenses, years } from "@/db/schema";
 import { sortAdditionalEntriesDesc } from "@/lib/additional-entries";
 import { computeMonthChain } from "@/lib/calculations";
 import {
@@ -8,7 +8,7 @@ import {
   parseYearRecurringExpense,
   sortRecurringExpensesAsc,
 } from "@/lib/recurring-expenses";
-import type { YearData } from "@/lib/types";
+import type { AdditionalEntryGroup, YearData } from "@/lib/types";
 import { pickDefaultYear } from "./year-navigation";
 
 export async function getYearData(userId: string, year: number): Promise<YearData | null> {
@@ -37,6 +37,14 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
           .where(inArray(additionalEntries.monthId, monthRows.map((month) => month.id)))
       : [];
 
+  const allGroups =
+    monthRows.length > 0
+      ? await db
+          .select()
+          .from(additionalEntryGroups)
+          .where(inArray(additionalEntryGroups.monthId, monthRows.map((month) => month.id)))
+      : [];
+
   const allRecurringExpenses =
     monthRows.length > 0
       ? await db
@@ -51,6 +59,12 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
     entriesByMonthId.get(entry.monthId)!.push(entry);
   }
 
+  const groupsByMonthId = new Map<number, typeof allGroups>();
+  for (const group of allGroups) {
+    if (!groupsByMonthId.has(group.monthId)) groupsByMonthId.set(group.monthId, []);
+    groupsByMonthId.get(group.monthId)!.push(group);
+  }
+
   const recurringExpensesByMonthId = new Map<number, typeof allRecurringExpenses>();
   for (const entry of allRecurringExpenses) {
     if (!recurringExpensesByMonthId.has(entry.monthId)) recurringExpensesByMonthId.set(entry.monthId, []);
@@ -59,7 +73,31 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
 
   const rawMonths = monthRows.map((month) => {
     const entries = entriesByMonthId.get(month.id) ?? [];
+    const groups = groupsByMonthId.get(month.id) ?? [];
     const recurringExpenses = recurringExpensesByMonthId.get(month.id) ?? [];
+
+    const expenseEntries = entries.filter((e) => e.type === "expense");
+
+    const additionalExpenseGroups: AdditionalEntryGroup[] = groups.map((group) => ({
+      id: group.id,
+      monthId: group.monthId,
+      label: group.label,
+      entries: sortAdditionalEntriesDesc(
+        expenseEntries
+          .filter((e) => e.groupId === group.id)
+          .map((e) => ({
+            id: e.id,
+            monthId: e.monthId,
+            type: "expense" as const,
+            label: e.label,
+            amount: parseFloat(e.amount),
+          }))
+      ),
+    }));
+
+    const groupedEntryIds = new Set(
+      additionalExpenseGroups.flatMap((g) => g.entries.map((e) => e.id))
+    );
 
     return {
       id: month.id,
@@ -80,25 +118,26 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
       personalRemaining: parseFloat(month.personalRemaining),
       recurringExpenses: sortRecurringExpensesAsc(recurringExpenses.map(parseMonthlyRecurringExpense)),
       additionalExpenses: sortAdditionalEntriesDesc(
-        entries
-          .filter((entry) => entry.type === "expense")
-          .map((entry) => ({
-            id: entry.id,
-            monthId: entry.monthId,
+        expenseEntries
+          .filter((e) => !groupedEntryIds.has(e.id))
+          .map((e) => ({
+            id: e.id,
+            monthId: e.monthId,
             type: "expense" as const,
-            label: entry.label,
-            amount: parseFloat(entry.amount),
+            label: e.label,
+            amount: parseFloat(e.amount),
           }))
       ),
+      additionalExpenseGroups,
       additionalIncomes: sortAdditionalEntriesDesc(
         entries
-          .filter((entry) => entry.type === "income")
-          .map((entry) => ({
-            id: entry.id,
-            monthId: entry.monthId,
+          .filter((e) => e.type === "income")
+          .map((e) => ({
+            id: e.id,
+            monthId: e.monthId,
             type: "income" as const,
-            label: entry.label,
-            amount: parseFloat(entry.amount),
+            label: e.label,
+            amount: parseFloat(e.amount),
           }))
       ),
     };

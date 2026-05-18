@@ -14,7 +14,7 @@ import { sortRecurringExpensesAsc } from "@/lib/recurring-expenses";
 import { cn, formatCurrency, formatMonthName } from "@/lib/utils";
 import { computeMonthChain } from "@/lib/calculations";
 import { getHorizontalSwipeDirection } from "@/lib/mobile-swipe";
-import type { MonthData, YearData, AdditionalEntry, RecurringExpense } from "@/lib/types";
+import type { MonthData, YearData, AdditionalEntry, AdditionalEntryGroup, RecurringExpense } from "@/lib/types";
 
 interface Props {
   yearData: YearData;
@@ -351,6 +351,54 @@ export function MonthOverview({
     void handleAdditionalEntryMove(draggedEntry.entry, draggedEntry.type, draggedEntry.sourceMonthId, targetMonthId);
   }, [draggedEntry, handleAdditionalEntryMove]);
 
+  const handleGroupsChange = useCallback((groups: AdditionalEntryGroup[]) => {
+    setMonths((prev) => {
+      const updated = prev.map((m) => {
+        if (m.month !== monthNumber) return m;
+        return { ...m, additionalExpenseGroups: groups };
+      });
+      const recomputedMonths = recompute(updated);
+      if (onYearDataChange) {
+        onYearDataChange({ config, recurringExpenses: yearRecurringExpenses, months: recomputedMonths });
+      }
+      return recomputedMonths;
+    });
+  }, [config, monthNumber, onYearDataChange, recompute, yearRecurringExpenses]);
+
+  const handleEntryGroupChanged = useCallback((entry: AdditionalEntry, toGroupId: number | null) => {
+    setMonths((prev) => {
+      const updated = prev.map((m) => {
+        if (m.month !== monthNumber) return m;
+        const newUngrouped = m.additionalExpenses.filter((e) => e.id !== entry.id);
+        const newGroups = m.additionalExpenseGroups.map((g) => ({
+          ...g,
+          entries: g.entries.filter((e) => e.id !== entry.id),
+        }));
+        if (toGroupId === null) {
+          return {
+            ...m,
+            additionalExpenses: sortAdditionalEntriesDesc([...newUngrouped, entry]),
+            additionalExpenseGroups: newGroups,
+          };
+        }
+        return {
+          ...m,
+          additionalExpenses: newUngrouped,
+          additionalExpenseGroups: newGroups.map((g) =>
+            g.id === toGroupId
+              ? { ...g, entries: sortAdditionalEntriesDesc([...g.entries, entry]) }
+              : g
+          ),
+        };
+      });
+      const recomputedMonths = recompute(updated);
+      if (onYearDataChange) {
+        onYearDataChange({ config, recurringExpenses: yearRecurringExpenses, months: recomputedMonths });
+      }
+      return recomputedMonths;
+    });
+  }, [config, monthNumber, onYearDataChange, recompute, yearRecurringExpenses]);
+
   const handleRecurringExpensesChange = useCallback((entries: RecurringExpense[]) => {
     setMonths((prev) => {
       const updated = prev.map((m) =>
@@ -659,6 +707,9 @@ export function MonthOverview({
           type="expense"
           entries={month.additionalExpenses}
           onEntriesChange={(entries) => handleEntriesChange("expense", entries)}
+          groups={month.additionalExpenseGroups}
+          onGroupsChange={handleGroupsChange}
+          onEntryGroupChanged={handleEntryGroupChanged}
           readOnly={readOnly}
           title={tOverview("additionalExpensesTitle")}
           movingEntryId={movingEntry?.entryId ?? null}

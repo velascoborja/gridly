@@ -23,6 +23,7 @@ function month(overrides: Partial<MonthData>): MonthData {
     personalRemaining: 0,
     recurringExpenses: [],
     additionalExpenses: [],
+    additionalExpenseGroups: [],
     additionalIncomes: [],
     totalIncome: overrides.totalIncome ?? 0,
     totalExpenses: overrides.totalExpenses ?? 0,

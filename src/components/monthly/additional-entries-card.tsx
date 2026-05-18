@@ -2,10 +2,19 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
-import { Loader2, Plus, Trash2 } from "lucide-react";
+import { FolderInput, FolderPlus, Loader2, Plus, Trash2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,16 +26,20 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { AdditionalEntryGroupRow } from "./additional-entry-group-row";
 import { sortAdditionalEntriesDesc, sumAdditionalEntries } from "@/lib/additional-entries";
 import { sanitizeNumericInput } from "@/lib/currency-input";
 import { cn, formatCurrency } from "@/lib/utils";
-import type { AdditionalEntry } from "@/lib/types";
+import type { AdditionalEntry, AdditionalEntryGroup } from "@/lib/types";
 
 interface Props {
   monthId: number;
   type: "income" | "expense";
   entries: AdditionalEntry[];
   onEntriesChange: (entries: AdditionalEntry[]) => void;
+  groups?: AdditionalEntryGroup[];
+  onGroupsChange?: (groups: AdditionalEntryGroup[]) => void;
+  onEntryGroupChanged?: (entry: AdditionalEntry, toGroupId: number | null) => void;
   readOnly?: boolean;
   title: string;
   movingEntryId?: number | null;
@@ -39,6 +52,9 @@ export function AdditionalEntriesCard({
   type,
   entries,
   onEntriesChange,
+  groups = [],
+  onGroupsChange,
+  onEntryGroupChanged,
   readOnly = false,
   title,
   movingEntryId = null,
@@ -57,8 +73,13 @@ export function AdditionalEntriesCard({
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editLabel, setEditLabel] = useState("");
   const [editAmount, setEditAmount] = useState("");
+  const [addingGroupOpen, setAddingGroupOpen] = useState(false);
+  const [isAddingGroup, setIsAddingGroup] = useState(false);
+  const [newGroupLabel, setNewGroupLabel] = useState("");
+  const [movingToGroupId, setMovingToGroupId] = useState<number | null>(null);
   const sortedEntries = sortAdditionalEntriesDesc(entries);
-  const entriesTotal = sumAdditionalEntries(entries);
+  const groupedTotal = groups.reduce((sum, g) => sum + sumAdditionalEntries(g.entries), 0);
+  const entriesTotal = sumAdditionalEntries(entries) + groupedTotal;
 
   const closeAddForm = () => {
     setAddingFormOpen(false);
@@ -133,21 +154,68 @@ export function AdditionalEntriesCard({
 
     setSavingId(id);
     try {
+      const body: Record<string, unknown> = { label: editLabel.trim(), amount };
+
       const res = await fetch(`/api/months/${monthId}/entries/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ label: editLabel.trim(), amount }),
+        body: JSON.stringify(body),
       });
       if (!res.ok) return;
       const updated = await res.json();
+      const updatedEntry: AdditionalEntry = { ...updated, amount: parseFloat(updated.amount) };
+
       onEntriesChange(
         sortAdditionalEntriesDesc(
-          entries.map((e) => e.id === id ? { ...updated, amount: parseFloat(updated.amount) } : e)
+          entries.map((e) => e.id === id ? updatedEntry : e)
         )
       );
       setEditingId(null);
     } finally {
       setSavingId(null);
+    }
+  };
+
+  const handleMoveToGroup = async (entry: AdditionalEntry, toGroupId: number | null) => {
+    if (movingToGroupId === entry.id) return;
+
+    setMovingToGroupId(entry.id);
+    try {
+      const res = await fetch(`/api/months/${monthId}/entries/${entry.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ groupId: toGroupId }),
+      });
+      if (!res.ok) return;
+      const updated = await res.json();
+      const updatedEntry: AdditionalEntry = { ...updated, amount: parseFloat(updated.amount) };
+
+      onEntriesChange(sortAdditionalEntriesDesc(entries.filter((e) => e.id !== entry.id)));
+      onEntryGroupChanged?.(updatedEntry, toGroupId);
+    } finally {
+      setMovingToGroupId(null);
+    }
+  };
+
+  const handleAddGroup = async () => {
+    if (isAddingGroup) return;
+    const label = newGroupLabel.trim();
+    if (!label) return;
+    setIsAddingGroup(true);
+    try {
+      const res = await fetch(`/api/months/${monthId}/entry-groups`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ label }),
+      });
+      if (!res.ok) return;
+      const group = await res.json();
+      const newGroup: AdditionalEntryGroup = { id: group.id, monthId: group.monthId, label: group.label, entries: [] };
+      onGroupsChange?.([...groups, newGroup]);
+      setAddingGroupOpen(false);
+      setNewGroupLabel("");
+    } finally {
+      setIsAddingGroup(false);
     }
   };
 
@@ -205,6 +273,30 @@ export function AdditionalEntriesCard({
       </CardHeader>
       <CardContent className="flex flex-col gap-2.5">
         <div>
+          {!readOnly && !addingFormOpen && !addingGroupOpen ? (
+            <div className="flex items-center gap-3 pb-1">
+              <button
+                className="inline-flex items-center gap-2 rounded-md text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                onClick={() => setAddingFormOpen(true)}
+                type="button"
+              >
+                <Plus className="h-3.5 w-3.5" /> {t("addEntry")}
+              </button>
+              {type === "expense" && (
+                <>
+                  <div className="h-3.5 w-px bg-border" />
+                  <button
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground/70 transition-colors hover:text-muted-foreground"
+                    onClick={() => setAddingGroupOpen(true)}
+                    type="button"
+                  >
+                    <FolderPlus className="h-3 w-3" /> {t("addGroup")}
+                  </button>
+                </>
+              )}
+            </div>
+          ) : null}
+
           {!readOnly && addingFormOpen ? (
             <div className="rounded-xl border border-border/70 bg-muted/20 p-1.5" aria-busy={isAdding}>
               <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto] sm:items-center">
@@ -239,19 +331,58 @@ export function AdditionalEntriesCard({
                 </Button>
               </div>
             </div>
-          ) : !readOnly ? (
-            <button
-              className="inline-flex items-center gap-2 rounded-md text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-              onClick={() => setAddingFormOpen(true)}
-              type="button"
-            >
-              <Plus className="h-3.5 w-3.5" /> {t("addEntry")}
-            </button>
+          ) : null}
+
+          {!readOnly && type === "expense" && addingGroupOpen ? (
+            <div className="rounded-xl border border-border/70 bg-muted/20 p-1.5" aria-busy={isAddingGroup}>
+              <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center">
+                <Input
+                  className="h-9 min-w-0 text-sm"
+                  placeholder={t("groupNamePlaceholder")}
+                  value={newGroupLabel}
+                  onChange={(e) => setNewGroupLabel(e.target.value)}
+                  disabled={isAddingGroup}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleAddGroup();
+                    if (e.key === "Escape" && !isAddingGroup) { setAddingGroupOpen(false); setNewGroupLabel(""); }
+                  }}
+                  autoFocus
+                />
+                <Button size="sm" className="h-9 w-full px-3 sm:w-auto" onClick={handleAddGroup} disabled={isAddingGroup}>
+                  {isAddingGroup ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+                  {isAddingGroup ? t("addingGroup") : t("add")}
+                </Button>
+                <Button size="sm" variant="ghost" className="h-9 w-full px-3 sm:w-auto" onClick={() => { setAddingGroupOpen(false); setNewGroupLabel(""); }} disabled={isAddingGroup}>
+                  {t("cancel")}
+                </Button>
+              </div>
+            </div>
           ) : null}
         </div>
 
+        {type === "expense" && groups.length > 0 && (
+          <div className="flex flex-col gap-2">
+            {groups.map((group) => (
+              <AdditionalEntryGroupRow
+                key={group.id}
+                monthId={monthId}
+                group={group}
+                allGroups={groups}
+                onGroupUpdate={(updated) =>
+                  onGroupsChange?.(groups.map((g) => (g.id === updated.id ? updated : g)))
+                }
+                onGroupDelete={(groupId) =>
+                  onGroupsChange?.(groups.filter((g) => g.id !== groupId))
+                }
+                onEntryGroupChanged={onEntryGroupChanged ?? (() => {})}
+                readOnly={readOnly}
+              />
+            ))}
+          </div>
+        )}
+
         <div className="flex flex-col gap-2">
-          {sortedEntries.length === 0 && (readOnly || !addingFormOpen) && (
+          {sortedEntries.length === 0 && groups.length === 0 && (readOnly || !addingFormOpen) && (
             <div className="rounded-xl border border-dashed border-border/70 bg-muted/20 px-3 py-3 text-sm text-muted-foreground">
               {t("noEntries")}
             </div>
@@ -259,12 +390,17 @@ export function AdditionalEntriesCard({
           {sortedEntries.map((entry) =>
             !readOnly && editingId === entry.id ? (
               <div key={entry.id} className="rounded-xl border border-border/70 bg-muted/20 p-1.5">
-                <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto] sm:items-center">
+                <div className={cn(
+                  "grid gap-2 sm:items-center",
+                  type === "expense" && groups.length > 0
+                    ? "sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto_auto]"
+                    : "sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto]"
+                )}>
                   <Input
                     className="h-9 min-w-0 text-sm"
                     value={editLabel}
                     onChange={(e) => setEditLabel(e.target.value)}
-                    disabled={savingId === entry.id}
+                    disabled={savingId === entry.id || movingToGroupId === entry.id}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") handleEdit(entry.id);
                       if (e.key === "Escape" && savingId !== entry.id) setEditingId(null);
@@ -274,17 +410,59 @@ export function AdditionalEntriesCard({
                   {renderAmountInput({
                     value: editAmount,
                     onChange: setEditAmount,
-                    disabled: savingId === entry.id,
+                    disabled: savingId === entry.id || movingToGroupId === entry.id,
                     onKeyDown: (e) => {
                       if (e.key === "Enter") handleEdit(entry.id);
                       if (e.key === "Escape" && savingId !== entry.id) setEditingId(null);
                     },
                   })}
-                  <Button size="sm" className="h-9 w-full px-3 sm:w-auto" onClick={() => handleEdit(entry.id)} disabled={savingId === entry.id}>
+                  {type === "expense" && groups.length > 0 ? (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger
+                        render={
+                          <Button
+                            size="icon-sm"
+                            variant="ghost"
+                            className="h-9 w-full text-muted-foreground hover:text-primary sm:w-9"
+                            aria-label={`${t("moveToGroup")} ${entry.label}`}
+                            disabled={savingId === entry.id || movingToGroupId === entry.id}
+                          >
+                            {movingToGroupId === entry.id ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            ) : (
+                              <FolderInput className="h-3.5 w-3.5" />
+                            )}
+                          </Button>
+                        }
+                      />
+                      <DropdownMenuContent align="end" className="w-72 max-w-[calc(100vw-2rem)]">
+                        <DropdownMenuGroup>
+                          <DropdownMenuLabel>{t("moveToGroup")}</DropdownMenuLabel>
+                          <DropdownMenuRadioGroup
+                            value="none"
+                            onValueChange={(value) => {
+                              if (value === "none") return;
+                              void handleMoveToGroup(entry, parseInt(value, 10));
+                            }}
+                          >
+                            <DropdownMenuRadioItem value="none" disabled>
+                              {t("noGroup")}
+                            </DropdownMenuRadioItem>
+                            {groups.map((g) => (
+                              <DropdownMenuRadioItem key={g.id} value={String(g.id)}>
+                                <span className="truncate">{g.label}</span>
+                              </DropdownMenuRadioItem>
+                            ))}
+                          </DropdownMenuRadioGroup>
+                        </DropdownMenuGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  ) : null}
+                  <Button size="sm" className="h-9 w-full px-3 sm:w-auto" onClick={() => handleEdit(entry.id)} disabled={savingId === entry.id || movingToGroupId === entry.id}>
                     {savingId === entry.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
                     {savingId === entry.id ? t("saving") : common("save")}
                   </Button>
-                  <Button size="sm" variant="ghost" className="h-9 w-full px-3 sm:w-auto" onClick={() => setEditingId(null)} disabled={savingId === entry.id}>
+                  <Button size="sm" variant="ghost" className="h-9 w-full px-3 sm:w-auto" onClick={() => setEditingId(null)} disabled={savingId === entry.id || movingToGroupId === entry.id}>
                     {t("cancel")}
                   </Button>
                 </div>
