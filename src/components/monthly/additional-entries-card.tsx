@@ -46,6 +46,7 @@ interface Props {
   movingEntryId?: number | null;
   onEntryDragStart?: (entry: AdditionalEntry) => void;
   onEntryDragEnd?: () => void;
+  highlightId?: string | null;
 }
 
 export function AdditionalEntriesCard({
@@ -61,6 +62,7 @@ export function AdditionalEntriesCard({
   movingEntryId = null,
   onEntryDragStart,
   onEntryDragEnd,
+  highlightId = null,
 }: Props) {
   const t = useTranslations("Monthly.additionalEntries");
   const common = useTranslations("Common");
@@ -379,6 +381,7 @@ export function AdditionalEntriesCard({
                 }
                 onEntryGroupChanged={onEntryGroupChanged ?? (() => {})}
                 readOnly={readOnly}
+                highlightId={highlightId}
               />
             ))}
           </div>
@@ -479,7 +482,8 @@ export function AdditionalEntriesCard({
                 className={cn(
                   "rounded-xl border border-transparent px-2 py-1.5 transition-all hover:border-border/70 hover:bg-muted/40",
                   canMoveEntry(entry) && "cursor-grab active:cursor-grabbing",
-                  (deletingId === entry.id || movingEntryId === entry.id) && "pointer-events-none opacity-60"
+                  (deletingId === entry.id || movingEntryId === entry.id) && "pointer-events-none opacity-60",
+                  highlightId === `entry-${entry.id}` && "ring-2 ring-primary/40 bg-primary/5"
                 )}
               >
                 <div className="flex min-w-0 items-center justify-between gap-2">
