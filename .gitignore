@@ -53,6 +53,8 @@ next-env.d.ts
 *.swo
 
 # local docs
+docs/plans
+docs/specs
 docs/superpowers
 .worktrees/
 .superpowers/
