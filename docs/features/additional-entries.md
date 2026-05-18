@@ -58,4 +58,4 @@ Users can group related additional expenses within a month (e.g., "Viaje a Roma"
 - Collapsed state resets on reload (UI-only state, not persisted).
 - Group name is editable inline: click the group label to rename, Enter or blur to save, Escape to cancel.
 - Deleting a group opens a confirmation dialog listing the group name and entry count.
-- Entries can be moved to/from groups via the group dropdown in the entry edit form (available in both `AdditionalEntryGroupRow` and `AdditionalEntriesCard`).
+- Entries can be moved to/from groups via the compact row-level group menu (available in both `AdditionalEntryGroupRow` and `AdditionalEntriesCard`), keeping edit forms focused on label and amount only.

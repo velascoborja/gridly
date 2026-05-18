@@ -2,10 +2,19 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
-import { Loader2, Plus, Trash2 } from "lucide-react";
+import { FolderInput, FolderPlus, Loader2, Plus, Trash2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,7 +26,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { FolderPlus } from "lucide-react";
 import { AdditionalEntryGroupRow } from "./additional-entry-group-row";
 import { sortAdditionalEntriesDesc, sumAdditionalEntries } from "@/lib/additional-entries";
 import { sanitizeNumericInput } from "@/lib/currency-input";
@@ -65,10 +73,10 @@ export function AdditionalEntriesCard({
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editLabel, setEditLabel] = useState("");
   const [editAmount, setEditAmount] = useState("");
-  const [editEntryGroupId, setEditEntryGroupId] = useState<number | "none">("none");
   const [addingGroupOpen, setAddingGroupOpen] = useState(false);
   const [isAddingGroup, setIsAddingGroup] = useState(false);
   const [newGroupLabel, setNewGroupLabel] = useState("");
+  const [movingToGroupId, setMovingToGroupId] = useState<number | null>(null);
   const sortedEntries = sortAdditionalEntriesDesc(entries);
   const groupedTotal = groups.reduce((sum, g) => sum + sumAdditionalEntries(g.entries), 0);
   const entriesTotal = sumAdditionalEntries(entries) + groupedTotal;
@@ -83,7 +91,6 @@ export function AdditionalEntriesCard({
     setEditingId(entry.id);
     setEditLabel(entry.label);
     setEditAmount(String(entry.amount));
-    setEditEntryGroupId("none");
   };
 
   const canMoveEntry = (entry: AdditionalEntry) =>
@@ -145,12 +152,9 @@ export function AdditionalEntriesCard({
     const amount = parseAmountInput(editAmount);
     if (!editLabel.trim() || isNaN(amount)) return;
 
-    const toGroupId = editEntryGroupId === "none" ? null : editEntryGroupId;
-
     setSavingId(id);
     try {
       const body: Record<string, unknown> = { label: editLabel.trim(), amount };
-      if (type === "expense" && toGroupId !== null) body.groupId = toGroupId;
 
       const res = await fetch(`/api/months/${monthId}/entries/${id}`, {
         method: "PATCH",
@@ -161,19 +165,35 @@ export function AdditionalEntriesCard({
       const updated = await res.json();
       const updatedEntry: AdditionalEntry = { ...updated, amount: parseFloat(updated.amount) };
 
-      if (type === "expense" && toGroupId !== null) {
-        onEntriesChange(sortAdditionalEntriesDesc(entries.filter((e) => e.id !== id)));
-        onEntryGroupChanged?.(updatedEntry, toGroupId);
-      } else {
-        onEntriesChange(
-          sortAdditionalEntriesDesc(
-            entries.map((e) => e.id === id ? updatedEntry : e)
-          )
-        );
-      }
+      onEntriesChange(
+        sortAdditionalEntriesDesc(
+          entries.map((e) => e.id === id ? updatedEntry : e)
+        )
+      );
       setEditingId(null);
     } finally {
       setSavingId(null);
+    }
+  };
+
+  const handleMoveToGroup = async (entry: AdditionalEntry, toGroupId: number | null) => {
+    if (movingToGroupId === entry.id) return;
+
+    setMovingToGroupId(entry.id);
+    try {
+      const res = await fetch(`/api/months/${monthId}/entries/${entry.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ groupId: toGroupId }),
+      });
+      if (!res.ok) return;
+      const updated = await res.json();
+      const updatedEntry: AdditionalEntry = { ...updated, amount: parseFloat(updated.amount) };
+
+      onEntriesChange(sortAdditionalEntriesDesc(entries.filter((e) => e.id !== entry.id)));
+      onEntryGroupChanged?.(updatedEntry, toGroupId);
+    } finally {
+      setMovingToGroupId(null);
     }
   };
 
@@ -380,7 +400,7 @@ export function AdditionalEntriesCard({
                     className="h-9 min-w-0 text-sm"
                     value={editLabel}
                     onChange={(e) => setEditLabel(e.target.value)}
-                    disabled={savingId === entry.id}
+                    disabled={savingId === entry.id || movingToGroupId === entry.id}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") handleEdit(entry.id);
                       if (e.key === "Escape" && savingId !== entry.id) setEditingId(null);
@@ -390,32 +410,59 @@ export function AdditionalEntriesCard({
                   {renderAmountInput({
                     value: editAmount,
                     onChange: setEditAmount,
-                    disabled: savingId === entry.id,
+                    disabled: savingId === entry.id || movingToGroupId === entry.id,
                     onKeyDown: (e) => {
                       if (e.key === "Enter") handleEdit(entry.id);
                       if (e.key === "Escape" && savingId !== entry.id) setEditingId(null);
                     },
                   })}
-                  {type === "expense" && groups.length > 0 && (
-                    <select
-                      className="h-9 rounded-md border border-input bg-background px-3 text-sm"
-                      value={editEntryGroupId === "none" ? "none" : String(editEntryGroupId)}
-                      onChange={(e) =>
-                        setEditEntryGroupId(e.target.value === "none" ? "none" : parseInt(e.target.value, 10))
-                      }
-                      disabled={savingId === entry.id}
-                    >
-                      <option value="none">{t("noGroup")}</option>
-                      {groups.map((g) => (
-                        <option key={g.id} value={String(g.id)}>{g.label}</option>
-                      ))}
-                    </select>
-                  )}
-                  <Button size="sm" className="h-9 w-full px-3 sm:w-auto" onClick={() => handleEdit(entry.id)} disabled={savingId === entry.id}>
+                  {type === "expense" && groups.length > 0 ? (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger
+                        render={
+                          <Button
+                            size="icon-sm"
+                            variant="ghost"
+                            className="h-9 w-full text-muted-foreground hover:text-primary sm:w-9"
+                            aria-label={`${t("moveToGroup")} ${entry.label}`}
+                            disabled={savingId === entry.id || movingToGroupId === entry.id}
+                          >
+                            {movingToGroupId === entry.id ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            ) : (
+                              <FolderInput className="h-3.5 w-3.5" />
+                            )}
+                          </Button>
+                        }
+                      />
+                      <DropdownMenuContent align="end" className="w-72 max-w-[calc(100vw-2rem)]">
+                        <DropdownMenuGroup>
+                          <DropdownMenuLabel>{t("moveToGroup")}</DropdownMenuLabel>
+                          <DropdownMenuRadioGroup
+                            value="none"
+                            onValueChange={(value) => {
+                              if (value === "none") return;
+                              void handleMoveToGroup(entry, parseInt(value, 10));
+                            }}
+                          >
+                            <DropdownMenuRadioItem value="none" disabled>
+                              {t("noGroup")}
+                            </DropdownMenuRadioItem>
+                            {groups.map((g) => (
+                              <DropdownMenuRadioItem key={g.id} value={String(g.id)}>
+                                <span className="truncate">{g.label}</span>
+                              </DropdownMenuRadioItem>
+                            ))}
+                          </DropdownMenuRadioGroup>
+                        </DropdownMenuGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  ) : null}
+                  <Button size="sm" className="h-9 w-full px-3 sm:w-auto" onClick={() => handleEdit(entry.id)} disabled={savingId === entry.id || movingToGroupId === entry.id}>
                     {savingId === entry.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
                     {savingId === entry.id ? t("saving") : common("save")}
                   </Button>
-                  <Button size="sm" variant="ghost" className="h-9 w-full px-3 sm:w-auto" onClick={() => setEditingId(null)} disabled={savingId === entry.id}>
+                  <Button size="sm" variant="ghost" className="h-9 w-full px-3 sm:w-auto" onClick={() => setEditingId(null)} disabled={savingId === entry.id || movingToGroupId === entry.id}>
                     {t("cancel")}
                   </Button>
                 </div>

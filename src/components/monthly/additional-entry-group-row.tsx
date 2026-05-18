@@ -2,9 +2,18 @@
 
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { ChevronRight, Loader2, Plus, Trash2 } from "lucide-react";
+import { ChevronRight, FolderInput, Loader2, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -58,9 +67,9 @@ export function AdditionalEntryGroupRow({
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editLabel, setEditLabel] = useState("");
   const [editAmount, setEditAmount] = useState("");
-  const [editGroupId, setEditGroupId] = useState<number | "none">("none");
   const [savingId, setSavingId] = useState<number | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [movingToGroupId, setMovingToGroupId] = useState<number | null>(null);
 
   const parseAmount = (v: string) => parseFloat(v.replace(",", "."));
   const groupTotal = group.entries.reduce((sum, e) => sum + e.amount, 0);
@@ -145,7 +154,6 @@ export function AdditionalEntryGroupRow({
     setEditingId(entry.id);
     setEditLabel(entry.label);
     setEditAmount(String(entry.amount));
-    setEditGroupId(group.id);
   };
 
   const handleEdit = async (entryId: number) => {
@@ -153,13 +161,9 @@ export function AdditionalEntryGroupRow({
     const amount = parseAmount(editAmount);
     if (!editLabel.trim() || isNaN(amount)) return;
 
-    const toGroupId = editGroupId === "none" ? null : editGroupId;
-    const groupChanged = toGroupId !== group.id;
-
     setSavingId(entryId);
     try {
       const body: Record<string, unknown> = { label: editLabel.trim(), amount };
-      if (groupChanged) body.groupId = toGroupId;
 
       const res = await fetch(`/api/months/${monthId}/entries/${entryId}`, {
         method: "PATCH",
@@ -170,19 +174,34 @@ export function AdditionalEntryGroupRow({
       const updated = await res.json();
       const updatedEntry: AdditionalEntry = { ...updated, amount: parseFloat(updated.amount) };
 
-      if (groupChanged) {
-        onEntryGroupChanged(updatedEntry, toGroupId);
-      } else {
-        onGroupUpdate({
-          ...group,
-          entries: sortAdditionalEntriesDesc(
-            group.entries.map((e) => (e.id === entryId ? updatedEntry : e))
-          ),
-        });
-      }
+      onGroupUpdate({
+        ...group,
+        entries: sortAdditionalEntriesDesc(
+          group.entries.map((e) => (e.id === entryId ? updatedEntry : e))
+        ),
+      });
       setEditingId(null);
     } finally {
       setSavingId(null);
+    }
+  };
+
+  const handleMoveToGroup = async (entry: AdditionalEntry, toGroupId: number | null) => {
+    if (movingToGroupId === entry.id || toGroupId === group.id) return;
+
+    setMovingToGroupId(entry.id);
+    try {
+      const res = await fetch(`/api/months/${monthId}/entries/${entry.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ groupId: toGroupId }),
+      });
+      if (!res.ok) return;
+      const updated = await res.json();
+      const updatedEntry: AdditionalEntry = { ...updated, amount: parseFloat(updated.amount) };
+      onEntryGroupChanged(updatedEntry, toGroupId);
+    } finally {
+      setMovingToGroupId(null);
     }
   };
 
@@ -345,7 +364,7 @@ export function AdditionalEntryGroupRow({
                     className="h-9 min-w-0 text-sm"
                     value={editLabel}
                     onChange={(e) => setEditLabel(e.target.value)}
-                    disabled={savingId === entry.id}
+                    disabled={savingId === entry.id || movingToGroupId === entry.id}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") handleEdit(entry.id);
                       if (e.key === "Escape" && savingId !== entry.id) setEditingId(null);
@@ -355,34 +374,63 @@ export function AdditionalEntryGroupRow({
                   {renderAmountInput({
                     value: editAmount,
                     onChange: setEditAmount,
-                    disabled: savingId === entry.id,
+                    disabled: savingId === entry.id || movingToGroupId === entry.id,
                     onKeyDown: (e) => {
                       if (e.key === "Enter") handleEdit(entry.id);
                       if (e.key === "Escape" && savingId !== entry.id) setEditingId(null);
                     },
                   })}
-                  <select
-                    className="h-9 rounded-md border border-input bg-background px-3 text-sm"
-                    value={editGroupId === "none" ? "none" : String(editGroupId)}
-                    onChange={(e) =>
-                      setEditGroupId(
-                        e.target.value === "none" ? "none" : parseInt(e.target.value, 10)
-                      )
-                    }
-                    disabled={savingId === entry.id}
-                  >
-                    <option value="none">{t("noGroup")}</option>
-                    {allGroups.map((g) => (
-                      <option key={g.id} value={String(g.id)}>
-                        {g.label}
-                      </option>
-                    ))}
-                  </select>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger
+                      render={
+                        <Button
+                          size="icon-sm"
+                          variant="ghost"
+                          className="h-9 w-full text-muted-foreground hover:text-primary sm:w-9"
+                          aria-label={`${t("moveToGroup")} ${entry.label}`}
+                          disabled={savingId === entry.id || movingToGroupId === entry.id}
+                        >
+                          {movingToGroupId === entry.id ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <FolderInput className="h-3.5 w-3.5" />
+                          )}
+                        </Button>
+                      }
+                    />
+                    <DropdownMenuContent align="end" className="w-72 max-w-[calc(100vw-2rem)]">
+                      <DropdownMenuGroup>
+                        <DropdownMenuLabel>{t("moveToGroup")}</DropdownMenuLabel>
+                        <DropdownMenuRadioGroup
+                          value={String(group.id)}
+                          onValueChange={(value) => {
+                            void handleMoveToGroup(
+                              entry,
+                              value === "none" ? null : parseInt(value, 10)
+                            );
+                          }}
+                        >
+                          <DropdownMenuRadioItem value="none">
+                            {t("noGroup")}
+                          </DropdownMenuRadioItem>
+                          {allGroups.map((g) => (
+                            <DropdownMenuRadioItem
+                              key={g.id}
+                              value={String(g.id)}
+                              disabled={g.id === group.id}
+                            >
+                              <span className="truncate">{g.label}</span>
+                            </DropdownMenuRadioItem>
+                          ))}
+                        </DropdownMenuRadioGroup>
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                   <Button
                     size="sm"
                     className="h-9 w-full px-3 sm:w-auto"
                     onClick={() => handleEdit(entry.id)}
-                    disabled={savingId === entry.id}
+                    disabled={savingId === entry.id || movingToGroupId === entry.id}
                   >
                     {savingId === entry.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
                     {savingId === entry.id ? t("saving") : common("save")}
@@ -392,7 +440,7 @@ export function AdditionalEntryGroupRow({
                     variant="ghost"
                     className="h-9 w-full px-3 sm:w-auto"
                     onClick={() => setEditingId(null)}
-                    disabled={savingId === entry.id}
+                    disabled={savingId === entry.id || movingToGroupId === entry.id}
                   >
                     {t("cancel")}
                   </Button>

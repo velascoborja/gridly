@@ -245,3 +245,23 @@ test("additional entry rows move by drag and drop without a separate move button
   assert.doesNotMatch(entriesSource, /t\("moveEntry"\)/);
   assert.doesNotMatch(overviewSource, /moveTargets=\{additionalEntryMoveTargets\}/);
 });
+
+test("additional expense group moves use a compact edit-row menu instead of selects", () => {
+  const entriesSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
+  const groupRowSource = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");
+  const esMessages = readFileSync(new URL("../../../messages/es.json", import.meta.url), "utf8");
+  const enMessages = readFileSync(new URL("../../../messages/en.json", import.meta.url), "utf8");
+
+  for (const source of [entriesSource, groupRowSource]) {
+    assert.match(source, /DropdownMenu/);
+    assert.match(source, /DropdownMenuRadioGroup/);
+    assert.match(source, /FolderInput/);
+    assert.match(source, /handleMoveToGroup/);
+    assert.match(source, /const \[movingToGroupId, setMovingToGroupId\] = useState<number \| null>\(null\)/);
+    assert.match(source, /size="icon-sm"/);
+    assert.doesNotMatch(source, /<select/);
+  }
+
+  assert.match(esMessages, /"moveToGroup": "Mover a grupo"/);
+  assert.match(enMessages, /"moveToGroup": "Move to group"/);
+});

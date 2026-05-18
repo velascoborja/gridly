@@ -15,6 +15,10 @@ test("additional entries card source includes mutation feedback states", async (
   assert.match(source, /animate-spin/, "pending controls should show a spinner");
   assert.match(source, /aria-busy=\{isAdding\}/, "the add form should expose a busy state");
   assert.match(source, /disabled=\{isAdding\}/, "the add action should disable while pending");
-  assert.match(source, /disabled=\{savingId === entry\.id\}/, "the save action should disable the active row while pending");
+  assert.match(
+    source,
+    /disabled=\{savingId === entry\.id(?: \|\| movingToGroupId === entry\.id)?\}/,
+    "the save action should disable the active row while pending"
+  );
   assert.match(source, /disabled=\{deletingId === entry\.id\}/, "the delete confirmation should disable while pending");
 });
