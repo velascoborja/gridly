@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
-import { DrizzleAdapter } from "@auth/drizzle-adapter";
+import { createEncryptedAdapter } from "@/lib/server/encrypted-adapter";
 import type { AdapterUser } from "@auth/core/adapters";
 import { getDatabase } from "@/db";
 import { accounts, authenticators, sessions, users, verificationTokens } from "@/db/schema";
@@ -9,7 +9,7 @@ import { claimLegacyYearsForUser } from "@/lib/server/legacy-user";
 const database = getDatabase();
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: DrizzleAdapter(database, {
+  adapter: createEncryptedAdapter(database, {
     usersTable: users,
     accountsTable: accounts,
     sessionsTable: sessions,
