@@ -461,7 +461,7 @@ export function AdditionalEntryGroupRow({
                 className={cn(
                   "rounded-lg border border-transparent px-2 py-1.5 transition-all hover:border-border/70 hover:bg-muted/40",
                   deletingId === entry.id && "pointer-events-none opacity-60",
-                  highlightId === `entry-${entry.id}` && "ring-2 ring-primary/40 bg-primary/5"
+                  highlightId === `entry-${entry.id}` && "animate-entry-highlight"
                 )}
               >
                 <div className="flex min-w-0 items-center justify-between gap-2">

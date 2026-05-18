@@ -111,7 +111,7 @@ export function RecurringExpensesList({ monthId, entries, onEntriesChange, readO
             className={cn(
               "rounded-md border border-transparent px-2 py-1.5 transition-all hover:border-border/70 hover:bg-background/60",
               deletingId === entry.id && "pointer-events-none opacity-60",
-              highlightId === `recurring-${entry.id}` && "ring-2 ring-primary/40 bg-primary/5"
+              highlightId === `recurring-${entry.id}` && "animate-entry-highlight"
             )}
           >
             <div className="flex min-w-0 items-center justify-between gap-2">
