@@ -335,12 +335,13 @@ export function AdditionalEntryGroupRow({
                   })}
                 </AlertDialogDescription>
               </AlertDialogHeader>
-              <AlertDialogFooter>
+              <AlertDialogFooter className="group-data-[size=sm]/alert-dialog-content:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
                 <AlertDialogCancel variant="ghost" disabled={isDeletingGroup}>
                   {t("cancel")}
                 </AlertDialogCancel>
                 <AlertDialogAction
                   variant="destructive"
+                  className="min-w-0 px-2 text-xs sm:text-sm"
                   onClick={handleDeleteGroup}
                   disabled={isDeletingGroup}
                 >

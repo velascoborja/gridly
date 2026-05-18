@@ -265,3 +265,14 @@ test("additional expense group moves use a compact edit-row menu instead of sele
   assert.match(esMessages, /"moveToGroup": "Mover a grupo"/);
   assert.match(enMessages, /"moveToGroup": "Move to group"/);
 });
+
+test("additional expense group delete loading action fits the compact dialog footer", () => {
+  const groupRowSource = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");
+
+  assert.match(
+    groupRowSource,
+    /group-data-\[size=sm\]\/alert-dialog-content:grid-cols-\[minmax\(0,0\.8fr\)_minmax\(0,1\.2fr\)\]/
+  );
+  assert.match(groupRowSource, /className="min-w-0 px-2 text-xs sm:text-sm"/);
+  assert.match(groupRowSource, /isDeletingGroup \? t\("deletingGroup"\) : t\("confirmDeleteGroupAction"\)/);
+});
