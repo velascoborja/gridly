@@ -1,7 +1,7 @@
 "use client";
 
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Search } from "lucide-react";
 import { Dialog, DialogOverlay, DialogPortal } from "@/components/ui/dialog";
@@ -24,8 +24,8 @@ export function SearchPalette({ yearData, open, onClose, onSelect }: Props) {
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const allEntries = buildSearchIndex(yearData);
-  const results = filterSearchIndex(allEntries, query);
+  const allEntries = useMemo(() => buildSearchIndex(yearData), [yearData]);
+  const results = useMemo(() => filterSearchIndex(allEntries, query), [allEntries, query]);
 
   useEffect(() => {
     if (open) {
@@ -52,6 +52,15 @@ export function SearchPalette({ yearData, open, onClose, onSelect }: Props) {
     },
     [results, activeIndex, onSelect, onClose]
   );
+
+  const resultsContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = resultsContainerRef.current;
+    if (!container) return;
+    const activeEl = container.querySelector<HTMLButtonElement>("[data-active='true']");
+    activeEl?.scrollIntoView({ block: "nearest" });
+  }, [activeIndex]);
 
   // Group results by month for display
   const months: number[] = [];
@@ -96,7 +105,7 @@ export function SearchPalette({ yearData, open, onClose, onSelect }: Props) {
               autoFocus
             />
           </div>
-          <div className="max-h-80 overflow-y-auto">
+          <div className="max-h-80 overflow-y-auto" ref={resultsContainerRef}>
             {query.length > 0 && results.length === 0 && (
               <div className="px-4 py-8 text-center text-sm text-muted-foreground">
                 {t("noResults")}
@@ -114,6 +123,7 @@ export function SearchPalette({ yearData, open, onClose, onSelect }: Props) {
                     <button
                       key={entry.id}
                       type="button"
+                      data-active={isActive}
                       className={cn(
                         "flex w-full items-center justify-between gap-3 px-4 py-2 text-left text-sm transition-colors",
                         isActive ? "bg-muted" : "hover:bg-muted/60"
