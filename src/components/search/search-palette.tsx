@@ -36,6 +36,7 @@ export function SearchPalette({ yearData, open, onClose, onSelect }: Props) {
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
+      if (results.length === 0) return;
       if (e.key === "ArrowDown") {
         e.preventDefault();
         setActiveIndex((i) => Math.min(i + 1, results.length - 1));
@@ -94,6 +95,9 @@ export function SearchPalette({ yearData, open, onClose, onSelect }: Props) {
         <DialogPrimitive.Popup
           className="fixed left-1/2 top-[15vh] z-50 w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 overflow-hidden rounded-xl border border-border/70 bg-popover shadow-2xl ring-1 ring-foreground/10 outline-none duration-100 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95"
         >
+          <DialogPrimitive.Title className="sr-only">
+            {t("placeholder")}
+          </DialogPrimitive.Title>
           <div className="flex items-center gap-3 border-b border-border/70 px-4 py-3">
             <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
             <Input

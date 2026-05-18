@@ -125,6 +125,12 @@ export function YearPageClient({
   }, []);
 
   const handleMonthSelect = useCallback((nextMonth: number) => {
+    if (highlightTimerRef.current !== null) {
+      clearTimeout(highlightTimerRef.current);
+      highlightTimerRef.current = null;
+    }
+    setHighlightId(null);
+
     if (selectedView === "overview" && selectedMonth === nextMonth) return;
 
     setSelectedMonth(nextMonth);

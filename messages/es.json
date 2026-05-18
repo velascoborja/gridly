@@ -562,7 +562,8 @@
     "noResults": "Sin resultados",
     "kindIncome": "Ingreso",
     "kindExpense": "Gasto",
-    "kindRecurring": "Gasto fijo"
+    "kindRecurring": "Gasto fijo",
+    "openButton": "Buscar entradas"
   },
   "Privacy": {
     "title": "Política de Privacidad",

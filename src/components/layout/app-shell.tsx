@@ -1,6 +1,7 @@
 "use client";
 
 import { Search } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { NavSelectors } from "./nav-selectors";
 import { UserMenu } from "@/components/auth/user-menu";
 import { BaseAppShell } from "./base-app-shell";
@@ -36,6 +37,7 @@ export function AppShell({
   onSearchOpen,
   children,
 }: Props) {
+  const t = useTranslations("Search");
   return (
     <BaseAppShell
       headerRightContent={
@@ -45,7 +47,7 @@ export function AppShell({
               <Button
                 variant="ghost"
                 size="icon-sm"
-                aria-label="Search entries"
+                aria-label={t("openButton")}
                 onClick={onSearchOpen}
                 className="text-muted-foreground hover:text-foreground"
               >

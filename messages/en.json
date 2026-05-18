@@ -562,7 +562,8 @@
     "noResults": "No results",
     "kindIncome": "Income",
     "kindExpense": "Expense",
-    "kindRecurring": "Recurring"
+    "kindRecurring": "Recurring",
+    "openButton": "Search entries"
   },
   "Privacy": {
     "title": "Privacy Policy",
