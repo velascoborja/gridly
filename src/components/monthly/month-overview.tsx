@@ -24,6 +24,7 @@ interface Props {
   currentMonthPathPrefix?: string;
   onMonthSelect?: (month: number) => void;
   onYearDataChange?: (yearData: YearData) => void;
+  highlightId?: string | null;
 }
 
 type FixedUpdateOptions = Partial<Pick<
@@ -72,6 +73,7 @@ export function MonthOverview({
   currentMonthPathPrefix,
   onMonthSelect,
   onYearDataChange,
+  highlightId = null,
 }: Props) {
   const t = useTranslations("Monthly");
   const tOverview = useTranslations("Monthly.overview");
@@ -156,6 +158,12 @@ export function MonthOverview({
       behavior: "smooth",
     });
   }, [monthNumber]);
+
+  useEffect(() => {
+    if (highlightId?.startsWith("recurring-")) {
+      setShowFixedEditors(true);
+    }
+  }, [highlightId]);
 
   const month = sortedMonths.find((m) => m.month === monthNumber);
   const activeIndex = month ? sortedMonths.findIndex((item) => item.id === month.id) : -1;
@@ -658,6 +666,7 @@ export function MonthOverview({
                 onRecurringEntriesChange={handleRecurringExpensesChange}
                 annualDefaults={config}
                 readOnly={readOnly}
+                highlightId={highlightId}
               />
               <IncomeCard
                 month={month}
@@ -693,6 +702,7 @@ export function MonthOverview({
             setDraggedEntry(null);
             setDragOverMonthId(null);
           }}
+          highlightId={highlightId}
         />
 
         <AdditionalEntriesCard
@@ -713,6 +723,7 @@ export function MonthOverview({
             setDraggedEntry(null);
             setDragOverMonthId(null);
           }}
+          highlightId={highlightId}
         />
       </div>
     </div>
