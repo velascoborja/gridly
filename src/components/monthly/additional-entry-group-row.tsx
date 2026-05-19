@@ -309,7 +309,7 @@ export function AdditionalEntryGroupRow({
           {group.entries.length}
         </span>
 
-        <span className="shrink-0 text-sm font-semibold tabular-nums text-rose-600 dark:text-rose-300">
+        <span className="shrink-0 text-sm font-semibold tabular-nums text-violet-600 dark:text-violet-400">
           {formatCurrency(groupTotal, locale)}
         </span>
 
