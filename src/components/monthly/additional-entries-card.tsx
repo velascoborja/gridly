@@ -476,6 +476,7 @@ export function AdditionalEntriesCard({
             ) : (
               <div
                 key={entry.id}
+                data-highlight-id={`entry-${entry.id}`}
                 draggable={canMoveEntry(entry)}
                 onDragStart={(event) => handleDragStart(event, entry)}
                 onDragEnd={handleDragEnd}

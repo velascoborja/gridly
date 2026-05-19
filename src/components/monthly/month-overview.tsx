@@ -165,6 +165,15 @@ export function MonthOverview({
     }
   }, [highlightId]);
 
+  useEffect(() => {
+    if (!highlightId) return;
+    const timer = setTimeout(() => {
+      const el = document.querySelector(`[data-highlight-id="${highlightId}"]`);
+      el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [highlightId]);
+
   const month = sortedMonths.find((m) => m.month === monthNumber);
   const activeIndex = month ? sortedMonths.findIndex((item) => item.id === month.id) : -1;
   const previousMonth = activeIndex > 0 ? sortedMonths[activeIndex - 1] : null;

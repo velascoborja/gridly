@@ -458,6 +458,7 @@ export function AdditionalEntryGroupRow({
             ) : (
               <div
                 key={entry.id}
+                data-highlight-id={`entry-${entry.id}`}
                 className={cn(
                   "rounded-lg border border-transparent px-2 py-1.5 transition-all hover:border-border/70 hover:bg-muted/40",
                   deletingId === entry.id && "pointer-events-none opacity-60",

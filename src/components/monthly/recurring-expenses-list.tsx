@@ -108,6 +108,7 @@ export function RecurringExpensesList({ monthId, entries, onEntriesChange, readO
         ) : (
           <div
             key={entry.id}
+            data-highlight-id={`recurring-${entry.id}`}
             className={cn(
               "rounded-md border border-transparent px-2 py-1.5 transition-all hover:border-border/70 hover:bg-background/60",
               deletingId === entry.id && "pointer-events-none opacity-60",
