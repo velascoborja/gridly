@@ -363,7 +363,13 @@ export function AdditionalEntryGroupRow({
       </div>
 
       {/* Expanded body */}
-      {!collapsed && (
+      <div
+        className={cn(
+          "grid transition-[grid-template-rows] duration-200 ease-in-out",
+          collapsed ? "grid-rows-[0fr]" : "grid-rows-[1fr]"
+        )}
+      >
+        <div className={cn("overflow-hidden transition-opacity duration-200", collapsed ? "opacity-0" : "opacity-100")}>
         <div className="border-t border-primary/10 bg-background/60 px-2 py-1.5 flex flex-col gap-1.5">
           {group.entries.map((entry) =>
             !readOnly && editingId === entry.id ? (
@@ -603,7 +609,8 @@ export function AdditionalEntryGroupRow({
             </button>
           ) : null}
         </div>
-      )}
+        </div>
+      </div>
     </div>
   );
 }
