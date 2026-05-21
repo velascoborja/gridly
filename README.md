@@ -101,6 +101,26 @@ docs/features/  # In-depth documentation for each feature
 | i18n | [next-intl](https://next-intl.dev) |
 | Export | [ExcelJS](https://github.com/exceljs/exceljs) |
 
+## ⌨️ Keyboard Shortcuts
+
+All shortcuts use `Cmd` (macOS) or `Ctrl` (Windows/Linux) and are suppressed when focus is inside an input.
+
+| Shortcut | Action |
+|---|---|
+| `Cmd+K` | Open search palette |
+| `Cmd+1` | Navigate to Meses (month view) |
+| `Cmd+2` | Navigate to Años (annual summary) |
+| `Cmd+3` | Navigate to Evolución |
+| `Cmd+Shift+←` | Previous month |
+| `Cmd+Shift+→` | Next month |
+| `Cmd+B` | Jump to current calendar month |
+| `Cmd+Shift+E` | Open add expense form |
+| `Cmd+Shift+I` | Open add income form |
+| `Cmd+Shift+G` | Open create expense group form |
+| `Cmd+.` | Toggle expand/collapse fixed values |
+
+See [docs/features/keyboard-shortcuts.md](docs/features/keyboard-shortcuts.md) for full details.
+
 ## 🎨 Design System
 
 Gridly uses a custom design system inspired by Stripe's visual language — purple-primary, layered surfaces, and high-contrast typography. All design tokens, principles, and component guidelines are documented in [DESIGN.md](./DESIGN.md).
