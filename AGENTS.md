@@ -81,7 +81,7 @@ Never duplicate skill content between the two directories — `.claude/skills/` 
 
 ## Feature Documentation
 
-Detailed documentation for specific features can be found in `docs/features/`. Refer to these files for in-depth understanding of implementation logic and domain rules.
+Detailed documentation for specific features can be found in `docs/features/`. **These files are the preferred first stop for context.** Before searching the codebase or reading source files to understand how a feature works, check whether a relevant doc exists below — it covers implementation logic, domain rules, and architectural decisions without requiring code discovery. Only go to the source when the doc is insufficient or absent.
 
 When changing any of the features listed below, update the related documentation in the same change. If the work affects a feature that is not yet documented, add a new feature page under `docs/features/` and link it from this section.
 
