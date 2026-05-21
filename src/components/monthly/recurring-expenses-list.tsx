@@ -5,6 +5,17 @@ import { useState } from "react";
 import { Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { sanitizeNumericInput } from "@/lib/currency-input";
 import { sortRecurringExpensesAsc } from "@/lib/recurring-expenses";
 import { cn, formatCurrency } from "@/lib/utils";
@@ -27,12 +38,14 @@ export function RecurringExpensesList({ monthId, entries, onEntriesChange, readO
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editLabel, setEditLabel] = useState("");
   const [editAmount, setEditAmount] = useState("");
+  const [editFocusField, setEditFocusField] = useState<"label" | "amount">("label");
   const sortedEntries = sortRecurringExpensesAsc(entries);
 
-  const openEditForm = (entry: RecurringExpense) => {
+  const openEditForm = (entry: RecurringExpense, focusField: "label" | "amount" = "label") => {
     setEditingId(entry.id);
     setEditLabel(entry.label);
     setEditAmount(String(entry.amount));
+    setEditFocusField(focusField);
   };
 
   const handleEdit = async (id: number) => {
@@ -87,7 +100,7 @@ export function RecurringExpensesList({ monthId, entries, onEntriesChange, readO
                 value={editLabel}
                 onChange={(e) => setEditLabel(e.target.value)}
                 disabled={savingId === entry.id}
-                autoFocus
+                autoFocus={editFocusField === "label"}
               />
               <Input
                 className="h-8 w-full text-right text-sm sm:w-28"
@@ -95,6 +108,7 @@ export function RecurringExpensesList({ monthId, entries, onEntriesChange, readO
                 onChange={(e) => setEditAmount(sanitizeNumericInput(e.target.value))}
                 disabled={savingId === entry.id}
                 inputMode="decimal"
+                autoFocus={editFocusField === "amount"}
               />
               <Button size="sm" className="h-8 w-full px-3 sm:w-auto" onClick={() => handleEdit(entry.id)} disabled={savingId === entry.id}>
                 {savingId === entry.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
@@ -126,13 +140,51 @@ export function RecurringExpensesList({ monthId, entries, onEntriesChange, readO
                 {entry.label}
               </button>
               <div className="flex shrink-0 items-center gap-1.5">
-                <span className="whitespace-nowrap text-sm font-semibold tabular-nums">
-                  {formatCurrency(entry.amount, locale)}
-                </span>
                 {!readOnly ? (
-                  <Button variant="ghost" size="icon-sm" onClick={() => handleDelete(entry.id)} disabled={deletingId === entry.id} aria-label={t("deleteEntry", { label: entry.label })}>
-                    {deletingId === entry.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
-                  </Button>
+                  <button
+                    className="whitespace-nowrap text-sm font-semibold tabular-nums transition-colors hover:text-primary focus-visible:text-primary disabled:pointer-events-none"
+                    onClick={() => openEditForm(entry, "amount")}
+                    type="button"
+                    disabled={deletingId === entry.id}
+                  >
+                    {formatCurrency(entry.amount, locale)}
+                  </button>
+                ) : (
+                  <span className="whitespace-nowrap text-sm font-semibold tabular-nums">
+                    {formatCurrency(entry.amount, locale)}
+                  </span>
+                )}
+                {!readOnly ? (
+                  <AlertDialog>
+                    <AlertDialogTrigger
+                      render={
+                        <Button variant="ghost" size="icon-sm" disabled={deletingId === entry.id} aria-label={t("deleteEntry", { label: entry.label })}>
+                          {deletingId === entry.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
+                        </Button>
+                      }
+                    />
+                    <AlertDialogContent size="sm">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>{t("confirmDeleteTitle")}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {t("confirmDeleteDescription", { label: entry.label })}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel variant="ghost" disabled={deletingId === entry.id}>
+                          {common("cancel")}
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                          variant="destructive"
+                          onClick={() => handleDelete(entry.id)}
+                          disabled={deletingId === entry.id}
+                        >
+                          {deletingId === entry.id ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
+                          {deletingId === entry.id ? t("deleting") : t("confirmDeleteAction")}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 ) : null}
               </div>
             </div>

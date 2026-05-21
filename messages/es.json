@@ -241,7 +241,11 @@
       "description": "Gastos planificados que se repiten cada mes. Los cambios aquí solo afectan a este mes.",
       "total": "Total",
       "empty": "Sin gastos recurrentes este mes.",
-      "deleteEntry": "Eliminar gasto recurrente {label}"
+      "deleteEntry": "Eliminar gasto recurrente {label}",
+      "confirmDeleteTitle": "¿Eliminar gasto recurrente?",
+      "confirmDeleteDescription": "Se eliminará \"{label}\" de este mes. Esta acción no se puede deshacer.",
+      "confirmDeleteAction": "Eliminar",
+      "deleting": "Eliminando..."
     }
   },
   "Landing": {

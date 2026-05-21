@@ -241,7 +241,11 @@
       "description": "Planned expenses that repeat every month. Changes here only affect this month.",
       "total": "Total",
       "empty": "No recurring expenses this month.",
-      "deleteEntry": "Remove recurring expense {label}"
+      "deleteEntry": "Remove recurring expense {label}",
+      "confirmDeleteTitle": "Remove recurring expense?",
+      "confirmDeleteDescription": "\"{label}\" will be removed from this month. This action cannot be undone.",
+      "confirmDeleteAction": "Remove",
+      "deleting": "Removing..."
     }
   },
   "Landing": {
