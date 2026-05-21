@@ -48,24 +48,27 @@
   --radius-4xl: calc(var(--radius) * 2.6);
   --animate-shimmer-slide: shimmer-slide 1.7s cubic-bezier(0.4,0,0.6,1) infinite;
   --animate-label-fade: label-fade 2.6s ease-in-out infinite;
-  --animate-entry-highlight: entry-highlight 2s ease-out forwards;
+  --animate-entry-highlight: entry-highlight 3.5s ease-out forwards;
 }
 
 @keyframes entry-highlight {
   0% {
-    box-shadow: 0 0 0 2px color-mix(in oklch, var(--primary) 55%, transparent);
-    background-color: color-mix(in oklch, var(--primary) 10%, transparent);
-    transform: scale(1.018);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 75%, transparent);
+    background-color: color-mix(in oklch, var(--primary) 18%, transparent);
+    transform: scale(1.03);
   }
-  13% {
-    transform: scale(0.997);
+  10% {
+    transform: scale(0.992);
   }
-  22% {
+  18% {
+    transform: scale(1.012);
+  }
+  28% {
     transform: scale(1);
   }
-  60% {
-    box-shadow: 0 0 0 2px color-mix(in oklch, var(--primary) 40%, transparent);
-    background-color: color-mix(in oklch, var(--primary) 5%, transparent);
+  55% {
+    box-shadow: 0 0 0 2px color-mix(in oklch, var(--primary) 50%, transparent);
+    background-color: color-mix(in oklch, var(--primary) 10%, transparent);
   }
   100% {
     box-shadow: 0 0 0 2px transparent;

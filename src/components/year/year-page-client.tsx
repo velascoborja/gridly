@@ -165,7 +165,7 @@ export function YearPageClient({
       highlightTimerRef.current = setTimeout(() => {
         setHighlightId(null);
         highlightTimerRef.current = null;
-      }, 2000);
+      }, 3500);
     },
     [currentYearData.config.year, routePrefix]
   );
