@@ -89,6 +89,28 @@ test("filterSearchIndex returns no results for non-matching query", () => {
   assert.deepStrictEqual(filterSearchIndex(index, "zzznotfound"), []);
 });
 
+test("filterSearchIndex matches by exact amount", () => {
+  const index = buildSearchIndex(makeYearData());
+  const results = filterSearchIndex(index, "500");
+  assert.strictEqual(results.length, 1);
+  assert.strictEqual(results[0].label, "Freelance web");
+});
+
+test("filterSearchIndex matches by partial amount substring", () => {
+  const index = buildSearchIndex(makeYearData());
+  // "90" matches amount 900 (Alquiler)
+  const results = filterSearchIndex(index, "90");
+  assert.ok(results.some((e) => e.label === "Alquiler"));
+});
+
+test("filterSearchIndex returns both label and amount matches without duplicates", () => {
+  const index = buildSearchIndex(makeYearData());
+  // "45" matches amount 45 (Cena cumpleaños) — not a label match
+  const results = filterSearchIndex(index, "45");
+  assert.strictEqual(results.length, 1);
+  assert.strictEqual(results[0].label, "Cena cumpleaños");
+});
+
 test("filterSearchIndex sorts results by month ascending", () => {
   const data = makeYearData();
   data.months.push({

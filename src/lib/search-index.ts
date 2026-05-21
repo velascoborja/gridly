@@ -32,8 +32,8 @@ export function buildSearchIndex(yearData: YearData): SearchEntry[] {
 
 export function filterSearchIndex(entries: SearchEntry[], query: string): SearchEntry[] {
   if (!query.trim()) return [];
-  const q = query.toLowerCase();
+  const q = query.toLowerCase().trim();
   return entries
-    .filter((e) => e.label.toLowerCase().includes(q))
+    .filter((e) => e.label.toLowerCase().includes(q) || String(e.amount).includes(q))
     .sort((a, b) => a.month - b.month);
 }
