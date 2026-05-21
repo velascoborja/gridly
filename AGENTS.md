@@ -51,6 +51,18 @@ Gridly follows a premium, fintech-inspired visual system (Stripe-like) documente
 - **Data Initialization:** The prefill endpoint (`POST /api/years/[year]/prefill`) overwrites all 12 months based on `YearConfig`.
 - **Currency:** Amounts are `number` in TS, `numeric` (string) in DB. Defaults to `es-ES` (Euro).
 
+## Refactor Gate
+
+Before undertaking any refactor that touches more than one file, renames core abstractions, restructures a data flow, or changes a module's public contract — **stop and explain first**:
+
+1. **What** needs to change and why the current structure makes the task impossible or unreasonably risky without it.
+2. **Scope** — which files and interfaces will be affected.
+3. **Risk** — what could break and how it will be validated afterward.
+
+Then **wait for explicit user confirmation** before writing any code. Do not proceed under the assumption that the user implied consent by asking for the feature. A feature request is not a refactor approval.
+
+This gate applies even when the refactor seems obviously necessary. The cost of pausing is low; the cost of an unwanted structural change is high.
+
 ## Development Conventions
 
 - **Internationalization (i18n):** Uses `next-intl`. All UI strings must be in `messages/es.json` (Spanish) and `messages/en.json` (English). **Do not hardcode strings.** Use `@/i18n/routing` for all navigation components (Link, useRouter).
