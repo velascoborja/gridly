@@ -25,6 +25,10 @@ interface Props {
   onMonthSelect?: (month: number) => void;
   onYearDataChange?: (yearData: YearData) => void;
   highlightId?: string | null;
+  toggleFixedEditorsRef?: { current: (() => void) | null };
+  openAddExpenseFormRef?: { current: (() => void) | null };
+  openAddIncomeFormRef?: { current: (() => void) | null };
+  openAddGroupFormRef?: { current: (() => void) | null };
 }
 
 type FixedUpdateOptions = Partial<Pick<
@@ -74,6 +78,10 @@ export function MonthOverview({
   onMonthSelect,
   onYearDataChange,
   highlightId = null,
+  toggleFixedEditorsRef,
+  openAddExpenseFormRef,
+  openAddIncomeFormRef,
+  openAddGroupFormRef,
 }: Props) {
   const t = useTranslations("Monthly");
   const tOverview = useTranslations("Monthly.overview");
@@ -158,6 +166,12 @@ export function MonthOverview({
       behavior: "smooth",
     });
   }, [monthNumber]);
+
+  useEffect(() => {
+    if (!toggleFixedEditorsRef) return;
+    toggleFixedEditorsRef.current = () => setShowFixedEditors((prev) => !prev);
+    return () => { toggleFixedEditorsRef.current = null; };
+  }, [toggleFixedEditorsRef]);
 
   useEffect(() => {
     if (highlightId?.startsWith("recurring-")) {
@@ -712,6 +726,8 @@ export function MonthOverview({
             setDragOverMonthId(null);
           }}
           highlightId={highlightId}
+          openAddFormRef={openAddExpenseFormRef}
+          openAddGroupFormRef={openAddGroupFormRef}
         />
 
         <AdditionalEntriesCard
@@ -733,6 +749,7 @@ export function MonthOverview({
             setDragOverMonthId(null);
           }}
           highlightId={highlightId}
+          openAddFormRef={openAddIncomeFormRef}
         />
       </div>
     </div>

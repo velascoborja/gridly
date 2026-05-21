@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useRouter, usePathname, Link } from "@/i18n/routing";
 import { buttonVariants } from "@/components/ui/button";
 import { getGridlyYears, getNextCreatableYearFromOptions } from "@/lib/server/year-navigation";
@@ -80,6 +81,40 @@ export function NavSelectors({
   const summaryHref = buildYearSummaryHref(summaryPathPrefix, currentYear);
   const evolutionHref = buildEvolutionHref(undefined);
   const createYearHref = buildSetupHrefFromPathname(nextCreatableYear, pathname, currentYear, selectedMonth, view);
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      const active = document.activeElement;
+      const isTyping =
+        active instanceof HTMLInputElement ||
+        active instanceof HTMLTextAreaElement ||
+        active instanceof HTMLSelectElement ||
+        (active instanceof HTMLElement && active.isContentEditable);
+      if (isTyping) return;
+
+      const meta = e.metaKey || e.ctrlKey;
+      if (!meta) return;
+
+      if (e.key === "1" && !isHistoricalYearSelected) {
+        e.preventDefault();
+        if (onMonthViewSelect) onMonthViewSelect();
+        else router.push(monthHref);
+        return;
+      }
+      if (e.key === "2" && !isHistoricalYearSelected) {
+        e.preventDefault();
+        if (onSummaryViewSelect) onSummaryViewSelect();
+        else router.push(summaryHref);
+        return;
+      }
+      if (e.key === "3" && !hideEvolution) {
+        e.preventDefault();
+        router.push(evolutionHref);
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [monthHref, summaryHref, evolutionHref, isHistoricalYearSelected, hideEvolution, onMonthViewSelect, onSummaryViewSelect, router]);
 
   const mainTabs = [
     { label: t("months"), key: "overview" as const, href: monthHref, disabled: isHistoricalYearSelected, disabledTitle: t("historicalYearUnavailable") },

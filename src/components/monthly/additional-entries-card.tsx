@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FolderInput, FolderPlus, Loader2, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "@/i18n/routing";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,6 +47,8 @@ interface Props {
   onEntryDragStart?: (entry: AdditionalEntry) => void;
   onEntryDragEnd?: () => void;
   highlightId?: string | null;
+  openAddFormRef?: { current: (() => void) | null };
+  openAddGroupFormRef?: { current: (() => void) | null };
 }
 
 export function AdditionalEntriesCard({
@@ -63,6 +65,8 @@ export function AdditionalEntriesCard({
   onEntryDragStart,
   onEntryDragEnd,
   highlightId = null,
+  openAddFormRef,
+  openAddGroupFormRef,
 }: Props) {
   const t = useTranslations("Monthly.additionalEntries");
   const common = useTranslations("Common");
@@ -81,6 +85,18 @@ export function AdditionalEntriesCard({
   const [isAddingGroup, setIsAddingGroup] = useState(false);
   const [newGroupLabel, setNewGroupLabel] = useState("");
   const [movingToGroupId, setMovingToGroupId] = useState<number | null>(null);
+  useEffect(() => {
+    if (!openAddFormRef) return;
+    openAddFormRef.current = readOnly ? null : () => setAddingFormOpen(true);
+    return () => { openAddFormRef.current = null; };
+  }, [openAddFormRef, readOnly]);
+
+  useEffect(() => {
+    if (!openAddGroupFormRef) return;
+    openAddGroupFormRef.current = readOnly ? null : () => setAddingGroupOpen(true);
+    return () => { openAddGroupFormRef.current = null; };
+  }, [openAddGroupFormRef, readOnly]);
+
   const sortedEntries = sortAdditionalEntriesDesc(entries);
   const groupedTotal = groups.reduce((sum, g) => sum + sumAdditionalEntries(g.entries), 0);
   const entriesTotal = sumAdditionalEntries(entries) + groupedTotal;

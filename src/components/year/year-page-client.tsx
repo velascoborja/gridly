@@ -75,6 +75,10 @@ export function YearPageClient({
   const [searchOpen, setSearchOpen] = useState(false);
   const [highlightId, setHighlightId] = useState<string | null>(null);
   const highlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const toggleFixedRef = useRef<(() => void) | null>(null);
+  const openAddExpenseFormRef = useRef<(() => void) | null>(null);
+  const openAddIncomeFormRef = useRef<(() => void) | null>(null);
+  const openAddGroupFormRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     setCurrentYearData(yearData);
@@ -106,17 +110,6 @@ export function YearPageClient({
   }, [currentYearData.config.year, pathname]);
 
   useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        setSearchOpen((prev) => !prev);
-      }
-    }
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
-  useEffect(() => {
     return () => {
       if (highlightTimerRef.current !== null) {
         clearTimeout(highlightTimerRef.current);
@@ -144,6 +137,76 @@ export function YearPageClient({
     setSelectedView("summary");
     window.history.pushState(null, "", buildYearSummaryHref(routePrefix, currentYearData.config.year));
   }, [currentYearData.config.year, routePrefix, selectedView]);
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      const active = document.activeElement;
+      const isTyping =
+        active instanceof HTMLInputElement ||
+        active instanceof HTMLTextAreaElement ||
+        active instanceof HTMLSelectElement ||
+        (active instanceof HTMLElement && active.isContentEditable);
+      if (isTyping) return;
+
+      const meta = e.metaKey || e.ctrlKey;
+      if (!meta) return;
+
+      if (e.key === "k") {
+        e.preventDefault();
+        setSearchOpen((prev) => !prev);
+        return;
+      }
+
+      if (!e.shiftKey && e.key.toLowerCase() === "b") {
+        const today = new Date();
+        if (currentYearData.config.year === today.getFullYear()) {
+          e.preventDefault();
+          handleMonthSelect(today.getMonth() + 1);
+        }
+        return;
+      }
+
+      if (selectedView !== "overview") return;
+
+      if (e.shiftKey && e.key === "ArrowLeft") {
+        e.preventDefault();
+        const months = currentYearData.months.map((m) => m.month).sort((a, b) => a - b);
+        const idx = months.indexOf(selectedMonth);
+        if (idx > 0) handleMonthSelect(months[idx - 1]);
+        return;
+      }
+      if (e.shiftKey && e.key === "ArrowRight") {
+        e.preventDefault();
+        const months = currentYearData.months.map((m) => m.month).sort((a, b) => a - b);
+        const idx = months.indexOf(selectedMonth);
+        if (idx >= 0 && idx < months.length - 1) handleMonthSelect(months[idx + 1]);
+        return;
+      }
+
+      if (e.shiftKey && e.key.toLowerCase() === "e") {
+        e.preventDefault();
+        openAddExpenseFormRef.current?.();
+        return;
+      }
+      if (e.shiftKey && e.key.toLowerCase() === "i") {
+        e.preventDefault();
+        openAddIncomeFormRef.current?.();
+        return;
+      }
+      if (e.shiftKey && e.key.toLowerCase() === "g") {
+        e.preventDefault();
+        openAddGroupFormRef.current?.();
+        return;
+      }
+
+      if (e.key === ".") {
+        e.preventDefault();
+        toggleFixedRef.current?.();
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedMonth, selectedView, currentYearData, handleMonthSelect]);
 
   const handleSettingsSelect = useCallback(() => {
     if (selectedView === "settings") return;
@@ -199,6 +262,10 @@ export function YearPageClient({
           onMonthSelect={handleMonthSelect}
           onYearDataChange={setCurrentYearData}
           highlightId={highlightId}
+          toggleFixedEditorsRef={toggleFixedRef}
+          openAddExpenseFormRef={openAddExpenseFormRef}
+          openAddIncomeFormRef={openAddIncomeFormRef}
+          openAddGroupFormRef={openAddGroupFormRef}
         />
       )}
       <SearchPalette

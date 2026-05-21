@@ -108,3 +108,4 @@ When changing any of the features listed below, update the related documentation
 - [App Icons & Web App Metadata](docs/features/app-icons.md): Browser, manifest, and iOS Safari icon asset conventions.
 - [Evolution Dashboard](docs/features/evolution-dashboard.md): Multi-year balance, savings, and investment analytics.
 - [Historical Year Imports](docs/features/historical-year-imports.md): Summary-only pre-Gridly annual imports used by Evolution.
+- [Keyboard Shortcuts](docs/features/keyboard-shortcuts.md): Full shortcut reference and implementation notes for the keyboard navigation system.
