@@ -7,7 +7,7 @@ import { getGridlyYears, getNextCreatableYearFromOptions } from "@/lib/server/ye
 import type { YearOption } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Plus } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Select,
   SelectContent,
@@ -52,6 +52,7 @@ export function NavSelectors({
   const router = useRouter();
   const pathname = usePathname();
   const t = useTranslations("Nav");
+  const locale = useLocale();
   const selectedMonth = currentMonth ?? new Date().getMonth() + 1;
   const calendarYear = new Date().getFullYear();
   const yearOptions: YearOption[] = years.map((entry) =>
@@ -152,8 +153,8 @@ export function NavSelectors({
             </Select>
 
             {!hideCreateYear && (
-              <Link
-                href={createYearHref}
+              <a
+                href={`/${locale}${createYearHref}`}
                 aria-label={t("createYear", { year: nextCreatableYear })}
                 className={cn(
                   buttonVariants({ variant: "outline", size: "icon-sm" }),
@@ -161,7 +162,7 @@ export function NavSelectors({
                 )}
               >
                 <Plus className="size-4" />
-              </Link>
+              </a>
             )}
           </div>
         )}
@@ -186,7 +187,7 @@ export function NavSelectors({
                 <Link
                   key={tab.key}
                   href={tab.href}
-                  onNavigate={(event) => {
+                  onClick={(event) => {
                     if (tab.key === "evolution") return;
                     const handler = tab.key === "overview" ? onMonthViewSelect : tab.key === "summary" ? onSummaryViewSelect : undefined;
                     if (!handler) return;

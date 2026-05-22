@@ -2,7 +2,7 @@
 
 import { useRouter, usePathname } from "@/i18n/routing";
 import { MoreVertical, Plus } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,6 +30,7 @@ export function MobileYearMenu({ currentYear, currentMonth, view, years }: Props
   const router = useRouter();
   const pathname = usePathname();
   const t = useTranslations("Nav");
+  const locale = useLocale();
 
   if (view === "evolution") return null;
 
@@ -81,7 +82,7 @@ export function MobileYearMenu({ currentYear, currentMonth, view, years }: Props
             </DropdownMenuItem>
           ))}
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => router.push(createYearHref)} className="rounded border border-primary/20 bg-primary/[0.06] font-medium focus:bg-primary/10">
+          <DropdownMenuItem onClick={() => window.location.href = `/${locale}${createYearHref}`} className="rounded border border-primary/20 bg-primary/[0.06] font-medium focus:bg-primary/10">
             <Plus className="size-3.5 text-primary" />
             <span className="text-foreground">{nextCreatableYear}</span>
           </DropdownMenuItem>

@@ -57,7 +57,7 @@ export function UserMenu({ email, name, image, active, variant = "header", onSet
         </div>
         <Link
           href="/settings"
-          onNavigate={handleSettingsNavigate}
+          onClick={handleSettingsNavigate}
           className={cn(
             "flex w-full items-center justify-center gap-2 rounded-lg border transition-all duration-200",
             active
@@ -118,7 +118,7 @@ export function UserMenu({ email, name, image, active, variant = "header", onSet
       )}
       <Link
         href="/settings"
-        onNavigate={handleSettingsNavigate}
+        onClick={handleSettingsNavigate}
         className={cn(
           "flex size-9 items-center justify-center rounded-full border transition-all duration-200 hover:shadow-sm",
           active
