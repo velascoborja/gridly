@@ -81,9 +81,9 @@ export function MobileYearMenu({ currentYear, currentMonth, view, years }: Props
             </DropdownMenuItem>
           ))}
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => router.push(createYearHref)}>
+          <DropdownMenuItem onClick={() => router.push(createYearHref)} className="rounded border border-primary/20 bg-primary/[0.06] font-medium focus:bg-primary/10">
             <Plus className="size-3.5 text-primary" />
-            <span>{t("createYear", { year: nextCreatableYear })}</span>
+            <span className="text-foreground">{nextCreatableYear}</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
