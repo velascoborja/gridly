@@ -62,7 +62,7 @@
       "totalInvestmentNote": "Sum of monthly investments",
       "estimatedBalance": "Final balance",
       "estimatedBalanceNote": "Expected balance at the end of December",
-      "balanceDelta": "Change from starting balance: {amount}",
+      "startingBalanceKpi": "Starting balance: {amount}",
       "activeMonths": "{count, plural, one {# active month} other {# active months}}",
       "investmentMonths": "{count, plural, one {# month invested} other {# months invested}}",
       "positiveTrend": "Up",

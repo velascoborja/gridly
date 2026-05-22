@@ -62,7 +62,7 @@
       "totalInvestmentNote": "Suma de las inversiones mensuales",
       "estimatedBalance": "Saldo final",
       "estimatedBalanceNote": "Saldo previsto al terminar diciembre",
-      "balanceDelta": "Variación frente al saldo inicial: {amount}",
+      "startingBalanceKpi": "Saldo inicial: {amount}",
       "activeMonths": "{count, plural, one {# mes con actividad} other {# meses con actividad}}",
       "investmentMonths": "{count, plural, one {# mes con inversión} other {# meses con inversión}}",
       "positiveTrend": "Sube",

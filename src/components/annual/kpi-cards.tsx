@@ -122,7 +122,7 @@ export function KpiCards({
       label: t("estimatedBalance"),
       value: endingBalance,
       note: t("estimatedBalanceNote"),
-      comparison: t("balanceDelta", { amount: formatCurrency(balanceDelta, locale) }),
+      comparison: t("startingBalanceKpi", { amount: formatCurrency(startingBalance, locale) }),
       tone: getMetricTone(balanceDelta, toneLabels),
     },
     {
