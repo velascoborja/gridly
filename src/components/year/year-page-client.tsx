@@ -200,13 +200,13 @@ export function YearPageClient({
         return;
       }
 
-      if (e.shiftKey && e.key === ">") {
+      if (e.shiftKey && (e.key === ">" || e.key === ".")) {
         e.preventDefault();
         toggleAllGroupsRef.current?.();
         return;
       }
 
-      if (e.key === ".") {
+      if (!e.shiftKey && e.key === ".") {
         e.preventDefault();
         toggleFixedRef.current?.();
       }
