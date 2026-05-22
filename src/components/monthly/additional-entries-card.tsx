@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FolderInput, FolderPlus, Loader2, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "@/i18n/routing";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,6 +49,7 @@ interface Props {
   highlightId?: string | null;
   openAddFormRef?: { current: (() => void) | null };
   openAddGroupFormRef?: { current: (() => void) | null };
+  toggleAllGroupsRef?: { current: (() => void) | null };
 }
 
 export function AdditionalEntriesCard({
@@ -67,6 +68,7 @@ export function AdditionalEntriesCard({
   highlightId = null,
   openAddFormRef,
   openAddGroupFormRef,
+  toggleAllGroupsRef,
 }: Props) {
   const t = useTranslations("Monthly.additionalEntries");
   const common = useTranslations("Common");
@@ -85,6 +87,32 @@ export function AdditionalEntriesCard({
   const [isAddingGroup, setIsAddingGroup] = useState(false);
   const [newGroupLabel, setNewGroupLabel] = useState("");
   const [movingToGroupId, setMovingToGroupId] = useState<number | null>(null);
+  const [groupCollapsedState, setGroupCollapsedState] = useState<Record<number, boolean>>(
+    () => Object.fromEntries(groups.map(g => [g.id, true]))
+  );
+  const groupsRef = useRef(groups);
+  groupsRef.current = groups;
+  const groupCollapsedStateRef = useRef(groupCollapsedState);
+  groupCollapsedStateRef.current = groupCollapsedState;
+
+  useEffect(() => {
+    setGroupCollapsedState(prev =>
+      Object.fromEntries(groups.map(g => [g.id, g.id in prev ? prev[g.id] : true]))
+    );
+  }, [groups]);
+
+  useEffect(() => {
+    if (!toggleAllGroupsRef) return;
+    toggleAllGroupsRef.current = () => {
+      const currentGroups = groupsRef.current;
+      if (currentGroups.length === 0) return;
+      const currentState = groupCollapsedStateRef.current;
+      const allExpanded = currentGroups.every(g => currentState[g.id] === false);
+      setGroupCollapsedState(Object.fromEntries(currentGroups.map(g => [g.id, allExpanded])));
+    };
+    return () => { toggleAllGroupsRef.current = null; };
+  }, [toggleAllGroupsRef]);
+
   useEffect(() => {
     if (!openAddFormRef) return;
     openAddFormRef.current = readOnly ? null : () => setAddingFormOpen(true);
@@ -400,6 +428,8 @@ export function AdditionalEntriesCard({
                 onEntryGroupChanged={onEntryGroupChanged ?? (() => {})}
                 readOnly={readOnly}
                 highlightId={highlightId}
+                collapsed={groupCollapsedState[group.id] ?? true}
+                onCollapsedChange={(v) => setGroupCollapsedState(prev => ({ ...prev, [group.id]: v }))}
               />
             ))}
           </div>

@@ -29,6 +29,7 @@ interface Props {
   openAddExpenseFormRef?: { current: (() => void) | null };
   openAddIncomeFormRef?: { current: (() => void) | null };
   openAddGroupFormRef?: { current: (() => void) | null };
+  toggleAllGroupsRef?: { current: (() => void) | null };
 }
 
 type FixedUpdateOptions = Partial<Pick<
@@ -82,6 +83,7 @@ export function MonthOverview({
   openAddExpenseFormRef,
   openAddIncomeFormRef,
   openAddGroupFormRef,
+  toggleAllGroupsRef,
 }: Props) {
   const t = useTranslations("Monthly");
   const tOverview = useTranslations("Monthly.overview");
@@ -728,6 +730,7 @@ export function MonthOverview({
           highlightId={highlightId}
           openAddFormRef={openAddExpenseFormRef}
           openAddGroupFormRef={openAddGroupFormRef}
+          toggleAllGroupsRef={toggleAllGroupsRef}
         />
 
         <AdditionalEntriesCard

@@ -32,9 +32,12 @@ Tab shortcuts (`Cmd+1/2/3`) respect disabled state: if a historical year is sele
 | `Cmd+Shift+E` | Open add expense form |
 | `Cmd+Shift+I` | Open add income form |
 | `Cmd+Shift+G` | Open create expense group form |
+| `Cmd+Shift+.` | Expand / collapse all expense groups |
 | `Cmd+.` | Toggle expand/collapse fixed values |
 
 Entry and group shortcuts are no-ops in read-only mode.
+
+`Cmd+Shift+.` expands all groups when any group is collapsed; collapses all when every group is already expanded. It is a no-op when the current month has no expense groups.
 
 ## Implementation
 
@@ -42,3 +45,5 @@ Shortcuts are split across two components:
 
 - **`src/components/layout/nav-selectors.tsx`** — `Cmd+1/2/3` tab navigation. Lives here so it works on every page, including `/evolution` which has no year-page client.
 - **`src/components/year/year-page-client.tsx`** — all remaining shortcuts. Uses `useRef` callbacks registered by child components (`MonthOverview`, `AdditionalEntriesCard`) to trigger imperative actions like opening forms or toggling panels.
+
+`Cmd+Shift+.` uses `toggleAllGroupsRef`, which is wired through `MonthOverview` → `AdditionalEntriesCard`. The card owns the collapsed state for all groups (lifted from `AdditionalEntryGroupRow`) and registers the handler that reads current state and sets all groups expanded or collapsed atomically.

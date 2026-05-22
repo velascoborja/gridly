@@ -79,6 +79,7 @@ export function YearPageClient({
   const openAddExpenseFormRef = useRef<(() => void) | null>(null);
   const openAddIncomeFormRef = useRef<(() => void) | null>(null);
   const openAddGroupFormRef = useRef<(() => void) | null>(null);
+  const toggleAllGroupsRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     setCurrentYearData(yearData);
@@ -199,6 +200,12 @@ export function YearPageClient({
         return;
       }
 
+      if (e.shiftKey && e.key === ">") {
+        e.preventDefault();
+        toggleAllGroupsRef.current?.();
+        return;
+      }
+
       if (e.key === ".") {
         e.preventDefault();
         toggleFixedRef.current?.();
@@ -266,6 +273,7 @@ export function YearPageClient({
           openAddExpenseFormRef={openAddExpenseFormRef}
           openAddIncomeFormRef={openAddIncomeFormRef}
           openAddGroupFormRef={openAddGroupFormRef}
+          toggleAllGroupsRef={toggleAllGroupsRef}
         />
       )}
       <SearchPalette

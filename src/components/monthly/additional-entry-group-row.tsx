@@ -39,6 +39,8 @@ interface Props {
   onEntryGroupChanged: (entry: AdditionalEntry, toGroupId: number | null) => void;
   readOnly?: boolean;
   highlightId?: string | null;
+  collapsed: boolean;
+  onCollapsedChange: (collapsed: boolean) => void;
 }
 
 export function AdditionalEntryGroupRow({
@@ -50,12 +52,12 @@ export function AdditionalEntryGroupRow({
   onEntryGroupChanged,
   readOnly = false,
   highlightId = null,
+  collapsed,
+  onCollapsedChange,
 }: Props) {
   const t = useTranslations("Monthly.additionalEntries");
   const common = useTranslations("Common");
   const locale = useLocale();
-
-  const [collapsed, setCollapsed] = useState(true);
   const [isEditingName, setIsEditingName] = useState(false);
   const [nameValue, setNameValue] = useState(group.label);
   const [isSavingName, setIsSavingName] = useState(false);
@@ -78,12 +80,12 @@ export function AdditionalEntryGroupRow({
 
   useEffect(() => {
     if (highlightId && group.entries.some((e) => `entry-${e.id}` === highlightId)) {
-      setCollapsed(false);
+      onCollapsedChange(false);
     }
-  }, [highlightId, group.entries]);
+  }, [highlightId, group.entries, onCollapsedChange]);
 
   const handleToggle = () => {
-    if (!isEditingName) setCollapsed((c) => !c);
+    if (!isEditingName) onCollapsedChange(!collapsed);
   };
 
   const handleRenameStart = (e: React.MouseEvent) => {
