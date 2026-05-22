@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { NavSelectors } from "./nav-selectors";
 import { UserMenu } from "@/components/auth/user-menu";
 import { BaseAppShell } from "./base-app-shell";
+import { MobileYearMenu } from "./mobile-year-menu";
 import { Button } from "@/components/ui/button";
 import type { YearOption } from "@/lib/types";
 
@@ -54,6 +55,12 @@ export function AppShell({
                 <Search className="h-4 w-4" />
               </Button>
             )}
+            <MobileYearMenu
+              currentYear={currentYear}
+              currentMonth={currentMonth}
+              view={view}
+              years={years}
+            />
             <UserMenu
               email={user.email}
               name={user.name}

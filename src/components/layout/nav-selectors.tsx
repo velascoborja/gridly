@@ -126,7 +126,7 @@ export function NavSelectors({
     <div className="flex w-full min-w-0 justify-center md:justify-end">
       <div className="flex max-w-full flex-wrap items-center justify-center gap-2 md:justify-end md:gap-3">
         {showYearControls && (
-          <div className="flex shrink-0 items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+          <div className="hidden shrink-0 items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground md:flex">
             <span className="sr-only md:not-sr-only">{t("yearLabel")}</span>
             <Select value={String(currentYear)} onValueChange={handleYearChange}>
               <SelectTrigger className="h-8 rounded-md border-border/70 bg-background/90 pl-3 pr-3 font-medium text-foreground shadow-sm focus:border-primary focus:ring-primary/20 sm:h-9 sm:pl-4 sm:pr-4">
