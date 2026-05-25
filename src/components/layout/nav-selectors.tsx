@@ -187,7 +187,7 @@ export function NavSelectors({
                 <Link
                   key={tab.key}
                   href={tab.href}
-                  onClick={(event) => {
+                  onNavigate={(event) => {
                     if (tab.key === "evolution") return;
                     const handler = tab.key === "overview" ? onMonthViewSelect : tab.key === "summary" ? onSummaryViewSelect : undefined;
                     if (!handler) return;
