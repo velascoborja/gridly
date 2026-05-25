@@ -33,6 +33,8 @@ import { sanitizeNumericInput } from "@/lib/currency-input";
 import { cn, formatCurrency } from "@/lib/utils";
 import type { AdditionalEntry, AdditionalEntryGroup } from "@/lib/types";
 
+const NO_GROUPS: AdditionalEntryGroup[] = [];
+
 interface Props {
   monthId: number;
   type: "income" | "expense";
@@ -57,7 +59,7 @@ export function AdditionalEntriesCard({
   type,
   entries,
   onEntriesChange,
-  groups = [],
+  groups = NO_GROUPS,
   onGroupsChange,
   onEntryGroupChanged,
   readOnly = false,
