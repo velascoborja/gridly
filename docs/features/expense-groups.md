@@ -44,7 +44,7 @@ Two tables are involved:
 
 ### Creating a group
 - Click "Añadir grupo" in the expenses card footer.
-- Enter a name and confirm. The card's state updates immediately, then `router.refresh()` is called to invalidate the App Router client cache so the group survives route restore.
+- Enter a name and confirm. The card's state updates immediately via optimistic update. No `router.refresh()` is needed — Next.js 16 sets `staleTimes.dynamic = 0`, so dynamic pages are never cached client-side; fresh data is always fetched from the server on navigation.
 
 ### Adding an entry to a group
 - Expand the group row and click "Añadir al grupo".

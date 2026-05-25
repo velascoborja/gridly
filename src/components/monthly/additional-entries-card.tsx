@@ -3,7 +3,6 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { FolderInput, FolderPlus, Loader2, Plus, Trash2 } from "lucide-react";
-import { useRouter } from "@/i18n/routing";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -75,7 +74,6 @@ export function AdditionalEntriesCard({
   const t = useTranslations("Monthly.additionalEntries");
   const common = useTranslations("Common");
   const locale = useLocale();
-  const router = useRouter();
   const [addingFormOpen, setAddingFormOpen] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [savingId, setSavingId] = useState<number | null>(null);
@@ -262,7 +260,6 @@ export function AdditionalEntriesCard({
       const group = await res.json();
       const newGroup: AdditionalEntryGroup = { id: group.id, monthId: group.monthId, label: group.label, entries: [] };
       onGroupsChange?.([...groups, newGroup]);
-      router.refresh();
       setAddingGroupOpen(false);
       setNewGroupLabel("");
     } finally {
