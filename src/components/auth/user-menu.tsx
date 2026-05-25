@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { LogOut, Settings } from "lucide-react";
+import { useTransition } from "react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import {
@@ -29,6 +30,15 @@ interface Props {
 
 export function UserMenu({ email, name, image, active, variant = "header", onSettingsSelect }: Props) {
   const t = useTranslations("Common");
+  const [pending, startTransition] = useTransition();
+
+  const handleLogout = () => {
+    startTransition(async () => {
+      await signOut();
+      window.location.href = "/";
+    });
+  };
+
   const handleSettingsNavigate = (event: { preventDefault: () => void }) => {
     if (!onSettingsSelect) return;
 
@@ -86,11 +96,9 @@ export function UserMenu({ email, name, image, active, variant = "header", onSet
               <DialogClose render={<Button variant="outline" className="w-full sm:w-auto" />}>
                 {t("cancel")}
               </DialogClose>
-              <form action={signOut}>
-                <Button type="submit" variant="destructive" className="w-full sm:w-auto">
-                  {t("logout")}
-                </Button>
-              </form>
+              <Button type="button" variant="destructive" className="w-full sm:w-auto" onClick={handleLogout} disabled={pending}>
+                {t("logout")}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -154,11 +162,9 @@ export function UserMenu({ email, name, image, active, variant = "header", onSet
             <DialogClose render={<Button variant="outline" className="w-full sm:w-auto" />}>
               {t("cancel")}
             </DialogClose>
-            <form action={signOut}>
-              <Button type="submit" variant="destructive" className="w-full sm:w-auto">
-                {t("logout")}
-              </Button>
-            </form>
+            <Button type="button" variant="destructive" className="w-full sm:w-auto" onClick={handleLogout} disabled={pending}>
+              {t("logout")}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
