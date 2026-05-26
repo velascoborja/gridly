@@ -1,8 +1,8 @@
 "use server";
 
 import { db } from "@/db";
-import { monthlyRecurringExpenses, months, yearRecurringExpenses, years } from "@/db/schema";
-import { asc, eq } from "drizzle-orm";
+import { additionalEntries, monthlyRecurringExpenses, months, yearRecurringExpenses, years } from "@/db/schema";
+import { asc, and, eq, inArray, isNull } from "drizzle-orm";
 import { propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { deriveStartingBalance, shouldAllowYearCreation } from "@/lib/server/year-planning";
 import { getSessionUser } from "@/lib/server/session";
@@ -138,6 +138,54 @@ export async function createAndPrefillYear(data: {
         }))
       )
     );
+  }
+
+  // 4b. Copy recurring additional entries from previous year
+  const previousYear = await db.query.years.findFirst({
+    where: and(eq(years.userId, user.id), eq(years.year, data.year - 1)),
+  });
+
+  if (previousYear) {
+    const previousMonths = await db
+      .select()
+      .from(months)
+      .where(eq(months.yearId, previousYear.id));
+
+    if (previousMonths.length > 0) {
+      const recurringEntries = await db
+        .select()
+        .from(additionalEntries)
+        .where(
+          and(
+            inArray(additionalEntries.monthId, previousMonths.map((m) => m.id)),
+            eq(additionalEntries.isRecurring, true),
+            isNull(additionalEntries.groupId)
+          )
+        );
+
+      if (recurringEntries.length > 0) {
+        const newMonthByNumber = new Map(insertedMonths.map((m) => [m.month, m.id]));
+        const prevMonthNumberById = new Map(previousMonths.map((m) => [m.id, m.month]));
+
+        const entriesToInsert = recurringEntries
+          .filter((e) => {
+            const monthNumber = prevMonthNumberById.get(e.monthId);
+            return monthNumber !== undefined && newMonthByNumber.has(monthNumber);
+          })
+          .map((e) => ({
+            monthId: newMonthByNumber.get(prevMonthNumberById.get(e.monthId)!)!,
+            type: e.type as "income" | "expense",
+            label: e.label,
+            amount: e.amount,
+            isRecurring: true,
+            groupId: null,
+          }));
+
+        if (entriesToInsert.length > 0) {
+          await db.insert(additionalEntries).values(entriesToInsert);
+        }
+      }
+    }
   }
 
   // 5. Propagate Carry Over
