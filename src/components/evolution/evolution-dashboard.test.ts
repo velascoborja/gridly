@@ -82,7 +82,7 @@ test("evolution dashboard shows an empty state while historical imports are need
   const spanish = JSON.parse(readFileSync(new URL("../../../messages/es.json", import.meta.url), "utf8"));
   const english = JSON.parse(readFileSync(new URL("../../../messages/en.json", import.meta.url), "utf8"));
 
-  assert.match(dashboard, /const showEmptyState = metrics\.length < 2/);
+  assert.match(dashboard, /const showEmptyState = visibleMetrics\.length < 2/);
   assert.match(dashboard, /emptyState/);
   assert.match(dashboard, /setDialogOpen\(true\)/);
   assert.equal(spanish.Evolution.emptyState.title, "Añade años históricos para comparar");

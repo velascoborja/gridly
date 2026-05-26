@@ -18,16 +18,25 @@ const STORAGE_KEY = "evolution_return_rate";
 interface Props {
   metrics: EvolutionYearMetric[];
   historicalYears: HistoricalYear[];
+  calendarYear: number;
 }
 
-export function EvolutionDashboard({ metrics, historicalYears }: Props) {
+export function EvolutionDashboard({ metrics, historicalYears, calendarYear }: Props) {
   const t = useTranslations("Evolution");
   const locale = useLocale();
-  const summary = summarizeEvolutionMetrics(metrics);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingHistoricalYear, setEditingHistoricalYear] = useState<HistoricalYear | null>(null);
   const [returnRate, setReturnRate] = useState<number | null>(null);
-  const showEmptyState = metrics.length < 2;
+  const [includeFuture, setIncludeFuture] = useState(false);
+
+  const hasFutureYears = metrics.some((m) => m.year > calendarYear);
+  const visibleMetrics = includeFuture ? metrics : metrics.filter((m) => m.year <= calendarYear);
+  const visibleHistoricalYears = includeFuture
+    ? historicalYears
+    : historicalYears.filter((h) => h.year <= calendarYear);
+
+  const summary = summarizeEvolutionMetrics(visibleMetrics);
+  const showEmptyState = visibleMetrics.length < 2;
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -52,8 +61,8 @@ export function EvolutionDashboard({ metrics, historicalYears }: Props) {
   }
 
   const estimatedValues =
-    returnRate !== null && metrics.length > 0
-      ? calcEstimatedPortfolioValues(metrics, returnRate)
+    returnRate !== null && visibleMetrics.length > 0
+      ? calcEstimatedPortfolioValues(visibleMetrics, returnRate)
       : null;
 
   const latestEstimatedPortfolio = estimatedValues?.at(-1)?.estimatedPortfolioValue ?? null;
@@ -78,14 +87,27 @@ export function EvolutionDashboard({ metrics, historicalYears }: Props) {
               {t("title")}
             </h1>
           </div>
-          <Button
-            type="button"
-            className="w-full gap-2 rounded-md sm:w-auto"
-            onClick={() => setDialogOpen(true)}
-          >
-            <Plus className="size-4" />
-            {t("addHistoricalYear")}
-          </Button>
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+            {hasFutureYears && (
+              <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
+                <input
+                  type="checkbox"
+                  checked={includeFuture}
+                  onChange={(e) => setIncludeFuture(e.target.checked)}
+                  className="h-4 w-4 rounded border-border text-primary accent-primary"
+                />
+                {t("includeFutureYears")}
+              </label>
+            )}
+            <Button
+              type="button"
+              className="w-full gap-2 rounded-md sm:w-auto"
+              onClick={() => setDialogOpen(true)}
+            >
+              <Plus className="size-4" />
+              {t("addHistoricalYear")}
+            </Button>
+          </div>
         </div>
         <p className="mt-1.5 hidden max-w-2xl text-sm leading-6 text-muted-foreground sm:mt-2 sm:block">
           {t("description")}
@@ -153,10 +175,10 @@ export function EvolutionDashboard({ metrics, historicalYears }: Props) {
         </section>
       ) : (
         <>
-          <EvolutionCharts metrics={metrics} estimatedValues={estimatedValues} />
+          <EvolutionCharts metrics={visibleMetrics} estimatedValues={estimatedValues} />
           <EvolutionDetailTable
-            metrics={metrics}
-            historicalYears={historicalYears}
+            metrics={visibleMetrics}
+            historicalYears={visibleHistoricalYears}
             onEditHistoricalYear={(row) => {
               setEditingHistoricalYear(row);
               setDialogOpen(true);
