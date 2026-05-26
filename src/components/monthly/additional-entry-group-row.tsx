@@ -25,8 +25,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { EntryFormRow } from "./entry-form-row";
 import { sortAdditionalEntriesDesc } from "@/lib/additional-entries";
-import { sanitizeNumericInput } from "@/lib/currency-input";
 import { cn, formatCurrency } from "@/lib/utils";
 import type { AdditionalEntry, AdditionalEntryGroup } from "@/lib/types";
 
@@ -230,38 +230,6 @@ export function AdditionalEntryGroupRow({
     }
   };
 
-  const renderAmountInput = ({
-    value,
-    onChange,
-    disabled,
-    onKeyDown,
-    placeholder,
-  }: {
-    value: string;
-    onChange: (v: string) => void;
-    disabled: boolean;
-    onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
-    placeholder?: string;
-  }) => (
-    <div className="relative w-full sm:w-28">
-      <Input
-        className="h-9 w-full pr-8 text-right text-sm"
-        placeholder={placeholder}
-        value={value}
-        onChange={(e) => onChange(sanitizeNumericInput(e.target.value))}
-        disabled={disabled}
-        onKeyDown={onKeyDown}
-        inputMode="decimal"
-      />
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground"
-      >
-        €
-      </span>
-    </div>
-  );
-
   return (
     <div className="overflow-hidden rounded-xl border border-primary/20 bg-primary/[0.03]">
       {/* Group header */}
@@ -376,92 +344,72 @@ export function AdditionalEntryGroupRow({
           {group.entries.map((entry) =>
             !readOnly && editingId === entry.id ? (
               <div key={entry.id} className="rounded-xl border border-border/70 bg-muted/20 p-1.5">
-                <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto_auto] sm:items-center">
-                  <Input
-                    className="h-9 min-w-0 text-sm"
-                    value={editLabel}
-                    onChange={(e) => setEditLabel(e.target.value)}
-                    disabled={savingId === entry.id || movingToGroupId === entry.id}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") handleEdit(entry.id);
-                      if (e.key === "Escape" && savingId !== entry.id) setEditingId(null);
-                    }}
-                    autoFocus
-                  />
-                  {renderAmountInput({
-                    value: editAmount,
-                    onChange: setEditAmount,
-                    disabled: savingId === entry.id || movingToGroupId === entry.id,
-                    onKeyDown: (e) => {
-                      if (e.key === "Enter") handleEdit(entry.id);
-                      if (e.key === "Escape" && savingId !== entry.id) setEditingId(null);
-                    },
-                  })}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger
-                      render={
-                        <Button
-                          size="icon-sm"
-                          variant="ghost"
-                          className="h-9 w-full text-muted-foreground hover:text-primary sm:w-9"
-                          aria-label={`${t("moveToGroup")} ${entry.label}`}
-                          disabled={savingId === entry.id || movingToGroupId === entry.id}
-                        >
-                          {movingToGroupId === entry.id ? (
-                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                          ) : (
-                            <FolderInput className="h-3.5 w-3.5" />
-                          )}
-                        </Button>
-                      }
-                    />
-                    <DropdownMenuContent align="end" className="w-72 max-w-[calc(100vw-2rem)]">
-                      <DropdownMenuGroup>
-                        <DropdownMenuLabel>{t("moveToGroup")}</DropdownMenuLabel>
-                        <DropdownMenuRadioGroup
-                          value={String(group.id)}
-                          onValueChange={(value) => {
-                            void handleMoveToGroup(
-                              entry,
-                              value === "none" ? null : parseInt(value, 10)
-                            );
-                          }}
-                        >
-                          <DropdownMenuRadioItem value="none">
-                            {t("noGroup")}
-                          </DropdownMenuRadioItem>
-                          {allGroups.map((g) => (
-                            <DropdownMenuRadioItem
-                              key={g.id}
-                              value={String(g.id)}
-                              disabled={g.id === group.id}
-                            >
-                              <span className="truncate">{g.label}</span>
+                <EntryFormRow
+                  labelValue={editLabel}
+                  onLabelChange={setEditLabel}
+                  amountValue={editAmount}
+                  onAmountChange={setEditAmount}
+                  onSave={() => handleEdit(entry.id)}
+                  onCancel={() => setEditingId(null)}
+                  disabled={savingId === entry.id || movingToGroupId === entry.id}
+                  isSaving={savingId === entry.id}
+                  saveLabel={common("save")}
+                  savingLabel={t("saving")}
+                  cancelLabel={t("cancel")}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleEdit(entry.id);
+                    if (e.key === "Escape" && savingId !== entry.id) setEditingId(null);
+                  }}
+                  autoFocus
+                  folderAction={
+                    <DropdownMenu>
+                      <DropdownMenuTrigger
+                        render={
+                          <Button
+                            size="icon-sm"
+                            variant="ghost"
+                            className="h-9 w-9 text-muted-foreground hover:text-primary"
+                            aria-label={`${t("moveToGroup")} ${entry.label}`}
+                            disabled={savingId === entry.id || movingToGroupId === entry.id}
+                          >
+                            {movingToGroupId === entry.id ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            ) : (
+                              <FolderInput className="h-3.5 w-3.5" />
+                            )}
+                          </Button>
+                        }
+                      />
+                      <DropdownMenuContent align="end" className="w-72 max-w-[calc(100vw-2rem)]">
+                        <DropdownMenuGroup>
+                          <DropdownMenuLabel>{t("moveToGroup")}</DropdownMenuLabel>
+                          <DropdownMenuRadioGroup
+                            value={String(group.id)}
+                            onValueChange={(value) => {
+                              void handleMoveToGroup(
+                                entry,
+                                value === "none" ? null : parseInt(value, 10)
+                              );
+                            }}
+                          >
+                            <DropdownMenuRadioItem value="none">
+                              {t("noGroup")}
                             </DropdownMenuRadioItem>
-                          ))}
-                        </DropdownMenuRadioGroup>
-                      </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                  <Button
-                    size="sm"
-                    className="h-9 w-full px-3 sm:w-auto"
-                    onClick={() => handleEdit(entry.id)}
-                    disabled={savingId === entry.id || movingToGroupId === entry.id}
-                  >
-                    {savingId === entry.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
-                    {savingId === entry.id ? t("saving") : common("save")}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="h-9 w-full px-3 sm:w-auto"
-                    onClick={() => setEditingId(null)}
-                    disabled={savingId === entry.id || movingToGroupId === entry.id}
-                  >
-                    {t("cancel")}
-                  </Button>
-                </div>
+                            {allGroups.map((g) => (
+                              <DropdownMenuRadioItem
+                                key={g.id}
+                                value={String(g.id)}
+                                disabled={g.id === group.id}
+                              >
+                                <span className="truncate">{g.label}</span>
+                              </DropdownMenuRadioItem>
+                            ))}
+                          </DropdownMenuRadioGroup>
+                        </DropdownMenuGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  }
+                />
               </div>
             ) : (
               <div
@@ -558,48 +506,26 @@ export function AdditionalEntryGroupRow({
           {/* Add entry to group form */}
           {!readOnly && addingFormOpen ? (
             <div className="rounded-xl border border-border/70 bg-muted/20 p-1.5" aria-busy={isAdding}>
-              <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto] sm:items-center">
-                <Input
-                  className="h-9 min-w-0 text-sm"
-                  placeholder={t("descriptionPlaceholder")}
-                  value={newLabel}
-                  onChange={(e) => setNewLabel(e.target.value)}
-                  disabled={isAdding}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleAdd();
-                    if (e.key === "Escape" && !isAdding) closeAddForm();
-                  }}
-                  autoFocus
-                />
-                {renderAmountInput({
-                  value: newAmount,
-                  onChange: setNewAmount,
-                  disabled: isAdding,
-                  placeholder: "0.00",
-                  onKeyDown: (e) => {
-                    if (e.key === "Enter") handleAdd();
-                    if (e.key === "Escape" && !isAdding) closeAddForm();
-                  },
-                })}
-                <Button
-                  size="sm"
-                  className="h-9 w-full px-3 sm:w-auto"
-                  onClick={handleAdd}
-                  disabled={isAdding}
-                >
-                  {isAdding ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
-                  {isAdding ? t("adding") : t("add")}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-9 w-full px-3 sm:w-auto"
-                  onClick={closeAddForm}
-                  disabled={isAdding}
-                >
-                  {t("cancel")}
-                </Button>
-              </div>
+              <EntryFormRow
+                labelValue={newLabel}
+                onLabelChange={setNewLabel}
+                labelPlaceholder={t("descriptionPlaceholder")}
+                amountValue={newAmount}
+                onAmountChange={setNewAmount}
+                amountPlaceholder="0.00"
+                onSave={handleAdd}
+                onCancel={closeAddForm}
+                disabled={isAdding}
+                isSaving={isAdding}
+                saveLabel={t("add")}
+                savingLabel={t("adding")}
+                cancelLabel={t("cancel")}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleAdd();
+                  if (e.key === "Escape" && !isAdding) closeAddForm();
+                }}
+                autoFocus
+              />
             </div>
           ) : !readOnly ? (
             <button

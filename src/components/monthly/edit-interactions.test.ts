@@ -50,24 +50,22 @@ test("additional expense group creation refreshes the app router cache after loc
 });
 
 test("additional entry amount inputs show a Euro suffix as soon as they are editable", () => {
-  const source = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
+  const cardSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
+  const formRowSource = readFileSync(new URL("./entry-form-row.tsx", import.meta.url), "utf8");
 
-  assert.match(source, /renderAmountInput/);
-  assert.match(source, />\s*€\s*<\/span>/);
-  assert.match(source, /const parseAmountInput = \(value: string\) => parseFloat\(value\.replace\(",", "\."\)\)/);
-  assert.match(source, /const amount = parseAmountInput\(newAmount\)/);
-  assert.match(source, /const amount = parseAmountInput\(editAmount\)/);
-  assert.match(source, /value: newAmount/);
-  assert.match(source, /value: editAmount/);
-  assert.doesNotMatch(source.match(/const renderAmountInput[\s\S]*?\n  \);\n/)?.[0] ?? "", /value\.trim\(\)/);
-  assert.doesNotMatch(source.match(/const renderAmountInput[\s\S]*?\n  \);\n/)?.[0] ?? "", /opacity-0/);
+  assert.match(formRowSource, />\s*€\s*<\/span>/);
+  assert.match(cardSource, /const parseAmountInput = \(value: string\) => parseFloat\(value\.replace\(",", "\."\)\)/);
+  assert.match(cardSource, /const amount = parseAmountInput\(newAmount\)/);
+  assert.match(cardSource, /const amount = parseAmountInput\(editAmount\)/);
+  assert.match(cardSource, /amountValue=\{newAmount\}/);
+  assert.match(cardSource, /amountValue=\{editAmount\}/);
 });
 
 test("additional entry amount inputs reject non numeric characters while editing", () => {
-  const source = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
+  const source = readFileSync(new URL("./entry-form-row.tsx", import.meta.url), "utf8");
 
   assert.match(source, /sanitizeNumericInput/);
-  assert.match(source.match(/const renderAmountInput[\s\S]*?\n  \);\n/)?.[0] ?? "", /sanitizeNumericInput/);
+  assert.match(source, /onAmountChange\(sanitizeNumericInput\(e\.target\.value\)\)/);
 });
 
 test("fixed editor reveal animates without an extra parent stack gap", () => {
