@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { RecurringExpenseTemplateEditor } from "@/components/recurring-expenses/recurring-expense-template-editor";
 import { createAndPrefillYear } from "@/lib/server/actions/years";
 import type { RecurringExpenseInput } from "@/lib/recurring-expenses";
+import type { YearConfig } from "@/lib/types";
 import { parseLocalizedNumber, sanitizeNumericInput } from "@/lib/currency-input";
 import { hasSetupFieldValue } from "@/lib/setup-readiness";
 import { cn, formatCurrency } from "@/lib/utils";
@@ -21,6 +22,8 @@ interface Props {
   derivedStartingBalance: number;
   previousYear: number | null;
   startingBalanceEditable: boolean;
+  previousYearConfig: YearConfig | null;
+  previousRecurringExpenses: RecurringExpenseInput[] | null;
 }
 
 type SetupStep = {
@@ -55,7 +58,14 @@ const isSetupMobileStepper = () =>
 const setupInputClassName =
   "h-11 rounded-md border-[#e5edf5] px-3 text-sm text-[#061b31] shadow-none focus-visible:ring-[#533afd]/20";
 
-export function SetupPageClient({ year, derivedStartingBalance, previousYear, startingBalanceEditable }: Props) {
+export function SetupPageClient({
+  year,
+  derivedStartingBalance,
+  previousYear,
+  startingBalanceEditable,
+  previousYearConfig,
+  previousRecurringExpenses,
+}: Props) {
   const t = useTranslations("Setup");
   const locale = useLocale();
   const searchParams = useSearchParams();
@@ -80,12 +90,16 @@ export function SetupPageClient({ year, derivedStartingBalance, previousYear, st
   const [values, setValues] = useState<Record<string, string>>(
     Object.fromEntries([
       ["startingBalance", startingBalanceEditable ? "" : String(derivedStartingBalance)],
-      ["estimatedExtraPayment", ""],
-      ...numericFields.map((field) => [field.key, ""]),
+      ["estimatedExtraPayment", previousYearConfig ? String(previousYearConfig.estimatedExtraPayment) : ""],
+      ...NUMERIC_FIELDS.map((key) => {
+        if (!previousYearConfig) return [key, ""];
+        if (key === "interestRate") return [key, String(previousYearConfig.interestRate * 100)];
+        return [key, String(previousYearConfig[key])];
+      }),
     ])
   );
-  const [hasExtraPayments, setHasExtraPayments] = useState(false);
-  const [recurringExpenses, setRecurringExpenses] = useState<RecurringExpenseInput[]>([]);
+  const [hasExtraPayments, setHasExtraPayments] = useState(previousYearConfig?.hasExtraPayments ?? false);
+  const [recurringExpenses, setRecurringExpenses] = useState<RecurringExpenseInput[]>(previousRecurringExpenses ?? []);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [activeStep, setActiveStep] = useState<SetupStepId>("starting-point");
