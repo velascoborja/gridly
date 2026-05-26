@@ -16,3 +16,11 @@ test("entry PATCH keeps existing label and amount edits while validating the sou
   assert.match(source, /if \(body\.amount !== undefined\) updates\.amount = String\(body\.amount\)/);
   assert.match(source, /entry\.monthId !== month\.id/);
 });
+
+test("entries PATCH route reads isRecurring from the request body", () => {
+  assert.match(source, /body\.isRecurring/);
+});
+
+test("entries PATCH route sets isRecurring on the updates object", () => {
+  assert.match(source, /updates\.isRecurring/);
+});

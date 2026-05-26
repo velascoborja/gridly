@@ -63,6 +63,10 @@ export async function PATCH(
     }
   }
 
+  if (body.isRecurring !== undefined) {
+    updates.isRecurring = body.isRecurring === true;
+  }
+
   const [updated] = await db
     .update(additionalEntries)
     .set(updates)
