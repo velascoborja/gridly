@@ -87,9 +87,17 @@ export function EvolutionDashboard({ metrics, historicalYears, calendarYear }: P
               {t("title")}
             </h1>
           </div>
-          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+          <div className="flex w-full flex-col items-start gap-2 sm:w-auto sm:items-end">
+            <Button
+              type="button"
+              className="w-full gap-2 rounded-md sm:w-auto"
+              onClick={() => setDialogOpen(true)}
+            >
+              <Plus className="size-4" />
+              {t("addHistoricalYear")}
+            </Button>
             {hasFutureYears && (
-              <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
+              <label className="flex cursor-pointer items-center gap-2 pt-1 text-sm text-muted-foreground">
                 <input
                   type="checkbox"
                   checked={includeFuture}
@@ -99,14 +107,6 @@ export function EvolutionDashboard({ metrics, historicalYears, calendarYear }: P
                 {t("includeFutureYears")}
               </label>
             )}
-            <Button
-              type="button"
-              className="w-full gap-2 rounded-md sm:w-auto"
-              onClick={() => setDialogOpen(true)}
-            >
-              <Plus className="size-4" />
-              {t("addHistoricalYear")}
-            </Button>
           </div>
         </div>
         <p className="mt-1.5 hidden max-w-2xl text-sm leading-6 text-muted-foreground sm:mt-2 sm:block">
