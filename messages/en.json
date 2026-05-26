@@ -37,6 +37,25 @@
     "deleteAccountDeleting": "Deleting...",
     "deleteAccountError": "Could not delete the account. Check the connection and try again."
   },
+  "KeyboardShortcuts": {
+    "title": "Keyboard shortcuts",
+    "description": "Navigate and act faster without using the mouse",
+    "groupGlobal": "Global",
+    "groupMonthNav": "Month navigation",
+    "groupEntries": "Entries & groups",
+    "openSearch": "Open search",
+    "viewMonths": "View Months",
+    "viewYears": "View Years",
+    "viewEvolution": "View Evolution",
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month",
+    "goToCurrentMonth": "Go to current month",
+    "addExpense": "Add expense",
+    "addIncome": "Add income",
+    "createGroup": "Create expense group",
+    "toggleGroups": "Expand / collapse groups",
+    "toggleFixed": "Toggle fixed values"
+  },
   "Annual": {
     "title": "Annual Summary",
     "yearLabel": "Exercise {year}",

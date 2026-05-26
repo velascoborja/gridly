@@ -37,6 +37,25 @@
     "deleteAccountDeleting": "Eliminando...",
     "deleteAccountError": "No se ha podido eliminar la cuenta. Revisa la conexión e inténtalo de nuevo."
   },
+  "KeyboardShortcuts": {
+    "title": "Atajos de teclado",
+    "description": "Navega y actúa más rápido sin usar el ratón",
+    "groupGlobal": "Global",
+    "groupMonthNav": "Navegación mensual",
+    "groupEntries": "Entradas y grupos",
+    "openSearch": "Abrir búsqueda",
+    "viewMonths": "Ver Meses",
+    "viewYears": "Ver Años",
+    "viewEvolution": "Ver Evolución",
+    "prevMonth": "Mes anterior",
+    "nextMonth": "Mes siguiente",
+    "goToCurrentMonth": "Ir al mes actual",
+    "addExpense": "Añadir gasto",
+    "addIncome": "Añadir ingreso",
+    "createGroup": "Crear grupo de gastos",
+    "toggleGroups": "Expandir / colapsar grupos",
+    "toggleFixed": "Mostrar / ocultar valores fijos"
+  },
   "Annual": {
     "title": "Resumen anual",
     "yearLabel": "Ejercicio {year}",
