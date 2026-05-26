@@ -26,12 +26,21 @@ export default async function SetupPage({ params }: { params: Promise<{ year: st
   const previousYearData = latestYear !== undefined ? await getYearData(user.id, latestYear) : null;
   const derivedStartingBalance = previousYearData ? deriveStartingBalance(previousYearData) : 0;
 
+  const previousYearConfig = previousYearData?.config ?? null;
+  const previousRecurringExpenses = previousYearData
+    ? [...previousYearData.recurringExpenses]
+        .sort((a, b) => a.sortOrder - b.sortOrder || a.id - b.id)
+        .map(({ label, amount }) => ({ label, amount }))
+    : null;
+
   return (
     <SetupPageClient
       year={yearNum}
       derivedStartingBalance={derivedStartingBalance}
       previousYear={latestYear ?? null}
       startingBalanceEditable={latestYear === undefined}
+      previousYearConfig={previousYearConfig}
+      previousRecurringExpenses={previousRecurringExpenses}
     />
   );
 }
