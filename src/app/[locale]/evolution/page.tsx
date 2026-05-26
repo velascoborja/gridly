@@ -12,8 +12,8 @@ export default async function EvolutionPage() {
   const calendarYear = now.getFullYear();
   const [years, historicalRows, evolutionSources] = await Promise.all([
     getYearsForUser(user.id),
-    getHistoricalYearsForUser(user.id, { maxYear: calendarYear }),
-    getEvolutionSourcesForUser(user.id, calendarYear),
+    getHistoricalYearsForUser(user.id),
+    getEvolutionSourcesForUser(user.id),
   ]);
   const metrics = deriveEvolutionMetrics(evolutionSources);
 
@@ -31,7 +31,11 @@ export default async function EvolutionPage() {
       years={yearOptions}
       user={user}
     >
-      <EvolutionDashboard metrics={metrics} historicalYears={historicalRows} />
+      <EvolutionDashboard
+        metrics={metrics}
+        historicalYears={historicalRows}
+        calendarYear={calendarYear}
+      />
     </AppShell>
   );
 }

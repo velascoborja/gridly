@@ -116,10 +116,10 @@ export async function deleteHistoricalYearForUser(userId: string, id: number) {
   return { ok: true as const };
 }
 
-export async function getEvolutionSourcesForUser(userId: string, maxYear: number): Promise<EvolutionMetricSource[]> {
+export async function getEvolutionSourcesForUser(userId: string, maxYear?: number): Promise<EvolutionMetricSource[]> {
   const [historicalRows, gridlyYearData] = await Promise.all([
-    getHistoricalYearsForUser(userId, { maxYear }),
-    getAllYearDataForUser(userId, { maxYear }),
+    getHistoricalYearsForUser(userId, maxYear !== undefined ? { maxYear } : {}),
+    getAllYearDataForUser(userId, maxYear !== undefined ? { maxYear } : {}),
   ]);
 
   return [

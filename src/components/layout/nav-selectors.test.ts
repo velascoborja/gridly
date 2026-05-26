@@ -62,13 +62,13 @@ test("evolution page loads sources and allows single-year access for historical 
   const source = readFileSync(new URL("../../app/[locale]/evolution/page.tsx", import.meta.url), "utf8");
 
   assert.match(source, /const calendarYear = now\.getFullYear\(\)/);
-  assert.match(source, /getEvolutionSourcesForUser\(user\.id, calendarYear\)/);
-  assert.match(source, /getHistoricalYearsForUser\(user\.id, \{ maxYear: calendarYear \}\)/);
+  assert.match(source, /getEvolutionSourcesForUser\(user\.id\)/);
+  assert.match(source, /getHistoricalYearsForUser\(user\.id\)/);
   assert.match(source, /deriveEvolutionMetrics/);
   assert.doesNotMatch(source, /metrics\.length < 2/);
   assert.doesNotMatch(source, /redirect\(/);
   assert.match(source, /view="evolution"/);
-  assert.match(source, /<EvolutionDashboard metrics=\{metrics\} historicalYears=\{historicalRows\} \/>/);
+  assert.match(source, /calendarYear=\{calendarYear\}/);
 });
 
 test("navigation accepts sourced year options and disables full-year views for historical selections", () => {
