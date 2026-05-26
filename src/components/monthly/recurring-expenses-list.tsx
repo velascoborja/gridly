@@ -4,7 +4,6 @@ import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,7 +15,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { sanitizeNumericInput } from "@/lib/currency-input";
+import { EntryFormRow } from "./entry-form-row";
 import { sortRecurringExpensesAsc } from "@/lib/recurring-expenses";
 import { cn, formatCurrency } from "@/lib/utils";
 import type { RecurringExpense } from "@/lib/types";
@@ -38,14 +37,12 @@ export function RecurringExpensesList({ monthId, entries, onEntriesChange, readO
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editLabel, setEditLabel] = useState("");
   const [editAmount, setEditAmount] = useState("");
-  const [editFocusField, setEditFocusField] = useState<"label" | "amount">("label");
   const sortedEntries = sortRecurringExpensesAsc(entries);
 
-  const openEditForm = (entry: RecurringExpense, focusField: "label" | "amount" = "label") => {
+  const openEditForm = (entry: RecurringExpense) => {
     setEditingId(entry.id);
     setEditLabel(entry.label);
     setEditAmount(String(entry.amount));
-    setEditFocusField(focusField);
   };
 
   const handleEdit = async (id: number) => {
@@ -94,30 +91,20 @@ export function RecurringExpensesList({ monthId, entries, onEntriesChange, readO
       {sortedEntries.map((entry) =>
         !readOnly && editingId === entry.id ? (
           <div key={entry.id} className="rounded-md border border-border/70 bg-background/80 p-1.5" aria-busy={savingId === entry.id}>
-            <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto] sm:items-center">
-              <Input
-                className="h-8 min-w-0 text-sm"
-                value={editLabel}
-                onChange={(e) => setEditLabel(e.target.value)}
-                disabled={savingId === entry.id}
-                autoFocus={editFocusField === "label"}
-              />
-              <Input
-                className="h-8 w-full text-right text-sm sm:w-28"
-                value={editAmount}
-                onChange={(e) => setEditAmount(sanitizeNumericInput(e.target.value))}
-                disabled={savingId === entry.id}
-                inputMode="decimal"
-                autoFocus={editFocusField === "amount"}
-              />
-              <Button size="sm" className="h-8 w-full px-3 sm:w-auto" onClick={() => handleEdit(entry.id)} disabled={savingId === entry.id}>
-                {savingId === entry.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
-                {savingId === entry.id ? common("saving") : common("save")}
-              </Button>
-              <Button size="sm" variant="ghost" className="h-8 w-full px-3 sm:w-auto" onClick={() => setEditingId(null)} disabled={savingId === entry.id}>
-                {common("cancel")}
-              </Button>
-            </div>
+            <EntryFormRow
+              labelValue={editLabel}
+              onLabelChange={setEditLabel}
+              amountValue={editAmount}
+              onAmountChange={setEditAmount}
+              onSave={() => handleEdit(entry.id)}
+              onCancel={() => setEditingId(null)}
+              disabled={savingId === entry.id}
+              isSaving={savingId === entry.id}
+              saveLabel={common("save")}
+              savingLabel={common("saving")}
+              cancelLabel={common("cancel")}
+              autoFocus
+            />
           </div>
         ) : (
           <div
@@ -143,7 +130,7 @@ export function RecurringExpensesList({ monthId, entries, onEntriesChange, readO
                 {!readOnly ? (
                   <button
                     className="whitespace-nowrap text-sm font-semibold tabular-nums transition-colors hover:text-primary focus-visible:text-primary disabled:pointer-events-none"
-                    onClick={() => openEditForm(entry, "amount")}
+                    onClick={() => openEditForm(entry)}
                     type="button"
                     disabled={deletingId === entry.id}
                   >

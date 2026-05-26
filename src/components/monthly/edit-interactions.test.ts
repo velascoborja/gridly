@@ -188,11 +188,11 @@ test("fixed expenses card embeds recurring expenses without month-level add", ()
   assert.match(listSource, /deletingId === entry\.id/);
 });
 
-test("monthly recurring expense amount inputs reject non numeric characters while editing", () => {
+test("recurring expenses edit form uses EntryFormRow for unified layout", () => {
   const source = readFileSync(new URL("./recurring-expenses-list.tsx", import.meta.url), "utf8");
 
-  assert.match(source, /sanitizeNumericInput/);
-  assert.match(source, /setEditAmount\(sanitizeNumericInput\(e\.target\.value\)\)/);
+  assert.match(source, /from ".\/entry-form-row"/);
+  assert.match(source, /<EntryFormRow/);
 });
 
 test("monthly edits update client state without clearing the route cache", () => {
