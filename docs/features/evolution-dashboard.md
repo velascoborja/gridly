@@ -8,11 +8,11 @@ The main navigation shows `Meses`, `Año`, and `Evolución`.
 
 `Evolución` is always visible and enabled for authenticated users with a configured Gridly year. This is intentional even when there is only one full year, because the Evolution screen is where users can add summary-only historical imports.
 
-The tab links to `/{locale}/evolution`. The year selector is hidden on this route because the dashboard compares all eligible Evolution sources up to the current calendar year, excluding future configured years.
+The tab links to `/{locale}/evolution`. The year selector is hidden on this route. The dashboard compares all eligible Evolution sources up to the current calendar year by default. A session-only "Include future years" toggle in the dashboard header reveals configured future years when they exist; it resets to off on every page visit and is hidden when no future years are configured.
 
 ## Data Loading
 
-The route loads configured years and historical imports for the authenticated user on the server with `maxYear` set to the current calendar year. It derives compact dashboard metrics from normalized Evolution sources and does not reuse `YearPageClient`, which is scoped to a single selected year. Future configured years are intentionally excluded from the analytics until they become the current year.
+The route loads all configured years and all historical imports for the authenticated user on the server, without a calendar-year cap. Future configured years are included in the data but hidden by default in the dashboard. The client applies a `year <= calendarYear` filter unless the user explicitly enables the "Include future years" toggle. The route derives compact dashboard metrics from normalized Evolution sources and does not reuse `YearPageClient`, which is scoped to a single selected year.
 
 If the computed metrics result in fewer than two years, the route still renders. The client dashboard shows an empty state with the historical import action so single-year users can add pre-Gridly history from the same screen.
 
