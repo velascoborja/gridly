@@ -7,8 +7,10 @@ Gridly is a premium personal finance tracking app that helps you monitor your in
 - **🏠 Cockpit Overview** — A dedicated current-month dashboard with KPIs, balance tracking, and quick-add actions.
 - **📅 Monthly Detail** — Deep-dive into fixed, recurring, and additional movements with real-time inline editing.
 - **📈 Annual Insights** — Visualise trends with high-quality charts and KPI summaries for the full year.
-- **🔮 Evolution Dashboard** — Multi-year analytics spanning your configured years and pre-Gridly historical imports.
+- **🔮 Evolution Dashboard** — Multi-year analytics spanning your configured years and pre-Gridly historical imports, with an optional "Include future years" toggle and a portfolio return-rate estimator.
 - **🔄 Recurring Expenses** — Define named monthly expenses (rent, subscriptions, etc.) that repeat automatically across the year.
+- **📁 Expense Groups** — Organise related additional expenses under a named heading within a month (e.g., "Holiday trip", "Kitchen renovation").
+- **🔁 Annual Entries** — Mark any variable expense or income as annual so it copies automatically into the same month when a new year is created.
 - **🗂️ Historical Imports** — Add summary-only pre-Gridly annual data to enrich your multi-year evolution view.
 - **🎮 Demo Mode** — Explore the app with sample data before signing in.
 - **📤 Export** — Take your data with you via Excel export.
@@ -68,7 +70,7 @@ New users start with an empty account and configure their own year on first acce
 
 ### 🏁 First Use
 
-1. **Create a year** — enter your starting balance, estimated salary, monthly investment target, home expense, personal budget, interest rate, and any recurring expenses.
+1. **Create a year** — enter your starting balance, estimated salary, monthly investment target, home expense, personal budget, interest rate, and any recurring expenses. From the second year onward the starting balance and most fields are pre-filled from the previous year's configuration.
 2. The app pre-fills all 12 months with your estimates.
 3. Each month, open the month view and update the actual figures (payslip received, real home costs, etc.).
 4. Use the **Annual** view for charts and KPIs across the full year.
@@ -117,6 +119,7 @@ All shortcuts use `Cmd` (macOS) or `Ctrl` (Windows/Linux) and are suppressed whe
 | `Cmd+Shift+E` | Open add expense form |
 | `Cmd+Shift+I` | Open add income form |
 | `Cmd+Shift+G` | Open create expense group form |
+| `Cmd+Shift+.` | Expand / collapse all expense groups |
 | `Cmd+.` | Toggle expand/collapse fixed values |
 
 See [docs/features/keyboard-shortcuts.md](docs/features/keyboard-shortcuts.md) for full details.
