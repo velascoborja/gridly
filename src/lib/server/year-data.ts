@@ -91,6 +91,7 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
             type: "expense" as const,
             label: e.label,
             amount: parseFloat(e.amount),
+            isRecurring: e.isRecurring,
           }))
       ),
     }));
@@ -126,6 +127,7 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
             type: "expense" as const,
             label: e.label,
             amount: parseFloat(e.amount),
+            isRecurring: e.isRecurring,
           }))
       ),
       additionalExpenseGroups,
@@ -138,6 +140,7 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
             type: "income" as const,
             label: e.label,
             amount: parseFloat(e.amount),
+            isRecurring: e.isRecurring,
           }))
       ),
     };

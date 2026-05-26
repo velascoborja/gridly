@@ -17,6 +17,7 @@ export interface AdditionalEntry {
   type: "income" | "expense";
   label: string;
   amount: number;
+  isRecurring: boolean;
 }
 
 export interface AdditionalEntryGroup {
