@@ -116,7 +116,7 @@ export function EvolutionDashboard({ metrics, historicalYears, calendarYear }: P
           <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-primary">
             {t("totalWealth")}
           </p>
-          <p className="finance-number mt-1.5 text-3xl font-light tracking-[-0.04em] text-primary sm:mt-2 sm:text-4xl md:text-5xl">
+          <p key={String(includeFuture)} className="finance-number mt-1.5 text-3xl font-light tracking-[-0.04em] text-primary animate-in fade-in slide-in-from-bottom-1 duration-300 sm:mt-2 sm:text-4xl md:text-5xl">
             {formatCurrency(displayedWealth, locale)}
           </p>
           <p className="mt-1.5 text-xs text-muted-foreground sm:mt-2">{wealthNote}</p>
@@ -144,11 +144,13 @@ export function EvolutionDashboard({ metrics, historicalYears, calendarYear }: P
             <span className="text-xs text-muted-foreground">{t("returnRateNote")}</span>
           </div>
         </div>
-        <EvolutionKpiCards
-          summary={summary}
-          estimatedPortfolioValue={latestEstimatedPortfolio}
-          returnRate={returnRate}
-        />
+        <div key={String(includeFuture)} className="animate-in fade-in slide-in-from-bottom-1 duration-300">
+          <EvolutionKpiCards
+            summary={summary}
+            estimatedPortfolioValue={latestEstimatedPortfolio}
+            returnRate={returnRate}
+          />
+        </div>
       </section>
 
       {showEmptyState ? (
@@ -174,7 +176,7 @@ export function EvolutionDashboard({ metrics, historicalYears, calendarYear }: P
           </div>
         </section>
       ) : (
-        <>
+        <div key={String(includeFuture)} className="animate-in fade-in slide-in-from-bottom-1 duration-300 space-y-4 sm:space-y-5">
           <EvolutionCharts metrics={visibleMetrics} estimatedValues={estimatedValues} />
           <EvolutionDetailTable
             metrics={visibleMetrics}
@@ -184,7 +186,7 @@ export function EvolutionDashboard({ metrics, historicalYears, calendarYear }: P
               setDialogOpen(true);
             }}
           />
-        </>
+        </div>
       )}
       <HistoricalYearDialog
         open={dialogOpen}
