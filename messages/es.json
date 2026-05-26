@@ -447,6 +447,7 @@
     "title": "Evolución financiera",
     "description": "Compara el saldo, el ahorro y la inversión entre el año actual y los anteriores.",
     "addHistoricalYear": "Añadir año histórico",
+    "includeFutureYears": "Incluir años futuros",
     "totalWealth": "Patrimonio total estimado",
     "totalWealthNote": "Saldo actual + inversión acumulada",
     "totalWealthNoteWithRate": "Saldo + valor estimado de la cartera ({rate}% de rentabilidad anual)",

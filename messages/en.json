@@ -447,6 +447,7 @@
     "title": "Financial evolution",
     "description": "Compare balance, savings, and investment across the current and previous years.",
     "addHistoricalYear": "Add historical year",
+    "includeFutureYears": "Include future years",
     "totalWealth": "Estimated total wealth",
     "totalWealthNote": "Current balance + accumulated investment",
     "totalWealthNoteWithRate": "Balance + estimated portfolio value ({rate}% annual return)",
