@@ -22,6 +22,8 @@ interface EntryFormRowProps {
   cancelLabel: string;
   /** Optional slot for a folder/move action button rendered before Save/Cancel */
   folderAction?: React.ReactNode;
+  /** Optional slot for a recurring toggle button rendered before folderAction */
+  recurringAction?: React.ReactNode;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   autoFocus?: boolean;
 }
@@ -41,18 +43,20 @@ export function EntryFormRow({
   savingLabel,
   cancelLabel,
   folderAction,
+  recurringAction,
   onKeyDown,
   autoFocus = false,
 }: EntryFormRowProps) {
+  const extraCount = [folderAction, recurringAction].filter(Boolean).length;
+  const smCols =
+    extraCount === 2
+      ? "sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto_auto_auto]"
+      : extraCount === 1
+      ? "sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto_auto]"
+      : "sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto]";
+
   return (
-    <div
-      className={cn(
-        "grid gap-2 grid-cols-[1fr_auto] sm:items-center",
-        folderAction
-          ? "sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto_auto]"
-          : "sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto]"
-      )}
-    >
+    <div className={cn("grid gap-2 grid-cols-[1fr_auto] sm:items-center", smCols)}>
       <Input
         className="h-9 min-w-0 text-sm"
         placeholder={labelPlaceholder}
@@ -80,6 +84,7 @@ export function EntryFormRow({
         </span>
       </div>
       <div className="col-span-2 flex items-center justify-end gap-1.5 sm:contents">
+        {recurringAction}
         {folderAction}
         <Button size="sm" className="h-9 px-3" onClick={onSave} disabled={disabled}>
           {isSaving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
