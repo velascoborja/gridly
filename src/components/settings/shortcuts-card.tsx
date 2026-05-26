@@ -19,7 +19,7 @@ export function ShortcutsCard() {
   const [mod, setMod] = useState("⌘");
 
   useEffect(() => {
-    if (!navigator.platform.startsWith("Mac")) {
+    if (!navigator.userAgent.includes("Mac")) {
       setMod("Ctrl");
     }
   }, []);
