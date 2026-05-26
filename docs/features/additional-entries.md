@@ -60,3 +60,13 @@ Users can group related additional expenses within a month (e.g., "Viaje a Roma"
 - Group name is editable inline: click the group label to rename, Enter or blur to save, Escape to cancel.
 - Deleting a group opens a confirmation dialog listing the group name and entry count.
 - Entries can be moved to/from groups via the compact row-level group menu (available in both `AdditionalEntryGroupRow` and `AdditionalEntriesCard`), keeping edit forms focused on label and amount only.
+
+## Recurring Entries
+
+Any **ungrouped** additional entry (income or expense) can be marked as recurring. When the next year is created, all recurring entries from the previous year are automatically copied into the same month number in the new year, preserving label, amount, type, and `isRecurring = true`.
+
+- **Toggle:** A repeat-icon button in the add/edit form marks or unmarks an entry as recurring. The button is not shown for entries inside expense groups (`AdditionalEntryGroupRow` does not pass `recurringAction` to `EntryFormRow`).
+- **Visual indicator:** Recurring entries show an "anual" pill badge after their label in the list view.
+- **Amount carry-over:** The amount is read from the source entry at the moment the new year is created (not fixed at time of marking).
+- **Schema:** `additionalEntries.isRecurring` (`boolean NOT NULL DEFAULT false` in `src/db/schema.ts`).
+- **Year creation hook:** Implemented as step 4b in `createAndPrefillYear` in `src/lib/server/actions/years.ts`. Runs after monthly recurring expenses are linked and before carry-over propagation.
