@@ -25,6 +25,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Globe, Trash2, AlertCircle } from "lucide-react";
+import { ShortcutsCard } from "./shortcuts-card";
 
 type DeleteConfirmationStep = "impact" | "typed";
 
@@ -139,6 +140,8 @@ export function SettingsForm() {
           </div>
         </CardContent>
       </Card>
+
+      <ShortcutsCard />
 
       <Card className="border-destructive/20 bg-destructive/[0.02] shadow-sm">
         <CardHeader>
