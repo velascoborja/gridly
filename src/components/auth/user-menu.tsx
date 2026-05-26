@@ -46,6 +46,7 @@ export function UserMenu({ email, name, image, active, variant = "header", onSet
     onSettingsSelect();
   };
 
+
   if (variant === "footer") {
     return (
       <div className="flex w-full max-w-sm flex-col gap-3 items-center">
@@ -67,7 +68,7 @@ export function UserMenu({ email, name, image, active, variant = "header", onSet
         </div>
         <Link
           href="/settings"
-          onClick={handleSettingsNavigate}
+          onNavigate={handleSettingsNavigate}
           className={cn(
             "flex w-full items-center justify-center gap-2 rounded-lg border transition-all duration-200",
             active

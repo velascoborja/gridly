@@ -63,6 +63,10 @@ Then **wait for explicit user confirmation** before writing any code. Do not pro
 
 This gate applies even when the refactor seems obviously necessary. The cost of pausing is low; the cost of an unwanted structural change is high.
 
+## Test Gate
+
+After every feature implementation or bug fix, run `npm test` and confirm all tests pass before considering the work done. If any tests fail, fix them as part of the same change — do not leave broken tests behind. This applies even when the failures appear unrelated to your change; investigate and resolve them.
+
 ## Development Conventions
 
 - **Internationalization (i18n):** Uses `next-intl`. All UI strings must be in `messages/es.json` (Spanish) and `messages/en.json` (English). **Do not hardcode strings.** Use `@/i18n/routing` for all navigation components (Link, useRouter).
