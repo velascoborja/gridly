@@ -416,7 +416,10 @@
       "confirmDeleteGroupTitle": "¿Eliminar este grupo?",
       "confirmDeleteGroupDescription": "Se eliminará \"{label}\" y {count, plural, one {# entrada asociada} other {# entradas asociadas}}. Esta acción no se puede deshacer.",
       "confirmDeleteGroupAction": "Eliminar grupo",
-      "savingGroup": "Guardando..."
+      "savingGroup": "Guardando...",
+      "recurringToggle": "Repetir cada año",
+      "recurringActive": "Se repetirá cada año",
+      "recurringBadge": "anual"
     },
     "summary": {
       "title": "Resumen",

@@ -416,7 +416,10 @@
       "confirmDeleteGroupTitle": "Delete this group?",
       "confirmDeleteGroupDescription": "\"{label}\" and {count, plural, one {# linked entry} other {# linked entries}} will be removed. This action cannot be undone.",
       "confirmDeleteGroupAction": "Delete group",
-      "savingGroup": "Saving..."
+      "savingGroup": "Saving...",
+      "recurringToggle": "Repeat every year",
+      "recurringActive": "Repeats every year",
+      "recurringBadge": "annual"
     },
     "summary": {
       "title": "Summary",
