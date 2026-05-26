@@ -3,7 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "@/i18n/routing";
-import { FolderInput, FolderPlus, Loader2, Plus, Trash2 } from "lucide-react";
+import { FolderInput, FolderPlus, Loader2, Plus, Repeat, Trash2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -89,6 +89,8 @@ export function AdditionalEntriesCard({
   const [isAddingGroup, setIsAddingGroup] = useState(false);
   const [newGroupLabel, setNewGroupLabel] = useState("");
   const [movingToGroupId, setMovingToGroupId] = useState<number | null>(null);
+  const [newRecurring, setNewRecurring] = useState(false);
+  const [editRecurring, setEditRecurring] = useState(false);
   const [groupCollapsedState, setGroupCollapsedState] = useState<Record<number, boolean>>(
     () => Object.fromEntries(groups.map(g => [g.id, true]))
   );
@@ -135,12 +137,14 @@ export function AdditionalEntriesCard({
     setAddingFormOpen(false);
     setNewLabel("");
     setNewAmount("");
+    setNewRecurring(false);
   };
 
   const openEditForm = (entry: AdditionalEntry) => {
     setEditingId(entry.id);
     setEditLabel(entry.label);
     setEditAmount(String(entry.amount));
+    setEditRecurring(entry.isRecurring);
   };
 
   const canMoveEntry = (entry: AdditionalEntry) =>
@@ -173,7 +177,7 @@ export function AdditionalEntriesCard({
       const res = await fetch(`/api/months/${monthId}/entries`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, label: newLabel.trim(), amount }),
+        body: JSON.stringify({ type, label: newLabel.trim(), amount, isRecurring: newRecurring }),
       });
       if (!res.ok) return;
       const entry = await res.json();
@@ -204,7 +208,7 @@ export function AdditionalEntriesCard({
 
     setSavingId(id);
     try {
-      const body: Record<string, unknown> = { label: editLabel.trim(), amount };
+      const body: Record<string, unknown> = { label: editLabel.trim(), amount, isRecurring: editRecurring };
 
       const res = await fetch(`/api/months/${monthId}/entries/${id}`, {
         method: "PATCH",
@@ -337,6 +341,25 @@ export function AdditionalEntriesCard({
                   if (e.key === "Escape" && !isAdding) closeAddForm();
                 }}
                 autoFocus
+                recurringAction={
+                  <Button
+                    size="icon-sm"
+                    variant="ghost"
+                    type="button"
+                    className={cn(
+                      "h-9 w-9",
+                      newRecurring
+                        ? "bg-primary/10 text-primary hover:bg-primary/20"
+                        : "text-muted-foreground hover:text-primary"
+                    )}
+                    aria-label={t(newRecurring ? "recurringActive" : "recurringToggle")}
+                    title={t(newRecurring ? "recurringActive" : "recurringToggle")}
+                    onClick={() => setNewRecurring((v) => !v)}
+                    disabled={isAdding}
+                  >
+                    <Repeat className="h-3.5 w-3.5" />
+                  </Button>
+                }
               />
             </div>
           ) : null}
@@ -418,6 +441,25 @@ export function AdditionalEntriesCard({
                     if (e.key === "Escape" && savingId !== entry.id) setEditingId(null);
                   }}
                   autoFocus
+                  recurringAction={
+                    <Button
+                      size="icon-sm"
+                      variant="ghost"
+                      type="button"
+                      className={cn(
+                        "h-9 w-9",
+                        editRecurring
+                          ? "bg-primary/10 text-primary hover:bg-primary/20"
+                          : "text-muted-foreground hover:text-primary"
+                      )}
+                      aria-label={t(editRecurring ? "recurringActive" : "recurringToggle")}
+                      title={t(editRecurring ? "recurringActive" : "recurringToggle")}
+                      onClick={() => setEditRecurring((v) => !v)}
+                      disabled={savingId === entry.id || movingToGroupId === entry.id}
+                    >
+                      <Repeat className="h-3.5 w-3.5" />
+                    </Button>
+                  }
                   folderAction={type === "expense" && groups.length > 0 ? (
                     <DropdownMenu>
                       <DropdownMenuTrigger
@@ -479,7 +521,14 @@ export function AdditionalEntriesCard({
                 <div className="flex min-w-0 items-center justify-between gap-2">
                   {readOnly ? (
                     <span className="min-w-0 flex-1 truncate text-left text-sm font-medium text-foreground" title={entry.label}>
-                      {entry.label}
+                      <span className="flex min-w-0 items-center gap-1.5">
+                        <span className="truncate">{entry.label}</span>
+                        {entry.isRecurring && (
+                          <span className="shrink-0 rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium leading-none text-primary">
+                            {t("recurringBadge")}
+                          </span>
+                        )}
+                      </span>
                     </span>
                   ) : (
                     <button
@@ -490,7 +539,14 @@ export function AdditionalEntriesCard({
                       title={entry.label}
                       disabled={deletingId === entry.id}
                     >
-                      {entry.label}
+                      <span className="flex min-w-0 items-center gap-1.5">
+                        <span className="truncate">{entry.label}</span>
+                        {entry.isRecurring && (
+                          <span className="shrink-0 rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium leading-none text-primary">
+                            {t("recurringBadge")}
+                          </span>
+                        )}
+                      </span>
                     </button>
                   )}
                   <div className="flex shrink-0 items-center gap-1.5">
