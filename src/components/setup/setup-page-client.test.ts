@@ -45,7 +45,7 @@ test("setup numeric fields start empty and use translated placeholder hints", ()
   assert.match(source, /placeholder: t\("monthlyInvestmentPlaceholder"\)/);
   assert.match(source, /placeholder: t\("interestRatePlaceholder"\)/);
   assert.match(source, /\["startingBalance", startingBalanceEditable \? "" : String\(derivedStartingBalance\)\]/);
-  assert.match(source, /\["estimatedExtraPayment", ""\]/);
+  assert.match(source, /\["estimatedExtraPayment", previousYearConfig \? String\(previousYearConfig\.estimatedExtraPayment\) : ""\]/);
   assert.doesNotMatch(source, /defaultValue: "0"/);
 });
 
@@ -215,4 +215,16 @@ test("setup summary derives values from local state without adding payload field
   const payloadMatch = source.match(/const payload = \{[\s\S]*?recurringExpenses,\n\s*\};/);
   assert.ok(payloadMatch);
   assert.doesNotMatch(payloadMatch[0], /estimatedMonthlySavings/);
+});
+
+test("setup prefills form values and recurring expenses from previous year config when provided", () => {
+  const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /previousYearConfig: YearConfig \| null/);
+  assert.match(source, /previousRecurringExpenses: RecurringExpenseInput\[\] \| null/);
+  assert.match(source, /previousYearConfig \? String\(previousYearConfig\.estimatedExtraPayment\) : ""/);
+  assert.match(source, /if \(key === "interestRate"\) return \[key, String\(previousYearConfig\.interestRate \* 100\)\]/);
+  assert.match(source, /return \[key, String\(previousYearConfig\[key\]\)\]/);
+  assert.match(source, /previousYearConfig\?\.hasExtraPayments \?\? false/);
+  assert.match(source, /previousRecurringExpenses \?\? \[\]/);
 });
