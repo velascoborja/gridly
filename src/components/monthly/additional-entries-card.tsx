@@ -129,7 +129,10 @@ export function AdditionalEntriesCard({
     return () => { openAddGroupFormRef.current = null; };
   }, [openAddGroupFormRef, readOnly]);
 
-  const sortedEntries = sortAdditionalEntriesDesc(entries);
+  const sortedEntries = [
+    ...sortAdditionalEntriesDesc(entries.filter((e) => e.isRecurring)),
+    ...sortAdditionalEntriesDesc(entries.filter((e) => !e.isRecurring)),
+  ];
   const groupedTotal = groups.reduce((sum, g) => sum + sumAdditionalEntries(g.entries), 0);
   const entriesTotal = sumAdditionalEntries(entries) + groupedTotal;
 
