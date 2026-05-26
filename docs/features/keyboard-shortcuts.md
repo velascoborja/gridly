@@ -39,6 +39,10 @@ Entry and group shortcuts are no-ops in read-only mode.
 
 `Cmd+Shift+.` expands all groups when any group is collapsed; collapses all when every group is already expanded. It is a no-op when the current month has no expense groups.
 
+## Settings reference card
+
+The Settings page (`/settings`) displays a read-only reference card listing all shortcuts grouped by context. It lives in `src/components/settings/shortcuts-card.tsx` and detects the user's OS on mount (`navigator.userAgent`) to display `⌘` (macOS) or `Ctrl` (Windows/Linux). All strings are under the `KeyboardShortcuts` i18n namespace.
+
 ## Implementation
 
 Shortcuts are split across two components:
