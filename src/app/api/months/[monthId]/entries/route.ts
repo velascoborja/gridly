@@ -16,7 +16,7 @@ export async function POST(
   const { monthId } = await params;
   const id = parseInt(monthId, 10);
   const body = await request.json();
-  const { type, label, amount, groupId } = body;
+  const { type, label, amount, groupId, isRecurring } = body;
 
   if (!type || !label || amount === undefined) {
     return Response.json({ error: "type, label, and amount are required" }, { status: 400 });
@@ -36,6 +36,7 @@ export async function POST(
     label,
     amount: String(amount),
     groupId: groupId ?? null,
+    isRecurring: isRecurring === true,
   }).returning();
 
   const yearNumber = await getYearNumberForYearId(ownedMonth.yearId);

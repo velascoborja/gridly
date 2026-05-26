@@ -9,7 +9,7 @@ const groupRowSource = readFileSync(
 );
 
 test("entries POST route reads groupId from the request body", () => {
-  assert.match(routeSource, /const \{ type, label, amount, groupId \} = body/);
+  assert.match(routeSource, /const \{ type, label, amount, groupId/);
 });
 
 test("entries POST route persists groupId to the database insert", () => {
@@ -21,4 +21,12 @@ test("group row add-entry handler sends groupId in the POST body", () => {
     groupRowSource,
     /body: JSON\.stringify\(\{ type: "expense", label: newLabel\.trim\(\), amount, groupId: group\.id \}\)/
   );
+});
+
+test("entries POST route reads isRecurring from the request body", () => {
+  assert.match(routeSource, /isRecurring/);
+});
+
+test("entries POST route persists isRecurring in the database insert", () => {
+  assert.match(routeSource, /isRecurring: isRecurring/);
 });
