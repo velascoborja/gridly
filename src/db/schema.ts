@@ -144,6 +144,7 @@ export const additionalEntries = pgTable("additional_entries", {
   type: text("type").notNull(), // 'income' | 'expense'
   label: text("label").notNull(),
   amount: numeric("amount", { precision: 12, scale: 2 }).notNull().default("0"),
+  isRecurring: boolean("is_recurring").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
