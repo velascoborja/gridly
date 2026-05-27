@@ -29,6 +29,15 @@ test("TagManagerCard saves valid changed rows through PATCH", () => {
   assert.match(source, /setSavingTagId\(tag\.id\)/);
 });
 
+test("TagManagerCard saves edited tags locally without refreshing the route", () => {
+  assert.match(source, /setTags\(\(current\) => current\.map\(\(item\) => \(item\.id === updated\.id \? updated : item\)\)\)/);
+  assert.match(source, /\[updated\.id\]: \{ name: updated\.name, color: updated\.color \}/);
+  assert.doesNotMatch(
+    source,
+    /async function handleSave[\s\S]*?router\.refresh\(\);[\s\S]*?async function handleDeleteConfirmed/
+  );
+});
+
 test("TagManagerCard confirms and deletes tags through DELETE", () => {
   assert.match(source, /deleteCandidate/);
   assert.match(source, /method: "DELETE"/);
@@ -63,7 +72,8 @@ test("TagManagerCard icon badge avoids a pale seam inside the border", () => {
 test("TagManagerCard rows use compact single-line controls on desktop", () => {
   assert.match(source, /sm:grid-cols-\[minmax\(7rem,12rem\)_1fr_auto\]/);
   assert.match(source, /className="h-9 rounded-lg/);
-  assert.match(source, /"flex flex-nowrap items-center justify-center gap-1\.5 sm:gap-1"/);
+  assert.match(source, /"flex flex-nowrap items-center justify-center gap-1\.5/);
+  assert.match(source, /sm:gap-1/);
   assert.match(source, /"size-3\.5 rounded-full/);
   assert.match(source, /className="min-w-20 gap-1\.5"/);
   assert.doesNotMatch(source, /<div className="min-w-0 space-y-3">/);
@@ -83,8 +93,14 @@ test("TagManagerCard rows use a compact selected-color swatch on mobile", () => 
   assert.match(source, /aria-label=\{t\("selectColor", \{ color: draft\?\.color \?\? tag\.color \}\)\}/);
   assert.match(source, /setExpandedColorTagId\(\(current\) => \(current === tag\.id \? null : tag\.id\)\)/);
   assert.match(source, /style=\{\{ background: TAG_COLORS\[draft\?\.color \?\? tag\.color\]\.text \}\}/);
-  assert.match(source, /"flex flex-nowrap items-center justify-center gap-1\.5 sm:gap-1"/);
-  assert.match(source, /expandedColorTagId === tag\.id \? "flex" : "hidden sm:flex"/);
+  assert.match(source, /"flex flex-nowrap items-center justify-center gap-1\.5/);
+  assert.match(source, /sm:gap-1/);
+  assert.match(
+    source,
+    /"flex flex-nowrap items-center justify-center gap-1\.5 overflow-hidden transition-\[max-height,opacity,transform\] duration-200 ease-out sm:gap-1 sm:overflow-visible sm:transition-none"/
+  );
+  assert.match(source, /expandedColorTagId === tag\.id\s+\? "max-h-10 opacity-100 translate-y-0"\s+: "max-h-0 opacity-0 -translate-y-1 sm:max-h-none sm:opacity-100 sm:translate-y-0"/);
+  assert.doesNotMatch(source, /expandedColorTagId === tag\.id \? "flex" : "hidden sm:flex"/);
   assert.match(source, /setExpandedColorTagId\(null\)/);
   assert.match(source, /className="min-w-20 gap-1\.5"/);
   assert.doesNotMatch(source, /className="[^"]*flex-1[^"]*"/);

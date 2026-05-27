@@ -120,7 +120,6 @@ export function TagManagerCard() {
         ...current,
         [updated.id]: { name: updated.name, color: updated.color },
       }));
-      router.refresh();
     } catch (error) {
       console.error("Failed to save tag:", error);
       setActionError(t("saveError"));
@@ -252,8 +251,10 @@ export function TagManagerCard() {
 
                   <div
                     className={cn(
-                      "flex flex-nowrap items-center justify-center gap-1.5 sm:gap-1",
-                      expandedColorTagId === tag.id ? "flex" : "hidden sm:flex"
+                      "flex flex-nowrap items-center justify-center gap-1.5 overflow-hidden transition-[max-height,opacity,transform] duration-200 ease-out sm:gap-1 sm:overflow-visible sm:transition-none",
+                      expandedColorTagId === tag.id
+                        ? "max-h-10 opacity-100 translate-y-0"
+                        : "max-h-0 opacity-0 -translate-y-1 sm:max-h-none sm:opacity-100 sm:translate-y-0"
                     )}
                     aria-label={t("colorLabel")}
                   >
