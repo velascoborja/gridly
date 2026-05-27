@@ -291,6 +291,7 @@ export function AdditionalEntriesCard({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, color }),
     });
+    if (!res.ok) throw new Error("Failed to create tag");
     const tag: Tag = await res.json();
     setTags((prev) => [...prev, tag]);
     return tag;
