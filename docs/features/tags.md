@@ -94,7 +94,7 @@ Settings card for global tag maintenance:
 - Saves name/color changes through `PATCH /api/tags/[tagId]`.
 - Deletes tags through `DELETE /api/tags/[tagId]` after a confirmation that explains existing expenses and groups become untagged.
 - Shows localized loading, empty, and error states without blocking the rest of Settings.
-- Uses a mobile-specific stacked edit layout: full-width name input, centered single-line color palette, and a right-aligned action row with a fixed-width Save button plus compact Delete button. At `sm` and above, rows keep the compact desktop single-line grid.
+- Uses a mobile-specific compact edit layout: the name input sits beside the currently selected color swatch, tapping that swatch reveals the row's color palette, and the action row keeps a fixed-width Save button plus compact Delete button aligned to the right. At `sm` and above, rows keep the compact desktop single-line grid with the full palette always visible.
 
 ### `src/components/monthly/entry-form-row.tsx`
 
