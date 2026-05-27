@@ -144,7 +144,7 @@ export function TagPicker({ tags, value, onChange, onCreateTag, disabled }: TagP
                   autoFocus
                   disabled={isCreating}
                 />
-                <div className="mb-2 grid grid-cols-9 gap-1 px-0.5">
+                <div className="mb-2 grid grid-cols-9 gap-2 px-0.5">
                   {TAG_COLOR_KEYS.map((key) => (
                     <button
                       key={key}
