@@ -61,7 +61,7 @@ export async function PATCH(
       }
       updates.groupId = groupId;
       updates.isRecurring = false;
-      updates.tagId = null;
+      updates.tagId = group.tagId ?? null;
     }
   }
 

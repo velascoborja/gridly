@@ -24,3 +24,7 @@ test("entries PATCH route reads isRecurring from the request body", () => {
 test("entries PATCH route sets isRecurring on the updates object", () => {
   assert.match(source, /updates\.isRecurring/);
 });
+
+test("entries PATCH route applies destination group tagId when moving entry into a group", () => {
+  assert.match(source, /updates\.tagId = group\.tagId \?\? null/);
+});
