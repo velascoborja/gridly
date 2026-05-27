@@ -1,6 +1,6 @@
 import { and, asc, eq, inArray } from "drizzle-orm";
 import { db } from "@/db";
-import { additionalEntries, additionalEntryGroups, monthlyRecurringExpenses, months, yearRecurringExpenses, years } from "@/db/schema";
+import { additionalEntries, additionalEntryGroups, monthlyRecurringExpenses, months, tags, yearRecurringExpenses, years } from "@/db/schema";
 import { sortAdditionalEntriesDesc } from "@/lib/additional-entries";
 import { computeMonthChain } from "@/lib/calculations";
 import {
@@ -8,7 +8,7 @@ import {
   parseYearRecurringExpense,
   sortRecurringExpensesAsc,
 } from "@/lib/recurring-expenses";
-import type { AdditionalEntryGroup, YearData } from "@/lib/types";
+import type { AdditionalEntryGroup, Tag, YearData } from "@/lib/types";
 import { pickDefaultYear } from "./year-navigation";
 
 export async function getYearData(userId: string, year: number): Promise<YearData | null> {
@@ -44,6 +44,19 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
           .from(additionalEntryGroups)
           .where(inArray(additionalEntryGroups.monthId, monthRows.map((month) => month.id)))
       : [];
+
+  const usedTagIds = [...new Set(
+    allEntries.map((e) => e.tagId).filter((id): id is number => id !== null)
+  )];
+  const tagRows = usedTagIds.length > 0
+    ? await db.select().from(tags).where(inArray(tags.id, usedTagIds))
+    : [];
+  const tagsById = new Map<number, Tag>(
+    tagRows.map((t) => [t.id, { id: t.id, name: t.name, color: t.color }])
+  );
+
+  const resolveTag = (tagId: number | null | undefined): Tag | null =>
+    tagId != null ? (tagsById.get(tagId) ?? null) : null;
 
   const allRecurringExpenses =
     monthRows.length > 0
@@ -92,6 +105,8 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
             label: e.label,
             amount: parseFloat(e.amount),
             isRecurring: e.isRecurring,
+            tagId: e.tagId ?? null,
+            tag: resolveTag(e.tagId),
           }))
       ),
     }));
@@ -128,6 +143,8 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
             label: e.label,
             amount: parseFloat(e.amount),
             isRecurring: e.isRecurring,
+            tagId: e.tagId ?? null,
+            tag: resolveTag(e.tagId),
           }))
       ),
       additionalExpenseGroups,
@@ -141,6 +158,8 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
             label: e.label,
             amount: parseFloat(e.amount),
             isRecurring: e.isRecurring,
+            tagId: e.tagId ?? null,
+            tag: resolveTag(e.tagId),
           }))
       ),
     };
