@@ -18,7 +18,6 @@ import {
 import {
   buildYearMonthHref,
   buildYearSummaryHref,
-  buildYearCategoriesHref,
   buildSetupHrefFromPathname,
   buildEvolutionHref,
 } from "@/lib/year-routes";
@@ -26,7 +25,7 @@ import {
 interface Props {
   currentYear: number;
   currentMonth: number | null;
-  view: "overview" | "summary" | "settings" | "evolution" | "categories";
+  view: "overview" | "summary" | "settings" | "evolution";
   years: number[] | YearOption[];
   monthPathPrefix?: string;
   summaryPathPrefix?: string;
@@ -35,7 +34,6 @@ interface Props {
   hideEvolution?: boolean;
   onMonthViewSelect?: () => void;
   onSummaryViewSelect?: () => void;
-  onCategoriesViewSelect?: () => void;
 }
 
 export function NavSelectors({
@@ -50,7 +48,6 @@ export function NavSelectors({
   hideEvolution = false,
   onMonthViewSelect,
   onSummaryViewSelect,
-  onCategoriesViewSelect,
 }: Props) {
   const router = useRouter();
   const pathname = usePathname();
@@ -66,7 +63,7 @@ export function NavSelectors({
   const isHistoricalYearSelected = selectedYearOption?.source === "historical";
   const showCurrentYearMarker = yearOptions.length > 1 && gridlyYears.length > 0;
   const nextCreatableYear = getNextCreatableYearFromOptions(yearOptions, currentYear);
-  const activeMainView = view === "summary" ? "summary" : view === "evolution" ? "evolution" : view === "categories" ? "categories" : view === "settings" ? null : "overview";
+  const activeMainView = view === "summary" ? "summary" : view === "evolution" ? "evolution" : view === "settings" ? null : "overview";
   const showYearControls = !hideYearSelector && view !== "evolution";
 
   const handleYearChange = (val: string | null) => {
@@ -78,13 +75,11 @@ export function NavSelectors({
       return;
     }
     if (view === "summary") router.push(buildYearSummaryHref(summaryPathPrefix, y));
-    else if (view === "categories") router.push(buildYearCategoriesHref(summaryPathPrefix, y));
     else router.push(buildYearMonthHref(monthPathPrefix, y, selectedMonth));
   };
 
   const monthHref = buildYearMonthHref(monthPathPrefix, currentYear, selectedMonth);
   const summaryHref = buildYearSummaryHref(summaryPathPrefix, currentYear);
-  const categoriesHref = buildYearCategoriesHref(summaryPathPrefix, currentYear);
   const evolutionHref = buildEvolutionHref(undefined);
   const createYearHref = buildSetupHrefFromPathname(nextCreatableYear, pathname, currentYear, selectedMonth, view);
 
@@ -123,40 +118,9 @@ export function NavSelectors({
   }, [monthHref, summaryHref, evolutionHref, isHistoricalYearSelected, hideEvolution, onMonthViewSelect, onSummaryViewSelect, router]);
 
   const mainTabs = [
-    {
-      label: t("months"),
-      key: "overview" as const,
-      href: monthHref,
-      disabled: isHistoricalYearSelected,
-      disabledTitle: t("historicalYearUnavailable"),
-      handler: onMonthViewSelect,
-    },
-    {
-      label: t("annualSummary"),
-      key: "summary" as const,
-      href: summaryHref,
-      disabled: isHistoricalYearSelected,
-      disabledTitle: t("historicalYearUnavailable"),
-      handler: onSummaryViewSelect,
-    },
-    {
-      label: t("categories"),
-      key: "categories" as const,
-      href: categoriesHref,
-      disabled: isHistoricalYearSelected,
-      disabledTitle: t("historicalYearUnavailable"),
-      handler: onCategoriesViewSelect,
-    },
-    ...(!hideEvolution
-      ? [{
-          label: t("evolution"),
-          key: "evolution" as const,
-          href: evolutionHref,
-          disabled: false,
-          disabledTitle: "",
-          handler: undefined as (() => void) | undefined,
-        }]
-      : []),
+    { label: t("months"), key: "overview" as const, href: monthHref, disabled: isHistoricalYearSelected, disabledTitle: t("historicalYearUnavailable") },
+    { label: t("annualSummary"), key: "summary" as const, href: summaryHref, disabled: isHistoricalYearSelected, disabledTitle: t("historicalYearUnavailable") },
+    ...(!hideEvolution ? [{ label: t("evolution"), key: "evolution" as const, href: evolutionHref, disabled: false, disabledTitle: "" }] : []),
   ];
 
   return (
@@ -225,8 +189,7 @@ export function NavSelectors({
                   href={tab.href}
                   onNavigate={(event) => {
                     if (tab.key === "evolution") return;
-                    let handler: (() => void) | undefined = tab.key === "overview" ? onMonthViewSelect : tab.key === "summary" ? onSummaryViewSelect : undefined;
-                    if (tab.key === "categories") handler = onCategoriesViewSelect;
+                    const handler = tab.key === "overview" ? onMonthViewSelect : tab.key === "summary" ? onSummaryViewSelect : undefined;
                     if (!handler) return;
 
                     event.preventDefault();

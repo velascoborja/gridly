@@ -1,4 +1,4 @@
-export type YearRouteView = "overview" | "summary" | "settings" | "evolution" | "categories";
+export type YearRouteView = "overview" | "summary" | "settings" | "evolution";
 
 export function parseYearRoutePathname(pathname: string): { year: number | null; view: YearRouteView; month: number | null } | null {
   if (pathname.match(/\/settings$/)) {
@@ -14,11 +14,6 @@ export function parseYearRoutePathname(pathname: string): { year: number | null;
     return { year: Number.parseInt(summaryMatch[1], 10), view: "summary", month: null };
   }
 
-  const categoriesMatch = pathname.match(/\/(\d+)\/categories$/);
-  if (categoriesMatch) {
-    return { year: Number.parseInt(categoriesMatch[1], 10), view: "categories", month: null };
-  }
-
   const monthMatch = pathname.match(/\/(\d+)\/(\d+)$/);
   if (monthMatch) {
     return { year: Number.parseInt(monthMatch[1], 10), view: "overview", month: Number.parseInt(monthMatch[2], 10) };
@@ -28,7 +23,7 @@ export function parseYearRoutePathname(pathname: string): { year: number | null;
 }
 
 export function getYearRoutePrefix(pathname: string, year: number): string {
-  const yearMatch = pathname.match(new RegExp(`^(.*)/${year}/(?:summary|categories|\\d+)$`));
+  const yearMatch = pathname.match(new RegExp(`^(.*)/${year}/(?:summary|\\d+)$`));
   if (yearMatch) return yearMatch[1];
 
   const settingsMatch = pathname.match(/^(.*)\/settings$/);
@@ -48,10 +43,6 @@ export function buildYearSummaryHref(prefix: string | undefined, year: number): 
   return `${prefix ?? ""}/${year}/summary`;
 }
 
-export function buildYearCategoriesHref(prefix: string | undefined, year: number): string {
-  return `${prefix ?? ""}/${year}/categories`;
-}
-
 export function buildSettingsHref(prefix: string): string {
   return prefix ? `${prefix}/settings` : "/settings";
 }
@@ -66,7 +57,6 @@ export function buildSetupHref(nextYear: number, returnPath: string): string {
 
 export function buildReturnPathFromView(currentYear: number, currentMonth: number, view: YearRouteView): string {
   if (view === "summary") return `/${currentYear}/summary`;
-  if (view === "categories") return `/${currentYear}/categories`;
   return `/${currentYear}/${currentMonth}`;
 }
 

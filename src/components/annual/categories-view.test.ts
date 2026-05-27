@@ -51,42 +51,9 @@ test("DrilldownList shows month abbreviation, description, and amount", () => {
   assert.match(source, /entry\.groupName/);
 });
 
-test("categories page mirrors summary page structure", () => {
-  const source = readFileSync(
-    new URL("../../app/[locale]/[year]/categories/page.tsx", import.meta.url),
-    "utf8"
-  );
-
-  assert.match(source, /getYearData/);
-  assert.match(source, /getYearsForUser/);
-  assert.match(source, /initialView="categories"/);
-  assert.match(source, /requireSessionUser/);
-});
-
-test("year-page-client renders CategoriesView for the categories view", () => {
-  const source = readFileSync(new URL("../year/year-page-client.tsx", import.meta.url), "utf8");
+test("annual-view renders CategoriesView as a section", () => {
+  const source = readFileSync(new URL("./annual-view.tsx", import.meta.url), "utf8");
 
   assert.match(source, /CategoriesView/);
-  assert.match(source, /selectedView === "categories"/);
-  assert.match(source, /handleCategoriesSelect/);
-  assert.match(source, /buildYearCategoriesHref/);
-  assert.match(source, /window\.history\.pushState\(null, "", buildYearCategoriesHref/);
-});
-
-test("nav-selectors includes categories tab pointing at buildYearCategoriesHref", () => {
-  const source = readFileSync(new URL("../layout/nav-selectors.tsx", import.meta.url), "utf8");
-
-  assert.match(source, /buildYearCategoriesHref/);
-  assert.match(source, /key: "categories"/);
-  assert.match(source, /t\("categories"\)/);
-  assert.match(source, /view === "categories" \? "categories"/);
-});
-
-test("year-routes parses and builds categories paths correctly", () => {
-  const source = readFileSync(new URL("../../lib/year-routes.ts", import.meta.url), "utf8");
-
-  assert.match(source, /\/categories\$/);
-  assert.match(source, /view: "categories"/);
-  assert.match(source, /export function buildYearCategoriesHref/);
-  assert.match(source, /summary\|categories/);
+  assert.match(source, /<CategoriesView/);
 });

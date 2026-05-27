@@ -12,7 +12,7 @@ import type { YearOption } from "@/lib/types";
 interface Props {
   currentYear: number;
   currentMonth: number | null;
-  view: "overview" | "summary" | "settings" | "evolution" | "categories";
+  view: "overview" | "summary" | "settings" | "evolution";
   years: number[] | YearOption[];
   user: {
     email?: string | null;
@@ -21,7 +21,6 @@ interface Props {
   };
   onMonthViewSelect?: () => void;
   onSummaryViewSelect?: () => void;
-  onCategoriesViewSelect?: () => void;
   onSettingsSelect?: () => void;
   onSearchOpen?: () => void;
   children: React.ReactNode;
@@ -35,7 +34,6 @@ export function AppShell({
   user,
   onMonthViewSelect,
   onSummaryViewSelect,
-  onCategoriesViewSelect,
   onSettingsSelect,
   onSearchOpen,
   children,
@@ -79,7 +77,6 @@ export function AppShell({
               years={years}
               onMonthViewSelect={onMonthViewSelect}
               onSummaryViewSelect={onSummaryViewSelect}
-              onCategoriesViewSelect={onCategoriesViewSelect}
             />
           </div>
         </>

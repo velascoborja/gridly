@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnnualView } from "@/components/annual/annual-view";
-import { CategoriesView } from "@/components/annual/categories-view";
 import { AppShell } from "@/components/layout/app-shell";
 import { MonthOverview } from "@/components/monthly/month-overview";
 import { SearchPalette } from "@/components/search/search-palette";
@@ -16,14 +15,13 @@ import {
   getYearRoutePrefix,
   buildYearMonthHref,
   buildYearSummaryHref,
-  buildYearCategoriesHref,
   buildSettingsHref,
 } from "@/lib/year-routes";
 
 interface Props {
   yearData: YearData;
   initialMonth: number;
-  initialView: "overview" | "summary" | "categories";
+  initialView: "overview" | "summary";
   years: number[];
   startingBalanceEditable?: boolean;
   user: {
@@ -37,7 +35,7 @@ function getInitialStateFromPathname(
   pathname: string,
   currentYear: number,
   fallbackMonth: number,
-  fallbackView: "overview" | "summary" | "categories"
+  fallbackView: "overview" | "summary"
 ): { month: number; view: YearRouteView } {
   const pathnameState = parseYearRoutePathname(pathname);
   if (pathnameState?.view === "evolution") {
@@ -139,13 +137,6 @@ export function YearPageClient({
 
     setSelectedView("summary");
     window.history.pushState(null, "", buildYearSummaryHref(routePrefix, currentYearData.config.year));
-  }, [currentYearData.config.year, routePrefix, selectedView]);
-
-  const handleCategoriesSelect = useCallback(() => {
-    if (selectedView === "categories") return;
-
-    setSelectedView("categories");
-    window.history.pushState(null, "", buildYearCategoriesHref(routePrefix, currentYearData.config.year));
   }, [currentYearData.config.year, routePrefix, selectedView]);
 
   useEffect(() => {
@@ -258,7 +249,6 @@ export function YearPageClient({
       user={user}
       onMonthViewSelect={() => handleMonthSelect(selectedMonth)}
       onSummaryViewSelect={handleSummarySelect}
-      onCategoriesViewSelect={handleCategoriesSelect}
       onSettingsSelect={handleSettingsSelect}
       onSearchOpen={() => setSearchOpen(true)}
     >
@@ -272,8 +262,6 @@ export function YearPageClient({
           startingBalanceEditable={startingBalanceEditable}
           onYearDataChange={setCurrentYearData}
         />
-      ) : selectedView === "categories" ? (
-        <CategoriesView yearData={currentYearData} />
       ) : (
         <MonthOverview
           yearData={currentYearData}
