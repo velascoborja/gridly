@@ -32,6 +32,8 @@ export interface AdditionalEntryGroup {
   id: number;
   monthId: number;
   label: string;
+  tagId: number | null;
+  tag: Tag | null;
   entries: AdditionalEntry[];
 }
 

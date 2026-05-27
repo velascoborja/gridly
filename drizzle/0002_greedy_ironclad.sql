@@ -1,0 +1,2 @@
+ALTER TABLE "additional_entry_groups" ADD COLUMN "tag_id" integer;--> statement-breakpoint
+ALTER TABLE "additional_entry_groups" ADD CONSTRAINT "additional_entry_groups_tag_id_tags_id_fk" FOREIGN KEY ("tag_id") REFERENCES "public"."tags"("id") ON DELETE set null ON UPDATE no action;

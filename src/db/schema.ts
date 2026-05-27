@@ -131,6 +131,8 @@ export const additionalEntryGroups = pgTable("additional_entry_groups", {
     .notNull()
     .references(() => months.id, { onDelete: "cascade" }),
   label: text("label").notNull(),
+  tagId: integer("tag_id")
+    .references(() => tags.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

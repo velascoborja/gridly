@@ -313,7 +313,7 @@ export function AdditionalEntriesCard({
       });
       if (!res.ok) return;
       const group = await res.json();
-      const newGroup: AdditionalEntryGroup = { id: group.id, monthId: group.monthId, label: group.label, entries: [] };
+      const newGroup: AdditionalEntryGroup = { id: group.id, monthId: group.monthId, label: group.label, tagId: group.tagId ?? null, tag: group.tag ?? null, entries: [] };
       onGroupsChange?.([...groups, newGroup]);
       router.refresh();
       setAddingGroupOpen(false);

@@ -95,6 +95,8 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
       id: group.id,
       monthId: group.monthId,
       label: group.label,
+      tagId: group.tagId ?? null,
+      tag: resolveTag(group.tagId),
       entries: sortAdditionalEntriesDesc(
         expenseEntries
           .filter((e) => e.groupId === group.id)
