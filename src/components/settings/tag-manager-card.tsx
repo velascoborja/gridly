@@ -250,14 +250,14 @@ export function TagManagerCard() {
                     ))}
                   </div>
 
-                  <div className="flex items-center gap-2 sm:justify-end">
+                  <div className="flex items-center justify-end gap-2">
                     <Button
                       type="button"
                       size="sm"
                       onClick={() => void handleSave(tag)}
                       disabled={!canSave}
                       aria-busy={isSaving}
-                      className="min-w-0 flex-1 gap-1.5 sm:min-w-20 sm:flex-none"
+                      className="min-w-20 gap-1.5"
                     >
                       {isSaving ? <Loader2 className="size-3.5 animate-spin" /> : <Save className="size-3.5" />}
                       {isSaving ? t("saving") : t("save")}
