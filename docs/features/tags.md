@@ -6,7 +6,7 @@ Users can assign a single tag to any ungrouped additional expense entry. Tags ha
 
 - Tags apply to **expense entries** (not income). Tags on ungrouped entries are assigned per-entry via the inline `TagPicker` on each row. Tags on grouped entries are assigned at the group level — a tag assigned to a group propagates to all its entries automatically, and individual entries inside a group do not have their own tag picker.
 - No dedicated tag management page — tags are created inline when assigning.
-- One tag per entry; a tag can be cleared at any time.
+- One tag per entry or group; a tag can be cleared at any time.
 
 ## Data Model
 
@@ -20,9 +20,9 @@ Users can assign a single tag to any ungrouped additional expense entry. Tags ha
 | `color` | text NOT NULL | Key from the 9-color palette |
 | `createdAt` | timestamp | `defaultNow()` |
 
-### `additionalEntries.tagId`
+### `additionalEntries.tagId` and `additionalEntryGroups.tagId`
 
-Nullable integer FK → `tags.id` with `onDelete: set null`. If a tag is ever deleted, affected entries silently lose their tag — entries are never cascade-deleted.
+Nullable integer FK → `tags.id` with `onDelete: set null`. If a tag is ever deleted, affected entries and groups silently lose their tag — entries and groups are never cascade-deleted.
 
 ## Color Palette
 
@@ -52,13 +52,15 @@ Returns all tags for the authenticated user as `Tag[]`.
 
 Body: `{ name: string; color: string }`. Validates that `name` is non-empty and `color` is a valid palette key (400 otherwise). Returns the created `Tag` with status 201.
 
-### Entry endpoints
+### Entry and Group endpoints
 
-Both `POST /api/months/[monthId]/entries` (create) and `PATCH /api/months/[monthId]/entries/[entryId]` (edit) accept an optional `tagId?: number | null`. Sending `tagId: null` explicitly clears the tag. Moving an entry into a group also clears its tag (alongside clearing `isRecurring`).
+Both `POST /api/months/[monthId]/entries` (create) and `PATCH /api/months/[monthId]/entries/[entryId]` (edit) accept an optional `tagId?: number | null`. Sending `tagId: null` explicitly clears the tag. Moving an entry into a group replaces its tag with the destination group's tag (which may be `null`), alongside clearing `isRecurring`.
+
+`PATCH /api/months/[monthId]/entry-groups/[groupId]` (edit group) accepts an optional `tagId?: number | null`. Assigning a tag to a group automatically updates all entries within that group to the same tag.
 
 ## Server-Side Data Loading
 
-`src/lib/server/year-data.ts` resolves tags when loading year data: after fetching all entries, it collects the unique non-null `tagId` values, runs a single `inArray` query against the `tags` table, and builds a `Map<number, Tag>`. Each entry's `tag` field is populated from this map (or `null`). No additional client-side fetches are needed for display.
+`src/lib/server/year-data.ts` resolves tags when loading year data: after fetching all entries and groups, it collects the unique non-null `tagId` values, runs a single `inArray` query against the `tags` table, and builds a `Map<number, Tag>`. Each entry and group's `tag` field is populated from this map (or `null`). No additional client-side fetches are needed for display.
 
 ## Component Architecture
 
@@ -105,7 +107,7 @@ Has an optional `tagAction?: React.ReactNode` slot alongside the existing `recur
 
 ### `src/components/monthly/additional-entry-group-row.tsx`
 
-No changes. Grouped entries do not receive `tagAction`, mirroring the existing behaviour for `recurringAction`.
+The group header includes a `TagPicker` to assign a tag to the group itself. When a tag is assigned, a colored chip is displayed in the header. Individual grouped entries do not receive a `tagAction`, mirroring the existing behaviour for `recurringAction`.
 
 ## i18n Keys
 
