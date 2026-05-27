@@ -353,12 +353,13 @@ export function AdditionalEntryGroupRow({
           </div>
         )}
 
-        <span className="shrink-0 text-sm font-semibold tabular-nums text-violet-600 dark:text-violet-400">
-          {formatCurrency(groupTotal, locale)}
-        </span>
+        <div className="flex shrink-0 items-center gap-1 ml-1.5 sm:ml-0">
+          <span className="text-sm font-semibold tabular-nums text-violet-600 dark:text-violet-400">
+            {formatCurrency(groupTotal, locale)}
+          </span>
 
-        {!readOnly && (
-          <AlertDialog>
+          {!readOnly && (
+            <AlertDialog>
             <AlertDialogTrigger
               render={
                 <Button
@@ -403,7 +404,8 @@ export function AdditionalEntryGroupRow({
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Expanded body */}
