@@ -61,11 +61,16 @@ export async function PATCH(
       }
       updates.groupId = groupId;
       updates.isRecurring = false;
+      updates.tagId = null;
     }
   }
 
   if (body.isRecurring !== undefined) {
     updates.isRecurring = body.isRecurring === true;
+  }
+
+  if (body.tagId !== undefined) {
+    updates.tagId = body.tagId === null ? null : (typeof body.tagId === "number" ? body.tagId : undefined);
   }
 
   const [updated] = await db
