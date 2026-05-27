@@ -65,7 +65,9 @@ export function buildSetupHref(nextYear: number, returnPath: string): string {
 }
 
 export function buildReturnPathFromView(currentYear: number, currentMonth: number, view: YearRouteView): string {
-  return view === "summary" ? `/${currentYear}/summary` : `/${currentYear}/${currentMonth}`;
+  if (view === "summary") return `/${currentYear}/summary`;
+  if (view === "categories") return `/${currentYear}/categories`;
+  return `/${currentYear}/${currentMonth}`;
 }
 
 export function buildSetupHrefFromPathname(
