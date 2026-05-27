@@ -28,7 +28,9 @@ import {
 import { EntryFormRow } from "./entry-form-row";
 import { sortAdditionalEntriesDesc } from "@/lib/additional-entries";
 import { cn, formatCurrency } from "@/lib/utils";
-import type { AdditionalEntry, AdditionalEntryGroup } from "@/lib/types";
+import type { AdditionalEntry, AdditionalEntryGroup, Tag } from "@/lib/types";
+import { TagPicker } from "./tag-picker";
+import { TAG_COLORS } from "@/lib/tags";
 
 interface Props {
   monthId: number;
@@ -41,6 +43,8 @@ interface Props {
   highlightId?: string | null;
   collapsed: boolean;
   onCollapsedChange: (collapsed: boolean) => void;
+  tags: Tag[];
+  onCreateTag: (name: string, color: string) => Promise<Tag>;
 }
 
 export function AdditionalEntryGroupRow({
@@ -54,6 +58,8 @@ export function AdditionalEntryGroupRow({
   highlightId = null,
   collapsed,
   onCollapsedChange,
+  tags,
+  onCreateTag,
 }: Props) {
   const t = useTranslations("Monthly.additionalEntries");
   const common = useTranslations("Common");
@@ -74,6 +80,7 @@ export function AdditionalEntryGroupRow({
   const [savingId, setSavingId] = useState<number | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [movingToGroupId, setMovingToGroupId] = useState<number | null>(null);
+  const [isSavingTag, setIsSavingTag] = useState(false);
 
   const parseAmount = (v: string) => parseFloat(v.replace(",", "."));
   const groupTotal = group.entries.reduce((sum, e) => sum + e.amount, 0);
@@ -230,6 +237,28 @@ export function AdditionalEntryGroupRow({
     }
   };
 
+  const handleGroupTagChange = async (tagId: number | null) => {
+    if (isSavingTag) return;
+    setIsSavingTag(true);
+    try {
+      const res = await fetch(`/api/months/${monthId}/entry-groups/${group.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ label: group.label, tagId }),
+      });
+      if (!res.ok) return;
+      const newTag = tagId !== null ? (tags.find((t) => t.id === tagId) ?? null) : null;
+      onGroupUpdate({
+        ...group,
+        tagId,
+        tag: newTag,
+        entries: group.entries.map((e) => ({ ...e, tagId, tag: newTag })),
+      });
+    } finally {
+      setIsSavingTag(false);
+    }
+  };
+
   return (
     <div className="overflow-hidden rounded-xl border border-primary/20 bg-primary/[0.03]">
       {/* Group header */}
@@ -278,6 +307,37 @@ export function AdditionalEntryGroupRow({
         <span className="shrink-0 rounded-full bg-muted/40 px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
           {group.entries.length}
         </span>
+
+        {!readOnly && (
+          <div
+            className="flex shrink-0 items-center gap-1"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {group.tag && TAG_COLORS[group.tag.color] && (
+              <span
+                className="inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-medium leading-none"
+                style={{
+                  background: TAG_COLORS[group.tag.color].bg,
+                  borderColor: TAG_COLORS[group.tag.color].border,
+                  color: TAG_COLORS[group.tag.color].text,
+                }}
+              >
+                <span
+                  className="h-1.5 w-1.5 rounded-full"
+                  style={{ background: TAG_COLORS[group.tag.color].text }}
+                />
+                {group.tag.name}
+              </span>
+            )}
+            <TagPicker
+              tags={tags}
+              value={group.tagId}
+              onChange={handleGroupTagChange}
+              onCreateTag={onCreateTag}
+              disabled={isSavingTag}
+            />
+          </div>
+        )}
 
         <span className="shrink-0 text-sm font-semibold tabular-nums text-violet-600 dark:text-violet-400">
           {formatCurrency(groupTotal, locale)}
