@@ -193,7 +193,7 @@ export function KpiCards({
                           </Button>
                         }
                       />
-                      <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-lg">
+                      <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-2xl">
                         <div className="max-h-[calc(100dvh-2rem)] overflow-y-auto">
                           <DialogHeader className="sticky top-0 z-10 border-b border-border/50 bg-card/70 px-5 pt-5 pr-14 pb-4 backdrop-blur-xl supports-[backdrop-filter]:bg-card/55 md:px-6 md:pt-6 md:pr-16 md:pb-5">
                             <DialogTitle>{tAnnual("categoriesTitle")}</DialogTitle>

@@ -315,7 +315,7 @@ export function AdditionalEntryGroupRow({
 
         {!readOnly && (
           <div
-            className="flex shrink-0 items-center gap-1 min-h-8"
+            className="flex shrink-0 items-center gap-1 h-9"
             onClick={(e) => e.stopPropagation()}
           >
             <TagPicker

@@ -62,7 +62,13 @@ export function TagStatRow({ stat, maxAmount }: Props) {
           <span>{t("entryCount", { count: stat.entryCount })}</span>
         </div>
       </button>
-      {isOpen && <DrilldownList entries={stat.entries} />}
+      <div
+        className={`grid transition-[grid-template-rows] duration-200 ease-in-out ${isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
+      >
+        <div className="overflow-hidden">
+          <DrilldownList entries={stat.entries} />
+        </div>
+      </div>
     </div>
   );
 }
