@@ -17,9 +17,10 @@ interface TagPickerProps {
   onCreateTag: (name: string, color: string) => Promise<Tag>;
   disabled?: boolean;
   isLoading?: boolean;
+  customTrigger?: React.ReactElement;
 }
 
-export function TagPicker({ tags, value, onChange, onCreateTag, disabled, isLoading }: TagPickerProps) {
+export function TagPicker({ tags, value, onChange, onCreateTag, disabled, isLoading, customTrigger }: TagPickerProps) {
   const t = useTranslations("Monthly.additionalEntries");
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<"list" | "create">("list");
@@ -57,26 +58,28 @@ export function TagPicker({ tags, value, onChange, onCreateTag, disabled, isLoad
     <Popover.Root open={open} onOpenChange={handleOpenChange}>
       <Popover.Trigger
         render={
-          <Button
-            size="icon-sm"
-            variant="ghost"
-            type="button"
-            className={cn(
-              "h-9 w-9",
-              value !== null
-                ? "bg-primary/10 text-primary hover:bg-primary/20"
-                : "text-muted-foreground hover:text-primary"
-            )}
-            aria-label={selectedTag ? `${t("tagButton")}: ${selectedTag.name}` : t("tagButton")}
-            title={selectedTag ? selectedTag.name : t("tagButton")}
-            disabled={disabled || isLoading}
-          >
-            {isLoading ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <TagIcon className="h-3.5 w-3.5" />
-            )}
-          </Button>
+          customTrigger || (
+            <Button
+              size="icon-sm"
+              variant="ghost"
+              type="button"
+              className={cn(
+                "h-9 w-9",
+                value !== null
+                  ? "bg-primary/10 text-primary hover:bg-primary/20"
+                  : "text-muted-foreground hover:text-primary"
+              )}
+              aria-label={selectedTag ? `${t("tagButton")}: ${selectedTag.name}` : t("tagButton")}
+              title={selectedTag ? selectedTag.name : t("tagButton")}
+              disabled={disabled || isLoading}
+            >
+              {isLoading ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <TagIcon className="h-3.5 w-3.5" />
+              )}
+            </Button>
+          )
         }
       />
       <Popover.Portal>

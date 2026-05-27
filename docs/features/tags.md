@@ -75,7 +75,7 @@ Controlled popover (`@base-ui/react/popover`) with two internal views:
 - **List view** — existing tags with checkmarks, a "Sin etiqueta" clear option, and a "+ Nueva etiqueta" link.
 - **Create view** — name text input, 9-color swatch grid, and "Crear y asignar" button. "← Volver" returns to the list without creating. On successful creation the new tag is immediately selected and the popover closes.
 
-The trigger button highlights with `bg-primary/10` when a tag is currently assigned.
+The trigger button highlights with `bg-primary/10` when a tag is currently assigned. The component also accepts an optional `customTrigger?: React.ReactElement` prop to completely override the default tag icon button.
 
 ### `src/components/monthly/entry-form-row.tsx`
 
@@ -87,27 +87,15 @@ Has an optional `tagAction?: React.ReactNode` slot alongside the existing `recur
 - Passes a `TagPicker` as `tagAction` to `EntryFormRow` for both the add form and each open edit form (ungrouped expenses only).
 - `handleCreateTag`: calls `POST /api/tags`, appends the new tag to local `tags` state, and returns the `Tag` to `TagPicker`.
 - Includes `tagId` in create and edit payloads; resolves `tag` from local state on the returned entry to avoid a refetch.
-- Renders a tag chip inline in the entry list row, immediately before the "anual" recurring badge:
-
-```tsx
-{entry.tag && TAG_COLORS[entry.tag.color] && (
-  <span
-    className="shrink-0 inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-medium leading-none"
-    style={{
-      background: TAG_COLORS[entry.tag.color].bg,
-      borderColor: TAG_COLORS[entry.tag.color].border,
-      color: TAG_COLORS[entry.tag.color].text,
-    }}
-  >
-    <span className="h-1.5 w-1.5 rounded-full" style={{ background: TAG_COLORS[entry.tag.color].text }} />
-    {entry.tag.name}
-  </span>
-)}
-```
+- Renders a tag chip inline in the entry list row, alongside the "anual" recurring badge.
+- **Responsive Optimization**: To prevent aggressive text truncation on narrow mobile screens, if an entry has *both* a tag and is recurring, the "anual" text badge gracefully collapses into a simple primary-colored dot on `< sm` viewports.
 
 ### `src/components/monthly/additional-entry-group-row.tsx`
 
-The group header includes a `TagPicker` to assign a tag to the group itself. When a tag is assigned, a colored chip is displayed in the header. Individual grouped entries do not receive a `tagAction`, mirroring the existing behaviour for `recurringAction`.
+The group header utilizes `TagPicker` to assign a tag to the group itself.
+- When a tag is assigned, it uses the `customTrigger` prop of `TagPicker` to render the colored tag chip as the interactive trigger.
+- This hides the default tag icon button, allowing the user to tap the assigned tag itself to open the menu and change/remove it.
+- Individual grouped entries do not receive a `tagAction`, mirroring the existing behaviour for `recurringAction`.
 
 ## i18n Keys
 

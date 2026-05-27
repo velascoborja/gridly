@@ -318,22 +318,6 @@ export function AdditionalEntryGroupRow({
             className="flex shrink-0 items-center gap-1"
             onClick={(e) => e.stopPropagation()}
           >
-            {group.tag && TAG_COLORS[group.tag.color] && (
-              <span
-                className="inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-medium leading-none"
-                style={{
-                  background: TAG_COLORS[group.tag.color].bg,
-                  borderColor: TAG_COLORS[group.tag.color].border,
-                  color: TAG_COLORS[group.tag.color].text,
-                }}
-              >
-                <span
-                  className="h-1.5 w-1.5 rounded-full"
-                  style={{ background: TAG_COLORS[group.tag.color].text }}
-                />
-                {group.tag.name}
-              </span>
-            )}
             <TagPicker
               tags={tags}
               value={group.tagId}
@@ -341,6 +325,30 @@ export function AdditionalEntryGroupRow({
               onCreateTag={onCreateTag}
               disabled={isSavingTag}
               isLoading={isSavingTag}
+              customTrigger={
+                group.tag && TAG_COLORS[group.tag.color] ? (
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-medium leading-none transition-colors hover:opacity-80 disabled:opacity-50"
+                    style={{
+                      background: TAG_COLORS[group.tag.color].bg,
+                      borderColor: TAG_COLORS[group.tag.color].border,
+                      color: TAG_COLORS[group.tag.color].text,
+                    }}
+                    disabled={isSavingTag}
+                  >
+                    {isSavingTag ? (
+                      <Loader2 className="h-1.5 w-1.5 animate-spin" />
+                    ) : (
+                      <span
+                        className="h-1.5 w-1.5 rounded-full"
+                        style={{ background: TAG_COLORS[group.tag.color].text }}
+                      />
+                    )}
+                    {group.tag.name}
+                  </button>
+                ) : undefined
+              }
             />
           </div>
         )}

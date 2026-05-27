@@ -613,9 +613,20 @@ export function AdditionalEntriesCard({
                           </span>
                         )}
                         {entry.isRecurring && (
-                          <span className="shrink-0 rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium leading-none text-primary">
-                            {t("recurringBadge")}
-                          </span>
+                          <>
+                            {entry.tag && (
+                              <span
+                                className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary sm:hidden"
+                                title={t("recurringBadge")}
+                              />
+                            )}
+                            <span className={cn(
+                              "shrink-0 rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium leading-none text-primary",
+                              entry.tag && "hidden sm:inline-block"
+                            )}>
+                              {t("recurringBadge")}
+                            </span>
+                          </>
                         )}
                       </span>
                     </span>
@@ -647,9 +658,20 @@ export function AdditionalEntriesCard({
                           </span>
                         )}
                         {entry.isRecurring && (
-                          <span className="shrink-0 rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium leading-none text-primary">
-                            {t("recurringBadge")}
-                          </span>
+                          <>
+                            {entry.tag && (
+                              <span
+                                className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary sm:hidden"
+                                title={t("recurringBadge")}
+                              />
+                            )}
+                            <span className={cn(
+                              "shrink-0 rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium leading-none text-primary",
+                              entry.tag && "hidden sm:inline-block"
+                            )}>
+                              {t("recurringBadge")}
+                            </span>
+                          </>
                         )}
                       </span>
                     </button>
