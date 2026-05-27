@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { additionalEntryGroups } from "@/db/schema";
+import { additionalEntryGroups, additionalEntries } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getSessionUser } from "@/lib/server/session";
 import { getOwnedMonth, getOwnedGroup } from "@/lib/server/ownership";
@@ -31,11 +31,24 @@ export async function PATCH(
     return Response.json({ error: "label is required" }, { status: 400 });
   }
 
+  const groupUpdate: { label: string; tagId?: number | null } = { label };
+  if ("tagId" in body) {
+    groupUpdate.tagId = body.tagId === null ? null : (typeof body.tagId === "number" ? body.tagId : undefined);
+  }
+
   const [updated] = await db
     .update(additionalEntryGroups)
-    .set({ label })
+    .set(groupUpdate)
     .where(eq(additionalEntryGroups.id, group.id))
     .returning();
+
+  if ("tagId" in body) {
+    const newTagId = body.tagId === null ? null : (typeof body.tagId === "number" ? body.tagId : null);
+    await db
+      .update(additionalEntries)
+      .set({ tagId: newTagId })
+      .where(eq(additionalEntries.groupId, group.id));
+  }
 
   const yearNumber = await getYearNumberForYearId(month.yearId);
   if (yearNumber !== null) {
