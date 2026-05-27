@@ -51,9 +51,10 @@ test("DrilldownList shows month abbreviation, description, and amount", () => {
   assert.match(source, /entry\.groupName/);
 });
 
-test("annual-view renders CategoriesView as a section", () => {
-  const source = readFileSync(new URL("./annual-view.tsx", import.meta.url), "utf8");
+test("kpi-cards renders CategoriesView inside a dialog", () => {
+  const source = readFileSync(new URL("./kpi-cards.tsx", import.meta.url), "utf8");
 
   assert.match(source, /CategoriesView/);
   assert.match(source, /<CategoriesView/);
+  assert.match(source, /DialogContent/);
 });

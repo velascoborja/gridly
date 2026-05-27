@@ -84,6 +84,8 @@
     "configTitle": "Year Configuration",
     "configDescription": "Adjust the base values for the year. Changes apply to the forecast and export.",
     "description": "Review the expected closing balance, accumulated savings, and monthly trend for the year.",
+    "categoriesButton": "Spending by tag",
+    "categoriesTitle": "Spending by tag",
     "exportExcel": "Export Excel",
     "exporting": "Exporting...",
     "saving": "Saving...",

@@ -1,5 +1,5 @@
 import { useLocale, useTranslations } from "next-intl";
-import { ArrowDownRight, ArrowUpRight, Download, Minus, PiggyBank, Settings, type LucideIcon } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, Download, Minus, PiggyBank, Settings, Tags, type LucideIcon } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,6 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { formatCurrency } from "@/lib/utils";
+import { CategoriesView } from "./categories-view";
 import { YearConfigForm } from "./year-config-form";
 import type { MonthData, YearConfig, YearData, YearRecurringExpense } from "@/lib/types";
 
@@ -22,6 +23,7 @@ interface Props {
   description: string;
   savingConfig: boolean;
   startingBalanceEditable: boolean;
+  yearData: YearData;
   readOnly?: boolean;
   onConfigChange: Dispatch<SetStateAction<YearConfig>>;
   onConfigApplied: (config: YearConfig, applyFromMonth: number) => void;
@@ -86,6 +88,7 @@ export function KpiCards({
   description,
   savingConfig,
   startingBalanceEditable,
+  yearData,
   readOnly = false,
   onConfigChange,
   onConfigApplied,
@@ -177,6 +180,29 @@ export function KpiCards({
               {!readOnly ? (
                 <>
                   <div className="flex items-center gap-2">
+                    <Dialog>
+                      <DialogTrigger
+                        render={
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-9 w-9 border-border/70 bg-background/80 text-muted-foreground shadow-sm hover:border-primary/30 hover:bg-primary/[0.06] hover:text-primary"
+                          >
+                            <Tags className="h-4 w-4" />
+                            <span className="sr-only">{tAnnual("categoriesButton")}</span>
+                          </Button>
+                        }
+                      />
+                      <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-lg">
+                        <div className="max-h-[calc(100dvh-2rem)] overflow-y-auto">
+                          <DialogHeader className="sticky top-0 z-10 border-b border-border/50 bg-card/70 px-5 pt-5 pr-14 pb-4 backdrop-blur-xl supports-[backdrop-filter]:bg-card/55 md:px-6 md:pt-6 md:pr-16 md:pb-5">
+                            <DialogTitle>{tAnnual("categoriesTitle")}</DialogTitle>
+                          </DialogHeader>
+                          <CategoriesView yearData={yearData} />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+
                     <Dialog>
                       <DialogTrigger
                         render={

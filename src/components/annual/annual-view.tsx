@@ -7,7 +7,6 @@ import { KpiCards } from "./kpi-cards";
 import { BalanceChart } from "./balance-chart";
 import { SavingsChart } from "./savings-chart";
 import { AdditionalEntriesAverages } from "./additional-entries-averages";
-import { CategoriesView } from "./categories-view";
 import type { YearData, YearConfig } from "@/lib/types";
 
 interface Props {
@@ -103,6 +102,7 @@ export function AnnualView({
         readOnly={readOnly}
         onConfigChange={setConfig}
         onConfigApplied={applyConfigToMonths}
+        yearData={initial}
         recurringExpenses={recurringExpenses}
         onRecurringExpensesApplied={handleRecurringExpensesApplied}
         onExport={handleExport}
@@ -115,8 +115,6 @@ export function AnnualView({
       </div>
 
       <AdditionalEntriesAverages months={months} />
-
-      <CategoriesView yearData={initial} />
     </div>
   );
 }

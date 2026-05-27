@@ -84,6 +84,8 @@
     "configTitle": "Configuración del año",
     "configDescription": "Ajusta los valores base del año. Los cambios se aplican a la previsión y al exportar.",
     "description": "Consulta el cierre previsto, el ahorro acumulado y la evolución mensual del año.",
+    "categoriesButton": "Gasto por etiqueta",
+    "categoriesTitle": "Gasto por etiqueta",
     "exportExcel": "Exportar Excel",
     "exporting": "Exportando...",
     "saving": "Guardando...",
