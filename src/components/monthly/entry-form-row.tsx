@@ -24,6 +24,8 @@ interface EntryFormRowProps {
   folderAction?: React.ReactNode;
   /** Optional slot for a recurring toggle button rendered before folderAction */
   recurringAction?: React.ReactNode;
+  /** Optional slot for a tag action button rendered before recurringAction */
+  tagAction?: React.ReactNode;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   autoFocus?: boolean;
 }
@@ -44,12 +46,15 @@ export function EntryFormRow({
   cancelLabel,
   folderAction,
   recurringAction,
+  tagAction,
   onKeyDown,
   autoFocus = false,
 }: EntryFormRowProps) {
-  const extraCount = [folderAction, recurringAction].filter(Boolean).length;
+  const extraCount = [folderAction, recurringAction, tagAction].filter(Boolean).length;
   const smCols =
-    extraCount === 2
+    extraCount === 3
+      ? "sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto_auto_auto_auto]"
+      : extraCount === 2
       ? "sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto_auto_auto]"
       : extraCount === 1
       ? "sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto_auto]"
@@ -84,6 +89,7 @@ export function EntryFormRow({
         </span>
       </div>
       <div className="col-span-2 flex items-center justify-end gap-1.5 sm:contents">
+        {tagAction}
         {recurringAction}
         {folderAction}
         <Button size="sm" className="h-9 px-3" onClick={onSave} disabled={disabled}>

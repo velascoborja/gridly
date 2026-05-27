@@ -282,3 +282,11 @@ test("additional expense group delete loading action fits the compact dialog foo
   assert.match(groupRowSource, /className="min-w-0 px-2 text-xs sm:text-sm"/);
   assert.match(groupRowSource, /isDeletingGroup \? t\("deletingGroup"\) : t\("confirmDeleteGroupAction"\)/);
 });
+
+test("EntryFormRow exposes a tagAction slot and accounts for it in the grid column formula", () => {
+  const source = readFileSync(new URL("./entry-form-row.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /tagAction\?: React\.ReactNode/);
+  assert.match(source, /\[folderAction, recurringAction, tagAction\]\.filter\(Boolean\)\.length/);
+  assert.match(source, /extraCount === 3/);
+});
