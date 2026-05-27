@@ -45,9 +45,10 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
           .where(inArray(additionalEntryGroups.monthId, monthRows.map((month) => month.id)))
       : [];
 
-  const usedTagIds = [...new Set(
-    allEntries.map((e) => e.tagId).filter((id): id is number => id !== null)
-  )];
+  const usedTagIds = [...new Set([
+    ...allEntries.map((e) => e.tagId).filter((id): id is number => id !== null),
+    ...allGroups.map((g) => g.tagId).filter((id): id is number => id !== null),
+  ])];
   const tagRows = usedTagIds.length > 0
     ? await db.select().from(tags).where(inArray(tags.id, usedTagIds))
     : [];
