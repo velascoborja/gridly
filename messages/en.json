@@ -35,7 +35,28 @@
     "deleteAccountConfirmationHint": "Type {phrase} to enable deletion.",
     "deleteAccountConfirmationPhrase": "DELETE",
     "deleteAccountDeleting": "Deleting...",
-    "deleteAccountError": "Could not delete the account. Check the connection and try again."
+    "deleteAccountError": "Could not delete the account. Check the connection and try again.",
+    "tags": {
+      "title": "Tags",
+      "description": "Edit the name and color of the tags you use to classify expenses.",
+      "count": "{count, plural, =0 {No tags} one {# tag} other {# tags}}",
+      "loading": "Loading tags...",
+      "empty": "There are no tags yet. You can create the first one from any monthly expense.",
+      "nameLabel": "Name",
+      "colorLabel": "Color",
+      "save": "Save",
+      "saving": "Saving...",
+      "delete": "Delete",
+      "deleting": "Deleting...",
+      "cancel": "Cancel",
+      "deleteTag": "Delete tag {name}",
+      "selectColor": "Select color {color}",
+      "deleteConfirmTitle": "Delete {name}",
+      "deleteConfirmDescription": "The tag will be deleted and expenses or groups using it will become untagged. No entries will be deleted.",
+      "loadError": "Could not load tags. Check the connection and try again.",
+      "saveError": "Could not save the tag. Check the name and try again.",
+      "deleteError": "Could not delete the tag. Check the connection and try again."
+    }
   },
   "KeyboardShortcuts": {
     "title": "Keyboard shortcuts",

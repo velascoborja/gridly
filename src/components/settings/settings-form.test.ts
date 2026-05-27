@@ -8,6 +8,8 @@ test("account deletion requires a typed second confirmation before the delete re
   const enMessages = readFileSync(new URL("../../../messages/en.json", import.meta.url), "utf8");
 
   assert.match(source, /type DeleteConfirmationStep = "impact" \| "typed"/);
+  assert.match(source, /import \{ TagManagerCard \} from "\.\/tag-manager-card"/);
+  assert.match(source, /<TagManagerCard \/>/);
   assert.match(source, /const \[deleteConfirmationStep, setDeleteConfirmationStep\]/);
   assert.match(source, /const \[deleteConfirmationText, setDeleteConfirmationText\]/);
   assert.match(source, /const requiredDeleteConfirmation = t\("deleteAccountConfirmationPhrase"\)/);
