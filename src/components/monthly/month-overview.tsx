@@ -325,6 +325,7 @@ export function MonthOverview({
       const movedEntry: AdditionalEntry = {
         ...updated,
         amount: parseFloat(updated.amount),
+        tag: updated.tagId === entry.tagId ? entry.tag : null,
       };
 
       commitMonthsChange((prev) =>
