@@ -156,7 +156,12 @@ export function AdditionalEntryGroupRow({
       });
       if (!res.ok) return;
       const entry = await res.json();
-      const newEntry: AdditionalEntry = { ...entry, amount: parseFloat(entry.amount) };
+      const newEntry: AdditionalEntry = {
+        ...entry,
+        amount: parseFloat(entry.amount),
+        tagId: entry.tagId ?? null,
+        tag: entry.tagId != null ? (tags.find((t) => t.id === entry.tagId) ?? null) : null,
+      };
       onGroupUpdate({
         ...group,
         entries: sortAdditionalEntriesDesc([...group.entries, newEntry]),

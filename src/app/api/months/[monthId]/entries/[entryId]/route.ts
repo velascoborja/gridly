@@ -69,7 +69,7 @@ export async function PATCH(
     updates.isRecurring = body.isRecurring === true;
   }
 
-  if (body.tagId !== undefined) {
+  if (body.tagId !== undefined && body.groupId === undefined) {
     updates.tagId = body.tagId === null ? null : (typeof body.tagId === "number" ? body.tagId : undefined);
   }
 
