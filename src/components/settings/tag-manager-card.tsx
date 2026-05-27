@@ -282,7 +282,7 @@ export function TagManagerCard() {
       <AlertDialog open={deleteCandidate !== null} onOpenChange={(open) => !open && !deletingTagId && setDeleteCandidate(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t("deleteConfirmTitle")}</AlertDialogTitle>
+            <AlertDialogTitle>{t("deleteConfirmTitle", { name: deleteCandidate?.name ?? "" })}</AlertDialogTitle>
             <AlertDialogDescription>
               {t("deleteConfirmDescription", { name: deleteCandidate?.name ?? "" })}
             </AlertDialogDescription>
