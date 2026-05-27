@@ -13,7 +13,7 @@ import type { Tag } from "@/lib/types";
 interface TagPickerProps {
   tags: Tag[];
   value: number | null;
-  onChange: (tagId: number | null) => void;
+  onChange: (tagId: number | null, tag?: Tag | null) => void;
   onCreateTag: (name: string, color: string) => Promise<Tag>;
   disabled?: boolean;
   isLoading?: boolean;
@@ -43,7 +43,7 @@ export function TagPicker({ tags, value, onChange, onCreateTag, disabled, isLoad
     setIsCreating(true);
     try {
       const created = await onCreateTag(newName.trim(), newColor);
-      onChange(created.id);
+      onChange(created.id, created);
       setOpen(false);
       setView("list");
       setNewName("");
@@ -97,7 +97,7 @@ export function TagPicker({ tags, value, onChange, onCreateTag, disabled, isLoad
                           "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-muted",
                           value === tag.id ? "text-primary" : "text-foreground"
                         )}
-                        onClick={() => { onChange(tag.id); setOpen(false); }}
+                        onClick={() => { onChange(tag.id, tag); setOpen(false); }}
                       >
                         <span
                           className="h-2.5 w-2.5 shrink-0 rounded-full"
@@ -113,7 +113,7 @@ export function TagPicker({ tags, value, onChange, onCreateTag, disabled, isLoad
                 <button
                   type="button"
                   className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted"
-                  onClick={() => { onChange(null); setOpen(false); }}
+                  onClick={() => { onChange(null, null); setOpen(false); }}
                 >
                   {t("noTag")}
                 </button>

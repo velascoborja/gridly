@@ -242,7 +242,7 @@ export function AdditionalEntryGroupRow({
     }
   };
 
-  const handleGroupTagChange = async (tagId: number | null) => {
+  const handleGroupTagChange = async (tagId: number | null, selectedTag?: Tag | null) => {
     if (isSavingTag) return;
     setIsSavingTag(true);
     try {
@@ -252,7 +252,7 @@ export function AdditionalEntryGroupRow({
         body: JSON.stringify({ label: group.label, tagId }),
       });
       if (!res.ok) return;
-      const newTag = tagId !== null ? (tags.find((t) => t.id === tagId) ?? null) : null;
+      const newTag = selectedTag !== undefined ? selectedTag : (tagId !== null ? (tags.find((t) => t.id === tagId) ?? null) : null);
       onGroupUpdate({
         ...group,
         tagId,
