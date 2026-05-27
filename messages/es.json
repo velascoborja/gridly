@@ -419,7 +419,13 @@
       "savingGroup": "Guardando...",
       "recurringToggle": "Repetir cada año",
       "recurringActive": "Se repetirá cada año",
-      "recurringBadge": "anual"
+      "recurringBadge": "anual",
+      "tagButton": "Asignar etiqueta",
+      "yourTags": "Tus etiquetas",
+      "noTag": "Sin etiqueta",
+      "newTag": "+ Nueva etiqueta",
+      "tagName": "Nombre...",
+      "createAndAssign": "Crear y asignar"
     },
     "summary": {
       "title": "Resumen",
