@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Globe, Trash2, AlertCircle } from "lucide-react";
 import { ShortcutsCard } from "./shortcuts-card";
+import { TagManagerCard } from "./tag-manager-card";
 
 type DeleteConfirmationStep = "impact" | "typed";
 
@@ -140,6 +141,8 @@ export function SettingsForm() {
           </div>
         </CardContent>
       </Card>
+
+      <TagManagerCard />
 
       <ShortcutsCard />
 

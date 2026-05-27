@@ -35,7 +35,28 @@
     "deleteAccountConfirmationHint": "Escribe {phrase} para activar la eliminación.",
     "deleteAccountConfirmationPhrase": "ELIMINAR",
     "deleteAccountDeleting": "Eliminando...",
-    "deleteAccountError": "No se ha podido eliminar la cuenta. Revisa la conexión e inténtalo de nuevo."
+    "deleteAccountError": "No se ha podido eliminar la cuenta. Revisa la conexión e inténtalo de nuevo.",
+    "tags": {
+      "title": "Etiquetas",
+      "description": "Edita el nombre y color de las etiquetas que usas para clasificar gastos.",
+      "count": "{count, plural, =0 {Sin etiquetas} one {# etiqueta} other {# etiquetas}}",
+      "loading": "Cargando etiquetas...",
+      "empty": "Aún no hay etiquetas. Puedes crear la primera desde cualquier gasto mensual.",
+      "nameLabel": "Nombre",
+      "colorLabel": "Color",
+      "save": "Guardar",
+      "saving": "Guardando...",
+      "delete": "Eliminar",
+      "deleting": "Eliminando...",
+      "cancel": "Cancelar",
+      "deleteTag": "Eliminar etiqueta {name}",
+      "selectColor": "Seleccionar color {color}",
+      "deleteConfirmTitle": "Eliminar {name}",
+      "deleteConfirmDescription": "La etiqueta se eliminará y los gastos o grupos que la usaban quedarán sin etiqueta. Los movimientos no se borrarán.",
+      "loadError": "No se han podido cargar las etiquetas. Revisa la conexión e inténtalo de nuevo.",
+      "saveError": "No se ha podido guardar la etiqueta. Revisa el nombre y vuelve a intentarlo.",
+      "deleteError": "No se ha podido eliminar la etiqueta. Revisa la conexión e inténtalo de nuevo."
+    }
   },
   "KeyboardShortcuts": {
     "title": "Atajos de teclado",
