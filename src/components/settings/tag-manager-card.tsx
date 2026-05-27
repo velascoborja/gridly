@@ -200,8 +200,7 @@ export function TagManagerCard() {
           </div>
         ) : tags.length === 0 && !loadError ? (
           <div className="rounded-lg border border-dashed border-primary/20 bg-primary/[0.03] p-5 text-sm text-muted-foreground">
-            <p className="font-medium text-foreground">{t("emptyTitle")}</p>
-            <p className="mt-1">{t("emptyDescription")}</p>
+            <p>{t("empty")}</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -231,7 +230,7 @@ export function TagManagerCard() {
                       aria-invalid={draft ? draft.name.trim().length === 0 : false}
                       className="h-10 rounded-lg bg-background text-sm font-medium"
                     />
-                    <div className="flex flex-wrap gap-2" aria-label={t("colorPaletteLabel")}>
+                    <div className="flex flex-wrap gap-2" aria-label={t("colorLabel")}>
                       {TAG_COLOR_KEYS.map((colorKey) => (
                         <button
                           key={colorKey}
@@ -243,7 +242,7 @@ export function TagManagerCard() {
                           style={{ background: TAG_COLORS[colorKey].text }}
                           onClick={() => updateDraft(tag.id, { color: colorKey })}
                           disabled={isRowPending}
-                          aria-label={t("colorOption", { color: colorKey })}
+                          aria-label={t("selectColor", { color: colorKey })}
                           aria-pressed={draft?.color === colorKey}
                         />
                       ))}
@@ -268,7 +267,7 @@ export function TagManagerCard() {
                       variant="destructive"
                       onClick={() => setDeleteCandidate(tag)}
                       disabled={isRowPending}
-                      aria-label={t("delete", { name: tag.name })}
+                      aria-label={t("deleteTag", { name: tag.name })}
                     >
                       {isDeleting ? <Loader2 className="size-3.5 animate-spin" /> : <Trash2 className="size-3.5" />}
                     </Button>
@@ -298,7 +297,7 @@ export function TagManagerCard() {
               className="gap-2"
             >
               {deletingTagId !== null ? <Loader2 className="size-3.5 animate-spin" /> : <Trash2 className="size-3.5" />}
-              {deletingTagId !== null ? t("deleting") : t("deleteConfirmAction")}
+              {deletingTagId !== null ? t("deleting") : t("delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
