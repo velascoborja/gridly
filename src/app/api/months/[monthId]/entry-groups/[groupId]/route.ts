@@ -43,11 +43,13 @@ export async function PATCH(
     .returning();
 
   if ("tagId" in body) {
-    const newTagId = body.tagId === null ? null : (typeof body.tagId === "number" ? body.tagId : null);
-    await db
-      .update(additionalEntries)
-      .set({ tagId: newTagId })
-      .where(eq(additionalEntries.groupId, group.id));
+    const newTagId = body.tagId === null ? null : (typeof body.tagId === "number" ? body.tagId : undefined);
+    if (newTagId !== undefined) {
+      await db
+        .update(additionalEntries)
+        .set({ tagId: newTagId })
+        .where(eq(additionalEntries.groupId, group.id));
+    }
   }
 
   const yearNumber = await getYearNumberForYearId(month.yearId);
