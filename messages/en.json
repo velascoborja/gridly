@@ -123,6 +123,17 @@
       "incomeLabel": "Avg additional income",
       "incomeNote": "Monthly average of variable additional income across all 12 months"
     },
+    "categories": {
+      "tab": "Categories",
+      "heading": "Spending by tag",
+      "totalLabel": "Total additional spend",
+      "tagCount": "{count, plural, one {# tag} other {# tags}}",
+      "shareLabel": "{pct}% of additional spend",
+      "entryCount": "{count, plural, one {# entry} other {# entries}}",
+      "untagged": "Untagged",
+      "untaggedShare": "{pct}% unclassified",
+      "emptyState": "No additional entries this year"
+    },
     "config": {
       "startingBalanceLabel": "Linked starting balance",
       "startingBalanceEditableLabel": "Year starting balance",
@@ -461,6 +472,7 @@
   "Nav": {
     "months": "Months",
     "annualSummary": "Year",
+    "categories": "Categories",
     "evolution": "Evolution",
     "evolutionUnavailable": "Available once you have more than one recorded year up to the current year.",
     "historicalYearUnavailable": "Available only for years added with monthly tracking in Gridly.",

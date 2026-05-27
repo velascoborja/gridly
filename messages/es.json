@@ -123,6 +123,17 @@
       "incomeLabel": "Ingreso adicional medio",
       "incomeNote": "Media mensual de ingresos variables adicionales sobre los 12 meses del año"
     },
+    "categories": {
+      "tab": "Categorías",
+      "heading": "Gasto por etiqueta",
+      "totalLabel": "Total gasto adicional",
+      "tagCount": "{count, plural, one {# etiqueta} other {# etiquetas}}",
+      "shareLabel": "{pct}% del gasto adicional",
+      "entryCount": "{count, plural, one {# entrada} other {# entradas}}",
+      "untagged": "Sin etiqueta",
+      "untaggedShare": "{pct}% sin clasificar",
+      "emptyState": "No hay entradas adicionales este año"
+    },
     "config": {
       "startingBalanceLabel": "Saldo inicial vinculado",
       "startingBalanceEditableLabel": "Saldo inicial del año",
@@ -461,6 +472,7 @@
   "Nav": {
     "months": "Meses",
     "annualSummary": "Año",
+    "categories": "Categorías",
     "evolution": "Evolución",
     "evolutionUnavailable": "Disponible cuando tengas más de un año registrado hasta el año actual.",
     "historicalYearUnavailable": "Disponible solo para años añadidos con seguimiento mensual en Gridly.",
