@@ -78,6 +78,7 @@ Two tables are involved:
 
 ### Collapsed state
 - Groups render collapsed by default. State is UI-only and resets on page reload.
+- The collapsed group header uses compact vertical padding so grouped expense headers align visually with the density of regular entry rows while retaining the same controls.
 - Collapsed state is lifted to `AdditionalEntriesCard` (a `Record<groupId, boolean>` map) and passed to each `AdditionalEntryGroupRow` as `collapsed` / `onCollapsedChange` props. This allows the card to coordinate all groups atomically for bulk expand/collapse.
 - If a highlighted entry (from search/navigation) belongs to a group, the group auto-expands via a `useEffect` watching `highlightId`.
 - `Cmd+Shift+.` expands all groups if any are collapsed, or collapses all if every group is already expanded. See [Keyboard Shortcuts](keyboard-shortcuts.md).

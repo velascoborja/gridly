@@ -269,7 +269,7 @@ export function AdditionalEntryGroupRow({
       {/* Group header */}
       <div
         className={cn(
-          "flex cursor-pointer select-none items-center gap-1 px-2.5 py-2 sm:gap-2",
+          "flex cursor-pointer select-none items-center gap-1 px-2.5 py-1.5 sm:gap-2",
           !readOnly && "hover:bg-primary/[0.05]"
         )}
         onClick={handleToggle}
@@ -315,7 +315,7 @@ export function AdditionalEntryGroupRow({
 
         {!readOnly && (
           <div
-            className="flex shrink-0 items-center gap-1 min-h-9"
+            className="flex shrink-0 items-center gap-1 min-h-8"
             onClick={(e) => e.stopPropagation()}
           >
             <TagPicker
