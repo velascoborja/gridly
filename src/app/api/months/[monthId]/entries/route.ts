@@ -1,5 +1,6 @@
+import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { additionalEntries } from "@/db/schema";
+import { additionalEntries, additionalEntryGroups } from "@/db/schema";
 import { getYearNumberForYearId, propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getSessionUser } from "@/lib/server/session";
 import { getOwnedMonth } from "@/lib/server/ownership";
@@ -30,6 +31,21 @@ export async function POST(
     return Response.json({ error: "Month not found" }, { status: 404 });
   }
 
+  let entryTagId: number | null = typeof tagId === "number" ? tagId : null;
+
+  if (groupId != null) {
+    const group = await db.query.additionalEntryGroups.findFirst({
+      where: and(
+        eq(additionalEntryGroups.id, groupId),
+        eq(additionalEntryGroups.monthId, ownedMonth.id)
+      ),
+    });
+    if (!group) {
+      return Response.json({ error: "Group not found" }, { status: 404 });
+    }
+    entryTagId = group.tagId ?? null;
+  }
+
   const [entry] = await db.insert(additionalEntries).values({
     monthId: ownedMonth.id,
     type,
@@ -37,7 +53,7 @@ export async function POST(
     amount: String(amount),
     groupId: groupId ?? null,
     isRecurring: isRecurring === true,
-    tagId: typeof tagId === "number" ? tagId : null,
+    tagId: entryTagId,
   }).returning();
 
   const yearNumber = await getYearNumberForYearId(ownedMonth.yearId);

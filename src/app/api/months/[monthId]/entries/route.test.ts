@@ -30,3 +30,7 @@ test("entries POST route reads isRecurring from the request body", () => {
 test("entries POST route persists isRecurring in the database insert", () => {
   assert.match(routeSource, /isRecurring: isRecurring/);
 });
+
+test("entries POST route uses group tagId when groupId is provided", () => {
+  assert.match(routeSource, /group\.tagId/);
+});
