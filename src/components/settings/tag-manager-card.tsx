@@ -49,6 +49,7 @@ export function TagManagerCard() {
   const [savingTagId, setSavingTagId] = useState<number | null>(null);
   const [deletingTagId, setDeletingTagId] = useState<number | null>(null);
   const [deleteCandidate, setDeleteCandidate] = useState<Tag | null>(null);
+  const [expandedColorTagId, setExpandedColorTagId] = useState<number | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -218,7 +219,7 @@ export function TagManagerCard() {
                   key={tag.id}
                   className="grid gap-3 rounded-xl border border-border/70 bg-background p-3 shadow-sm transition-shadow hover:shadow-md sm:grid-cols-[minmax(7rem,12rem)_1fr_auto] sm:items-center sm:gap-2"
                 >
-                  <div className="min-w-0 sm:max-w-48">
+                  <div className="flex min-w-0 items-center gap-2 sm:max-w-48">
                     <label className="sr-only" htmlFor={`tag-name-${tag.id}`}>
                       {t("nameLabel")}
                     </label>
@@ -230,9 +231,32 @@ export function TagManagerCard() {
                       aria-invalid={draft ? draft.name.trim().length === 0 : false}
                       className="h-9 rounded-lg bg-background text-sm font-medium"
                     />
+                    <button
+                      type="button"
+                      className={cn(
+                        "flex size-9 shrink-0 items-center justify-center rounded-lg border bg-background shadow-sm transition-all hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:hidden",
+                        isRowPending ? "cursor-not-allowed opacity-60" : ""
+                      )}
+                      style={{ borderColor: TAG_COLORS[draft?.color ?? tag.color].text }}
+                      onClick={() => setExpandedColorTagId((current) => (current === tag.id ? null : tag.id))}
+                      disabled={isRowPending}
+                      aria-label={t("selectColor", { color: draft?.color ?? tag.color })}
+                      aria-expanded={expandedColorTagId === tag.id}
+                    >
+                      <span
+                        className="size-4 rounded-full shadow-sm"
+                        style={{ background: TAG_COLORS[draft?.color ?? tag.color].text }}
+                      />
+                    </button>
                   </div>
 
-                  <div className="flex flex-nowrap items-center justify-center gap-1.5 sm:gap-1" aria-label={t("colorLabel")}>
+                  <div
+                    className={cn(
+                      "flex flex-nowrap items-center justify-center gap-1.5 sm:gap-1",
+                      expandedColorTagId === tag.id ? "flex" : "hidden sm:flex"
+                    )}
+                    aria-label={t("colorLabel")}
+                  >
                     {TAG_COLOR_KEYS.map((colorKey) => (
                       <button
                         key={colorKey}
@@ -242,7 +266,10 @@ export function TagManagerCard() {
                           draft?.color === colorKey ? "border-foreground" : "border-transparent"
                         )}
                         style={{ background: TAG_COLORS[colorKey].text }}
-                        onClick={() => updateDraft(tag.id, { color: colorKey })}
+                        onClick={() => {
+                          updateDraft(tag.id, { color: colorKey });
+                          setExpandedColorTagId(null);
+                        }}
                         disabled={isRowPending}
                         aria-label={t("selectColor", { color: colorKey })}
                         aria-pressed={draft?.color === colorKey}

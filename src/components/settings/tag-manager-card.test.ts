@@ -63,21 +63,29 @@ test("TagManagerCard icon badge avoids a pale seam inside the border", () => {
 test("TagManagerCard rows use compact single-line controls on desktop", () => {
   assert.match(source, /sm:grid-cols-\[minmax\(7rem,12rem\)_1fr_auto\]/);
   assert.match(source, /className="h-9 rounded-lg/);
-  assert.match(source, /className="flex flex-nowrap items-center justify-center gap-1\.5 sm:gap-1"/);
+  assert.match(source, /"flex flex-nowrap items-center justify-center gap-1\.5 sm:gap-1"/);
   assert.match(source, /"size-3\.5 rounded-full/);
   assert.match(source, /className="min-w-20 gap-1\.5"/);
   assert.doesNotMatch(source, /<div className="min-w-0 space-y-3">/);
   assert.doesNotMatch(source, /className="flex flex-wrap gap-1\.5"/);
 });
 
-test("TagManagerCard rows use a tightened stacked layout on mobile", () => {
+test("TagManagerCard rows use a compact selected-color swatch on mobile", () => {
+  assert.match(
+    source,
+    /const \[expandedColorTagId, setExpandedColorTagId\] = useState<number \| null>\(null\)/
+  );
   assert.match(
     source,
     /className="grid gap-3 rounded-xl border border-border\/70 bg-background p-3 shadow-sm transition-shadow hover:shadow-md sm:grid-cols-\[minmax\(7rem,12rem\)_1fr_auto\] sm:items-center sm:gap-2"/
   );
-  assert.match(source, /<div className="min-w-0 sm:max-w-48">/);
-  assert.match(source, /className="flex flex-nowrap items-center justify-center gap-1\.5 sm:gap-1"/);
-  assert.match(source, /className="flex items-center justify-end gap-2"/);
+  assert.match(source, /<div className="flex min-w-0 items-center gap-2 sm:max-w-48">/);
+  assert.match(source, /aria-label=\{t\("selectColor", \{ color: draft\?\.color \?\? tag\.color \}\)\}/);
+  assert.match(source, /setExpandedColorTagId\(\(current\) => \(current === tag\.id \? null : tag\.id\)\)/);
+  assert.match(source, /style=\{\{ background: TAG_COLORS\[draft\?\.color \?\? tag\.color\]\.text \}\}/);
+  assert.match(source, /"flex flex-nowrap items-center justify-center gap-1\.5 sm:gap-1"/);
+  assert.match(source, /expandedColorTagId === tag\.id \? "flex" : "hidden sm:flex"/);
+  assert.match(source, /setExpandedColorTagId\(null\)/);
   assert.match(source, /className="min-w-20 gap-1\.5"/);
   assert.doesNotMatch(source, /className="[^"]*flex-1[^"]*"/);
 });
