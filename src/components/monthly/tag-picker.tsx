@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Popover } from "@base-ui/react/popover";
-import { Tag as TagIcon, ArrowLeft } from "lucide-react";
+import { Tag as TagIcon, ArrowLeft, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -16,9 +16,10 @@ interface TagPickerProps {
   onChange: (tagId: number | null) => void;
   onCreateTag: (name: string, color: string) => Promise<Tag>;
   disabled?: boolean;
+  isLoading?: boolean;
 }
 
-export function TagPicker({ tags, value, onChange, onCreateTag, disabled }: TagPickerProps) {
+export function TagPicker({ tags, value, onChange, onCreateTag, disabled, isLoading }: TagPickerProps) {
   const t = useTranslations("Monthly.additionalEntries");
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<"list" | "create">("list");
@@ -68,9 +69,13 @@ export function TagPicker({ tags, value, onChange, onCreateTag, disabled }: TagP
             )}
             aria-label={selectedTag ? `${t("tagButton")}: ${selectedTag.name}` : t("tagButton")}
             title={selectedTag ? selectedTag.name : t("tagButton")}
-            disabled={disabled}
+            disabled={disabled || isLoading}
           >
-            <TagIcon className="h-3.5 w-3.5" />
+            {isLoading ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <TagIcon className="h-3.5 w-3.5" />
+            )}
           </Button>
         }
       />

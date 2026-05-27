@@ -340,6 +340,7 @@ export function AdditionalEntryGroupRow({
               onChange={handleGroupTagChange}
               onCreateTag={onCreateTag}
               disabled={isSavingTag}
+              isLoading={isSavingTag}
             />
           </div>
         )}
