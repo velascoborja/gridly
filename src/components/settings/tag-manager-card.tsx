@@ -247,6 +247,29 @@ export function TagManagerCard() {
                         style={{ background: TAG_COLORS[draft?.color ?? tag.color].text }}
                       />
                     </button>
+
+                    <Button
+                      type="button"
+                      size="icon-sm"
+                      onClick={() => void handleSave(tag)}
+                      disabled={!canSave}
+                      aria-busy={isSaving}
+                      className="size-9 p-0 sm:hidden"
+                    >
+                      {isSaving ? <Loader2 className="size-3.5 animate-spin" /> : <Save className="size-3.5" />}
+                      <span className="sr-only">{isSaving ? t("saving") : t("save")}</span>
+                    </Button>
+                    <Button
+                      type="button"
+                      size="icon-sm"
+                      variant="destructive"
+                      onClick={() => setDeleteCandidate(tag)}
+                      disabled={isRowPending}
+                      aria-label={t("deleteTag", { name: tag.name })}
+                      className="sm:hidden"
+                    >
+                      {isDeleting ? <Loader2 className="size-3.5 animate-spin" /> : <Trash2 className="size-3.5" />}
+                    </Button>
                   </div>
 
                   <div
@@ -278,7 +301,7 @@ export function TagManagerCard() {
                     ))}
                   </div>
 
-                  <div className="flex items-center justify-end gap-2">
+                  <div className="hidden items-center justify-end gap-2 sm:flex">
                     <Button
                       type="button"
                       size="sm"

@@ -75,12 +75,13 @@ test("TagManagerCard rows use compact single-line controls on desktop", () => {
   assert.match(source, /"flex flex-nowrap items-center justify-center gap-1\.5/);
   assert.match(source, /sm:gap-1/);
   assert.match(source, /"size-3\.5 rounded-full/);
+  assert.match(source, /className="hidden items-center justify-end gap-2 sm:flex"/);
   assert.match(source, /className="min-w-20 gap-1\.5"/);
   assert.doesNotMatch(source, /<div className="min-w-0 space-y-3">/);
   assert.doesNotMatch(source, /className="flex flex-wrap gap-1\.5"/);
 });
 
-test("TagManagerCard rows use a compact selected-color swatch on mobile", () => {
+test("TagManagerCard rows show mobile input, color button, save, and delete in one row", () => {
   assert.match(
     source,
     /const \[expandedColorTagId, setExpandedColorTagId\] = useState<number \| null>\(null\)/
@@ -90,18 +91,16 @@ test("TagManagerCard rows use a compact selected-color swatch on mobile", () => 
     /className="grid gap-3 rounded-xl border border-border\/70 bg-background p-3 shadow-sm transition-shadow hover:shadow-md sm:grid-cols-\[minmax\(7rem,12rem\)_1fr_auto\] sm:items-center sm:gap-2"/
   );
   assert.match(source, /<div className="flex min-w-0 items-center gap-2 sm:max-w-48">/);
-  assert.match(source, /aria-label=\{t\("selectColor", \{ color: draft\?\.color \?\? tag\.color \}\)\}/);
   assert.match(source, /setExpandedColorTagId\(\(current\) => \(current === tag\.id \? null : tag\.id\)\)/);
+  assert.match(source, /style=\{\{ borderColor: TAG_COLORS\[draft\?\.color \?\? tag\.color\]\.text \}\}/);
   assert.match(source, /style=\{\{ background: TAG_COLORS\[draft\?\.color \?\? tag\.color\]\.text \}\}/);
-  assert.match(source, /"flex flex-nowrap items-center justify-center gap-1\.5/);
-  assert.match(source, /sm:gap-1/);
+  assert.match(source, /className="size-9 p-0 sm:hidden"/);
+  assert.match(source, /className="sm:hidden"/);
   assert.match(
     source,
     /"flex flex-nowrap items-center justify-center gap-1\.5 overflow-hidden transition-\[max-height,opacity,transform\] duration-200 ease-out sm:gap-1 sm:overflow-visible sm:transition-none"/
   );
   assert.match(source, /expandedColorTagId === tag\.id\s+\? "max-h-10 opacity-100 translate-y-0"\s+: "max-h-0 opacity-0 -translate-y-1 sm:max-h-none sm:opacity-100 sm:translate-y-0"/);
-  assert.doesNotMatch(source, /expandedColorTagId === tag\.id \? "flex" : "hidden sm:flex"/);
   assert.match(source, /setExpandedColorTagId\(null\)/);
-  assert.match(source, /className="min-w-20 gap-1\.5"/);
-  assert.doesNotMatch(source, /className="[^"]*flex-1[^"]*"/);
+  assert.doesNotMatch(source, /overflow-x-auto/);
 });
