@@ -4,7 +4,7 @@ Users can assign a single tag to any ungrouped additional expense entry. Tags ha
 
 ## Scope
 
-- Tags apply to **ungrouped expense entries only** (not income, not grouped entries).
+- Tags apply to **expense entries** (not income). Tags on ungrouped entries are assigned per-entry via the inline `TagPicker` on each row. Tags on grouped entries are assigned at the group level — a tag assigned to a group propagates to all its entries automatically, and individual entries inside a group do not have their own tag picker.
 - No dedicated tag management page — tags are created inline when assigning.
 - One tag per entry; a tag can be cleared at any time.
 

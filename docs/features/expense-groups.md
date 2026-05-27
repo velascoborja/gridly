@@ -10,12 +10,13 @@ Two tables are involved:
 
 | Table | Key columns | Notes |
 |---|---|---|
-| `additional_entry_groups` | `id`, `month_id`, `label`, `created_at` | Cascade-deleted when the month is deleted |
+| `additional_entry_groups` | `id`, `month_id`, `label`, `tag_id`, `created_at` | `tag_id` nullable FK → `tags.id`, `onDelete: set null`; cascade-deleted when the month is deleted |
 | `additional_entries` | …, `group_id` (nullable FK → `additional_entry_groups`) | `null` = ungrouped |
 
 - `group_id` is nullable; a `null` value means the entry is ungrouped.
 - Deleting a group cascades to all its entries (DB `ON DELETE CASCADE`).
 - An entry can belong to at most one group.
+- `tag_id` on a group is nullable. When set, all entries in the group carry the same `tagId` value as the group.
 
 ### How `MonthData` represents groups
 
@@ -28,7 +29,7 @@ Two tables are involved:
 | Method | Route | Purpose |
 |---|---|---|
 | `POST` | `/api/months/[monthId]/entry-groups` | Create a group `{ label }` |
-| `PATCH` | `/api/months/[monthId]/entry-groups/[groupId]` | Rename a group `{ label }` |
+| `PATCH` | `/api/months/[monthId]/entry-groups/[groupId]` | Rename a group `{ label }` or set its tag `{ label, tagId: number \| null }`. When `tagId` is present, all entries in the group are batch-updated to the same `tagId`. |
 | `DELETE` | `/api/months/[monthId]/entry-groups/[groupId]` | Delete group and all its entries (DB cascade) |
 | `POST` | `/api/months/[monthId]/entries` | Create an entry; accepts optional `groupId` to assign it directly into a group |
 | `PATCH` | `/api/months/[monthId]/entries/[entryId]` | Accepts `groupId: number \| null` to move an entry into or out of a group |
@@ -65,6 +66,14 @@ Two tables are involved:
 ### Deleting a group
 - The group header has a trash icon that opens an `AlertDialog` confirming the group name and entry count.
 - On confirm, sends `DELETE /api/months/[monthId]/entry-groups/[groupId]`. The DB cascade removes all child entries.
+
+### Setting a group tag
+- The group header shows a tag icon button (a `TagPicker`) between the entry count and the total amount.
+- When a tag is assigned, a colored chip is also shown in the header.
+- Selecting a tag sends `PATCH /api/months/[monthId]/entry-groups/[groupId]` with `{ label, tagId }` and batch-updates all entries in the group to the same tag.
+- New entries added to the group automatically receive the group's tag.
+- Entries moved into the group receive the destination group's tag.
+- Moving an entry out of the group leaves its `tagId` unchanged.
 
 ### Collapsed state
 - Groups render collapsed by default. State is UI-only and resets on page reload.
