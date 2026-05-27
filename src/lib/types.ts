@@ -11,6 +11,12 @@ export interface YearConfig {
   interestRate: number;
 }
 
+export interface Tag {
+  id: number;
+  name: string;
+  color: string;
+}
+
 export interface AdditionalEntry {
   id: number;
   monthId: number;
@@ -18,6 +24,8 @@ export interface AdditionalEntry {
   label: string;
   amount: number;
   isRecurring: boolean;
+  tagId: number | null;
+  tag: Tag | null;
 }
 
 export interface AdditionalEntryGroup {
