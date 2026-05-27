@@ -29,9 +29,11 @@ import {
 } from "@/components/ui/alert-dialog";
 import { AdditionalEntryGroupRow } from "./additional-entry-group-row";
 import { EntryFormRow } from "./entry-form-row";
+import { TagPicker } from "./tag-picker";
 import { sortAdditionalEntriesDesc, sumAdditionalEntries } from "@/lib/additional-entries";
+import { TAG_COLORS } from "@/lib/tags";
 import { cn, formatCurrency } from "@/lib/utils";
-import type { AdditionalEntry, AdditionalEntryGroup } from "@/lib/types";
+import type { AdditionalEntry, AdditionalEntryGroup, Tag } from "@/lib/types";
 
 const NO_GROUPS: AdditionalEntryGroup[] = [];
 
@@ -91,6 +93,9 @@ export function AdditionalEntriesCard({
   const [movingToGroupId, setMovingToGroupId] = useState<number | null>(null);
   const [newRecurring, setNewRecurring] = useState(false);
   const [editRecurring, setEditRecurring] = useState(false);
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [newTagId, setNewTagId] = useState<number | null>(null);
+  const [editTagId, setEditTagId] = useState<number | null>(null);
   const [groupCollapsedState, setGroupCollapsedState] = useState<Record<number, boolean>>(
     () => Object.fromEntries(groups.map(g => [g.id, true]))
   );
@@ -129,6 +134,14 @@ export function AdditionalEntriesCard({
     return () => { openAddGroupFormRef.current = null; };
   }, [openAddGroupFormRef, readOnly]);
 
+  useEffect(() => {
+    if (readOnly || type !== "expense") return;
+    fetch("/api/tags")
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data: Tag[]) => setTags(data))
+      .catch(() => {});
+  }, [readOnly, type]);
+
   const sortedEntries = [
     ...sortAdditionalEntriesDesc(entries.filter((e) => e.isRecurring)),
     ...sortAdditionalEntriesDesc(entries.filter((e) => !e.isRecurring)),
@@ -141,6 +154,7 @@ export function AdditionalEntriesCard({
     setNewLabel("");
     setNewAmount("");
     setNewRecurring(false);
+    setNewTagId(null);
   };
 
   const openEditForm = (entry: AdditionalEntry) => {
@@ -148,6 +162,7 @@ export function AdditionalEntriesCard({
     setEditLabel(entry.label);
     setEditAmount(String(entry.amount));
     setEditRecurring(entry.isRecurring);
+    setEditTagId(entry.tagId);
   };
 
   const canMoveEntry = (entry: AdditionalEntry) =>
@@ -180,11 +195,17 @@ export function AdditionalEntriesCard({
       const res = await fetch(`/api/months/${monthId}/entries`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, label: newLabel.trim(), amount, isRecurring: newRecurring }),
+        body: JSON.stringify({ type, label: newLabel.trim(), amount, isRecurring: newRecurring, tagId: newTagId }),
       });
       if (!res.ok) return;
-      const entry = await res.json();
-      onEntriesChange(sortAdditionalEntriesDesc([...entries, { ...entry, amount: parseFloat(entry.amount) }]));
+      const raw = await res.json();
+      const entry: AdditionalEntry = {
+        ...raw,
+        amount: parseFloat(raw.amount),
+        tagId: raw.tagId ?? null,
+        tag: resolveTag(raw.tagId ?? null),
+      };
+      onEntriesChange(sortAdditionalEntriesDesc([...entries, entry]));
       closeAddForm();
     } finally {
       setIsAdding(false);
@@ -211,7 +232,7 @@ export function AdditionalEntriesCard({
 
     setSavingId(id);
     try {
-      const body: Record<string, unknown> = { label: editLabel.trim(), amount, isRecurring: editRecurring };
+      const body: Record<string, unknown> = { label: editLabel.trim(), amount, isRecurring: editRecurring, tagId: editTagId };
 
       const res = await fetch(`/api/months/${monthId}/entries/${id}`, {
         method: "PATCH",
@@ -220,7 +241,12 @@ export function AdditionalEntriesCard({
       });
       if (!res.ok) return;
       const updated = await res.json();
-      const updatedEntry: AdditionalEntry = { ...updated, amount: parseFloat(updated.amount) };
+      const updatedEntry: AdditionalEntry = {
+        ...updated,
+        amount: parseFloat(updated.amount),
+        tagId: updated.tagId ?? null,
+        tag: resolveTag(updated.tagId ?? null),
+      };
 
       onEntriesChange(
         sortAdditionalEntriesDesc(
@@ -245,7 +271,12 @@ export function AdditionalEntriesCard({
       });
       if (!res.ok) return;
       const updated = await res.json();
-      const updatedEntry: AdditionalEntry = { ...updated, amount: parseFloat(updated.amount) };
+      const updatedEntry: AdditionalEntry = {
+        ...updated,
+        amount: parseFloat(updated.amount),
+        tagId: updated.tagId ?? null,
+        tag: resolveTag(updated.tagId ?? null),
+      };
 
       onEntriesChange(sortAdditionalEntriesDesc(entries.filter((e) => e.id !== entry.id)));
       onEntryGroupChanged?.(updatedEntry, toGroupId);
@@ -253,6 +284,20 @@ export function AdditionalEntriesCard({
       setMovingToGroupId(null);
     }
   };
+
+  const handleCreateTag = async (name: string, color: string): Promise<Tag> => {
+    const res = await fetch("/api/tags", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, color }),
+    });
+    const tag: Tag = await res.json();
+    setTags((prev) => [...prev, tag]);
+    return tag;
+  };
+
+  const resolveTag = (tagId: number | null): Tag | null =>
+    tagId != null ? (tags.find((t) => t.id === tagId) ?? null) : null;
 
   const handleAddGroup = async () => {
     if (isAddingGroup) return;
@@ -344,6 +389,17 @@ export function AdditionalEntriesCard({
                   if (e.key === "Escape" && !isAdding) closeAddForm();
                 }}
                 autoFocus
+                tagAction={
+                  type === "expense" ? (
+                    <TagPicker
+                      tags={tags}
+                      value={newTagId}
+                      onChange={setNewTagId}
+                      onCreateTag={handleCreateTag}
+                      disabled={isAdding}
+                    />
+                  ) : undefined
+                }
                 recurringAction={
                   <Button
                     size="icon-sm"
@@ -444,6 +500,17 @@ export function AdditionalEntriesCard({
                     if (e.key === "Escape" && savingId !== entry.id) setEditingId(null);
                   }}
                   autoFocus
+                  tagAction={
+                    type === "expense" ? (
+                      <TagPicker
+                        tags={tags}
+                        value={editTagId}
+                        onChange={setEditTagId}
+                        onCreateTag={handleCreateTag}
+                        disabled={savingId === entry.id || movingToGroupId === entry.id}
+                      />
+                    ) : undefined
+                  }
                   recurringAction={
                     <Button
                       size="icon-sm"
@@ -526,6 +593,22 @@ export function AdditionalEntriesCard({
                     <span className="min-w-0 flex-1 truncate text-left text-sm font-medium text-foreground" title={entry.label}>
                       <span className="flex min-w-0 items-center gap-1.5">
                         <span className="truncate">{entry.label}</span>
+                        {entry.tag && TAG_COLORS[entry.tag.color] && (
+                          <span
+                            className="shrink-0 inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-medium leading-none"
+                            style={{
+                              background: TAG_COLORS[entry.tag.color].bg,
+                              borderColor: TAG_COLORS[entry.tag.color].border,
+                              color: TAG_COLORS[entry.tag.color].text,
+                            }}
+                          >
+                            <span
+                              className="h-1.5 w-1.5 rounded-full"
+                              style={{ background: TAG_COLORS[entry.tag.color].text }}
+                            />
+                            {entry.tag.name}
+                          </span>
+                        )}
                         {entry.isRecurring && (
                           <span className="shrink-0 rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium leading-none text-primary">
                             {t("recurringBadge")}
@@ -544,6 +627,22 @@ export function AdditionalEntriesCard({
                     >
                       <span className="flex min-w-0 items-center gap-1.5">
                         <span className="truncate">{entry.label}</span>
+                        {entry.tag && TAG_COLORS[entry.tag.color] && (
+                          <span
+                            className="shrink-0 inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-medium leading-none"
+                            style={{
+                              background: TAG_COLORS[entry.tag.color].bg,
+                              borderColor: TAG_COLORS[entry.tag.color].border,
+                              color: TAG_COLORS[entry.tag.color].text,
+                            }}
+                          >
+                            <span
+                              className="h-1.5 w-1.5 rounded-full"
+                              style={{ background: TAG_COLORS[entry.tag.color].text }}
+                            />
+                            {entry.tag.name}
+                          </span>
+                        )}
                         {entry.isRecurring && (
                           <span className="shrink-0 rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium leading-none text-primary">
                             {t("recurringBadge")}
