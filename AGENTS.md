@@ -114,3 +114,4 @@ When changing any of the features listed below, update the related documentation
 - [Evolution Dashboard](docs/features/evolution-dashboard.md): Multi-year balance, savings, and investment analytics.
 - [Historical Year Imports](docs/features/historical-year-imports.md): Summary-only pre-Gridly annual imports used by Evolution.
 - [Keyboard Shortcuts](docs/features/keyboard-shortcuts.md): Full shortcut reference and implementation notes for the keyboard navigation system.
+- [Tags](docs/features/tags.md): Color-coded tags assignable to ungrouped expense entries, with inline creation.

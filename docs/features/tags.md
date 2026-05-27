@@ -1,0 +1,127 @@
+# Feature: Tags
+
+Users can assign a single tag to any ungrouped additional expense entry. Tags have a name and a color from a fixed 9-color palette, and are global to the user's account — created once, reusable across all years and months.
+
+## Scope
+
+- Tags apply to **ungrouped expense entries only** (not income, not grouped entries).
+- No dedicated tag management page — tags are created inline when assigning.
+- One tag per entry; a tag can be cleared at any time.
+
+## Data Model
+
+### `tags` table (`src/db/schema.ts`)
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | serial PK | |
+| `userId` | text FK → `users.id` | `onDelete: cascade` |
+| `name` | text NOT NULL | User-defined label |
+| `color` | text NOT NULL | Key from the 9-color palette |
+| `createdAt` | timestamp | `defaultNow()` |
+
+### `additionalEntries.tagId`
+
+Nullable integer FK → `tags.id` with `onDelete: set null`. If a tag is ever deleted, affected entries silently lose their tag — entries are never cascade-deleted.
+
+## Color Palette
+
+Nine fixed colors, defined in `src/lib/tags.ts` as `TAG_COLORS` (a record mapping key → `{ bg, border, text }`) and `TAG_COLOR_KEYS` (ordered array). Colors are stored as string keys in the DB and resolved to hex values at render time.
+
+| Key | Hex |
+|---|---|
+| `rose` | #f43f5e |
+| `orange` | #f97316 |
+| `amber` | #eab308 |
+| `emerald` | #10b981 |
+| `cyan` | #06b6d4 |
+| `blue` | #3b82f6 |
+| `violet` | #8b5cf6 |
+| `pink` | #ec4899 |
+| `slate` | #64748b |
+
+The `bg` and `border` values use `rgba` with low opacity so chips look good on any background surface.
+
+## API
+
+### `GET /api/tags`
+
+Returns all tags for the authenticated user as `Tag[]`.
+
+### `POST /api/tags`
+
+Body: `{ name: string; color: string }`. Validates that `name` is non-empty and `color` is a valid palette key (400 otherwise). Returns the created `Tag` with status 201.
+
+### Entry endpoints
+
+Both `POST /api/months/[monthId]/entries` (create) and `PATCH /api/months/[monthId]/entries/[entryId]` (edit) accept an optional `tagId?: number | null`. Sending `tagId: null` explicitly clears the tag. Moving an entry into a group also clears its tag (alongside clearing `isRecurring`).
+
+## Server-Side Data Loading
+
+`src/lib/server/year-data.ts` resolves tags when loading year data: after fetching all entries, it collects the unique non-null `tagId` values, runs a single `inArray` query against the `tags` table, and builds a `Map<number, Tag>`. Each entry's `tag` field is populated from this map (or `null`). No additional client-side fetches are needed for display.
+
+## Component Architecture
+
+### `src/lib/tags.ts`
+
+Exports `TAG_COLORS`, `TAG_COLOR_KEYS`, and the `TagColor` interface. The single source of truth for palette data.
+
+### `src/components/monthly/tag-picker.tsx`
+
+Controlled popover (`@base-ui/react/popover`) with two internal views:
+
+- **List view** — existing tags with checkmarks, a "Sin etiqueta" clear option, and a "+ Nueva etiqueta" link.
+- **Create view** — name text input, 9-color swatch grid, and "Crear y asignar" button. "← Volver" returns to the list without creating. On successful creation the new tag is immediately selected and the popover closes.
+
+The trigger button highlights with `bg-primary/10` when a tag is currently assigned.
+
+### `src/components/monthly/entry-form-row.tsx`
+
+Has an optional `tagAction?: React.ReactNode` slot alongside the existing `recurringAction`. The grid column formula handles 0/1/2/3 extra action columns.
+
+### `src/components/monthly/additional-entries-card.tsx`
+
+- Fetches tags on mount via `GET /api/tags` (skipped in read-only mode and for income entries).
+- Passes a `TagPicker` as `tagAction` to `EntryFormRow` for both the add form and each open edit form (ungrouped expenses only).
+- `handleCreateTag`: calls `POST /api/tags`, appends the new tag to local `tags` state, and returns the `Tag` to `TagPicker`.
+- Includes `tagId` in create and edit payloads; resolves `tag` from local state on the returned entry to avoid a refetch.
+- Renders a tag chip inline in the entry list row, immediately before the "anual" recurring badge:
+
+```tsx
+{entry.tag && TAG_COLORS[entry.tag.color] && (
+  <span
+    className="shrink-0 inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-medium leading-none"
+    style={{
+      background: TAG_COLORS[entry.tag.color].bg,
+      borderColor: TAG_COLORS[entry.tag.color].border,
+      color: TAG_COLORS[entry.tag.color].text,
+    }}
+  >
+    <span className="h-1.5 w-1.5 rounded-full" style={{ background: TAG_COLORS[entry.tag.color].text }} />
+    {entry.tag.name}
+  </span>
+)}
+```
+
+### `src/components/monthly/additional-entry-group-row.tsx`
+
+No changes. Grouped entries do not receive `tagAction`, mirroring the existing behaviour for `recurringAction`.
+
+## i18n Keys
+
+All keys live under `Monthly.additionalEntries` in `messages/es.json` and `messages/en.json`:
+
+| Key | ES | EN |
+|---|---|---|
+| `tagButton` | Asignar etiqueta | Assign tag |
+| `yourTags` | Tus etiquetas | Your tags |
+| `noTag` | Sin etiqueta | No tag |
+| `newTag` | + Nueva etiqueta | + New tag |
+| `tagName` | Nombre... | Name... |
+| `createAndAssign` | Crear y asignar | Create & assign |
+
+## Error Handling
+
+- `POST /api/tags` returns 400 if `name` is empty or `color` is not a valid palette key.
+- If the tags fetch fails on mount, the tag action button is hidden for that session (no hard error shown).
+- Tag assignment is always optional — saving an entry without a tag is valid.
