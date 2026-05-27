@@ -5,7 +5,7 @@ Users can assign a single tag to any ungrouped additional expense entry. Tags ha
 ## Scope
 
 - Tags apply to **expense entries** (not income). Tags on ungrouped entries are assigned per-entry via the inline `TagPicker` on each row. Tags on grouped entries are assigned at the group level — a tag assigned to a group propagates to all its entries automatically, and individual entries inside a group do not have their own tag picker.
-- No dedicated tag management page — tags are created inline when assigning.
+- Tags are created inline when assigning and managed globally from the main Settings page.
 - One tag per entry or group; a tag can be cleared at any time.
 
 ## Data Model
@@ -52,6 +52,14 @@ Returns all tags for the authenticated user as `Tag[]`.
 
 Body: `{ name: string; color: string }`. Validates that `name` is non-empty and `color` is a valid palette key (400 otherwise). Returns the created `Tag` with status 201.
 
+### `PATCH /api/tags/[tagId]`
+
+Body: `{ name: string; color: string }`. Validates that the requester owns the tag, `name` is non-empty, and `color` is a valid palette key. Returns the updated `Tag`.
+
+### `DELETE /api/tags/[tagId]`
+
+Deletes a tag owned by the authenticated user. Existing entries and groups that used the tag become untagged via the database `onDelete: set null` foreign keys; no financial entries or groups are deleted.
+
 ### Entry and Group endpoints
 
 Both `POST /api/months/[monthId]/entries` (create) and `PATCH /api/months/[monthId]/entries/[entryId]` (edit) accept an optional `tagId?: number | null`. Sending `tagId: null` explicitly clears the tag. Moving an entry into a group replaces its tag with the destination group's tag (which may be `null`), alongside clearing `isRecurring`.
@@ -76,6 +84,16 @@ Controlled popover (`@base-ui/react/popover`) with two internal views:
 - **Create view** — name text input, 9-color swatch grid, and "Crear y asignar" button. "← Volver" returns to the list without creating. On successful creation the new tag is immediately selected and the popover closes.
 
 The trigger button highlights with `bg-primary/10` when a tag is currently assigned. The component also accepts an optional `customTrigger?: React.ReactElement` prop to completely override the default tag icon button.
+
+### `src/components/settings/tag-manager-card.tsx`
+
+Settings card for global tag maintenance:
+
+- Fetches all tags from `GET /api/tags`.
+- Keeps editable drafts per row until Save succeeds.
+- Saves name/color changes through `PATCH /api/tags/[tagId]`.
+- Deletes tags through `DELETE /api/tags/[tagId]` after a confirmation that explains existing expenses and groups become untagged.
+- Shows localized loading, empty, and error states without blocking the rest of Settings.
 
 ### `src/components/monthly/entry-form-row.tsx`
 
@@ -110,8 +128,29 @@ All keys live under `Monthly.additionalEntries` in `messages/es.json` and `messa
 | `tagName` | Nombre... | Name... |
 | `createAndAssign` | Crear y asignar | Create & assign |
 
+All Settings tag-management keys live under `Settings.tags` in `messages/es.json` and `messages/en.json`:
+
+| Key | Purpose |
+|---|---|
+| `title` | Card title |
+| `description` | Card description |
+| `count` | Tag count badge |
+| `loading` | Loading state |
+| `empty` | Empty state |
+| `nameLabel` | Name input label |
+| `colorLabel` | Color swatch group label |
+| `save` / `saving` | Save action states |
+| `delete` / `deleting` | Delete action states |
+| `cancel` | Delete dialog cancel action |
+| `deleteTag` | Delete button accessible label |
+| `selectColor` | Color button accessible label |
+| `deleteConfirmTitle` | Delete dialog title |
+| `deleteConfirmDescription` | Delete dialog impact text |
+| `loadError` / `saveError` / `deleteError` | Error states |
+
 ## Error Handling
 
 - `POST /api/tags` returns 400 if `name` is empty or `color` is not a valid palette key.
 - If the tags fetch fails on mount, the tag action button is hidden for that session (no hard error shown).
 - Tag assignment is always optional — saving an entry without a tag is valid.
+- Settings tag management shows explicit localized errors for failed loading, saving, and deletion. Save is disabled for unchanged rows and blank names; API validation remains authoritative.
