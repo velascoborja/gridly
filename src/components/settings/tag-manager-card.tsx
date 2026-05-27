@@ -159,12 +159,12 @@ export function TagManagerCard() {
   }
 
   return (
-    <Card className="border-primary/20 bg-background/95 shadow-sm shadow-primary/5">
-      <CardHeader className="gap-3 border-b border-border/60 bg-primary/[0.03]">
+    <Card className="gap-0 border-primary/20 bg-primary/[0.03] py-0 shadow-[0_30px_45px_-30px_rgba(50,50,93,0.25),0_18px_36px_-24px_rgba(0,0,0,0.1)]">
+      <CardHeader className="relative z-10 gap-3 border-b border-border/60 pt-5 shadow-[0_18px_30px_-24px_rgba(50,50,93,0.45)]">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
-              <span className="flex size-8 items-center justify-center rounded-lg border border-primary/15 bg-primary/10 text-primary">
+              <span className="flex size-8 items-center justify-center rounded-lg border border-[#b9b9f9] bg-[#dbe8ff] text-primary">
                 <TagIcon className="size-4" />
               </span>
               <CardTitle>{t("title")}</CardTitle>
@@ -178,7 +178,7 @@ export function TagManagerCard() {
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4 pt-5">
+      <CardContent className="space-y-4 bg-background/95 pt-5 pb-5">
         {loadError ? (
           <div className="flex items-start gap-2 rounded-lg border border-destructive/20 bg-destructive/[0.04] p-3 text-sm text-destructive" role="alert">
             <AlertCircle className="mt-0.5 size-4 shrink-0" />
@@ -216,9 +216,9 @@ export function TagManagerCard() {
               return (
                 <div
                   key={tag.id}
-                  className="grid gap-3 rounded-xl border border-border/70 bg-background p-3 shadow-sm transition-shadow hover:shadow-md sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+                  className="grid gap-2 rounded-xl border border-border/70 bg-background p-3 shadow-sm transition-shadow hover:shadow-md sm:grid-cols-[minmax(7rem,12rem)_1fr_auto] sm:items-center"
                 >
-                  <div className="min-w-0 space-y-3">
+                  <div className="min-w-0">
                     <label className="sr-only" htmlFor={`tag-name-${tag.id}`}>
                       {t("nameLabel")}
                     </label>
@@ -228,25 +228,26 @@ export function TagManagerCard() {
                       onChange={(event) => updateDraft(tag.id, { name: event.target.value })}
                       disabled={isRowPending}
                       aria-invalid={draft ? draft.name.trim().length === 0 : false}
-                      className="h-10 rounded-lg bg-background text-sm font-medium"
+                      className="h-9 rounded-lg bg-background text-sm font-medium"
                     />
-                    <div className="flex flex-wrap gap-2" aria-label={t("colorLabel")}>
-                      {TAG_COLOR_KEYS.map((colorKey) => (
-                        <button
-                          key={colorKey}
-                          type="button"
-                          className={cn(
-                            "size-6 rounded-full border-2 shadow-sm transition-all hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                            draft?.color === colorKey ? "border-foreground" : "border-transparent"
-                          )}
-                          style={{ background: TAG_COLORS[colorKey].text }}
-                          onClick={() => updateDraft(tag.id, { color: colorKey })}
-                          disabled={isRowPending}
-                          aria-label={t("selectColor", { color: colorKey })}
-                          aria-pressed={draft?.color === colorKey}
-                        />
-                      ))}
-                    </div>
+                  </div>
+
+                  <div className="flex flex-nowrap items-center justify-center gap-1" aria-label={t("colorLabel")}>
+                    {TAG_COLOR_KEYS.map((colorKey) => (
+                      <button
+                        key={colorKey}
+                        type="button"
+                        className={cn(
+                          "size-3.5 rounded-full border-2 shadow-sm transition-all hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                          draft?.color === colorKey ? "border-foreground" : "border-transparent"
+                        )}
+                        style={{ background: TAG_COLORS[colorKey].text }}
+                        onClick={() => updateDraft(tag.id, { color: colorKey })}
+                        disabled={isRowPending}
+                        aria-label={t("selectColor", { color: colorKey })}
+                        aria-pressed={draft?.color === colorKey}
+                      />
+                    ))}
                   </div>
 
                   <div className="flex items-center justify-end gap-2">
@@ -256,7 +257,7 @@ export function TagManagerCard() {
                       onClick={() => void handleSave(tag)}
                       disabled={!canSave}
                       aria-busy={isSaving}
-                      className="min-w-24 gap-2"
+                      className="min-w-20 gap-1.5"
                     >
                       {isSaving ? <Loader2 className="size-3.5 animate-spin" /> : <Save className="size-3.5" />}
                       {isSaving ? t("saving") : t("save")}

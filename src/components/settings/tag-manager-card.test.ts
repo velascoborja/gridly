@@ -45,3 +45,27 @@ test("TagManagerCard translations exist in Spanish and English", () => {
   assert.match(esMessages, /"deleteConfirmDescription":/);
   assert.match(enMessages, /"deleteConfirmDescription":/);
 });
+
+test("TagManagerCard uses elevated card and header shadow treatments", () => {
+  assert.match(source, /<Card className="[^"]*gap-0[^"]*bg-primary\/\[0\.03\][^"]*py-0/);
+  assert.match(source, /shadow-\[0_30px_45px_-30px_rgba\(50,50,93,0\.25\),0_18px_36px_-24px_rgba\(0,0,0,0\.1\)\]/);
+  assert.match(source, /CardHeader className="[^"]*pt-5/);
+  assert.match(source, /CardHeader className="[^"]*relative[^"]*z-10[^"]*shadow-\[0_18px_30px_-24px_rgba\(50,50,93,0\.45\)\]/);
+  assert.doesNotMatch(source, /CardHeader className="[^"]*bg-primary\/\[0\.03\]/);
+  assert.match(source, /CardContent className="[^"]*bg-background\/95[^"]*pb-5/);
+});
+
+test("TagManagerCard icon badge avoids a pale seam inside the border", () => {
+  assert.match(source, /border-\[#b9b9f9\] bg-\[#dbe8ff\]/);
+  assert.doesNotMatch(source, /border-primary\/15 bg-primary\/10/);
+});
+
+test("TagManagerCard rows use compact single-line controls on desktop", () => {
+  assert.match(source, /sm:grid-cols-\[minmax\(7rem,12rem\)_1fr_auto\]/);
+  assert.match(source, /className="h-9 rounded-lg/);
+  assert.match(source, /className="flex flex-nowrap items-center justify-center gap-1"/);
+  assert.match(source, /"size-3\.5 rounded-full/);
+  assert.match(source, /className="min-w-20 gap-1\.5/);
+  assert.doesNotMatch(source, /<div className="min-w-0 space-y-3">/);
+  assert.doesNotMatch(source, /className="flex flex-wrap gap-1\.5"/);
+});
