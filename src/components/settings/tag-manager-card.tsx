@@ -216,9 +216,9 @@ export function TagManagerCard() {
               return (
                 <div
                   key={tag.id}
-                  className="grid gap-2 rounded-xl border border-border/70 bg-background p-3 shadow-sm transition-shadow hover:shadow-md sm:grid-cols-[minmax(7rem,12rem)_1fr_auto] sm:items-center"
+                  className="grid gap-3 rounded-xl border border-border/70 bg-background p-3 shadow-sm transition-shadow hover:shadow-md sm:grid-cols-[minmax(7rem,12rem)_1fr_auto] sm:items-center sm:gap-2"
                 >
-                  <div className="min-w-0">
+                  <div className="min-w-0 sm:max-w-48">
                     <label className="sr-only" htmlFor={`tag-name-${tag.id}`}>
                       {t("nameLabel")}
                     </label>
@@ -232,7 +232,7 @@ export function TagManagerCard() {
                     />
                   </div>
 
-                  <div className="flex flex-nowrap items-center justify-center gap-1" aria-label={t("colorLabel")}>
+                  <div className="flex flex-nowrap items-center justify-center gap-1.5 sm:gap-1" aria-label={t("colorLabel")}>
                     {TAG_COLOR_KEYS.map((colorKey) => (
                       <button
                         key={colorKey}
@@ -250,14 +250,14 @@ export function TagManagerCard() {
                     ))}
                   </div>
 
-                  <div className="flex items-center justify-end gap-2">
+                  <div className="flex items-center gap-2 sm:justify-end">
                     <Button
                       type="button"
                       size="sm"
                       onClick={() => void handleSave(tag)}
                       disabled={!canSave}
                       aria-busy={isSaving}
-                      className="min-w-20 gap-1.5"
+                      className="min-w-0 flex-1 gap-1.5 sm:min-w-20 sm:flex-none"
                     >
                       {isSaving ? <Loader2 className="size-3.5 animate-spin" /> : <Save className="size-3.5" />}
                       {isSaving ? t("saving") : t("save")}

@@ -63,9 +63,20 @@ test("TagManagerCard icon badge avoids a pale seam inside the border", () => {
 test("TagManagerCard rows use compact single-line controls on desktop", () => {
   assert.match(source, /sm:grid-cols-\[minmax\(7rem,12rem\)_1fr_auto\]/);
   assert.match(source, /className="h-9 rounded-lg/);
-  assert.match(source, /className="flex flex-nowrap items-center justify-center gap-1"/);
+  assert.match(source, /className="flex flex-nowrap items-center justify-center gap-1\.5 sm:gap-1"/);
   assert.match(source, /"size-3\.5 rounded-full/);
-  assert.match(source, /className="min-w-20 gap-1\.5/);
+  assert.match(source, /sm:min-w-20 sm:flex-none/);
   assert.doesNotMatch(source, /<div className="min-w-0 space-y-3">/);
   assert.doesNotMatch(source, /className="flex flex-wrap gap-1\.5"/);
+});
+
+test("TagManagerCard rows use a tightened stacked layout on mobile", () => {
+  assert.match(
+    source,
+    /className="grid gap-3 rounded-xl border border-border\/70 bg-background p-3 shadow-sm transition-shadow hover:shadow-md sm:grid-cols-\[minmax\(7rem,12rem\)_1fr_auto\] sm:items-center sm:gap-2"/
+  );
+  assert.match(source, /<div className="min-w-0 sm:max-w-48">/);
+  assert.match(source, /className="flex flex-nowrap items-center justify-center gap-1\.5 sm:gap-1"/);
+  assert.match(source, /className="flex items-center gap-2 sm:justify-end"/);
+  assert.match(source, /className="min-w-0 flex-1 gap-1\.5 sm:min-w-20 sm:flex-none"/);
 });
