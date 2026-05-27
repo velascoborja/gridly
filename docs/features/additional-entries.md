@@ -63,7 +63,7 @@ Users can group related additional expenses within a month (e.g., "Viaje a Roma"
 
 ## Recurring Entries
 
-Any **ungrouped** additional entry (income or expense) can be marked as recurring. When the next year is created, all recurring entries from the previous year are automatically copied into the same month number in the new year, preserving label, amount, type, and `isRecurring = true`.
+Any **ungrouped** additional entry (income or expense) can be marked as recurring. When the next year is created, all recurring entries from the previous year are automatically copied into the same month number in the new year, preserving label, amount, type, `isRecurring = true`, and `tagId` (so any assigned tag carries over too).
 
 - **Toggle:** A repeat-icon button in the add/edit form marks or unmarks an entry as recurring. The button is not shown for entries inside expense groups (`AdditionalEntryGroupRow` does not pass `recurringAction` to `EntryFormRow`).
 - **Visual indicator:** Recurring entries show an "anual" pill badge after their label in the list view.

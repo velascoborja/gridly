@@ -179,6 +179,7 @@ export async function createAndPrefillYear(data: {
             amount: e.amount,
             isRecurring: true,
             groupId: null,
+            tagId: e.tagId,
           }));
 
         if (entriesToInsert.length > 0) {

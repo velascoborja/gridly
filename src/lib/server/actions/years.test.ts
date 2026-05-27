@@ -15,3 +15,7 @@ test("createAndPrefillYear filters out grouped entries using isNull", () => {
 test("createAndPrefillYear looks up the previous year by data.year - 1", () => {
   assert.match(source, /data\.year - 1/);
 });
+
+test("createAndPrefillYear carries tagId when copying recurring entries", () => {
+  assert.match(source, /tagId: e\.tagId/);
+});
