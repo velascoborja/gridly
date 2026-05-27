@@ -272,6 +272,12 @@ test("additional expense group moves use a compact edit-row menu instead of sele
   assert.match(enMessages, /"moveToGroup": "Move to group"/);
 });
 
+test("additional expense group header keeps trailing controls tighter on mobile", () => {
+  const groupRowSource = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");
+
+  assert.match(groupRowSource, /"flex cursor-pointer select-none items-center gap-1 px-2\.5 py-2 sm:gap-2"/);
+});
+
 test("additional expense group delete loading action fits the compact dialog footer", () => {
   const groupRowSource = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");
 

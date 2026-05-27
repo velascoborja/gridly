@@ -69,6 +69,7 @@ Two tables are involved:
 
 ### Setting a group tag
 - The group header shows a tag icon button (a `TagPicker`) between the entry count and the total amount.
+- On mobile, the group header uses tighter spacing between trailing controls so longer group names keep more horizontal room.
 - When a tag is assigned, a colored chip is also shown in the header.
 - Selecting a tag sends `PATCH /api/months/[monthId]/entry-groups/[groupId]` with `{ label, tagId }` and batch-updates all entries in the group to the same tag.
 - New entries added to the group automatically receive the group's tag.

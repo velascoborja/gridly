@@ -679,7 +679,7 @@ export function MonthOverview({
           <div ref={fixedEditorsInnerRef} className="overflow-hidden pb-6">
             <div
               className={cn(
-                "grid gap-4 pt-1 pb-0.5 transition-[opacity,transform,filter] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] sm:grid-cols-2",
+                "grid gap-4 pt-1 pb-0.5 transition-[opacity,transform,filter] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] md:grid-cols-2",
                 fixedEditorsVisible
                   ? "opacity-100 translate-y-0 blur-0"
                   : "opacity-0 translate-y-1.5 blur-[2px]"
@@ -705,7 +705,7 @@ export function MonthOverview({
         </div>
       ) : null}
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2">
         <AdditionalEntriesCard
           monthId={month.id}
           type="expense"

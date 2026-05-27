@@ -269,7 +269,7 @@ export function AdditionalEntryGroupRow({
       {/* Group header */}
       <div
         className={cn(
-          "flex cursor-pointer select-none items-center gap-2 px-2.5 py-2",
+          "flex cursor-pointer select-none items-center gap-1 px-2.5 py-2 sm:gap-2",
           !readOnly && "hover:bg-primary/[0.05]"
         )}
         onClick={handleToggle}
