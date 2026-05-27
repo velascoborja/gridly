@@ -155,3 +155,33 @@ All Settings tag-management keys live under `Settings.tags` in `messages/es.json
 - If the tags fetch fails on mount, the tag action button is hidden for that session (no hard error shown).
 - Tag assignment is always optional — saving an entry without a tag is valid.
 - Settings tag management shows explicit localized errors for failed loading, saving, and deletion. Save is disabled for unchanged rows and blank names; API validation remains authoritative.
+
+## Categorías View
+
+A dedicated "Categorías" tab in the in-year navigation aggregates additional expense spending by tag for the selected year. Accessible at `/{locale}/{year}/categories`.
+
+### Placement
+
+The tab appears in the same pill row as "Meses", "Año", and "Evolución". It is disabled for historical years (same as Meses and Año). Switching the year selector while on the Categorías tab navigates to the same tab for the new year.
+
+### Computation
+
+`computeTagStats(yearData: YearData): TagStats` in `src/lib/tag-stats.ts` derives all stats from the already-loaded `YearData` — no additional API calls.
+
+- **Ungrouped expenses:** each entry's `tagId` (or `null` for untagged) determines its bucket.
+- **Grouped expenses:** all entries inside a group are attributed to the group's `tagId`. Each entry appears in the drilldown with `groupName` set to the group's label. Group entries are **not** double-counted against their parent group total.
+- Results are sorted by `totalAmount` descending. The untagged bucket (if any) is always last.
+- `shareOfTotal` = `bucket.totalAmount / totalAdditional` where `totalAdditional` includes both tagged and untagged entries.
+- Progress bar width is relative to the top tag's amount (so the widest bar is always 100%).
+
+### Components
+
+| Component | File | Role |
+|---|---|---|
+| `CategoriesView` | `src/components/annual/categories-view.tsx` | Tab content — header strip + ranked tag rows |
+| `TagStatRow` | `src/components/annual/tag-stat-row.tsx` | Collapsible row with progress bar; expands to show entries |
+| `DrilldownList` | `src/components/annual/drilldown-list.tsx` | Chronological list of individual entries for an expanded tag |
+
+### i18n
+
+All keys live under `Annual.categories` in `messages/es.json` and `messages/en.json`. The nav tab label is `Nav.categories`.
