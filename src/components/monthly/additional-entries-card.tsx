@@ -470,6 +470,8 @@ export function AdditionalEntriesCard({
                 highlightId={highlightId}
                 collapsed={groupCollapsedState[group.id] ?? true}
                 onCollapsedChange={(v) => setGroupCollapsedState(prev => ({ ...prev, [group.id]: v }))}
+                tags={tags}
+                onCreateTag={handleCreateTag}
               />
             ))}
           </div>
