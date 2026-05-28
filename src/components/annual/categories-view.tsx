@@ -30,7 +30,7 @@ export function CategoriesView({ yearData }: Props) {
   const maxAmount = stats[0]?.totalAmount ?? 0;
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-6">
+    <div className="mx-auto max-w-2xl px-4 py-4">
       <p className="mb-4 text-xs text-muted-foreground">
         {t("totalLabel")}{" "}
         <strong className="text-foreground">{formatCurrency(totalAdditional, locale)}</strong>
