@@ -83,6 +83,10 @@ Both `POST /api/months/[monthId]/entries` (create) and `PATCH /api/months/[month
 
 The UI always shows a confirmation dialog before applying a tag change on a recurring expense, informing the user that the change will affect the entire year's series.
 
+### Annual recurring expense endpoint
+
+`PUT /api/years/[year]/recurring-expenses` replaces the recurring expense template list and rewrites monthly copies from the selected `applyFromMonth` through December. Before deleting existing templates, the route records a `label -> tagId` map and reapplies matching tags to recreated templates. Newly inserted monthly copies inherit the recreated template's `tagId`.
+
 ## Server-Side Data Loading
 
 `src/lib/server/year-data.ts` resolves tags when loading year data: after fetching all entries, groups, and recurring expenses, it collects the unique non-null `tagId` values from all three sources into a single `usedTagIds` set, runs a single `inArray` query against the `tags` table, and builds a `Map<number, Tag>`. Each entry, group, and recurring expense's `tag` field is populated from this map via `resolveTag` (or `null`). No additional client-side fetches are needed for display.
@@ -177,6 +181,8 @@ All Settings tag-management keys live under `Settings.tags` in `messages/es.json
 
 A dedicated "Categorías" tab in the in-year navigation aggregates additional expense spending by tag for the selected year. Accessible at `/{locale}/{year}/categories`.
 
+The same single-year breakdown is also available from the Annual summary KPI header via the Tags icon button. That button opens a dialog containing `CategoriesView` without leaving the current annual screen.
+
 ### Placement
 
 The tab appears in the same pill row as "Meses", "Año", and "Evolución". It is disabled for historical years (same as Meses and Año). Switching the year selector while on the Categorías tab navigates to the same tab for the new year.
@@ -202,7 +208,7 @@ The tab appears in the same pill row as "Meses", "Año", and "Evolución". It is
 
 ### i18n
 
-All keys live under `Annual.categories` in `messages/es.json` and `messages/en.json`. The nav tab label is `Nav.categories`.
+All category-view copy lives under `Annual.categories` in `messages/es.json` and `messages/en.json`. The nav tab label is `Nav.categories`. The annual summary dialog button and title use `Annual.categoriesButton` and `Annual.categoriesTitle`.
 
 ## Evolution Tags Dialog
 
