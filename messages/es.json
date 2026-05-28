@@ -298,7 +298,10 @@
       "confirmDeleteTitle": "¿Eliminar gasto recurrente?",
       "confirmDeleteDescription": "Se eliminará \"{label}\" de este mes. Esta acción no se puede deshacer.",
       "confirmDeleteAction": "Eliminar",
-      "deleting": "Eliminando..."
+      "deleting": "Eliminando...",
+      "tagConfirmTitle": "Aplicar etiqueta a toda la serie",
+      "tagConfirmDescription": "Esta etiqueta se asignará a «{label}» en todos los meses del año. ¿Quieres guardar el cambio?",
+      "tagConfirmAction": "Aplicar a todo el año"
     }
   },
   "Landing": {
