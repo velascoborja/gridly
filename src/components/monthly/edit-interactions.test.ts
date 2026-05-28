@@ -276,7 +276,7 @@ test("additional expense group header keeps trailing controls tighter on mobile"
   const groupRowSource = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");
 
   assert.match(groupRowSource, /"flex cursor-pointer select-none items-center gap-1 px-2\.5 py-1\.5 sm:gap-2"/);
-  assert.match(groupRowSource, /className="flex shrink-0 items-center gap-1 min-h-8"/);
+  assert.match(groupRowSource, /className="flex shrink-0 items-center gap-1 h-9"/);
 });
 
 test("additional expense group delete loading action fits the compact dialog footer", () => {

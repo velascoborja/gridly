@@ -483,8 +483,9 @@ export function AdditionalEntriesCard({
               {t("noEntries")}
             </div>
           )}
-          {sortedEntries.map((entry) =>
-            !readOnly && editingId === entry.id ? (
+          {sortedEntries.map((entry) => {
+            const displayTag = resolveTag(entry.tagId) ?? entry.tag;
+            return !readOnly && editingId === entry.id ? (
               <div key={entry.id} className="rounded-xl border border-border/70 bg-muted/20 p-1.5">
                 <EntryFormRow
                   labelValue={editLabel}
@@ -596,25 +597,25 @@ export function AdditionalEntriesCard({
                     <span className="min-w-0 flex-1 truncate text-left text-sm font-medium text-foreground" title={entry.label}>
                       <span className="flex min-w-0 items-center gap-1.5">
                         <span className="truncate">{entry.label}</span>
-                        {entry.tag && TAG_COLORS[entry.tag.color] && (
+                        {displayTag && TAG_COLORS[displayTag.color] && (
                           <span
                             className="shrink-0 inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-medium leading-none"
                             style={{
-                              background: TAG_COLORS[entry.tag.color].bg,
-                              borderColor: TAG_COLORS[entry.tag.color].border,
-                              color: TAG_COLORS[entry.tag.color].text,
+                              background: TAG_COLORS[displayTag.color].bg,
+                              borderColor: TAG_COLORS[displayTag.color].border,
+                              color: TAG_COLORS[displayTag.color].text,
                             }}
                           >
                             <span
                               className="h-1.5 w-1.5 rounded-full"
-                              style={{ background: TAG_COLORS[entry.tag.color].text }}
+                              style={{ background: TAG_COLORS[displayTag.color].text }}
                             />
-                            {entry.tag.name}
+                            <span className="hidden sm:inline">{displayTag.name}</span>
                           </span>
                         )}
                         {entry.isRecurring && (
                           <>
-                            {entry.tag && (
+                            {displayTag && (
                               <span
                                 className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary sm:hidden"
                                 title={t("recurringBadge")}
@@ -622,7 +623,7 @@ export function AdditionalEntriesCard({
                             )}
                             <span className={cn(
                               "shrink-0 rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium leading-none text-primary",
-                              entry.tag && "hidden sm:inline-block"
+                              displayTag && "hidden sm:inline-block"
                             )}>
                               {t("recurringBadge")}
                             </span>
@@ -641,25 +642,25 @@ export function AdditionalEntriesCard({
                     >
                       <span className="flex min-w-0 items-center gap-1.5">
                         <span className="truncate">{entry.label}</span>
-                        {entry.tag && TAG_COLORS[entry.tag.color] && (
+                        {displayTag && TAG_COLORS[displayTag.color] && (
                           <span
                             className="shrink-0 inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-medium leading-none"
                             style={{
-                              background: TAG_COLORS[entry.tag.color].bg,
-                              borderColor: TAG_COLORS[entry.tag.color].border,
-                              color: TAG_COLORS[entry.tag.color].text,
+                              background: TAG_COLORS[displayTag.color].bg,
+                              borderColor: TAG_COLORS[displayTag.color].border,
+                              color: TAG_COLORS[displayTag.color].text,
                             }}
                           >
                             <span
                               className="h-1.5 w-1.5 rounded-full"
-                              style={{ background: TAG_COLORS[entry.tag.color].text }}
+                              style={{ background: TAG_COLORS[displayTag.color].text }}
                             />
-                            {entry.tag.name}
+                            <span className="hidden sm:inline">{displayTag.name}</span>
                           </span>
                         )}
                         {entry.isRecurring && (
                           <>
-                            {entry.tag && (
+                            {displayTag && (
                               <span
                                 className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary sm:hidden"
                                 title={t("recurringBadge")}
@@ -667,7 +668,7 @@ export function AdditionalEntriesCard({
                             )}
                             <span className={cn(
                               "shrink-0 rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium leading-none text-primary",
-                              entry.tag && "hidden sm:inline-block"
+                              displayTag && "hidden sm:inline-block"
                             )}>
                               {t("recurringBadge")}
                             </span>
@@ -727,8 +728,8 @@ export function AdditionalEntriesCard({
                   </div>
                 </div>
               </div>
-            )
-          )}
+            );
+          })}
         </div>
       </CardContent>
     </Card>

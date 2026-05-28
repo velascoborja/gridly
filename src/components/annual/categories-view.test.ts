@@ -31,7 +31,8 @@ test("TagStatRow expands to show DrilldownList when clicked", () => {
   assert.match(source, /DrilldownList/);
   assert.match(source, /isOpen/);
   assert.match(source, /aria-expanded=\{isOpen\}/);
-  assert.match(source, /isOpen && <DrilldownList/);
+  assert.match(source, /isOpen \? "grid-rows-\[1fr\]" : "grid-rows-\[0fr\]"/);
+  assert.match(source, /<DrilldownList/);
 });
 
 test("TagStatRow uses TAG_COLORS for the dot and progress bar", () => {

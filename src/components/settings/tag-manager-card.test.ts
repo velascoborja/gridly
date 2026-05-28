@@ -88,19 +88,19 @@ test("TagManagerCard rows show mobile input, color button, save, and delete in o
   );
   assert.match(
     source,
-    /className="grid gap-3 rounded-xl border border-border\/70 bg-background p-3 shadow-sm transition-shadow hover:shadow-md sm:grid-cols-\[minmax\(7rem,12rem\)_1fr_auto\] sm:items-center sm:gap-2"/
+    /cn\(\s*"grid rounded-xl border border-border\/70 bg-background p-3 shadow-sm transition-shadow hover:shadow-md sm:grid-cols-\[minmax\(7rem,12rem\)_1fr_auto\] sm:items-center sm:gap-2"/
   );
+  assert.match(source, /expandedColorTagId === tag\.id && "gap-3"/);
   assert.match(source, /<div className="flex min-w-0 items-center gap-2 sm:max-w-48">/);
   assert.match(source, /setExpandedColorTagId\(\(current\) => \(current === tag\.id \? null : tag\.id\)\)/);
   assert.match(source, /style=\{\{ borderColor: TAG_COLORS\[draft\?\.color \?\? tag\.color\]\.text \}\}/);
   assert.match(source, /style=\{\{ background: TAG_COLORS\[draft\?\.color \?\? tag\.color\]\.text \}\}/);
   assert.match(source, /className="size-9 p-0 sm:hidden"/);
   assert.match(source, /className="sm:hidden"/);
-  assert.match(
-    source,
-    /"flex flex-nowrap items-center justify-center gap-1\.5 overflow-hidden transition-\[max-height,opacity,transform\] duration-200 ease-out sm:gap-1 sm:overflow-visible sm:transition-none"/
-  );
-  assert.match(source, /expandedColorTagId === tag\.id\s+\? "max-h-10 opacity-100 translate-y-0"\s+: "max-h-0 opacity-0 -translate-y-1 sm:max-h-none sm:opacity-100 sm:translate-y-0"/);
+  assert.match(source, /grid transition-\[grid-template-rows\]/);
+  assert.match(source, /expandedColorTagId === tag\.id \? "grid-rows-\[1fr\]" : "grid-rows-\[0fr\]"/);
+  assert.match(source, /overflow-hidden transition-opacity/);
+  assert.match(source, /"flex flex-nowrap items-center justify-center gap-1\.5 py-1 sm:gap-1 sm:py-0"/);
   assert.match(source, /setExpandedColorTagId\(null\)/);
   assert.doesNotMatch(source, /overflow-x-auto/);
 });

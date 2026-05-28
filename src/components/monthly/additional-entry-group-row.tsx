@@ -264,6 +264,8 @@ export function AdditionalEntryGroupRow({
     }
   };
 
+  const displayGroupTag = tags.find((t) => t.id === group.tagId) ?? group.tag;
+
   return (
     <div className="overflow-hidden rounded-xl border border-primary/20 bg-primary/[0.03]">
       {/* Group header */}
@@ -326,14 +328,14 @@ export function AdditionalEntryGroupRow({
               disabled={isSavingTag}
               isLoading={isSavingTag}
               customTrigger={
-                group.tag && TAG_COLORS[group.tag.color] ? (
+                displayGroupTag && TAG_COLORS[displayGroupTag.color] ? (
                   <button
                     type="button"
                     className="inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-medium leading-none transition-colors hover:opacity-80 disabled:opacity-50"
                     style={{
-                      background: TAG_COLORS[group.tag.color].bg,
-                      borderColor: TAG_COLORS[group.tag.color].border,
-                      color: TAG_COLORS[group.tag.color].text,
+                      background: TAG_COLORS[displayGroupTag.color].bg,
+                      borderColor: TAG_COLORS[displayGroupTag.color].border,
+                      color: TAG_COLORS[displayGroupTag.color].text,
                     }}
                     disabled={isSavingTag}
                   >
@@ -342,10 +344,10 @@ export function AdditionalEntryGroupRow({
                     ) : (
                       <span
                         className="h-1.5 w-1.5 rounded-full"
-                        style={{ background: TAG_COLORS[group.tag.color].text }}
+                        style={{ background: TAG_COLORS[displayGroupTag.color].text }}
                       />
                     )}
-                    {group.tag.name}
+                    <span className="hidden sm:inline">{displayGroupTag.name}</span>
                   </button>
                 ) : undefined
               }

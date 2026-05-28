@@ -216,7 +216,10 @@ export function TagManagerCard() {
               return (
                 <div
                   key={tag.id}
-                  className="grid gap-3 rounded-xl border border-border/70 bg-background p-3 shadow-sm transition-shadow hover:shadow-md sm:grid-cols-[minmax(7rem,12rem)_1fr_auto] sm:items-center sm:gap-2"
+                  className={cn(
+                    "grid rounded-xl border border-border/70 bg-background p-3 shadow-sm transition-shadow hover:shadow-md sm:grid-cols-[minmax(7rem,12rem)_1fr_auto] sm:items-center sm:gap-2",
+                    expandedColorTagId === tag.id && "gap-3"
+                  )}
                 >
                   <div className="flex min-w-0 items-center gap-2 sm:max-w-48">
                     <label className="sr-only" htmlFor={`tag-name-${tag.id}`}>
@@ -274,31 +277,38 @@ export function TagManagerCard() {
 
                   <div
                     className={cn(
-                      "flex flex-nowrap items-center justify-center gap-1.5 overflow-hidden transition-[max-height,opacity,transform] duration-200 ease-out sm:gap-1 sm:overflow-visible sm:transition-none",
-                      expandedColorTagId === tag.id
-                        ? "max-h-10 opacity-100 translate-y-0"
-                        : "max-h-0 opacity-0 -translate-y-1 sm:max-h-none sm:opacity-100 sm:translate-y-0"
+                      "grid transition-[grid-template-rows] duration-200 ease-in-out sm:block",
+                      expandedColorTagId === tag.id ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
                     )}
                     aria-label={t("colorLabel")}
                   >
-                    {TAG_COLOR_KEYS.map((colorKey) => (
-                      <button
-                        key={colorKey}
-                        type="button"
-                        className={cn(
-                          "size-3.5 rounded-full border-2 shadow-sm transition-all hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                          draft?.color === colorKey ? "border-foreground" : "border-transparent"
-                        )}
-                        style={{ background: TAG_COLORS[colorKey].text }}
-                        onClick={() => {
-                          updateDraft(tag.id, { color: colorKey });
-                          setExpandedColorTagId(null);
-                        }}
-                        disabled={isRowPending}
-                        aria-label={t("selectColor", { color: colorKey })}
-                        aria-pressed={draft?.color === colorKey}
-                      />
-                    ))}
+                    <div
+                      className={cn(
+                        "overflow-hidden transition-opacity duration-200 ease-in-out sm:overflow-visible",
+                        expandedColorTagId === tag.id ? "opacity-100" : "opacity-0 sm:opacity-100"
+                      )}
+                    >
+                      <div className="flex flex-nowrap items-center justify-center gap-1.5 py-1 sm:gap-1 sm:py-0">
+                        {TAG_COLOR_KEYS.map((colorKey) => (
+                          <button
+                            key={colorKey}
+                            type="button"
+                            className={cn(
+                              "size-3.5 rounded-full border-2 shadow-sm transition-all hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                              draft?.color === colorKey ? "border-foreground" : "border-transparent"
+                            )}
+                            style={{ background: TAG_COLORS[colorKey].text }}
+                            onClick={() => {
+                              updateDraft(tag.id, { color: colorKey });
+                              setExpandedColorTagId(null);
+                            }}
+                            disabled={isRowPending}
+                            aria-label={t("selectColor", { color: colorKey })}
+                            aria-pressed={draft?.color === colorKey}
+                          />
+                        ))}
+                      </div>
+                    </div>
                   </div>
 
                   <div className="hidden items-center justify-end gap-2 sm:flex">
