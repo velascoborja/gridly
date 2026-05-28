@@ -119,3 +119,20 @@ test("evolution categories button and dialog title keys exist in both locales", 
   assert.equal(spanish.Evolution.categoriesTitle, "Categorías (todos los años)");
   assert.equal(english.Evolution.categoriesTitle, "Categories (all years)");
 });
+
+test("evolution dashboard accepts multiYearTagStats prop and renders Tags button with dialog", () => {
+  const source = readFileSync(new URL("./evolution-dashboard.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /multiYearTagStats/);
+  assert.match(source, /TagStatRow/);
+  assert.match(source, /Tags/);
+  assert.match(source, /t\("categoriesButton"\)/);
+  assert.match(source, /t\("categoriesTitle"\)/);
+});
+
+test("evolution dashboard only shows tags button when multiYearTagStats has entries", () => {
+  const source = readFileSync(new URL("./evolution-dashboard.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /hasTagData/);
+  assert.match(source, /stats\.length > 0/);
+});

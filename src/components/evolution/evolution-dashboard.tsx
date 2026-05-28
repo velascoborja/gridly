@@ -2,12 +2,21 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Tags } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { calcEstimatedPortfolioValues, summarizeEvolutionMetrics, type EvolutionYearMetric } from "@/lib/evolution";
 import type { HistoricalYear } from "@/lib/types";
+import type { TagStats } from "@/lib/tag-stats";
 import { formatCurrency } from "@/lib/utils";
+import { TagStatRow } from "@/components/annual/tag-stat-row";
 import { EvolutionCharts } from "./evolution-charts";
 import { EvolutionDetailTable } from "./evolution-detail-table";
 import { HistoricalYearDialog } from "./historical-year-dialog";
@@ -19,9 +28,10 @@ interface Props {
   metrics: EvolutionYearMetric[];
   historicalYears: HistoricalYear[];
   calendarYear: number;
+  multiYearTagStats: TagStats | null;
 }
 
-export function EvolutionDashboard({ metrics, historicalYears, calendarYear }: Props) {
+export function EvolutionDashboard({ metrics, historicalYears, calendarYear, multiYearTagStats }: Props) {
   const t = useTranslations("Evolution");
   const locale = useLocale();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -37,6 +47,9 @@ export function EvolutionDashboard({ metrics, historicalYears, calendarYear }: P
 
   const summary = summarizeEvolutionMetrics(visibleMetrics);
   const showEmptyState = visibleMetrics.length < 2;
+
+  const hasTagData = multiYearTagStats !== null && multiYearTagStats.stats.length > 0;
+  const maxTagAmount = multiYearTagStats?.stats[0]?.totalAmount ?? 0;
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -88,14 +101,46 @@ export function EvolutionDashboard({ metrics, historicalYears, calendarYear }: P
             </h1>
           </div>
           <div className="flex w-full flex-col items-start gap-2 sm:w-auto sm:items-end">
-            <Button
-              type="button"
-              className="w-full gap-2 rounded-md sm:w-auto"
-              onClick={() => setDialogOpen(true)}
-            >
-              <Plus className="size-4" />
-              {t("addHistoricalYear")}
-            </Button>
+            <div className="flex items-center gap-2">
+              {hasTagData && (
+                <Dialog>
+                  <DialogTrigger
+                    render={
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-9 w-9 border-border/70 bg-background/80 text-muted-foreground shadow-sm hover:border-primary/30 hover:bg-primary/[0.06] hover:text-primary"
+                      >
+                        <Tags className="h-4 w-4" />
+                        <span className="sr-only">{t("categoriesButton")}</span>
+                      </Button>
+                    }
+                  />
+                  <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-2xl">
+                    <div className="max-h-[calc(100dvh-2rem)] overflow-y-auto">
+                      <DialogHeader className="sticky top-0 z-10 border-b border-border/50 bg-card/70 px-5 pt-5 pr-14 pb-4 backdrop-blur-xl supports-[backdrop-filter]:bg-card/55 md:px-6 md:pt-6 md:pr-16 md:pb-5">
+                        <DialogTitle>{t("categoriesTitle")}</DialogTitle>
+                      </DialogHeader>
+                      <div className="mx-auto max-w-2xl px-4 py-6">
+                        <div className="flex flex-col gap-2">
+                          {multiYearTagStats!.stats.map((stat) => (
+                            <TagStatRow key={stat.tag?.id ?? "untagged"} stat={stat} maxAmount={maxTagAmount} />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              )}
+              <Button
+                type="button"
+                className="w-full gap-2 rounded-md sm:w-auto"
+                onClick={() => setDialogOpen(true)}
+              >
+                <Plus className="size-4" />
+                {t("addHistoricalYear")}
+              </Button>
+            </div>
             {hasFutureYears && (
               <label className="flex cursor-pointer items-center gap-2 pt-1 text-sm text-muted-foreground">
                 <input
