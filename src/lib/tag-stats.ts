@@ -44,6 +44,12 @@ export function computeTagStats(yearData: YearData): TagStats {
         bucket.entries.push({ month: monthData.month, description: entry.label, amount: entry.amount, groupName: group.label });
       }
     }
+
+    for (const expense of monthData.recurringExpenses) {
+      const bucket = ensureBucket(expense.tagId, expense.tag);
+      bucket.totalAmount += expense.amount;
+      bucket.entries.push({ month: monthData.month, description: expense.label, amount: expense.amount });
+    }
   }
 
   const totalAdditional = [...buckets.values()].reduce((sum, b) => sum + b.totalAmount, 0);

@@ -46,6 +46,14 @@ test("computeTagStats returns zero shareOfTotal when totalAdditional is zero", (
   assert.match(source, /totalAdditional > 0 \? .* : 0/);
 });
 
+test("computeTagStats buckets recurring expenses by tagId like additional expenses", () => {
+  const source = readFileSync(new URL("./tag-stats.ts", import.meta.url), "utf8");
+
+  assert.match(source, /monthData\.recurringExpenses/);
+  assert.match(source, /expense\.tagId/);
+  assert.match(source, /expense\.tag/);
+});
+
 test("tag-stats messages keys exist in both locales", () => {
   const spanish = JSON.parse(readFileSync(new URL("../../messages/es.json", import.meta.url), "utf8"));
   const english = JSON.parse(readFileSync(new URL("../../messages/en.json", import.meta.url), "utf8"));
