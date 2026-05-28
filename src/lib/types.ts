@@ -43,6 +43,7 @@ export interface YearRecurringExpense {
   label: string;
   amount: number;
   sortOrder: number;
+  tagId: number | null;
 }
 
 export interface RecurringExpense {
@@ -52,6 +53,8 @@ export interface RecurringExpense {
   label: string;
   amount: number;
   sortOrder: number;
+  tagId: number | null;
+  tag: Tag | null;
 }
 
 export interface MonthData {

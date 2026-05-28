@@ -1,4 +1,4 @@
-import type { RecurringExpense, YearRecurringExpense } from "./types";
+import type { RecurringExpense, Tag, YearRecurringExpense } from "./types";
 
 export type RecurringExpenseInput = {
   label: string;
@@ -29,6 +29,7 @@ export function parseYearRecurringExpense(row: {
   label: string;
   amount: string;
   sortOrder: number;
+  tagId: number | null;
 }): YearRecurringExpense {
   return {
     id: row.id,
@@ -36,17 +37,22 @@ export function parseYearRecurringExpense(row: {
     label: row.label,
     amount: parseFloat(row.amount),
     sortOrder: row.sortOrder,
+    tagId: row.tagId ?? null,
   };
 }
 
-export function parseMonthlyRecurringExpense(row: {
-  id: number;
-  monthId: number;
-  yearRecurringExpenseId: number | null;
-  label: string;
-  amount: string;
-  sortOrder: number;
-}): RecurringExpense {
+export function parseMonthlyRecurringExpense(
+  row: {
+    id: number;
+    monthId: number;
+    yearRecurringExpenseId: number | null;
+    label: string;
+    amount: string;
+    sortOrder: number;
+    tagId: number | null;
+  },
+  tag: Tag | null = null,
+): RecurringExpense {
   return {
     id: row.id,
     monthId: row.monthId,
@@ -54,5 +60,7 @@ export function parseMonthlyRecurringExpense(row: {
     label: row.label,
     amount: parseFloat(row.amount),
     sortOrder: row.sortOrder,
+    tagId: row.tagId ?? null,
+    tag,
   };
 }

@@ -1,13 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { computeMonthChain, totalExpenses } from "./calculations.ts";
-import { sortRecurringExpensesAsc, sumRecurringExpenses } from "./recurring-expenses.ts";
+import { sortRecurringExpensesAsc, sumRecurringExpenses, parseYearRecurringExpense, parseMonthlyRecurringExpense } from "./recurring-expenses.ts";
 import type { RecurringExpense } from "./types.ts";
 
 const recurringExpenses: RecurringExpense[] = [
-  { id: 2, monthId: 1, yearRecurringExpenseId: 2, label: "Gimnasio", amount: 45, sortOrder: 2 },
-  { id: 1, monthId: 1, yearRecurringExpenseId: 1, label: "Alquiler", amount: 900, sortOrder: 1 },
-  { id: 3, monthId: 1, yearRecurringExpenseId: null, label: "Parking", amount: 80, sortOrder: 1 },
+  { id: 2, monthId: 1, yearRecurringExpenseId: 2, label: "Gimnasio", amount: 45, sortOrder: 2, tagId: null, tag: null },
+  { id: 1, monthId: 1, yearRecurringExpenseId: 1, label: "Alquiler", amount: 900, sortOrder: 1, tagId: null, tag: null },
+  { id: 3, monthId: 1, yearRecurringExpenseId: null, label: "Parking", amount: 80, sortOrder: 1, tagId: null, tag: null },
 ];
 
 test("recurring expenses sort by sort order and then id", () => {
@@ -86,4 +86,35 @@ test("month chain includes recurring expenses in savings and downstream balances
   assert.equal(months[0].savings, 475);
   assert.equal(months[0].endingBalance, 1475);
   assert.equal(months[1].startingBalance, 1475);
+});
+
+test("parseYearRecurringExpense carries tagId through (null default)", () => {
+  const result = parseYearRecurringExpense({
+    id: 1, yearId: 9, label: "Rent", amount: "100.00", sortOrder: 0, tagId: null,
+  });
+  assert.equal(result.tagId, null);
+});
+
+test("parseYearRecurringExpense carries a numeric tagId", () => {
+  const result = parseYearRecurringExpense({
+    id: 1, yearId: 9, label: "Rent", amount: "100.00", sortOrder: 0, tagId: 7,
+  });
+  assert.equal(result.tagId, 7);
+});
+
+test("parseMonthlyRecurringExpense carries tagId and defaults tag to null", () => {
+  const result = parseMonthlyRecurringExpense({
+    id: 2, monthId: 3, yearRecurringExpenseId: 1, label: "Rent", amount: "100.00", sortOrder: 0, tagId: 7,
+  });
+  assert.equal(result.tagId, 7);
+  assert.equal(result.tag, null);
+});
+
+test("parseMonthlyRecurringExpense attaches a resolved tag when passed", () => {
+  const tag = { id: 7, name: "Hogar", color: "blue" };
+  const result = parseMonthlyRecurringExpense(
+    { id: 2, monthId: 3, yearRecurringExpenseId: 1, label: "Rent", amount: "100.00", sortOrder: 0, tagId: 7 },
+    tag,
+  );
+  assert.deepEqual(result.tag, tag);
 });
