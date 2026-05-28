@@ -5,8 +5,9 @@ Users can assign a single tag to any ungrouped additional expense entry. Tags ha
 ## Scope
 
 - Tags apply to **expense entries** (not income). Tags on ungrouped entries are assigned per-entry via the inline `TagPicker` on each row. Tags on grouped entries are assigned at the group level — a tag assigned to a group propagates to all its entries automatically, and individual entries inside a group do not have their own tag picker.
+- Tags also apply to **recurring expenses** (the fixed monthly expenses shown in the Fixed Expenses card). A tag can be assigned, changed, or cleared on any recurring expense row directly from the monthly fixed-expenses card. Because recurring expenses are part of a year-wide series, every tag change triggers a confirmation dialog; on confirmation, the change is propagated to the template row and all monthly copies for that year.
 - Tags are created inline when assigning and managed globally from the main Settings page.
-- One tag per entry or group; a tag can be cleared at any time.
+- One tag per entry, group, or recurring expense; a tag can be cleared at any time.
 
 ## Data Model
 
@@ -23,6 +24,13 @@ Users can assign a single tag to any ungrouped additional expense entry. Tags ha
 ### `additionalEntries.tagId` and `additionalEntryGroups.tagId`
 
 Nullable integer FK → `tags.id` with `onDelete: set null`. If a tag is ever deleted, affected entries and groups silently lose their tag — entries and groups are never cascade-deleted.
+
+### `yearRecurringExpenses.tagId` and `monthlyRecurringExpenses.tagId`
+
+| Column | Notes |
+|---|---|
+| `yearRecurringExpenses.tagId` | Nullable integer FK → `tags.id`, `onDelete: set null`. The authoritative tag for the series template. |
+| `monthlyRecurringExpenses.tagId` | Nullable integer FK → `tags.id`, `onDelete: set null`. Per-month copy; kept in sync with the template when a tag change is propagated across the series. |
 
 ## Color Palette
 
@@ -66,9 +74,18 @@ Both `POST /api/months/[monthId]/entries` (create) and `PATCH /api/months/[month
 
 `PATCH /api/months/[monthId]/entry-groups/[groupId]` (edit group) accepts an optional `tagId?: number | null`. Assigning a tag to a group automatically updates all entries within that group to the same tag.
 
+### Recurring expense endpoint
+
+`PATCH /api/months/[monthId]/recurring-expenses/[entryId]` also accepts an optional `tagId?: number | null`. When present:
+
+- If the recurring expense has a `yearRecurringExpenseId` (i.e. it belongs to a year-wide series), the tag is written to the template row (`year_recurring_expenses`) **and** to all monthly copies of that series (`monthly_recurring_expenses`) across the year.
+- If the recurring expense is an orphaned copy with no `yearRecurringExpenseId`, only that single row is updated.
+
+The UI always shows a confirmation dialog before applying a tag change on a recurring expense, informing the user that the change will affect the entire year's series.
+
 ## Server-Side Data Loading
 
-`src/lib/server/year-data.ts` resolves tags when loading year data: after fetching all entries and groups, it collects the unique non-null `tagId` values, runs a single `inArray` query against the `tags` table, and builds a `Map<number, Tag>`. Each entry and group's `tag` field is populated from this map (or `null`). No additional client-side fetches are needed for display.
+`src/lib/server/year-data.ts` resolves tags when loading year data: after fetching all entries, groups, and recurring expenses, it collects the unique non-null `tagId` values from all three sources into a single `usedTagIds` set, runs a single `inArray` query against the `tags` table, and builds a `Map<number, Tag>`. Each entry, group, and recurring expense's `tag` field is populated from this map via `resolveTag` (or `null`). No additional client-side fetches are needed for display.
 
 ## Component Architecture
 
@@ -168,10 +185,11 @@ The tab appears in the same pill row as "Meses", "Año", and "Evolución". It is
 
 `computeTagStats(yearData: YearData): TagStats` in `src/lib/tag-stats.ts` derives all stats from the already-loaded `YearData` — no additional API calls.
 
-- **Ungrouped expenses:** each entry's `tagId` (or `null` for untagged) determines its bucket.
-- **Grouped expenses:** all entries inside a group are attributed to the group's `tagId`. Each entry appears in the drilldown with `groupName` set to the group's label. Group entries are **not** double-counted against their parent group total.
+- **Ungrouped additional expenses:** each entry's `tagId` (or `null` for untagged) determines its bucket.
+- **Grouped additional expenses:** all entries inside a group are attributed to the group's `tagId`. Each entry appears in the drilldown with `groupName` set to the group's label. Group entries are **not** double-counted against their parent group total.
+- **Recurring expenses:** bucketed exactly like additional expenses — tagged recurring expenses go to their tag bucket, untagged ones go to the untagged bucket. All recurring expenses count toward the `totalAdditional` denominator used for `shareOfTotal`.
 - Results are sorted by `totalAmount` descending. The untagged bucket (if any) is always last.
-- `shareOfTotal` = `bucket.totalAmount / totalAdditional` where `totalAdditional` includes both tagged and untagged entries.
+- `shareOfTotal` = `bucket.totalAmount / totalAdditional` where `totalAdditional` includes both tagged and untagged entries (additional and recurring).
 - Progress bar width is relative to the top tag's amount (so the widest bar is always 100%).
 
 ### Components
