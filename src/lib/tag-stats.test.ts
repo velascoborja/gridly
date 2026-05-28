@@ -54,6 +54,31 @@ test("computeTagStats buckets recurring expenses by tagId like additional expens
   assert.match(source, /expense\.tag/);
 });
 
+test("DrilldownEntry has an optional year field", () => {
+  const source = readFileSync(new URL("./tag-stats.ts", import.meta.url), "utf8");
+
+  assert.match(source, /year\?\s*:\s*number/);
+});
+
+test("computeMultiYearTagStats is exported", () => {
+  const source = readFileSync(new URL("./tag-stats.ts", import.meta.url), "utf8");
+
+  assert.match(source, /export function computeMultiYearTagStats/);
+});
+
+test("computeMultiYearTagStats fills year on DrilldownEntry from yearData.config.year", () => {
+  const source = readFileSync(new URL("./tag-stats.ts", import.meta.url), "utf8");
+
+  assert.match(source, /yearData\.config\.year/);
+  assert.match(source, /year,/);
+});
+
+test("computeMultiYearTagStats sorts entries by year ascending then month", () => {
+  const source = readFileSync(new URL("./tag-stats.ts", import.meta.url), "utf8");
+
+  assert.match(source, /a\.year.*b\.year/);
+});
+
 test("tag-stats messages keys exist in both locales", () => {
   const spanish = JSON.parse(readFileSync(new URL("../../messages/es.json", import.meta.url), "utf8"));
   const english = JSON.parse(readFileSync(new URL("../../messages/en.json", import.meta.url), "utf8"));
