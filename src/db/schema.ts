@@ -169,6 +169,8 @@ export const yearRecurringExpenses = pgTable("year_recurring_expenses", {
     .references(() => years.id, { onDelete: "cascade" }),
   label: text("label").notNull(),
   amount: numeric("amount", { precision: 12, scale: 2 }).notNull().default("0"),
+  tagId: integer("tag_id")
+    .references(() => tags.id, { onDelete: "set null" }),
   sortOrder: integer("sort_order").notNull().default(0),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -182,6 +184,8 @@ export const monthlyRecurringExpenses = pgTable("monthly_recurring_expenses", {
     .references(() => yearRecurringExpenses.id, { onDelete: "set null" }),
   label: text("label").notNull(),
   amount: numeric("amount", { precision: 12, scale: 2 }).notNull().default("0"),
+  tagId: integer("tag_id")
+    .references(() => tags.id, { onDelete: "set null" }),
   sortOrder: integer("sort_order").notNull().default(0),
   createdAt: timestamp("created_at").defaultNow(),
 });
