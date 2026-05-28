@@ -135,6 +135,7 @@ export async function createAndPrefillYear(data: {
           label: template.label,
           amount: template.amount,
           sortOrder: template.sortOrder,
+          tagId: template.tagId,
         }))
       )
     );

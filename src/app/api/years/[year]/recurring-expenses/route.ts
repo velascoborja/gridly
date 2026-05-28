@@ -56,6 +56,12 @@ export async function PUT(
     Array.isArray(body.recurringExpenses) ? body.recurringExpenses : []
   );
 
+  const existingTemplates = await db
+    .select()
+    .from(yearRecurringExpenses)
+    .where(eq(yearRecurringExpenses.yearId, yearRow.id));
+  const tagByLabel = new Map(existingTemplates.map((t) => [t.label, t.tagId]));
+
   await db.delete(yearRecurringExpenses).where(eq(yearRecurringExpenses.yearId, yearRow.id));
   const templates =
     normalized.length > 0
@@ -67,6 +73,7 @@ export async function PUT(
               label: entry.label,
               amount: String(entry.amount),
               sortOrder: entry.sortOrder,
+              tagId: tagByLabel.get(entry.label) ?? null,
             }))
           )
           .returning()
@@ -94,6 +101,7 @@ export async function PUT(
             label: template.label,
             amount: template.amount,
             sortOrder: template.sortOrder,
+            tagId: template.tagId,
           }))
         )
       );

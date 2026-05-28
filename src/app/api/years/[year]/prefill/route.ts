@@ -76,6 +76,7 @@ export async function POST(
           label: template.label,
           amount: template.amount,
           sortOrder: template.sortOrder,
+          tagId: template.tagId,
         }))
       )
     );
