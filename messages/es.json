@@ -301,7 +301,7 @@
       "deleting": "Eliminando...",
       "tagConfirmTitle": "Aplicar etiqueta a toda la serie",
       "tagConfirmDescription": "Esta etiqueta se asignará a «{label}» en todos los meses del año. ¿Quieres guardar el cambio?",
-      "tagConfirmAction": "Aplicar a todo el año"
+      "tagConfirmAction": "Aplicar"
     }
   },
   "Landing": {

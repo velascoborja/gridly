@@ -301,7 +301,7 @@
       "deleting": "Removing...",
       "tagConfirmTitle": "Apply tag to the whole series",
       "tagConfirmDescription": "This tag will be assigned to \"{label}\" in every month of the year. Save the change?",
-      "tagConfirmAction": "Apply to the whole year"
+      "tagConfirmAction": "Apply"
     }
   },
   "Landing": {
