@@ -37,8 +37,8 @@ export function getDemoYearData(): YearData {
   }));
 
   const recurringExpenses: YearRecurringExpense[] = [
-    { id: 1, yearId: config.id, label: "Alquiler", amount: 900, sortOrder: 0 },
-    { id: 2, yearId: config.id, label: "Gimnasio", amount: 45, sortOrder: 1 },
+    { id: 1, yearId: config.id, label: "Alquiler", amount: 900, sortOrder: 0, tagId: null },
+    { id: 2, yearId: config.id, label: "Gimnasio", amount: 45, sortOrder: 1, tagId: null },
   ];
 
   for (const month of baseMonths) {
@@ -49,6 +49,8 @@ export function getDemoYearData(): YearData {
       label: entry.label,
       amount: entry.amount,
       sortOrder: entry.sortOrder,
+      tagId: null,
+      tag: null,
     }));
   }
 

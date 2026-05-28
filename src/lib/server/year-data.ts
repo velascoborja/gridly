@@ -45,9 +45,18 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
           .where(inArray(additionalEntryGroups.monthId, monthRows.map((month) => month.id)))
       : [];
 
+  const allRecurringExpenses =
+    monthRows.length > 0
+      ? await db
+          .select()
+          .from(monthlyRecurringExpenses)
+          .where(inArray(monthlyRecurringExpenses.monthId, monthRows.map((month) => month.id)))
+      : [];
+
   const usedTagIds = [...new Set([
     ...allEntries.map((e) => e.tagId).filter((id): id is number => id !== null),
     ...allGroups.map((g) => g.tagId).filter((id): id is number => id !== null),
+    ...allRecurringExpenses.map((e) => e.tagId).filter((id): id is number => id !== null),
   ])];
   const tagRows = usedTagIds.length > 0
     ? await db.select().from(tags).where(inArray(tags.id, usedTagIds))
@@ -58,14 +67,6 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
 
   const resolveTag = (tagId: number | null | undefined): Tag | null =>
     tagId != null ? (tagsById.get(tagId) ?? null) : null;
-
-  const allRecurringExpenses =
-    monthRows.length > 0
-      ? await db
-          .select()
-          .from(monthlyRecurringExpenses)
-          .where(inArray(monthlyRecurringExpenses.monthId, monthRows.map((month) => month.id)))
-      : [];
 
   const entriesByMonthId = new Map<number, typeof allEntries>();
   for (const entry of allEntries) {
@@ -135,7 +136,9 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
       interests: parseFloat(month.interests),
       interestsManualOverride: month.interestsManualOverride,
       personalRemaining: parseFloat(month.personalRemaining),
-      recurringExpenses: sortRecurringExpensesAsc(recurringExpenses.map(parseMonthlyRecurringExpense)),
+      recurringExpenses: sortRecurringExpensesAsc(
+        recurringExpenses.map((r) => parseMonthlyRecurringExpense(r, resolveTag(r.tagId)))
+      ),
       additionalExpenses: sortAdditionalEntriesDesc(
         expenseEntries
           .filter((e) => !groupedEntryIds.has(e.id))
