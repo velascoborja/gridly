@@ -203,3 +203,11 @@ The tab appears in the same pill row as "Meses", "Año", and "Evolución". It is
 ### i18n
 
 All keys live under `Annual.categories` in `messages/es.json` and `messages/en.json`. The nav tab label is `Nav.categories`.
+
+## Evolution Tags Dialog
+
+The Evolution dashboard has a Tags icon button when there is multi-year tag data to show. It opens a dialog that aggregates spending by tag across all full Gridly years and reuses `TagStatRow` for the ranked list and expandable entry drilldown. Historical summary-only imports are excluded because they do not include expense or tag rows.
+
+`computeMultiYearTagStats(yearDataList: YearData[]): TagStats` in `src/lib/tag-stats.ts` applies the same bucketing rules as `computeTagStats`, but adds `year` to each `DrilldownEntry`. `DrilldownList` detects that field and groups expanded entries by year, sorted ascending, instead of by month. Within a year group, entries remain sorted by month.
+
+The dialog strings live under `Evolution.categoriesButton` and `Evolution.categoriesTitle` in `messages/es.json` and `messages/en.json`.

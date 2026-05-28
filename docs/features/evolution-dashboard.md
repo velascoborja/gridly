@@ -67,6 +67,14 @@ Evolution can include both full Gridly years and summary-only historical imports
 | `EvolutionDetailTable` | `evolution-detail-table.tsx` | Full year-by-year data table with historical row actions |
 | `HistoricalYearDialog` | `historical-year-dialog.tsx` | Add/edit form for summary-only historical imports |
 
+### Tags Dialog
+
+When at least one full Gridly year has tagged or untagged expense data, the dashboard header shows a Tags icon button. The button opens a dialog titled by `Evolution.categoriesTitle` and reuses the annual `TagStatRow` drilldown UI to show expense spending aggregated by tag across all Gridly years.
+
+Only Gridly years contribute to this dialog. Historical summary-only imports are excluded because they do not store entry-level expense or tag data. The route computes `multiYearTagStats` with `computeMultiYearTagStats(gridlyYearDataList)` and passes it to `EvolutionDashboard`; the dashboard hides the button when the prop is `null` or has no stats.
+
+The drilldown groups entries by year instead of by month when `DrilldownEntry.year` is present. Grouped expenses are attributed to the group's tag, ungrouped additional expenses use their own tag, and recurring expenses are bucketed by their recurring expense tag.
+
 ### KPI Cards
 
 Five cards derived from `EvolutionSummary`:
