@@ -15,7 +15,8 @@ test("year selector marks the real current year when multiple years are availabl
   const spanish = JSON.parse(readFileSync(new URL("../../../messages/es.json", import.meta.url), "utf8"));
   const english = JSON.parse(readFileSync(new URL("../../../messages/en.json", import.meta.url), "utf8"));
 
-  assert.match(source, /const calendarYear = new Date\(\)\.getFullYear\(\)/);
+  assert.match(source, /const now = new Date\(\)/);
+  assert.match(source, /const calendarYear = now\.getFullYear\(\)/);
   assert.match(source, /const showCurrentYearMarker = yearOptions\.length > 1/);
   assert.match(source, /option\.year === calendarYear/);
   assert.match(source, /t\("currentYear"\)/);
@@ -56,6 +57,19 @@ test("navigation handles evolution active state and hides year selector", () => 
 
   assert.match(navSource, /view === "summary" \? "summary" : view === "evolution" \? "evolution"/);
   assert.match(navSource, /const showYearControls = !hideYearSelector && view !== "evolution"/);
+});
+
+test("year changes open January unless the target is the current calendar year", () => {
+  const navSource = readFileSync(new URL("./nav-selectors.tsx", import.meta.url), "utf8");
+  const mobileSource = readFileSync(new URL("./mobile-year-menu.tsx", import.meta.url), "utf8");
+  const summarySource = readFileSync(new URL("../../app/[locale]/[year]/summary/page.tsx", import.meta.url), "utf8");
+
+  assert.match(navSource, /const calendarMonth = now\.getMonth\(\) \+ 1/);
+  assert.match(navSource, /buildYearMonthHref\(monthPathPrefix, y, y === calendarYear \? calendarMonth : 1\)/);
+  assert.match(mobileSource, /const calendarMonth = now\.getMonth\(\) \+ 1/);
+  assert.match(mobileSource, /buildYearMonthHref\(undefined, year, year === calendarYear \? calendarMonth : 1\)/);
+  assert.match(summarySource, /const defaultMonth = now\.getFullYear\(\) === year \? now\.getMonth\(\) \+ 1 : 1/);
+  assert.match(summarySource, /initialMonth=\{defaultMonth\}/);
 });
 
 test("evolution page loads sources and allows single-year access for historical imports", () => {

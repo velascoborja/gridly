@@ -34,8 +34,10 @@ export function MobileYearMenu({ currentYear, currentMonth, view, years }: Props
 
   if (view === "evolution") return null;
 
-  const selectedMonth = currentMonth ?? new Date().getMonth() + 1;
-  const calendarYear = new Date().getFullYear();
+  const now = new Date();
+  const selectedMonth = currentMonth ?? now.getMonth() + 1;
+  const calendarYear = now.getFullYear();
+  const calendarMonth = now.getMonth() + 1;
   const yearOptions: YearOption[] = years.map((entry) =>
     typeof entry === "number" ? { year: entry, source: "gridly" } : entry
   );
@@ -52,7 +54,7 @@ export function MobileYearMenu({ currentYear, currentMonth, view, years }: Props
       return;
     }
     if (view === "summary") router.push(buildYearSummaryHref(undefined, year));
-    else router.push(buildYearMonthHref(undefined, year, selectedMonth));
+    else router.push(buildYearMonthHref(undefined, year, year === calendarYear ? calendarMonth : 1));
   };
 
   return (

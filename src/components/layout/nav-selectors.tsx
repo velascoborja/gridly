@@ -53,8 +53,10 @@ export function NavSelectors({
   const pathname = usePathname();
   const t = useTranslations("Nav");
   const locale = useLocale();
-  const selectedMonth = currentMonth ?? new Date().getMonth() + 1;
-  const calendarYear = new Date().getFullYear();
+  const now = new Date();
+  const selectedMonth = currentMonth ?? now.getMonth() + 1;
+  const calendarYear = now.getFullYear();
+  const calendarMonth = now.getMonth() + 1;
   const yearOptions: YearOption[] = years.map((entry) =>
     typeof entry === "number" ? { year: entry, source: "gridly" } : entry
   );
@@ -75,7 +77,7 @@ export function NavSelectors({
       return;
     }
     if (view === "summary") router.push(buildYearSummaryHref(summaryPathPrefix, y));
-    else router.push(buildYearMonthHref(monthPathPrefix, y, selectedMonth));
+    else router.push(buildYearMonthHref(monthPathPrefix, y, y === calendarYear ? calendarMonth : 1));
   };
 
   const monthHref = buildYearMonthHref(monthPathPrefix, currentYear, selectedMonth);

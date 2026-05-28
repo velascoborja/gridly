@@ -16,11 +16,13 @@ export default async function SummaryPage({
   const [yearData, years] = await Promise.all([getYearData(user.id, year), getYearsForUser(user.id)]);
   if (!yearData) notFound();
   const startingBalanceEditable = years[0] === year;
+  const now = new Date();
+  const defaultMonth = now.getFullYear() === year ? now.getMonth() + 1 : 1;
 
   return (
     <YearPageClient
       yearData={yearData}
-      initialMonth={new Date().getMonth() + 1}
+      initialMonth={defaultMonth}
       initialView="summary"
       years={years.length > 0 ? years : [year]}
       startingBalanceEditable={startingBalanceEditable}
