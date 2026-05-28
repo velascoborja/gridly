@@ -109,3 +109,13 @@ test("historical year dialog money inputs show a persistent Euro hint", () => {
   assert.doesNotMatch(dialog, /opacity-0/);
   assert.match(dialog, /pr-8/);
 });
+
+test("evolution categories button and dialog title keys exist in both locales", () => {
+  const spanish = JSON.parse(readFileSync(new URL("../../../messages/es.json", import.meta.url), "utf8"));
+  const english = JSON.parse(readFileSync(new URL("../../../messages/en.json", import.meta.url), "utf8"));
+
+  assert.equal(spanish.Evolution.categoriesButton, "Ver categorías");
+  assert.equal(english.Evolution.categoriesButton, "View categories");
+  assert.equal(spanish.Evolution.categoriesTitle, "Categorías (todos los años)");
+  assert.equal(english.Evolution.categoriesTitle, "Categories (all years)");
+});

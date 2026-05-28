@@ -498,6 +498,8 @@
     "returnRateLabel": "Rentabilidad anual",
     "returnRatePlaceholder": "7",
     "returnRateNote": "Rentabilidad estimada de las inversiones por año",
+    "categoriesButton": "Ver categorías",
+    "categoriesTitle": "Categorías (todos los años)",
     "source": {
       "gridly": "Gridly",
       "historical": "Histórico"

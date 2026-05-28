@@ -498,6 +498,8 @@
     "returnRateLabel": "Annual return",
     "returnRatePlaceholder": "7",
     "returnRateNote": "Estimated return on investments per year",
+    "categoriesButton": "View categories",
+    "categoriesTitle": "Categories (all years)",
     "source": {
       "gridly": "Gridly",
       "historical": "Historical"
