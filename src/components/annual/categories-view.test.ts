@@ -52,6 +52,17 @@ test("DrilldownList shows month abbreviation, description, and amount", () => {
   assert.match(source, /entry\.groupName/);
 });
 
+test("DrilldownList collapses multi-year groups by default with year totals", () => {
+  const source = readFileSync(new URL("./drilldown-list.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /expandedYears/);
+  assert.match(source, /new Set\(\)/);
+  assert.match(source, /totalAmount: yearEntries\.reduce/);
+  assert.match(source, /aria-expanded=\{isExpanded\}/);
+  assert.match(source, /isExpanded \? "grid-rows-\[1fr\]" : "grid-rows-\[0fr\]"/);
+  assert.match(source, /formatCurrency\(totalAmount, locale\)/);
+});
+
 test("kpi-cards renders CategoriesView inside a dialog", () => {
   const source = readFileSync(new URL("./kpi-cards.tsx", import.meta.url), "utf8");
 

@@ -73,7 +73,7 @@ When at least one full Gridly year has tagged or untagged expense data, the dash
 
 Only Gridly years contribute to this dialog. Historical summary-only imports are excluded because they do not store entry-level expense or tag data. The route computes `multiYearTagStats` with `computeMultiYearTagStats(gridlyYearDataList)` and passes it to `EvolutionDashboard`; the dashboard hides the button when the prop is `null` or has no stats.
 
-The drilldown groups entries by year instead of by month when `DrilldownEntry.year` is present. Grouped expenses are attributed to the group's tag, ungrouped additional expenses use their own tag, and recurring expenses are bucketed by their recurring expense tag.
+The drilldown groups entries by year instead of by month when `DrilldownEntry.year` is present. Year headers are collapsed by default, show the aggregate spend for that year, and expand locally when tapped. Grouped expenses are attributed to the group's tag, ungrouped additional expenses use their own tag, and recurring expenses are bucketed by their recurring expense tag.
 
 ### KPI Cards
 

@@ -208,6 +208,6 @@ All keys live under `Annual.categories` in `messages/es.json` and `messages/en.j
 
 The Evolution dashboard has a Tags icon button when there is multi-year tag data to show. It opens a dialog that aggregates spending by tag across all full Gridly years and reuses `TagStatRow` for the ranked list and expandable entry drilldown. Historical summary-only imports are excluded because they do not include expense or tag rows.
 
-`computeMultiYearTagStats(yearDataList: YearData[]): TagStats` in `src/lib/tag-stats.ts` applies the same bucketing rules as `computeTagStats`, but adds `year` to each `DrilldownEntry`. `DrilldownList` detects that field and groups expanded entries by year, sorted ascending, instead of by month. Within a year group, entries remain sorted by month.
+`computeMultiYearTagStats(yearDataList: YearData[]): TagStats` in `src/lib/tag-stats.ts` applies the same bucketing rules as `computeTagStats`, but adds `year` to each `DrilldownEntry`. `DrilldownList` detects that field and groups expanded entries by year, sorted ascending, instead of by month. Year headers are collapsed by default, show that year's aggregate amount, and expand inline when tapped. Within a year group, entries remain sorted by month.
 
 The dialog strings live under `Evolution.categoriesButton` and `Evolution.categoriesTitle` in `messages/es.json` and `messages/en.json`.
