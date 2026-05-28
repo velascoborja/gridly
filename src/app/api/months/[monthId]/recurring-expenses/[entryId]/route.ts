@@ -31,6 +31,10 @@ export async function PATCH(
   const tagChange = body.tagId !== undefined;
   const newTagId: number | null = body.tagId === null ? null : Number(body.tagId);
 
+  if (tagChange && newTagId !== null && !(Number.isInteger(newTagId) && newTagId > 0)) {
+    return Response.json({ error: "Tag not found" }, { status: 404 });
+  }
+
   if (tagChange && newTagId !== null) {
     const owned = await db
       .select({ id: tags.id })
