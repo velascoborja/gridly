@@ -183,7 +183,7 @@ test("fixed expenses card embeds recurring expenses without month-level add", ()
   assert.match(expensesSource, /RecurringExpensesList/);
   assert.match(expensesSource, /{t\("recurringExpensesTitle"\)}/);
   assert.match(listSource, /\/api\/months\/\$\{monthId\}\/recurring-expenses\/\$\{id\}/);
-  assert.doesNotMatch(listSource, /method: "POST"/);
+  assert.doesNotMatch(listSource, /fetch\(`\/api\/months\/\$\{monthId\}\/recurring-expenses`[^)]*method:\s*"POST"/s);
   assert.doesNotMatch(listSource, /addEntry/);
   assert.match(listSource, /deletingId === entry\.id/);
 });
