@@ -33,6 +33,7 @@ Collapses the per-year metrics into a single summary object used by the KPI card
 - `averageSavingsPerYear`: mean `savedAmount` across eligible years.
 - `accumulatedInvested`: `accumulatedInvested` of the most recent eligible year.
 - `totalWealth`: latest eligible final balance plus accumulated invested.
+- `totalInterestsEarned`: sum of `interestsEarned` across eligible years.
 - `bestYear`: the year with the highest `savedAmount`. `null` when there are no years.
 
 **`calcEstimatedPortfolioValues(metrics: EvolutionYearMetric[], annualReturnRatePct: number)`**
@@ -50,6 +51,7 @@ Returns a per-year array of `{ year, estimatedPortfolioValue }`. For each year Y
 - `totalIncome`: sum of monthly total income for Gridly years, or `null` for historical imports.
 - `totalExpenses`: sum of monthly total expenses for Gridly years, or `null` for historical imports.
 - `savingsRate`: `savedAmount / totalIncome`, or `null` when income is zero, negative, or unavailable.
+- `interestsEarned`: sum of monthly `interests` for Gridly years, or the entered interest for historical imports.
 
 Annual savings intentionally means cash balance growth. Investment remains a separate metric because Gridly counts monthly investment inside expenses.
 
@@ -62,8 +64,8 @@ Evolution can include both full Gridly years and summary-only historical imports
 | Component | File | Role |
 |---|---|---|
 | `EvolutionDashboard` | `evolution-dashboard.tsx` | Root client component; owns layout and calls `summarizeEvolutionMetrics` |
-| `EvolutionKpiCards` | `evolution-kpi-cards.tsx` | Five summary KPI cards |
-| `EvolutionCharts` | `evolution-charts.tsx` | Three charts |
+| `EvolutionKpiCards` | `evolution-kpi-cards.tsx` | Six summary KPI cards |
+| `EvolutionCharts` | `evolution-charts.tsx` | Four charts |
 | `EvolutionDetailTable` | `evolution-detail-table.tsx` | Full year-by-year data table with historical row actions |
 | `HistoricalYearDialog` | `historical-year-dialog.tsx` | Add/edit form for summary-only historical imports |
 
@@ -84,6 +86,7 @@ Five cards derived from `EvolutionSummary`:
 3. **Accumulated Investment / Estimated Portfolio** — Without a return rate: shows raw `accumulatedInvested`. When a return rate is set: shows `estimatedPortfolioValue` (compounded estimate) as the primary value, with the raw invested amount shown as a tag underneath.
 4. **Average Annual Savings** (`averageSavingsPerYear`) — Mean savings across eligible years.
 5. **Best Year** (`bestYear`) — The year with the highest `savedAmount`. Shows the year number as the primary value and the saved amount in the note. Displays "N/A" when undefined.
+6. **Total Interest** (`totalInterestsEarned`) — Total interest earned across all eligible years.
 
 ### Investment Return Rate
 
@@ -99,12 +102,13 @@ The user can enter an annual return rate (%) directly in the Total Wealth box. T
 1. **Final Balance (LineChart)** — Year-over-year trend. Without a return rate: three lines — `finalBalance` (primary), `accumulatedInvested` (teal, dashed), `totalWealth` (orange, dotted). With a return rate: `finalBalance` (primary), `estimatedPortfolioValue` (teal, dashed), `estimatedTotalWealth` (orange, dotted). A legend labels each line.
 2. **Savings per Year (BarChart)** — `savedAmount` per year. Bars are green when `savedAmount ≥ 0` and red when negative.
 3. **Investment per Year (BarChart)** — `investedAmount` per year in primary color.
+4. **Interest per year (BarChart)** — `interestsEarned` per year in teal (`chart-2`). The secondary-chart row is a 3-column grid at `lg`.
 
 Y-axes on all charts are formatted as `Xk` (thousands).
 
 ### Detail Table
 
-Displays all `EvolutionYearMetric` fields for each eligible year: source, year, starting balance, final balance, saved amount, invested amount, accumulated invested, total income, total expenses, and savings rate. Savings rate is shown as a percentage with one decimal place, or `—` when `null`. Historical rows expose edit and delete actions; full Gridly years remain read-only from this table.
+Displays all `EvolutionYearMetric` fields for each eligible year: source, year, starting balance, final balance, saved amount, invested amount, accumulated invested, interest earned, total income, total expenses, and savings rate. Savings rate is shown as a percentage with one decimal place, or `—` when `null`. Historical rows expose edit and delete actions; full Gridly years remain read-only from this table.
 
 ### Empty State
 
@@ -112,7 +116,7 @@ When there are fewer than two metric rows, `EvolutionDashboard` replaces the cha
 
 ## Loading State
 
-`loading.tsx` renders inside `BaseAppShell` so the app background, sticky header, wordmark, and navigation area remain stable while the server loads all years. The skeleton mirrors the final dashboard structure: hero/header copy, total wealth stripe, five KPI cards, the primary balance chart, two secondary charts, and the detail table grid.
+`loading.tsx` renders inside `BaseAppShell` so the app background, sticky header, wordmark, and navigation area remain stable while the server loads all years. The skeleton mirrors the final dashboard structure: hero/header copy, total wealth stripe, six KPI cards, the primary balance chart, three secondary charts, and the detail table grid.
 
 ## Out Of Scope
 
