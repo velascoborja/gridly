@@ -9,6 +9,7 @@ export type HistoricalYearValidationError =
   | "invalidStartingBalance"
   | "invalidFinalBalance"
   | "invalidInvestedAmount"
+  | "invalidInterestsEarned"
   | "invalidSavingsRate";
 
 export type HistoricalYearPayloadResult =
@@ -32,6 +33,15 @@ export function parseHistoricalYearPayload(payload: unknown): HistoricalYearPayl
   if (!isFiniteCurrencyValue(finalBalance)) return { error: "invalidFinalBalance" };
   if (!isFiniteCurrencyValue(investedAmount) || investedAmount < 0) return { error: "invalidInvestedAmount" };
 
+  const interestsEarnedRaw = body.interestsEarned;
+  let interestsEarned = 0;
+  if (interestsEarnedRaw !== null && interestsEarnedRaw !== undefined) {
+    if (!isFiniteCurrencyValue(interestsEarnedRaw) || interestsEarnedRaw < 0) {
+      return { error: "invalidInterestsEarned" };
+    }
+    interestsEarned = interestsEarnedRaw;
+  }
+
   let parsedSavingsRate: number | null = null;
   if (savingsRate !== null && savingsRate !== undefined) {
     if (typeof savingsRate !== "number" || !Number.isFinite(savingsRate) || savingsRate < 0 || savingsRate > 1) {
@@ -40,7 +50,7 @@ export function parseHistoricalYearPayload(payload: unknown): HistoricalYearPayl
     parsedSavingsRate = savingsRate;
   }
 
-  return { year, startingBalance, finalBalance, investedAmount, savingsRate: parsedSavingsRate };
+  return { year, startingBalance, finalBalance, investedAmount, interestsEarned, savingsRate: parsedSavingsRate };
 }
 
 export function validateHistoricalYearEligibility({
@@ -81,6 +91,7 @@ export function serializeHistoricalYearMoney(input: HistoricalYearInput) {
     startingBalance: input.startingBalance.toFixed(2),
     finalBalance: input.finalBalance.toFixed(2),
     investedAmount: input.investedAmount.toFixed(2),
+    interestsEarned: input.interestsEarned.toFixed(2),
     savingsRate: input.savingsRate !== null ? input.savingsRate.toFixed(4) : null,
   };
 }
