@@ -67,6 +67,7 @@ export function HistoricalYearDialog({ open, mode, historicalYear, onOpenChange 
     startingBalance: "",
     finalBalance: "",
     investedAmount: "",
+    interestsEarned: "",
     savingsRate: "",
   });
   const [submitting, setSubmitting] = useState(false);
@@ -80,6 +81,7 @@ export function HistoricalYearDialog({ open, mode, historicalYear, onOpenChange 
       startingBalance: historicalYear ? String(historicalYear.startingBalance) : "",
       finalBalance: historicalYear ? String(historicalYear.finalBalance) : "",
       investedAmount: historicalYear ? String(historicalYear.investedAmount) : "",
+      interestsEarned: historicalYear ? String(historicalYear.interestsEarned) : "",
       savingsRate: historicalYear?.savingsRate !== null && historicalYear?.savingsRate !== undefined
         ? String(Math.round(historicalYear.savingsRate * 10000) / 100)
         : "",
@@ -101,6 +103,7 @@ export function HistoricalYearDialog({ open, mode, historicalYear, onOpenChange 
       startingBalance: parseLocalizedNumber(values.startingBalance),
       finalBalance: parseLocalizedNumber(values.finalBalance),
       investedAmount: parseLocalizedNumber(values.investedAmount),
+      interestsEarned: parseLocalizedNumber(values.interestsEarned),
       savingsRate,
     };
     const url = mode === "edit" && historicalYear ? `/api/historical-years/${historicalYear.id}` : "/api/historical-years";
@@ -128,7 +131,7 @@ export function HistoricalYearDialog({ open, mode, historicalYear, onOpenChange 
     }
   };
 
-  const updateCurrency = (key: "startingBalance" | "finalBalance" | "investedAmount", value: string) => {
+  const updateCurrency = (key: "startingBalance" | "finalBalance" | "investedAmount" | "interestsEarned", value: string) => {
     setValues((prev) => ({ ...prev, [key]: sanitizeNumericInput(value) }));
   };
 
@@ -163,6 +166,13 @@ export function HistoricalYearDialog({ open, mode, historicalYear, onOpenChange 
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground" htmlFor="historical-invested-amount">{t("investedAmount")}</label>
             <MoneyInput id="historical-invested-amount" value={values.investedAmount} onChange={(value) => updateCurrency("investedAmount", value)} disabled={submitting} placeholder={t("investedAmountPlaceholder")} />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-foreground" htmlFor="historical-interests-earned">
+              {t("interestEarned")}
+              <span className="ml-1.5 text-xs font-normal text-muted-foreground">{t("interestEarnedOptional")}</span>
+            </label>
+            <MoneyInput id="historical-interests-earned" value={values.interestsEarned} onChange={(value) => updateCurrency("interestsEarned", value)} disabled={submitting} placeholder={t("interestEarnedPlaceholder")} />
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground" htmlFor="historical-savings-rate">

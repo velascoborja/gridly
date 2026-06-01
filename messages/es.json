@@ -523,6 +523,9 @@
       "startingBalancePlaceholder": "15.000",
       "finalBalancePlaceholder": "18.500",
       "investedAmountPlaceholder": "3.000",
+      "interestEarned": "Intereses ganados",
+      "interestEarnedOptional": "(opcional)",
+      "interestEarnedPlaceholder": "200",
       "savingsRatePlaceholder": "18",
       "savedPreview": "Ahorro total",
       "create": "Añadir",
@@ -538,6 +541,7 @@
         "invalidStartingBalance": "Introduce un saldo inicial válido.",
         "invalidFinalBalance": "Introduce un saldo final válido.",
         "invalidInvestedAmount": "La inversión debe ser cero o mayor.",
+        "invalidInterestsEarned": "Los intereses deben ser cero o mayores.",
         "invalidSavingsRate": "La tasa de ahorro debe estar entre 0 y 100.",
         "connection": "No se ha podido guardar. Revisa la conexión e inténtalo de nuevo.",
         "generic": "No se ha podido guardar el año histórico."

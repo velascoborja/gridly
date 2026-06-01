@@ -523,6 +523,9 @@
       "startingBalancePlaceholder": "15.000",
       "finalBalancePlaceholder": "18.500",
       "investedAmountPlaceholder": "3.000",
+      "interestEarned": "Interest earned",
+      "interestEarnedOptional": "(optional)",
+      "interestEarnedPlaceholder": "200",
       "savingsRatePlaceholder": "18",
       "savedPreview": "Total savings",
       "create": "Add",
@@ -538,6 +541,7 @@
         "invalidStartingBalance": "Enter a valid starting balance.",
         "invalidFinalBalance": "Enter a valid final balance.",
         "invalidInvestedAmount": "Investment must be zero or greater.",
+        "invalidInterestsEarned": "Interest must be zero or greater.",
         "invalidSavingsRate": "Savings rate must be between 0 and 100.",
         "connection": "Could not save. Check your connection and try again.",
         "generic": "Could not save the historical year."
