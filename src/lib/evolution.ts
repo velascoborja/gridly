@@ -9,6 +9,7 @@ export type EvolutionMetricSource =
       finalBalance: number;
       investedAmount: number;
       savingsRate: number | null;
+      interestsEarned: number;
     };
 
 export interface EvolutionYearMetric {
@@ -18,6 +19,7 @@ export interface EvolutionYearMetric {
   finalBalance: number;
   savedAmount: number;
   investedAmount: number;
+  interestsEarned: number;
   accumulatedInvested: number;
   totalIncome: number | null;
   totalExpenses: number | null;
@@ -30,6 +32,7 @@ export interface EvolutionSummary {
   averageSavingsPerYear: number;
   averageSavingsRate: number | null;
   accumulatedInvested: number;
+  totalInterestsEarned: number;
   totalWealth: number;
   topYears: Array<{
     year: number;
@@ -56,6 +59,7 @@ export function deriveEvolutionMetrics(sources: EvolutionMetricSource[]): Evolut
         finalBalance: source.finalBalance,
         savedAmount: source.finalBalance - source.startingBalance,
         investedAmount: source.investedAmount,
+        interestsEarned: source.interestsEarned,
         accumulatedInvested,
         totalIncome: null,
         totalExpenses: null,
@@ -69,6 +73,7 @@ export function deriveEvolutionMetrics(sources: EvolutionMetricSource[]): Evolut
     if (!december) continue;
 
     const investedAmount = yearData.months.reduce((sum, month) => sum + month.investment, 0);
+    const interestsEarned = yearData.months.reduce((sum, month) => sum + month.interests, 0);
     const totalIncome = yearData.months.reduce((sum, month) => sum + month.totalIncome, 0);
     const totalExpenses = yearData.months.reduce((sum, month) => sum + month.totalExpenses, 0);
     const savedAmount = december.endingBalance - yearData.config.startingBalance;
@@ -81,6 +86,7 @@ export function deriveEvolutionMetrics(sources: EvolutionMetricSource[]): Evolut
       finalBalance: december.endingBalance,
       savedAmount,
       investedAmount,
+      interestsEarned,
       accumulatedInvested,
       totalIncome,
       totalExpenses,
@@ -115,6 +121,7 @@ export function summarizeEvolutionMetrics(metrics: EvolutionYearMetric[]): Evolu
   const latestFinalBalance = latest?.finalBalance ?? 0;
   const accumulatedInvested = latest?.accumulatedInvested ?? 0;
   const totalSaved = metrics.reduce((sum, metric) => sum + metric.savedAmount, 0);
+  const totalInterestsEarned = metrics.reduce((sum, metric) => sum + metric.interestsEarned, 0);
   const ratedMetrics = metrics.filter((m) => m.savingsRate !== null);
   const averageSavingsRate =
     ratedMetrics.length > 0
@@ -126,6 +133,7 @@ export function summarizeEvolutionMetrics(metrics: EvolutionYearMetric[]): Evolu
     averageSavingsPerYear: metrics.length > 0 ? totalSaved / metrics.length : 0,
     averageSavingsRate,
     accumulatedInvested,
+    totalInterestsEarned,
     totalWealth: latestFinalBalance + accumulatedInvested,
     topYears,
   };

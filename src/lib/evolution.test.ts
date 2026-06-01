@@ -18,7 +18,7 @@ function month(overrides: Partial<MonthData>): MonthData {
     payslipManualOverride: false,
     additionalPayslip: 0,
     additionalPayslipManualOverride: false,
-    interests: 0,
+    interests: overrides.interests ?? 0,
     interestsManualOverride: false,
     personalRemaining: 0,
     recurringExpenses: [],
@@ -151,8 +151,8 @@ test("deriveEvolutionMetrics sorts years ascending before accumulating investmen
 test("deriveEvolutionMetrics merges gridly and historical sources chronologically", () => {
   const metrics = deriveEvolutionMetrics([
     { source: "gridly", yearData: yearData(2024, 1000, [month({ month: 12, investment: 200, totalIncome: 2000, totalExpenses: 1200, endingBalance: 1800 })]) },
-    { source: "historical", year: 2022, startingBalance: 500, finalBalance: 900, investedAmount: 100, savingsRate: null },
-    { source: "historical", year: 2023, startingBalance: 900, finalBalance: 750, investedAmount: 50, savingsRate: null },
+    { source: "historical", year: 2022, startingBalance: 500, finalBalance: 900, investedAmount: 100, savingsRate: null, interestsEarned: 0 },
+    { source: "historical", year: 2023, startingBalance: 900, finalBalance: 750, investedAmount: 50, savingsRate: null, interestsEarned: 0 },
   ]);
 
   assert.deepEqual(metrics.map((metric) => ({
@@ -233,6 +233,7 @@ test("summarizeEvolutionMetrics derives dashboard totals and best year", () => {
     averageSavingsPerYear: 450,
     averageSavingsRate: 0.3,
     accumulatedInvested: 350,
+    totalInterestsEarned: 0,
     totalWealth: 2250,
     topYears: [
       { year: 2025, savedAmount: 600 },
@@ -248,7 +249,35 @@ test("summarizeEvolutionMetrics returns zero totals and null best year for empty
     averageSavingsPerYear: 0,
     averageSavingsRate: null,
     accumulatedInvested: 0,
+    totalInterestsEarned: 0,
     totalWealth: 0,
     topYears: [],
   });
+});
+
+test("deriveEvolutionMetrics sums monthly interest for gridly years and reads it from historical sources", () => {
+  const metrics = deriveEvolutionMetrics([
+    { source: "gridly", yearData: yearData(2024, 1000, [
+      month({ month: 6, interests: 12, endingBalance: 1200 }),
+      month({ month: 12, interests: 18, endingBalance: 1400 }),
+    ]) },
+    { source: "historical", year: 2022, startingBalance: 500, finalBalance: 900, investedAmount: 0, savingsRate: null, interestsEarned: 7 },
+  ]);
+
+  assert.deepEqual(
+    metrics.map((metric) => ({ year: metric.year, interestsEarned: metric.interestsEarned })),
+    [
+      { year: 2022, interestsEarned: 7 },
+      { year: 2024, interestsEarned: 30 },
+    ]
+  );
+});
+
+test("summarizeEvolutionMetrics totals interest across all years", () => {
+  const metrics = deriveEvolutionMetrics([
+    { source: "gridly", yearData: yearData(2024, 1000, [month({ month: 12, interests: 30, endingBalance: 1400 })]) },
+    { source: "historical", year: 2022, startingBalance: 500, finalBalance: 900, investedAmount: 0, savingsRate: null, interestsEarned: 7 },
+  ]);
+
+  assert.equal(summarizeEvolutionMetrics(metrics).totalInterestsEarned, 37);
 });
