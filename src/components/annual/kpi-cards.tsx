@@ -150,13 +150,8 @@ export function KpiCards({
       label: t("avgSavings"),
       value: avgSavings,
       note: t("avgSavingsNote"),
+      comparison: t("bestMonthKpi", { amount: formatCurrency(maxSavings, locale) }),
       tone: getMetricTone(avgSavings, toneLabels),
-    },
-    {
-      label: t("bestMonth"),
-      value: maxSavings,
-      note: t("bestMonthNote"),
-      tone: getMetricTone(maxSavings, toneLabels),
     },
     {
       label: t("totalInvestment"),

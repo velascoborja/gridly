@@ -98,6 +98,7 @@
       "totalSavingsNote": "Ahorro neto generado durante el año",
       "avgSavings": "Ahorro medio",
       "avgSavingsNote": "Media mensual en los meses con actividad",
+      "bestMonthKpi": "Mejor mes: {amount}",
       "bestMonth": "Mejor mes",
       "bestMonthNote": "Mayor ahorro registrado en un mes",
       "totalInvestment": "Inversión total",

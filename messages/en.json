@@ -98,6 +98,7 @@
       "totalSavingsNote": "Net savings generated during the year",
       "avgSavings": "Average savings",
       "avgSavingsNote": "Monthly average across active months",
+      "bestMonthKpi": "Best month: {amount}",
       "bestMonth": "Best month",
       "bestMonthNote": "Highest savings recorded in one month",
       "totalInvestment": "Total invested",
