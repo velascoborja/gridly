@@ -36,6 +36,8 @@ test("parseHistoricalYearPayload rejects invalid year and invested amount", () =
   assert.equal("error" in r2 ? r2.error : null, "invalidInvestedAmount");
   const r3 = parseHistoricalYearPayload({ year: 2022, startingBalance: 0, finalBalance: 1, investedAmount: 0, interestsEarned: -5 });
   assert.equal("error" in r3 ? r3.error : null, "invalidInterestsEarned");
+  const r4 = parseHistoricalYearPayload({ year: 2022, startingBalance: 0, finalBalance: 1, investedAmount: 0, interestsEarned: Infinity });
+  assert.equal("error" in r4 ? r4.error : null, "invalidInterestsEarned");
 });
 
 test("validateHistoricalYearEligibility enforces pre-Gridly-only imports", () => {
