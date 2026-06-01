@@ -17,9 +17,9 @@ test("evolution loading state keeps the app shell and mirrors dashboard sections
   assert.match(source, /BaseAppShell/);
   assert.match(source, /aria-busy="true"/);
   assert.match(source, /surface-depth-floating/);
-  assert.match(source, /xl:grid-cols-5/);
+  assert.match(source, /xl:grid-cols-6/);
   assert.match(source, /md:grid-cols-2/);
-  assert.match(source, /min-w-\[860px\]/);
+  assert.match(source, /min-w-\[1040px\]/);
 });
 
 test("evolution charts include final balance, savings, and investment series", () => {

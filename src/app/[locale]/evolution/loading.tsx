@@ -36,8 +36,8 @@ export default function EvolutionLoading() {
             <Skeleton className="mt-3 h-3 w-80 max-w-full rounded bg-muted/45" />
           </div>
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-            {Array.from({ length: 5 }, (_, index) => (
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
+            {Array.from({ length: 6 }, (_, index) => (
               <div
                 key={index}
                 className="rounded-lg border border-border/70 bg-card/90 p-4 shadow-sm"
@@ -56,7 +56,8 @@ export default function EvolutionLoading() {
 
         <section className="space-y-6">
           <ChartSkeleton heightClassName="h-[280px]" />
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <ChartSkeleton heightClassName="h-[240px]" />
             <ChartSkeleton heightClassName="h-[240px]" />
             <ChartSkeleton heightClassName="h-[240px]" />
           </div>
@@ -69,16 +70,16 @@ export default function EvolutionLoading() {
           </div>
           <div className="px-6 pb-6 pt-0">
             <div className="overflow-x-auto rounded-lg border border-border/60">
-              <div className="min-w-[860px]">
-                <div className="grid grid-cols-9 gap-3 bg-muted/40 px-3 py-3">
-                  {Array.from({ length: 9 }, (_, index) => (
+              <div className="min-w-[1040px]">
+                <div className="grid grid-cols-10 gap-3 bg-muted/40 px-3 py-3">
+                  {Array.from({ length: 10 }, (_, index) => (
                     <Skeleton key={index} className="h-3 rounded bg-muted/70" />
                   ))}
                 </div>
                 <div className="divide-y divide-border/60">
                   {Array.from({ length: 5 }, (_, rowIndex) => (
-                    <div key={rowIndex} className="grid grid-cols-9 gap-3 bg-card/70 px-3 py-3">
-                      {Array.from({ length: 9 }, (_, cellIndex) => (
+                    <div key={rowIndex} className="grid grid-cols-10 gap-3 bg-card/70 px-3 py-3">
+                      {Array.from({ length: 10 }, (_, cellIndex) => (
                         <Skeleton
                           key={cellIndex}
                           className={`h-4 rounded bg-muted/45 ${cellIndex === 0 ? "w-12" : "w-full"}`}
