@@ -11,3 +11,9 @@ test("historical year dialog includes an optional interest earned field", () => 
   assert.match(source, /interestsEarned/, "dialog should track interestsEarned state");
   assert.match(source, /t\("interestEarned"\)/, "dialog should label the interest field");
 });
+
+test("evolution KPI cards show total interest earned", () => {
+  const source = read("./evolution-kpi-cards.tsx");
+  assert.match(source, /summary\.totalInterestsEarned/, "should read the aggregate from the summary");
+  assert.match(source, /t\("totalInterestEarned"\)/, "should render a total interest card");
+});

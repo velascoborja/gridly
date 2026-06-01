@@ -1,6 +1,6 @@
 "use client";
 
-import { Award, CalendarDays, Landmark, PiggyBank, TrendingUp } from "lucide-react";
+import { Award, CalendarDays, Landmark, Percent, PiggyBank, TrendingUp } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Card, CardContent } from "@/components/ui/card";
 import type { EvolutionSummary } from "@/lib/evolution";
@@ -90,12 +90,21 @@ export function EvolutionKpiCards({ summary, estimatedPortfolioValue, returnRate
       Icon: Award,
       className: "text-foreground",
     },
+    {
+      label: t("totalInterestEarned"),
+      value: formatCurrency(summary.totalInterestsEarned, locale),
+      note: t("totalInterestEarnedNote"),
+      tag: undefined as string | undefined,
+      subItems: undefined as string[] | undefined,
+      Icon: Percent,
+      className: "text-primary",
+    },
   ];
 
   return (
     <div className="mt-5 flex flex-wrap justify-center gap-3">
       {cards.map(({ label, value, note, tag, subItems, Icon, className }) => (
-        <Card key={label} className="w-[calc(50%-6px)] border-border/70 bg-card/90 shadow-sm md:w-[calc(33.333%-8px)] xl:w-[calc(20%-9.6px)]">
+        <Card key={label} className="w-[calc(50%-6px)] border-border/70 bg-card/90 shadow-sm md:w-[calc(33.333%-8px)] xl:w-[calc(16.666%-10px)]">
           <CardContent className="p-3 sm:p-4">
             <div className="flex items-start justify-between gap-2">
               <p className="text-xs font-medium leading-4 text-muted-foreground sm:text-sm">{label}</p>

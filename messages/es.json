@@ -574,7 +574,9 @@
       "bestYearNote": "Ahorro generado: {amount}",
       "bestYearEmpty": "Sin años comparables",
       "bestYearRunnerUp": "{year}: {amount}",
-      "notAvailable": "No disponible"
+      "notAvailable": "No disponible",
+      "totalInterestEarned": "Intereses totales",
+      "totalInterestEarnedNote": "Intereses ganados en todos los años"
     },
     "charts": {
       "balanceTitle": "Evolución del saldo final",
