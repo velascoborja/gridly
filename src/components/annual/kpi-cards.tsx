@@ -1,5 +1,5 @@
 import { useLocale, useTranslations } from "next-intl";
-import { ArrowDownRight, ArrowUpRight, Download, Minus, PiggyBank, Settings, Tags, type LucideIcon } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, Download, Minus, Percent, PiggyBank, Settings, Tags, type LucideIcon } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -104,6 +104,8 @@ export function KpiCards({
   const totalSavings = populated.reduce((s, m) => s + m.savings, 0);
   const totalInvestment = months.reduce((sum, month) => sum + month.investment, 0);
   const investmentMonths = months.filter((month) => month.investment > 0).length;
+  const totalInterests = months.reduce((sum, m) => sum + m.interests, 0);
+  const interestMonths = months.filter((m) => m.interests > 0).length;
   const avgSavings = populated.length > 0 ? totalSavings / populated.length : 0;
   const maxSavings = populated.length > 0 ? Math.max(...populated.map((m) => m.savings)) : 0;
   const endingBalance = months.length > 0 ? months[months.length - 1].endingBalance : startingBalance;
@@ -118,6 +120,12 @@ export function KpiCards({
     badgeClassName: "border-primary/20 bg-primary/10 text-primary",
     label: t("neutralTrend"),
     Icon: PiggyBank,
+  };
+  const interestTone = {
+    valueClassName: "text-primary",
+    badgeClassName: "border-primary/20 bg-primary/10 text-primary",
+    label: t("neutralTrend"),
+    Icon: Percent,
   };
 
   const primaryMetrics: KpiMetric[] = [
@@ -156,6 +164,13 @@ export function KpiCards({
       note: t("totalInvestmentNote"),
       comparison: t("investmentMonths", { count: investmentMonths }),
       tone: investmentTone,
+    },
+    {
+      label: t("interestEarned"),
+      value: totalInterests,
+      note: t("interestEarnedNote"),
+      comparison: t("interestMonths", { count: interestMonths }),
+      tone: interestTone,
     },
   ];
 

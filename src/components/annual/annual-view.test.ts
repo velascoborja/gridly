@@ -157,3 +157,9 @@ test("annual setup dialog has room for the grouped desktop layout", () => {
   assert.match(source, /DialogContent className="[^"]*sm:max-w-3xl/, "config dialog should override the default narrow desktop max width");
   assert.match(formSource, /items-stretch gap-3 lg:grid-cols-2/, "paired desktop setup cards should match the tallest card height");
 });
+
+test("annual KPI cards show total interest earned", () => {
+  const source = readFileSync(new URL("./kpi-cards.tsx", import.meta.url), "utf8");
+  assert.match(source, /m\.interests/, "should sum monthly interest");
+  assert.match(source, /t\("interestEarned"\)/, "should render an interest KPI card");
+});
