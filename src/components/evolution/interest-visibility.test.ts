@@ -17,3 +17,9 @@ test("evolution KPI cards show total interest earned", () => {
   assert.match(source, /summary\.totalInterestsEarned/, "should read the aggregate from the summary");
   assert.match(source, /t\("totalInterestEarned"\)/, "should render a total interest card");
 });
+
+test("evolution charts include an interest-per-year bar chart", () => {
+  const source = read("./evolution-charts.tsx");
+  assert.match(source, /dataKey="interestsEarned"/, "should plot interestsEarned");
+  assert.match(source, /t\("interestTitle"\)/, "should title the interest chart");
+});

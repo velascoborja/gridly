@@ -591,7 +591,10 @@
       "savedLabel": "Savings",
       "investedTitle": "Investment per year",
       "investedDescription": "Sum of recorded monthly investment.",
-      "investedLabel": "Investment"
+      "investedLabel": "Investment",
+      "interestTitle": "Interest per year",
+      "interestDescription": "Interest earned on the savings account each year.",
+      "interestLabel": "Interest"
     },
     "table": {
       "title": "Year detail",

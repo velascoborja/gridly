@@ -65,7 +65,7 @@ export function EvolutionCharts({ metrics, estimatedValues }: Props) {
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
+      <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card className="border-border/70 bg-card/90 shadow-sm">
           <CardHeader className="space-y-1 pb-2">
             <CardTitle className="text-base font-light tracking-[-0.02em]">{t("savedTitle")}</CardTitle>
@@ -107,6 +107,28 @@ export function EvolutionCharts({ metrics, estimatedValues }: Props) {
                   <YAxis tickFormatter={axisCurrency} tick={{ fontSize: 11 }} width={44} />
                   <Tooltip formatter={(value) => formatCurrency(Number(value), locale)} />
                   <Bar name={t("investedLabel")} dataKey="investedAmount" fill="hsl(var(--primary))" radius={[3, 3, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border/70 bg-card/90 shadow-sm">
+          <CardHeader className="space-y-1 pb-2">
+            <CardTitle className="text-base font-light tracking-[-0.02em]">{t("interestTitle")}</CardTitle>
+            <p className="text-sm leading-5 text-muted-foreground">{t("interestDescription")}</p>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="rounded-lg border border-border/60 bg-muted/20 p-2 sm:p-3">
+              <div className="h-[180px] sm:h-[240px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={metrics} margin={{ top: 6, right: 4, bottom: 0, left: 4 }}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border/80" />
+                  <XAxis dataKey="year" tick={{ fontSize: 11 }} />
+                  <YAxis tickFormatter={axisCurrency} tick={{ fontSize: 11 }} width={44} />
+                  <Tooltip formatter={(value) => formatCurrency(Number(value), locale)} />
+                  <Bar name={t("interestLabel")} dataKey="interestsEarned" fill="var(--color-chart-2)" radius={[3, 3, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
               </div>

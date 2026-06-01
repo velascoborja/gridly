@@ -591,7 +591,10 @@
       "savedLabel": "Ahorro",
       "investedTitle": "Inversión por año",
       "investedDescription": "Suma de la inversión mensual registrada.",
-      "investedLabel": "Inversión"
+      "investedLabel": "Inversión",
+      "interestTitle": "Intereses por año",
+      "interestDescription": "Intereses ganados con la cuenta de ahorro cada año.",
+      "interestLabel": "Intereses"
     },
     "table": {
       "title": "Detalle por año",
