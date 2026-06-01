@@ -79,7 +79,7 @@ The drilldown groups entries by year instead of by month when `DrilldownEntry.ye
 
 ### KPI Cards
 
-Five cards derived from `EvolutionSummary`:
+Six cards derived from `EvolutionSummary`:
 
 1. **Latest Balance** (`latestFinalBalance`) — December ending balance of the most recent eligible year.
 2. **Total Saved** (`totalSaved`) — Cumulative savings across eligible years. Value is colored green when ≥ 0, red when negative.
