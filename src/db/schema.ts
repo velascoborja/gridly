@@ -94,6 +94,7 @@ export const historicalYears = pgTable("historical_years", {
   startingBalance: numeric("starting_balance", { precision: 12, scale: 2 }).notNull().default("0"),
   finalBalance: numeric("final_balance", { precision: 12, scale: 2 }).notNull().default("0"),
   investedAmount: numeric("invested_amount", { precision: 12, scale: 2 }).notNull().default("0"),
+  interestsEarned: numeric("interests_earned", { precision: 12, scale: 2 }).notNull().default("0"),
   savingsRate: numeric("savings_rate", { precision: 5, scale: 4 }),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
