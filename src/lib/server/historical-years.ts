@@ -129,6 +129,7 @@ export async function getEvolutionSourcesForUser(userId: string, maxYear?: numbe
       startingBalance: row.startingBalance,
       finalBalance: row.finalBalance,
       investedAmount: row.investedAmount,
+      interestsEarned: 0,
       savingsRate: row.savingsRate,
     })),
     ...gridlyYearData.map((yearData): EvolutionMetricSource => ({ source: "gridly", yearData })),
