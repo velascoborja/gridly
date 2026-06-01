@@ -613,6 +613,7 @@
       "totalIncome": "Income",
       "totalExpenses": "Expenses",
       "savingsRate": "Savings rate",
+      "interestEarned": "Interest",
       "actions": "Actions",
       "editHistoricalYear": "Edit historical year {year}",
       "deleteHistoricalYear": "Delete historical year {year}",

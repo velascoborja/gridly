@@ -613,6 +613,7 @@
       "totalIncome": "Ingresos",
       "totalExpenses": "Gastos",
       "savingsRate": "Tasa de ahorro",
+      "interestEarned": "Intereses",
       "actions": "Acciones",
       "editHistoricalYear": "Editar año histórico {year}",
       "deleteHistoricalYear": "Eliminar año histórico {year}",

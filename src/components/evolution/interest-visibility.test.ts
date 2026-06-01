@@ -23,3 +23,9 @@ test("evolution charts include an interest-per-year bar chart", () => {
   assert.match(source, /dataKey="interestsEarned"/, "should plot interestsEarned");
   assert.match(source, /t\("interestTitle"\)/, "should title the interest chart");
 });
+
+test("evolution detail table has an interest column", () => {
+  const source = read("./evolution-detail-table.tsx");
+  assert.match(source, /metric\.interestsEarned/, "should render the per-year interest cell");
+  assert.match(source, /t\("interestEarned"\)/, "should add an interest column header");
+});

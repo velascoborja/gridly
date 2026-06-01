@@ -65,7 +65,7 @@ export function EvolutionDetailTable({ metrics, historicalYears, onEditHistorica
       </CardHeader>
       <CardContent className="pt-0">
         <div className="overflow-x-auto rounded-lg border border-border/60">
-          <table className="min-w-[960px] w-full text-left text-sm">
+          <table className="min-w-[1040px] w-full text-left text-sm">
             <thead className="bg-muted/40 text-xs uppercase tracking-[0.12em] text-muted-foreground">
               <tr>
                 <th className="px-3 py-3 font-medium text-center">{t("sourceLabel")}</th>
@@ -78,6 +78,7 @@ export function EvolutionDetailTable({ metrics, historicalYears, onEditHistorica
                 <th className="px-3 py-3 font-medium text-center">{t("totalIncome")}</th>
                 <th className="px-3 py-3 font-medium text-center">{t("totalExpenses")}</th>
                 <th className="px-3 py-3 font-medium text-center">{t("savingsRate")}</th>
+                <th className="px-3 py-3 font-medium text-center">{t("interestEarned")}</th>
                 <th className="px-3 py-3 font-medium text-center">{t("actions")}</th>
               </tr>
             </thead>
@@ -99,6 +100,7 @@ export function EvolutionDetailTable({ metrics, historicalYears, onEditHistorica
                     <td className="px-3 py-3 text-center finance-number">
                       {metric.savingsRate === null ? t("notAvailable") : formatPercent(metric.savingsRate, locale)}
                     </td>
+                    <td className="px-3 py-3 text-center finance-number">{formatCurrency(metric.interestsEarned, locale)}</td>
                     <td className="px-3 py-3 text-center">
                       {historicalYear ? (
                         <div className="flex items-center gap-1">
