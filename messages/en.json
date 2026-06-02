@@ -503,7 +503,12 @@
     "returnRatePlaceholder": "7",
     "returnRateNote": "Estimated return on investments per year",
     "categoriesButton": "View categories",
-    "categoriesTitle": "Categories (all years)",
+    "categoriesTitle": "Categories",
+    "tagsPager": {
+      "allYears": "All years",
+      "prevYear": "Previous year",
+      "nextYear": "Next year"
+    },
     "source": {
       "gridly": "Gridly",
       "historical": "Historical"

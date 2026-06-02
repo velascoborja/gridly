@@ -503,7 +503,12 @@
     "returnRatePlaceholder": "7",
     "returnRateNote": "Rentabilidad estimada de las inversiones por año",
     "categoriesButton": "Ver categorías",
-    "categoriesTitle": "Categorías (todos los años)",
+    "categoriesTitle": "Categorías",
+    "tagsPager": {
+      "allYears": "Todos los años",
+      "prevYear": "Año anterior",
+      "nextYear": "Año siguiente"
+    },
     "source": {
       "gridly": "Gridly",
       "historical": "Histórico"

@@ -90,10 +90,25 @@ export function computeTagStats(yearData: YearData): TagStats {
   return finalizeBuckets(buckets, false);
 }
 
-export function computeMultiYearTagStats(yearDataList: YearData[]): TagStats {
+// Contract: entries from computeTagStats carry no `year`. mergeTagStatsByYear stamps each
+// entry with its source year so the combined drilldown can group entries by year.
+export function mergeTagStatsByYear(perYear: { year: number; stats: TagStats }[]): TagStats {
   const buckets = new Map<number | null, Bucket>();
-  for (const yearData of yearDataList) {
-    accumulateSingleYear(yearData, buckets, yearData.config.year);
+  for (const { year, stats } of perYear) {
+    for (const stat of stats.stats) {
+      const tagId = stat.tag?.id ?? null;
+      const bucket = ensureBucket(buckets, tagId, stat.tag);
+      bucket.totalAmount += stat.totalAmount;
+      for (const entry of stat.entries) {
+        bucket.entries.push({ ...entry, year });
+      }
+    }
   }
   return finalizeBuckets(buckets, true);
+}
+
+export function computeMultiYearTagStats(yearDataList: YearData[]): TagStats {
+  return mergeTagStatsByYear(
+    yearDataList.map((yearData) => ({ year: yearData.config.year, stats: computeTagStats(yearData) })),
+  );
 }

@@ -71,11 +71,17 @@ Evolution can include both full Gridly years and summary-only historical imports
 
 ### Tags Dialog
 
-When at least one full Gridly year has tagged or untagged expense data, the dashboard header shows a Tags icon button. The button opens a dialog titled by `Evolution.categoriesTitle` and reuses the annual `TagStatRow` drilldown UI to show expense spending aggregated by tag across all Gridly years.
+When at least one full Gridly year has tagged or untagged expense data, the dashboard header shows a Tags icon button. The button opens a dialog titled by `Evolution.categoriesTitle` that contains a **year pager** reusing the annual `TagStatRow` and `DrilldownList` UI.
 
-Only Gridly years contribute to this dialog. Historical summary-only imports are excluded because they do not store entry-level expense or tag data. The route computes `multiYearTagStats` with `computeMultiYearTagStats(gridlyYearDataList)` and passes it to `EvolutionDashboard`; the dashboard hides the button when the prop is `null` or has no stats.
+The dialog opens on page 0 — a combined **"Todos los años"** landing page — and subsequent pages show one Gridly year each in ascending chronological order. Navigation uses `‹`/`›` buttons with no wraparound (arrows are disabled at the ends). The dialog resets to the "Todos" page each time it is opened.
 
-The drilldown groups entries by year instead of by month when `DrilldownEntry.year` is present. Year headers are collapsed by default, show the aggregate spend for that year, and expand locally when tapped. Grouped expenses are attributed to the group's tag, ungrouped additional expenses use their own tag, and recurring expenses are bucketed by their recurring expense tag.
+The set of years available in the pager respects the dashboard's **"incluir futuros" (`includeFuture`) toggle**: with it off (the default), only years `<= calendarYear` appear; with it on, configured future years appear as well. Historical summary-only imports are always excluded because they do not store entry-level expense or tag data. Gridly years with `totalAdditional === 0` (no tracked spending) are skipped so there are no blank pages.
+
+Each page shows a per-page summary line with total spend and tag count. On the "Todos" page, `DrilldownList` groups expanded entries by year; on per-year pages, it groups by month — identical to the annual Categorías view.
+
+**Data flow**: the route passes `tagStatsByYear` — a `{ year: number; stats: TagStats }[]` array sorted ascending, one entry per Gridly year with spending — to `EvolutionDashboard`. The client merges the visible years for the combined page by calling `mergeTagStatsByYear(visibleYears)` (which attaches a `year` field to each `DrilldownEntry`). The dashboard hides the Tags button when `tagStatsByYear` is empty or absent.
+
+Grouped expenses are attributed to the group's tag, ungrouped additional expenses use their own tag, and recurring expenses are bucketed by their recurring expense tag.
 
 ### KPI Cards
 
