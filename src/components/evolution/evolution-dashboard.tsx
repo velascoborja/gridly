@@ -1,8 +1,8 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
-import { Plus, Tags } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ChevronLeft, ChevronRight, Plus, Tags } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -10,11 +10,10 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { calcEstimatedPortfolioValues, summarizeEvolutionMetrics, type EvolutionYearMetric } from "@/lib/evolution";
 import type { HistoricalYear } from "@/lib/types";
-import type { TagStats } from "@/lib/tag-stats";
+import { mergeTagStatsByYear, type TagStats } from "@/lib/tag-stats";
 import { formatCurrency } from "@/lib/utils";
 import { TagStatRow } from "@/components/annual/tag-stat-row";
 import { EvolutionCharts } from "./evolution-charts";
@@ -28,16 +27,19 @@ interface Props {
   metrics: EvolutionYearMetric[];
   historicalYears: HistoricalYear[];
   calendarYear: number;
-  multiYearTagStats: TagStats | null;
+  tagStatsByYear: { year: number; stats: TagStats }[];
 }
 
-export function EvolutionDashboard({ metrics, historicalYears, calendarYear, multiYearTagStats }: Props) {
+export function EvolutionDashboard({ metrics, historicalYears, calendarYear, tagStatsByYear }: Props) {
   const t = useTranslations("Evolution");
+  const tCat = useTranslations("Annual.categories");
   const locale = useLocale();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingHistoricalYear, setEditingHistoricalYear] = useState<HistoricalYear | null>(null);
   const [returnRate, setReturnRate] = useState<number | null>(null);
   const [includeFuture, setIncludeFuture] = useState(false);
+  const [tagsDialogOpen, setTagsDialogOpen] = useState(false);
+  const [tagPageIndex, setTagPageIndex] = useState(0);
 
   const hasFutureYears = metrics.some((m) => m.year > calendarYear);
   const visibleMetrics = includeFuture ? metrics : metrics.filter((m) => m.year <= calendarYear);
@@ -48,8 +50,25 @@ export function EvolutionDashboard({ metrics, historicalYears, calendarYear, mul
   const summary = summarizeEvolutionMetrics(visibleMetrics);
   const showEmptyState = visibleMetrics.length < 2;
 
-  const hasTagData = multiYearTagStats !== null && multiYearTagStats.stats.length > 0;
-  const maxTagAmount = multiYearTagStats?.stats[0]?.totalAmount ?? 0;
+  const visibleTagYears = useMemo(
+    () => (includeFuture ? tagStatsByYear : tagStatsByYear.filter((y) => y.year <= calendarYear)),
+    [tagStatsByYear, includeFuture, calendarYear],
+  );
+  const hasTagData = visibleTagYears.length > 0;
+  type TagPage = { year: number | null; stats: TagStats };
+  const tagPages = useMemo<TagPage[]>(
+    () => [
+      { year: null, stats: mergeTagStatsByYear(visibleTagYears) },
+      ...visibleTagYears.map((y) => ({ year: y.year, stats: y.stats })),
+    ],
+    [visibleTagYears],
+  );
+  const safeTagPageIndex = Math.min(tagPageIndex, tagPages.length - 1);
+  const currentTagPage = tagPages[safeTagPageIndex];
+  const currentTagStats = currentTagPage?.stats.stats ?? [];
+  const currentMaxTagAmount = currentTagStats[0]?.totalAmount ?? 0;
+  const currentTagTaggedCount = currentTagStats.filter((s) => s.tag !== null).length;
+  const currentTagTotal = currentTagPage?.stats.totalAdditional ?? 0;
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -103,28 +122,70 @@ export function EvolutionDashboard({ metrics, historicalYears, calendarYear, mul
           <div className="flex w-full flex-col items-start gap-2 sm:w-auto sm:items-end">
             <div className="flex items-center gap-2">
               {hasTagData && (
-                <Dialog>
-                  <DialogTrigger
-                    render={
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-9 w-9 border-border/70 bg-background/80 text-muted-foreground shadow-sm hover:border-primary/30 hover:bg-primary/[0.06] hover:text-primary"
-                      >
-                        <Tags className="h-4 w-4" />
-                        <span className="sr-only">{t("categoriesButton")}</span>
-                      </Button>
-                    }
-                  />
+                <Dialog
+                  open={tagsDialogOpen}
+                  onOpenChange={(open) => {
+                    setTagsDialogOpen(open);
+                    if (open) setTagPageIndex(0);
+                  }}
+                >
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-9 w-9 border-border/70 bg-background/80 text-muted-foreground shadow-sm hover:border-primary/30 hover:bg-primary/[0.06] hover:text-primary"
+                    onClick={() => setTagsDialogOpen(true)}
+                  >
+                    <Tags className="h-4 w-4" />
+                    <span className="sr-only">{t("categoriesButton")}</span>
+                  </Button>
                   <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-2xl">
                     <div className="max-h-[calc(100dvh-2rem)] overflow-y-auto">
                       <DialogHeader className="sticky top-0 z-10 border-b border-border/50 bg-card/70 px-5 pt-5 pr-14 pb-4 backdrop-blur-xl supports-[backdrop-filter]:bg-card/55 md:px-6 md:pt-6 md:pr-16 md:pb-5">
                         <DialogTitle>{t("categoriesTitle")}</DialogTitle>
+                        <div className="mt-3 flex items-center justify-between gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 shrink-0"
+                            disabled={safeTagPageIndex === 0}
+                            onClick={() => setTagPageIndex((i) => Math.max(0, Math.min(tagPages.length - 1, i) - 1))}
+                          >
+                            <ChevronLeft className="h-4 w-4" />
+                            <span className="sr-only">{t("tagsPager.prevYear")}</span>
+                          </Button>
+                          <span
+                            aria-live="polite"
+                            className="finance-number text-sm font-semibold tabular-nums text-foreground"
+                          >
+                            {currentTagPage?.year === null ? t("tagsPager.allYears") : currentTagPage?.year}
+                          </span>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 shrink-0"
+                            disabled={safeTagPageIndex >= tagPages.length - 1}
+                            onClick={() => setTagPageIndex((i) => Math.max(0, Math.min(tagPages.length - 1, i) + 1))}
+                          >
+                            <ChevronRight className="h-4 w-4" />
+                            <span className="sr-only">{t("tagsPager.nextYear")}</span>
+                          </Button>
+                        </div>
                       </DialogHeader>
                       <div className="mx-auto max-w-2xl px-4 py-6">
+                        <p className="mb-4 text-xs text-muted-foreground">
+                          {tCat("totalLabel")}{" "}
+                          <strong className="text-foreground">{formatCurrency(currentTagTotal, locale)}</strong>
+                          {currentTagTaggedCount > 0 && <> · {tCat("tagCount", { count: currentTagTaggedCount })}</>}
+                        </p>
                         <div className="flex flex-col gap-2">
-                          {multiYearTagStats!.stats.map((stat) => (
-                            <TagStatRow key={stat.tag?.id ?? "untagged"} stat={stat} maxAmount={maxTagAmount} />
+                          {currentTagStats.map((stat) => (
+                            <TagStatRow
+                              key={`${currentTagPage?.year ?? "all"}-${stat.tag?.id ?? "untagged"}`}
+                              stat={stat}
+                              maxAmount={currentMaxTagAmount}
+                            />
                           ))}
                         </div>
                       </div>
