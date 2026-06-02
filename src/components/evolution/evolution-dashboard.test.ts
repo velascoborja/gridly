@@ -116,8 +116,20 @@ test("evolution categories button and dialog title keys exist in both locales", 
 
   assert.equal(spanish.Evolution.categoriesButton, "Ver categorías");
   assert.equal(english.Evolution.categoriesButton, "View categories");
-  assert.equal(spanish.Evolution.categoriesTitle, "Categorías (todos los años)");
-  assert.equal(english.Evolution.categoriesTitle, "Categories (all years)");
+  assert.equal(spanish.Evolution.categoriesTitle, "Categorías");
+  assert.equal(english.Evolution.categoriesTitle, "Categories");
+});
+
+test("evolution tags pager keys exist in both locales", () => {
+  const spanish = JSON.parse(readFileSync(new URL("../../../messages/es.json", import.meta.url), "utf8"));
+  const english = JSON.parse(readFileSync(new URL("../../../messages/en.json", import.meta.url), "utf8"));
+
+  assert.equal(spanish.Evolution.tagsPager.allYears, "Todos los años");
+  assert.equal(english.Evolution.tagsPager.allYears, "All years");
+  assert.equal(spanish.Evolution.tagsPager.prevYear, "Año anterior");
+  assert.equal(english.Evolution.tagsPager.prevYear, "Previous year");
+  assert.equal(spanish.Evolution.tagsPager.nextYear, "Año siguiente");
+  assert.equal(english.Evolution.tagsPager.nextYear, "Next year");
 });
 
 test("evolution dashboard accepts multiYearTagStats prop and renders Tags button with dialog", () => {
