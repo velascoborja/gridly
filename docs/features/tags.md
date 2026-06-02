@@ -212,8 +212,29 @@ All category-view copy lives under `Annual.categories` in `messages/es.json` and
 
 ## Evolution Tags Dialog
 
-The Evolution dashboard has a Tags icon button when there is multi-year tag data to show. It opens a dialog that aggregates spending by tag across all full Gridly years and reuses `TagStatRow` for the ranked list and expandable entry drilldown. Historical summary-only imports are excluded because they do not include expense or tag rows.
+The Evolution dashboard has a Tags icon button when there is multi-year tag data to show. It opens a dialog that contains a **year pager** for browsing tag statistics across Gridly years.
 
-`computeMultiYearTagStats(yearDataList: YearData[]): TagStats` in `src/lib/tag-stats.ts` applies the same bucketing rules as `computeTagStats`, but adds `year` to each `DrilldownEntry`. `DrilldownList` detects that field and groups expanded entries by year, sorted ascending, instead of by month. Year headers are collapsed by default, show that year's aggregate amount, and expand inline when tapped. Within a year group, entries remain sorted by month.
+### Year pager
 
-The dialog strings live under `Evolution.categoriesButton` and `Evolution.categoriesTitle` in `messages/es.json` and `messages/en.json`.
+The dialog opens on page 0, a combined **"Todos los años"** view that aggregates spending by tag across all visible Gridly years. Subsequent pages show one Gridly year each, in ascending chronological order. Navigation is provided by `‹` (previous) and `›` (next) buttons; there is no wraparound — the arrows are disabled at the first and last pages respectively. The dialog always resets to the "Todos" page each time it is opened.
+
+Each page displays a per-page summary line showing total spend and tag count, reusing the `Annual.categories.totalLabel` and `tagCount` translation keys. The ranked tag list and expandable entry drilldown reuse `TagStatRow` and `DrilldownList`.
+
+### Year scope
+
+The set of years shown in the pager respects the dashboard's **"incluir futuros" (`includeFuture`) toggle**:
+
+- Toggle off (default): only years `<= calendarYear` appear.
+- Toggle on: configured future years appear as well.
+
+Historical summary-only imports are always excluded from the pager because they do not store entry-level expense or tag data. Gridly years where `totalAdditional === 0` (no tracked spending) are also skipped so there are no blank pages.
+
+### Data flow
+
+The route (`src/app/[locale]/evolution/page.tsx`) passes `tagStatsByYear` — a `{ year: number; stats: TagStats }[]` array sorted ascending, one entry per Gridly year that has spending — to `EvolutionDashboard`. The client merges the visible years for the combined "Todos" page by calling `mergeTagStatsByYear(visibleYears)`, which attaches a `year` field to each `DrilldownEntry` so `DrilldownList` can group entries by year. On per-year pages, `DrilldownList` groups entries by month (identical to the annual Categorías view).
+
+`computeMultiYearTagStats(yearDataList: YearData[]): TagStats` in `src/lib/tag-stats.ts` is now a thin wrapper that calls `computeTagStats` on each year and combines the results via the exported `mergeTagStatsByYear(perYear: { year: number; stats: TagStats }[])`.
+
+### i18n
+
+The dialog strings live under `Evolution.categoriesButton`, `Evolution.categoriesTitle`, and `Evolution.tagsPager.*` in `messages/es.json` and `messages/en.json`. The `tagsPager` namespace contains `allYears` ("Todos los años" / "All years"), `prevYear`, and `nextYear`.
