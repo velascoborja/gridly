@@ -86,6 +86,8 @@
     "description": "Review the expected closing balance, accumulated savings, and monthly trend for the year.",
     "categoriesButton": "Spending by tag",
     "categoriesTitle": "Spending by tag",
+    "fixedExpensesButton": "Fixed expenses",
+    "fixedExpensesTitle": "Fixed expenses",
     "exportExcel": "Export Excel",
     "exporting": "Exporting...",
     "saving": "Saving...",
@@ -139,6 +141,17 @@
       "untagged": "Untagged",
       "untaggedShare": "{pct}% unclassified",
       "emptyState": "No additional entries this year"
+    },
+    "fixedExpenses": {
+      "button": "Fixed expenses",
+      "title": "Fixed expenses",
+      "grandTotalLabel": "Total fixed expenses:",
+      "emptyState": "No fixed expense data recorded.",
+      "home": "Home",
+      "personal": "Personal budget",
+      "recurring": "Recurring expenses",
+      "shareLabel": "{pct}% of total",
+      "entryCount": "{count, plural, one {# entry} other {# entries}}"
     },
     "config": {
       "startingBalanceLabel": "Linked starting balance",
@@ -505,6 +518,13 @@
     "categoriesButton": "View categories",
     "categoriesTitle": "Categories",
     "tagsPager": {
+      "allYears": "All years",
+      "prevYear": "Previous year",
+      "nextYear": "Next year"
+    },
+    "fixedExpensesButton": "Fixed expenses",
+    "fixedExpensesTitle": "Fixed expenses",
+    "fixedPager": {
       "allYears": "All years",
       "prevYear": "Previous year",
       "nextYear": "Next year"

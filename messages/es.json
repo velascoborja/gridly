@@ -86,6 +86,8 @@
     "description": "Consulta el cierre previsto, el ahorro acumulado y la evolución mensual del año.",
     "categoriesButton": "Gasto por etiqueta",
     "categoriesTitle": "Gasto por etiqueta",
+    "fixedExpensesButton": "Gastos fijos",
+    "fixedExpensesTitle": "Gastos fijos",
     "exportExcel": "Exportar Excel",
     "exporting": "Exportando...",
     "saving": "Guardando...",
@@ -139,6 +141,17 @@
       "untagged": "Sin etiqueta",
       "untaggedShare": "{pct}% sin clasificar",
       "emptyState": "No hay entradas adicionales este año"
+    },
+    "fixedExpenses": {
+      "button": "Gastos fijos",
+      "title": "Gastos fijos",
+      "grandTotalLabel": "Total gastos fijos:",
+      "emptyState": "No hay datos de gastos fijos registrados.",
+      "home": "Vivienda",
+      "personal": "Presupuesto personal",
+      "recurring": "Gastos recurrentes",
+      "shareLabel": "{pct}% del total",
+      "entryCount": "{count, plural, one {# entrada} other {# entradas}}"
     },
     "config": {
       "startingBalanceLabel": "Saldo inicial vinculado",
@@ -505,6 +518,13 @@
     "categoriesButton": "Ver categorías",
     "categoriesTitle": "Categorías",
     "tagsPager": {
+      "allYears": "Todos los años",
+      "prevYear": "Año anterior",
+      "nextYear": "Año siguiente"
+    },
+    "fixedExpensesButton": "Gastos fijos",
+    "fixedExpensesTitle": "Gastos fijos",
+    "fixedPager": {
       "allYears": "Todos los años",
       "prevYear": "Año anterior",
       "nextYear": "Año siguiente"
