@@ -16,14 +16,11 @@ export function HelpFeatureRow({ title, summary, detail }: HelpFeatureRowProps) 
   const t = useTranslations("Help");
 
   return (
-    <div className="rounded-xl border border-border/50 bg-background/60 px-4 py-3">
-      <div className="flex items-start justify-between gap-3">
+    <div className="overflow-hidden rounded-xl border border-border/50 bg-background/60">
+      <div className="flex items-start justify-between gap-3 px-4 py-3">
         <div className="min-w-0">
           <p className="text-sm font-medium text-foreground">{title}</p>
           <p className="mt-0.5 text-sm text-muted-foreground">{summary}</p>
-          {expanded && (
-            <p className="mt-2 text-sm leading-relaxed text-foreground/80">{detail}</p>
-          )}
         </div>
         <Button
           variant="ghost"
@@ -40,6 +37,11 @@ export function HelpFeatureRow({ title, summary, detail }: HelpFeatureRowProps) 
           )}
         </Button>
       </div>
+      {expanded && (
+        <div className="border-t border-border/50 bg-muted/30 px-4 py-3">
+          <p className="text-sm leading-relaxed text-foreground/80">{detail}</p>
+        </div>
+      )}
     </div>
   );
 }
