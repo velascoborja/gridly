@@ -31,6 +31,7 @@ export function HelpFeatureRow({ title, summary, detail }: HelpFeatureRowProps) 
           onClick={() => setExpanded((prev) => !prev)}
           className="mt-0.5 shrink-0 text-muted-foreground hover:text-foreground"
           aria-label={expanded ? t("collapseLabel") : t("expandLabel")}
+          aria-expanded={expanded}
         >
           {expanded ? (
             <ChevronUp className="size-4" />
