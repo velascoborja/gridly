@@ -63,11 +63,14 @@ export function HelpPageClient() {
         <p className="mt-1 text-sm text-muted-foreground">{t("pageSubtitle")}</p>
       </div>
 
-      <div className="flex gap-1 rounded-xl border border-border/50 bg-muted/40 p-1">
+      <div role="tablist" className="flex gap-1 rounded-xl border border-border/50 bg-muted/40 p-1">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             type="button"
+            role="tab"
+            aria-selected={activeTab === tab.id}
+            aria-controls={`tabpanel-${tab.id}`}
             onClick={() => setActiveTab(tab.id)}
             className={cn(
               "flex-1 rounded-lg px-3 py-1.5 text-sm font-medium transition-all",
@@ -81,7 +84,12 @@ export function HelpPageClient() {
         ))}
       </div>
 
-      <div className="space-y-2">
+      <div
+        id={`tabpanel-${activeTab}`}
+        role="tabpanel"
+        aria-label={tabs.find((t) => t.id === activeTab)?.label}
+        className="space-y-2"
+      >
         {features.map((feature) => (
           <HelpFeatureRow
             key={feature.title}

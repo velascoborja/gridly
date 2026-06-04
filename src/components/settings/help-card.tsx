@@ -10,7 +10,8 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export function HelpCard() {
   const t = useTranslations("Help");
@@ -25,9 +26,9 @@ export function HelpCard() {
         <CardDescription>{t("cardDescription")}</CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
-        <Button asChild variant="outline">
-          <Link href="/help">{t("cardButton")}</Link>
-        </Button>
+        <Link href="/help" className={cn(buttonVariants({ variant: "outline" }))}>
+          {t("cardButton")}
+        </Link>
       </CardContent>
     </Card>
   );
