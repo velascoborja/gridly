@@ -75,7 +75,7 @@ export function EvolutionCharts({ metrics, estimatedValues }: Props) {
             <div className="rounded-lg border border-border/60 bg-muted/20 p-2 sm:p-3">
               <div className="h-[180px] sm:h-[240px]">
               <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={metrics} margin={{ top: 6, right: 4, bottom: 0, left: 4 }}>
+                <ComposedChart data={metrics} margin={{ top: 6, right: 8, bottom: 0, left: 4 }}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-border/80" />
                   <XAxis dataKey="year" tick={{ fontSize: 11 }} />
                   <YAxis yAxisId="left" tickFormatter={axisCurrency} tick={{ fontSize: 11 }} width={44} />
