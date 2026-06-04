@@ -706,7 +706,7 @@ export function MonthOverview({
         </div>
       ) : null}
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2">
         <AdditionalEntriesCard
           monthId={month.id}
           type="expense"
