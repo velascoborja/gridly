@@ -8,9 +8,10 @@ import type { DrilldownEntry } from "@/lib/tag-stats";
 
 interface Props {
   entries: DrilldownEntry[];
+  fallbackLabel?: string;
 }
 
-export function DrilldownList({ entries }: Props) {
+export function DrilldownList({ entries, fallbackLabel }: Props) {
   const locale = useLocale();
   const [expandedYears, setExpandedYears] = useState<Set<number>>(() => new Set());
   const isMultiYear = entries.length > 0 && entries[0].year !== undefined;
@@ -69,7 +70,7 @@ export function DrilldownList({ entries }: Props) {
                       className="flex items-start gap-3 border-b border-border/30 px-4 py-2.5 text-sm last:border-0"
                     >
                       <div className="min-w-0 flex-1">
-                        <div className="truncate text-foreground">{entry.description}</div>
+                        <div className="truncate text-foreground">{entry.description || fallbackLabel}</div>
                         {entry.groupName && (
                           <div className="truncate text-xs text-muted-foreground">{entry.groupName}</div>
                         )}
@@ -107,7 +108,7 @@ export function DrilldownList({ entries }: Props) {
               className="flex items-start gap-3 border-b border-border/30 px-4 py-2.5 text-sm last:border-0"
             >
               <div className="min-w-0 flex-1">
-                <div className="truncate text-foreground">{entry.description}</div>
+                <div className="truncate text-foreground">{entry.description || fallbackLabel}</div>
                 {entry.groupName && (
                   <div className="truncate text-xs text-muted-foreground">{entry.groupName}</div>
                 )}

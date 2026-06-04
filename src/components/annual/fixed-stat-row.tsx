@@ -70,7 +70,7 @@ export function FixedStatRow({ stat, maxAmount }: Props) {
         className={`grid transition-[grid-template-rows] duration-200 ease-in-out ${isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
       >
         <div className="overflow-hidden">
-          <DrilldownList entries={stat.entries} />
+          <DrilldownList entries={stat.entries} fallbackLabel={t(stat.key)} />
         </div>
       </div>
     </div>
