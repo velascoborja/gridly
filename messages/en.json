@@ -754,6 +754,7 @@
   "Help": {
     "pageTitle": "Features guide",
     "pageSubtitle": "Learn how each part of Gridly works.",
+    "overviewText": "Gridly is a personal finance tracker built around the way real life works — monthly paychecks, fixed bills, the occasional surprise expense, and those two extra payments Spain throws in each June and December. You log your income and spending month by month, and Gridly takes care of the rest: carrying your balance forward, calculating savings, and giving you a clear picture of where your money goes — not just this month, but across years.",
     "expandLabel": "Show more",
     "collapseLabel": "Show less",
     "cardTitle": "Help",

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { HelpFeatureRow } from "./help-feature-row";
 import { cn } from "@/lib/utils";
@@ -61,6 +62,11 @@ export function HelpPageClient() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">{t("pageTitle")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{t("pageSubtitle")}</p>
+      </div>
+
+      <div className="flex gap-3 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3.5">
+        <Sparkles className="mt-0.5 size-4 shrink-0 text-primary/60" aria-hidden="true" />
+        <p className="text-sm leading-relaxed text-foreground/80">{t("overviewText")}</p>
       </div>
 
       <div role="tablist" className="flex gap-1 rounded-xl border border-border/50 bg-muted/40 p-1">

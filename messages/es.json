@@ -754,6 +754,7 @@
   "Help": {
     "pageTitle": "Guía de funciones",
     "pageSubtitle": "Aprende cómo funciona cada parte de Gridly.",
+    "overviewText": "Gridly es un gestor de finanzas personales pensado para funcionar como lo hace la vida real: nóminas mensuales, gastos fijos, algún imprevisto de vez en cuando, y esas dos pagas extra de junio y diciembre. Registras tus ingresos y gastos mes a mes, y Gridly se encarga del resto: arrastra tu saldo, calcula el ahorro y te da una imagen clara de a dónde va tu dinero, no solo este mes, sino a lo largo de los años.",
     "expandLabel": "Ver más",
     "collapseLabel": "Ver menos",
     "cardTitle": "Ayuda",
