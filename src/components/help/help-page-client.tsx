@@ -67,6 +67,7 @@ export function HelpPageClient() {
         {tabs.map((tab) => (
           <button
             key={tab.id}
+            type="button"
             onClick={() => setActiveTab(tab.id)}
             className={cn(
               "flex-1 rounded-lg px-3 py-1.5 text-sm font-medium transition-all",
