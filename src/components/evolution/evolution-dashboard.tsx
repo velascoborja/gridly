@@ -2,7 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, Plus, Tags } from "lucide-react";
+import { ChevronLeft, ChevronRight, LayoutList, Plus, Tags } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -14,8 +14,10 @@ import {
 import { calcEstimatedPortfolioValues, summarizeEvolutionMetrics, type EvolutionYearMetric } from "@/lib/evolution";
 import type { HistoricalYear } from "@/lib/types";
 import { mergeTagStatsByYear, type TagStats } from "@/lib/tag-stats";
+import { mergeFixedStatsByYear, type FixedExpenseStats } from "@/lib/fixed-stats";
 import { formatCurrency } from "@/lib/utils";
 import { TagStatRow } from "@/components/annual/tag-stat-row";
+import { FixedStatRow } from "@/components/annual/fixed-stat-row";
 import { EvolutionCharts } from "./evolution-charts";
 import { EvolutionDetailTable } from "./evolution-detail-table";
 import { HistoricalYearDialog } from "./historical-year-dialog";
@@ -28,11 +30,13 @@ interface Props {
   historicalYears: HistoricalYear[];
   calendarYear: number;
   tagStatsByYear: { year: number; stats: TagStats }[];
+  fixedStatsByYear: { year: number; stats: FixedExpenseStats }[];
 }
 
-export function EvolutionDashboard({ metrics, historicalYears, calendarYear, tagStatsByYear }: Props) {
+export function EvolutionDashboard({ metrics, historicalYears, calendarYear, tagStatsByYear, fixedStatsByYear }: Props) {
   const t = useTranslations("Evolution");
   const tCat = useTranslations("Annual.categories");
+  const tFixed = useTranslations("Annual.fixedExpenses");
   const locale = useLocale();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingHistoricalYear, setEditingHistoricalYear] = useState<HistoricalYear | null>(null);
@@ -40,6 +44,8 @@ export function EvolutionDashboard({ metrics, historicalYears, calendarYear, tag
   const [includeFuture, setIncludeFuture] = useState(false);
   const [tagsDialogOpen, setTagsDialogOpen] = useState(false);
   const [tagPageIndex, setTagPageIndex] = useState(0);
+  const [fixedDialogOpen, setFixedDialogOpen] = useState(false);
+  const [fixedPageIndex, setFixedPageIndex] = useState(0);
 
   const hasFutureYears = metrics.some((m) => m.year > calendarYear);
   const visibleMetrics = includeFuture ? metrics : metrics.filter((m) => m.year <= calendarYear);
@@ -69,6 +75,25 @@ export function EvolutionDashboard({ metrics, historicalYears, calendarYear, tag
   const currentMaxTagAmount = currentTagStats[0]?.totalAmount ?? 0;
   const currentTagTaggedCount = currentTagStats.filter((s) => s.tag !== null).length;
   const currentTagTotal = currentTagPage?.stats.totalAdditional ?? 0;
+
+  const visibleFixedYears = useMemo(
+    () => (includeFuture ? fixedStatsByYear : fixedStatsByYear.filter((y) => y.year <= calendarYear)),
+    [fixedStatsByYear, includeFuture, calendarYear],
+  );
+  const hasFixedData = visibleFixedYears.length > 0;
+  type FixedPage = { year: number | null; stats: FixedExpenseStats };
+  const fixedPages = useMemo<FixedPage[]>(
+    () => [
+      { year: null, stats: mergeFixedStatsByYear(visibleFixedYears) },
+      ...visibleFixedYears.map((y) => ({ year: y.year, stats: y.stats })),
+    ],
+    [visibleFixedYears],
+  );
+  const safeFixedPageIndex = Math.min(fixedPageIndex, fixedPages.length - 1);
+  const currentFixedPage = fixedPages[safeFixedPageIndex];
+  const currentFixedStats = currentFixedPage?.stats.stats ?? [];
+  const currentMaxFixedAmount = currentFixedStats[0]?.totalAmount ?? 0;
+  const currentFixedTotal = currentFixedPage?.stats.grandTotal ?? 0;
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -121,6 +146,77 @@ export function EvolutionDashboard({ metrics, historicalYears, calendarYear, tag
           </div>
           <div className="flex w-full flex-col items-start gap-2 sm:w-auto sm:items-end">
             <div className="flex items-center gap-2">
+              {hasFixedData && (
+                <Dialog
+                  open={fixedDialogOpen}
+                  onOpenChange={(open) => {
+                    setFixedDialogOpen(open);
+                    if (open) setFixedPageIndex(0);
+                  }}
+                >
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-9 w-9 border-border/70 bg-background/80 text-muted-foreground shadow-sm hover:border-primary/30 hover:bg-primary/[0.06] hover:text-primary"
+                    onClick={() => setFixedDialogOpen(true)}
+                  >
+                    <LayoutList className="h-4 w-4" />
+                    <span className="sr-only">{t("fixedExpensesButton")}</span>
+                  </Button>
+                  <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-2xl">
+                    <div className="max-h-[calc(100dvh-2rem)] overflow-y-auto">
+                      <DialogHeader className="sticky top-0 z-10 border-b border-border/50 bg-card/70 px-5 pt-5 pr-14 pb-4 backdrop-blur-xl supports-[backdrop-filter]:bg-card/55 md:px-6 md:pt-6 md:pr-16 md:pb-5">
+                        <DialogTitle>{t("fixedExpensesTitle")}</DialogTitle>
+                        <div className="mt-3 flex items-center justify-between gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 shrink-0"
+                            disabled={safeFixedPageIndex === 0}
+                            onClick={() => setFixedPageIndex((i) => Math.max(0, Math.min(fixedPages.length - 1, i) - 1))}
+                          >
+                            <ChevronLeft className="h-4 w-4" />
+                            <span className="sr-only">{t("fixedPager.prevYear")}</span>
+                          </Button>
+                          <span
+                            aria-live="polite"
+                            className="finance-number text-sm font-semibold tabular-nums text-foreground"
+                          >
+                            {currentFixedPage?.year === null ? t("fixedPager.allYears") : currentFixedPage?.year}
+                          </span>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 shrink-0"
+                            disabled={safeFixedPageIndex >= fixedPages.length - 1}
+                            onClick={() => setFixedPageIndex((i) => Math.max(0, Math.min(fixedPages.length - 1, i) + 1))}
+                          >
+                            <ChevronRight className="h-4 w-4" />
+                            <span className="sr-only">{t("fixedPager.nextYear")}</span>
+                          </Button>
+                        </div>
+                      </DialogHeader>
+                      <div className="mx-auto max-w-2xl px-4 py-6">
+                        <p className="mb-4 text-xs text-muted-foreground">
+                          {tFixed("grandTotalLabel")}{" "}
+                          <strong className="text-foreground">{formatCurrency(currentFixedTotal, locale)}</strong>
+                        </p>
+                        <div className="flex flex-col gap-2">
+                          {currentFixedStats.map((stat) => (
+                            <FixedStatRow
+                              key={`${currentFixedPage?.year ?? "all"}-${stat.key}`}
+                              stat={stat}
+                              maxAmount={currentMaxFixedAmount}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              )}
               {hasTagData && (
                 <Dialog
                   open={tagsDialogOpen}
