@@ -83,6 +83,16 @@ Each page shows a per-page summary line with total spend and tag count. On the "
 
 Grouped expenses are attributed to the group's tag, ungrouped additional expenses use their own tag, and recurring expenses are bucketed by their recurring expense tag.
 
+### Fixed Expenses Dialog
+
+When at least one full Gridly year has non-zero fixed expense data, the dashboard header shows a `LayoutList` icon button. The button opens a dialog titled by `Evolution.fixedExpensesTitle` with the same **year pager** structure as the Tags dialog.
+
+Three rows appear — home expense, personal budget, and aggregated recurring expenses — rendered using `FixedStatRow` (from `src/components/annual/fixed-stat-row.tsx`). Each row shows total, share of fixed spend, and a monthly (or cross-year) drilldown via the existing `DrilldownList` component. Rows with a zero total are omitted. Rows are sorted by total amount descending.
+
+The set of years in the pager respects the `includeFuture` toggle. Historical summary-only imports are excluded. The dialog resets to the combined "Todos los años" page each time it is opened.
+
+**Data flow**: `computeFixedStats` (from `src/lib/fixed-stats.ts`) runs per Gridly year on the server (`evolution/page.tsx`) and results are passed as `fixedStatsByYear: { year: number; stats: FixedExpenseStats }[]` to `EvolutionDashboard`. The client uses `mergeFixedStatsByYear` to produce the combined all-years page.
+
 ### KPI Cards
 
 Six cards derived from `EvolutionSummary`:
