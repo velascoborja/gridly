@@ -2,6 +2,7 @@ import ExcelJS from "exceljs";
 import type { YearData } from "./types";
 import { formatMonthName } from "./utils";
 import { avgAdditionalEntriesPerMonth } from "./additional-entries";
+import { computeTagStats } from "./tag-stats";
 
 const EXPORT_MESSAGES = {
   en: {
@@ -38,6 +39,11 @@ const EXPORT_MESSAGES = {
     totalInvested: "Total invested",
     avgAdditionalExpenses: "Avg. additional expenses",
     avgAdditionalIncomes: "Avg. additional incomes",
+    categoriesSheet: "Categories",
+    tagNameHeader: "Tag",
+    tagTotalHeader: "Total",
+    tagShareHeader: "% of total",
+    untagged: "Untagged",
   },
   es: {
     expenses: "GASTOS",
@@ -73,6 +79,11 @@ const EXPORT_MESSAGES = {
     totalInvested: "Total invertido",
     avgAdditionalExpenses: "Gastos adicionales medios",
     avgAdditionalIncomes: "Ingresos adicionales medios",
+    categoriesSheet: "Categorías",
+    tagNameHeader: "Etiqueta",
+    tagTotalHeader: "Total",
+    tagShareHeader: "% del total",
+    untagged: "Sin etiqueta",
   },
 } as const;
 
@@ -337,11 +348,49 @@ function buildSummarySheet(
   }
 }
 
+function buildTagSheet(wb: ExcelJS.Workbook, yearData: YearData, locale: "en" | "es") {
+  const tagStats = computeTagStats(yearData);
+  if (tagStats.stats.length === 0) return;
+
+  const t = EXPORT_MESSAGES[locale];
+  const ws = wb.addWorksheet(t.categoriesSheet);
+  ws.columns = [
+    { width: 24 }, // A: tag name
+    { width: 14 }, // B: total amount
+    { width: 12 }, // C: % share
+  ];
+
+  let row = 1;
+
+  ws.mergeCells(`A${row}:C${row}`);
+  const title = ws.getCell(`A${row}`);
+  title.value = t.categoriesSheet;
+  title.font = { bold: true, size: 13 };
+  title.alignment = { horizontal: "center" };
+  row += 2;
+
+  styleHeader(ws, `A${row}`, t.tagNameHeader);
+  styleHeader(ws, `B${row}`, t.tagTotalHeader);
+  styleHeader(ws, `C${row}`, t.tagShareHeader);
+  row++;
+
+  for (const stat of tagStats.stats) {
+    ws.getCell(`A${row}`).value = stat.tag?.name ?? t.untagged;
+    money(ws, `B${row}`, stat.totalAmount);
+    const shareCell = ws.getCell(`C${row}`);
+    shareCell.value = stat.shareOfTotal;
+    shareCell.numFmt = "0.00%";
+    shareCell.alignment = { horizontal: "right" };
+    row++;
+  }
+}
+
 export async function buildWorkbook(yearData: YearData, locale: "en" | "es" = "es"): Promise<Buffer> {
   const wb = new ExcelJS.Workbook();
   wb.creator = "Gridly";
 
   buildSummarySheet(wb, yearData, locale);
+  buildTagSheet(wb, yearData, locale);
   for (const month of yearData.months) {
     buildMonthSheet(wb, yearData.config.year, month, locale);
   }
