@@ -175,3 +175,14 @@ test("evolution charts savings rate label and description keys exist in both loc
     "Difference between starting and final balance, with savings rate over income."
   );
 });
+
+test("evolution charts savings bar includes savings rate line overlay with dual Y-axis", () => {
+  const source = readFileSync(new URL("./evolution-charts.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /dataKey="savingsRate"/);
+  assert.match(source, /yAxisId="right"/);
+  assert.match(source, /orientation="right"/);
+  assert.match(source, /connectNulls=\{false\}/);
+  assert.match(source, /savingsRateLabel/);
+  assert.match(source, /ComposedChart/);
+});
