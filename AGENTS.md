@@ -95,6 +95,16 @@ This skill is defined in the canonical location. Read and follow `.agents/skills
 
 Never duplicate skill content between the two directories — `.claude/skills/` stubs exist only so Claude Code's skill discovery finds them.
 
+## Local-Only Paths
+
+The following paths are intentionally excluded from version control via `.gitignore` and must **never** be committed or pushed:
+
+- `docs/superpowers/` — local Superpowers skill docs and plans
+- `docs/plans/` — local implementation plans
+- `docs/specs/` — local specs
+
+Do not `git add` files under these directories. Do not use `--force` or any other mechanism to bypass this restriction. These files are for local reference only.
+
 ## Feature Documentation
 
 Detailed documentation for specific features can be found in `docs/features/`. **These files are the preferred first stop for context.** Before searching the codebase or reading source files to understand how a feature works, check whether a relevant doc exists below — it covers implementation logic, domain rules, and architectural decisions without requiring code discovery. Only go to the source when the doc is insufficient or absent.
