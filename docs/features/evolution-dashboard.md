@@ -106,11 +106,11 @@ The user can enter an annual return rate (%) directly in the Total Wealth box. T
 ### Charts
 
 1. **Final Balance (LineChart)** — Year-over-year trend. Without a return rate: three lines — `finalBalance` (primary), `accumulatedInvested` (teal, dashed), `totalWealth` (orange, dotted). With a return rate: `finalBalance` (primary), `estimatedPortfolioValue` (teal, dashed), `estimatedTotalWealth` (orange, dotted). A legend labels each line.
-2. **Savings per Year (BarChart)** — `savedAmount` per year. Bars are green when `savedAmount ≥ 0` and red when negative.
+2. **Savings per Year (ComposedChart)** — `savedAmount` per year (left Y-axis, currency). Bars are green when `savedAmount ≥ 0` and red when negative. A `savingsRate` trend line (right Y-axis, %) is overlaid using `var(--color-chart-3)`. Historical import years where `savingsRate` is `null` produce a gap in the line (`connectNulls={false}`).
 3. **Investment per Year (BarChart)** — `investedAmount` per year in primary color.
 4. **Interest per year (BarChart)** — `interestsEarned` per year in teal (`chart-2`). The secondary-chart row is a 3-column grid at `lg`.
 
-Y-axes on all charts are formatted as `Xk` (thousands).
+Y-axes on all currency charts are formatted as `Xk` (thousands). The savings chart has a second right Y-axis formatted as `%` for the savings rate line.
 
 ### Detail Table
 
