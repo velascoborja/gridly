@@ -159,3 +159,19 @@ test("evolution dashboard only shows tags button when there are visible tag year
   assert.match(source, /hasTagData/);
   assert.match(source, /visibleTagYears/);
 });
+
+test("evolution charts savings rate label and description keys exist in both locales", () => {
+  const spanish = JSON.parse(readFileSync(new URL("../../../messages/es.json", import.meta.url), "utf8"));
+  const english = JSON.parse(readFileSync(new URL("../../../messages/en.json", import.meta.url), "utf8"));
+
+  assert.equal(spanish.Evolution.charts.savingsRateLabel, "Tasa de ahorro");
+  assert.equal(english.Evolution.charts.savingsRateLabel, "Savings rate");
+  assert.equal(
+    spanish.Evolution.charts.savedDescription,
+    "Variación entre saldo inicial y final, con tasa de ahorro sobre ingresos."
+  );
+  assert.equal(
+    english.Evolution.charts.savedDescription,
+    "Difference between starting and final balance, with savings rate over income."
+  );
+});
