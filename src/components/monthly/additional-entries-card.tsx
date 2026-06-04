@@ -146,6 +146,9 @@ export function AdditionalEntriesCard({
     ...sortAdditionalEntriesDesc(entries.filter((e) => e.isRecurring)),
     ...sortAdditionalEntriesDesc(entries.filter((e) => !e.isRecurring)),
   ];
+  const sortedGroups = [...groups].sort(
+    (a, b) => sumAdditionalEntries(b.entries) - sumAdditionalEntries(a.entries)
+  );
   const groupedTotal = groups.reduce((sum, g) => sum + sumAdditionalEntries(g.entries), 0);
   const entriesTotal = sumAdditionalEntries(entries) + groupedTotal;
 
@@ -453,7 +456,7 @@ export function AdditionalEntriesCard({
 
         {type === "expense" && groups.length > 0 && (
           <div className="flex flex-col gap-2">
-            {groups.map((group) => (
+            {sortedGroups.map((group) => (
               <AdditionalEntryGroupRow
                 key={group.id}
                 monthId={monthId}
