@@ -115,7 +115,9 @@
       "investmentMonths": "{count, plural, one {# month invested} other {# months invested}}",
       "positiveTrend": "Up",
       "negativeTrend": "Down",
-      "neutralTrend": "Flat"
+      "neutralTrend": "Flat",
+      "expectedIncomeAnnotation": "Expected income: +{amount}",
+      "expectedExpensesAnnotation": "Expected expenses: -{amount}"
     },
     "charts": {
       "balanceTitle": "Balance by month",
@@ -203,7 +205,15 @@
       "deleteYearConfirmationHint": "Type {phrase} to enable deletion.",
       "deleteYearDeleting": "Deleting...",
       "deleteYearError": "Could not delete the exercise. Check the connection and try again."
-    }
+    },
+    "expectedEntriesButton": "Expected entries",
+    "expectedEntriesTitle": "Expected entries",
+    "expectedEntriesDescription": "Income and expenses you expect to receive or pay at some point this year. They only affect the summary estimate.",
+    "expectedEntriesEmptyState": "Add income or expenses you expect to have this year.",
+    "expectedEntryLabelPlaceholder": "Description (e.g. annual bonus)",
+    "expectedEntryAddButton": "Add",
+    "expectedEntryIncomeBadge": "Income",
+    "expectedEntryExpenseBadge": "Expense"
   },
   "Setup": {
     "title": "Configure {year}",
@@ -749,8 +759,7 @@
       "title": "Contact",
       "body": "For any questions related to these terms, contact us at privacy@appgridly.com."
     }
-  }
-  ,
+  },
   "Help": {
     "pageTitle": "Features guide",
     "pageSubtitle": "Learn how each part of Gridly works.",
