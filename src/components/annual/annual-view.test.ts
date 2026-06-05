@@ -163,3 +163,15 @@ test("annual KPI cards show total interest earned", () => {
   assert.match(source, /m\.interests/, "should sum monthly interest");
   assert.match(source, /t\("interestEarned"\)/, "should render an interest KPI card");
 });
+
+test("expected entries dialog renders a list and an add form", () => {
+  const source = readFileSync(new URL("./expected-entries-dialog.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /export interface ExpectedEntry \{/, "should export the ExpectedEntry type");
+  assert.match(source, /id: string/, "entry should have a string id");
+  assert.match(source, /type: "income" \| "expense"/, "entry type should be a union");
+  assert.match(source, /onAdd:/, "dialog should accept an onAdd callback");
+  assert.match(source, /onDelete:/, "dialog should accept an onDelete callback");
+  assert.match(source, /t\("expectedEntriesEmptyState"\)/, "should render empty state");
+  assert.match(source, /t\("expectedEntryAddButton"\)/, "should render an add button");
+});
