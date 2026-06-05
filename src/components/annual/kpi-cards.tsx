@@ -368,12 +368,12 @@ export function KpiCards({
                       {metric.tone.label}
                     </span>
                   </div>
-                  <p className={`mt-3 text-[2.1rem] font-light leading-none tracking-[-0.05em] finance-number md:text-5xl ${metric.isEstimate ? "text-amber-600 dark:text-amber-400" : metric.tone.valueClassName}`}>
+                  <p className={`mt-3 text-[2.1rem] font-light leading-none tracking-[-0.05em] finance-number md:text-5xl ${metric.tone.valueClassName}`}>
                     {formatCurrency(metric.value, locale)}
                     {metric.isEstimate ? <sup className="ml-0.5 align-top text-base font-medium">*</sup> : null}
                   </p>
                   <div className="mt-4 space-y-1 text-sm leading-5 text-muted-foreground">
-                    <p>{metric.note}</p>
+                    <p className={metric.isEstimate ? "text-amber-600 dark:text-amber-400" : undefined}>{metric.note}</p>
                     <p className="finance-number text-xs text-muted-foreground/80">{metric.comparison}</p>
                     {metric.expectedAnnotations && metric.expectedAnnotations.length > 0 ? (
                       <div className="mt-2 space-y-0.5 border-t border-border/40 pt-2">
