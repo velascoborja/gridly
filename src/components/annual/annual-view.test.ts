@@ -164,6 +164,18 @@ test("annual KPI cards show total interest earned", () => {
   assert.match(source, /t\("interestEarned"\)/, "should render an interest KPI card");
 });
 
+test("annual view reads expected entries from localStorage on mount", () => {
+  const source = readFileSync(new URL("./annual-view.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /expected_entries_\$\{/, "storage key should be scoped to the year");
+  assert.match(source, /localStorage\.getItem/, "should read from localStorage on mount");
+  assert.match(source, /localStorage\.setItem/, "should write to localStorage on mutation");
+  assert.match(source, /expectedIncome/, "should derive expectedIncome total");
+  assert.match(source, /expectedExpenses/, "should derive expectedExpenses total");
+  assert.match(source, /onAddExpectedEntry/, "should pass add handler to KpiCards");
+  assert.match(source, /onDeleteExpectedEntry/, "should pass delete handler to KpiCards");
+});
+
 test("expected entries dialog renders a list and an add form", () => {
   const source = readFileSync(new URL("./expected-entries-dialog.tsx", import.meta.url), "utf8");
 
