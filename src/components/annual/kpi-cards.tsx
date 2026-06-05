@@ -59,6 +59,7 @@ interface KpiMetric {
   note: string;
   comparison?: string;
   tone: MetricTone;
+  isEstimate?: boolean;
   expectedAnnotations?: Array<{ text: string; colorClass: string }>;
 }
 
@@ -164,6 +165,7 @@ export function KpiCards({
         ? t("baseValueComparison", { amount: formatCurrency(endingBalance, locale) })
         : t("startingBalanceKpi", { amount: formatCurrency(startingBalance, locale) }),
       tone: getMetricTone(hasExpected ? adjustedEndingBalance - startingBalance : balanceDelta, toneLabels),
+      isEstimate: hasExpected,
       expectedAnnotations: hasExpected ? expectedAnnotationLines : [],
     },
     {
@@ -174,6 +176,7 @@ export function KpiCards({
         ? t("baseValueComparison", { amount: formatCurrency(totalSavings, locale) })
         : t("activeMonths", { count: populated.length }),
       tone: getMetricTone(hasExpected ? adjustedTotalSavings : totalSavings, toneLabels),
+      isEstimate: hasExpected,
       expectedAnnotations: hasExpected ? expectedAnnotationLines : [],
     },
   ];
@@ -365,8 +368,9 @@ export function KpiCards({
                       {metric.tone.label}
                     </span>
                   </div>
-                  <p className={`mt-3 text-[2.1rem] font-light leading-none tracking-[-0.05em] finance-number md:text-5xl ${metric.tone.valueClassName}`}>
+                  <p className={`mt-3 text-[2.1rem] font-light leading-none tracking-[-0.05em] finance-number md:text-5xl ${metric.isEstimate ? "text-amber-600 dark:text-amber-400" : metric.tone.valueClassName}`}>
                     {formatCurrency(metric.value, locale)}
+                    {metric.isEstimate ? <sup className="ml-0.5 align-top text-base font-medium">*</sup> : null}
                   </p>
                   <div className="mt-4 space-y-1 text-sm leading-5 text-muted-foreground">
                     <p>{metric.note}</p>
