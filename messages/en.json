@@ -117,7 +117,10 @@
       "negativeTrend": "Down",
       "neutralTrend": "Flat",
       "expectedIncomeAnnotation": "Expected income: +{amount}",
-      "expectedExpensesAnnotation": "Expected expenses: -{amount}"
+      "expectedExpensesAnnotation": "Expected expenses: -{amount}",
+      "estimatedBalanceNoteWithExpected": "Expected balance including estimated entries",
+      "totalSavingsNoteWithExpected": "Net savings including estimated entries",
+      "baseValueComparison": "Without expected: {amount}"
     },
     "charts": {
       "balanceTitle": "Balance by month",

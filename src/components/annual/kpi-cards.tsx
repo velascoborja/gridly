@@ -141,6 +141,11 @@ export function KpiCards({
     Icon: Percent,
   };
 
+  const hasExpected = expectedEntries.length > 0;
+  const expectedNet = expectedIncome - expectedExpenses;
+  const adjustedEndingBalance = endingBalance + expectedNet;
+  const adjustedTotalSavings = totalSavings + expectedNet;
+
   const expectedAnnotationLines: Array<{ text: string; colorClass: string }> = [
     ...(expectedIncome > 0
       ? [{ text: t("expectedIncomeAnnotation", { amount: formatCurrency(expectedIncome, locale) }), colorClass: "text-emerald-600 dark:text-emerald-400" }]
@@ -153,19 +158,23 @@ export function KpiCards({
   const primaryMetrics: KpiMetric[] = [
     {
       label: t("estimatedBalance"),
-      value: endingBalance,
-      note: t("estimatedBalanceNote"),
-      comparison: t("startingBalanceKpi", { amount: formatCurrency(startingBalance, locale) }),
-      tone: getMetricTone(balanceDelta, toneLabels),
-      expectedAnnotations: expectedAnnotationLines,
+      value: hasExpected ? adjustedEndingBalance : endingBalance,
+      note: hasExpected ? t("estimatedBalanceNoteWithExpected") : t("estimatedBalanceNote"),
+      comparison: hasExpected
+        ? t("baseValueComparison", { amount: formatCurrency(endingBalance, locale) })
+        : t("startingBalanceKpi", { amount: formatCurrency(startingBalance, locale) }),
+      tone: getMetricTone(hasExpected ? adjustedEndingBalance - startingBalance : balanceDelta, toneLabels),
+      expectedAnnotations: hasExpected ? expectedAnnotationLines : [],
     },
     {
       label: t("totalSavings"),
-      value: totalSavings,
-      note: t("totalSavingsNote"),
-      comparison: t("activeMonths", { count: populated.length }),
-      tone: getMetricTone(totalSavings, toneLabels),
-      expectedAnnotations: expectedAnnotationLines,
+      value: hasExpected ? adjustedTotalSavings : totalSavings,
+      note: hasExpected ? t("totalSavingsNoteWithExpected") : t("totalSavingsNote"),
+      comparison: hasExpected
+        ? t("baseValueComparison", { amount: formatCurrency(totalSavings, locale) })
+        : t("activeMonths", { count: populated.length }),
+      tone: getMetricTone(hasExpected ? adjustedTotalSavings : totalSavings, toneLabels),
+      expectedAnnotations: hasExpected ? expectedAnnotationLines : [],
     },
   ];
 

@@ -117,7 +117,10 @@
       "negativeTrend": "Baja",
       "neutralTrend": "Estable",
       "expectedIncomeAnnotation": "Ingresos esperados: +{amount}",
-      "expectedExpensesAnnotation": "Gastos esperados: -{amount}"
+      "expectedExpensesAnnotation": "Gastos esperados: -{amount}",
+      "estimatedBalanceNoteWithExpected": "Saldo previsto incluyendo entradas esperadas",
+      "totalSavingsNoteWithExpected": "Ahorro neto incluyendo entradas esperadas",
+      "baseValueComparison": "Sin esperados: {amount}"
     },
     "charts": {
       "balanceTitle": "Saldo mes a mes",
