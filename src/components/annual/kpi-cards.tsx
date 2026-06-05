@@ -1,5 +1,5 @@
 import { useLocale, useTranslations } from "next-intl";
-import { ArrowDownRight, ArrowUpRight, Download, LayoutList, Minus, Percent, PiggyBank, Settings, Tags, type LucideIcon } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, Download, LayoutList, Minus, Percent, PiggyBank, Settings, Sparkles, Tags, type LucideIcon } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,6 +16,7 @@ import { CategoriesView } from "./categories-view";
 import { FixedExpensesView } from "./fixed-expenses-view";
 import { YearConfigForm } from "./year-config-form";
 import type { MonthData, YearConfig, YearData, YearRecurringExpense } from "@/lib/types";
+import { ExpectedEntriesDialog, type ExpectedEntry } from "./expected-entries-dialog";
 
 interface Props {
   months: MonthData[];
@@ -32,6 +33,11 @@ interface Props {
   onRecurringExpensesApplied: (yearData: YearData) => void;
   onExport: () => void;
   onPendingSave: (savePromise: Promise<void>) => void;
+  expectedEntries: ExpectedEntry[];
+  expectedIncome: number;
+  expectedExpenses: number;
+  onAddExpectedEntry: (entry: Omit<ExpectedEntry, "id">) => void;
+  onDeleteExpectedEntry: (id: string) => void;
 }
 
 interface MetricTone {
@@ -53,6 +59,7 @@ interface KpiMetric {
   note: string;
   comparison?: string;
   tone: MetricTone;
+  expectedAnnotations?: Array<{ text: string; colorClass: string }>;
 }
 
 function getMetricTone(value: number, labels: ToneLabels): MetricTone {
@@ -97,6 +104,11 @@ export function KpiCards({
   onRecurringExpensesApplied,
   onExport,
   onPendingSave,
+  expectedEntries,
+  expectedIncome,
+  expectedExpenses,
+  onAddExpectedEntry,
+  onDeleteExpectedEntry,
 }: Props) {
   const tAnnual = useTranslations("Annual");
   const t = useTranslations("Annual.kpis");
@@ -129,6 +141,15 @@ export function KpiCards({
     Icon: Percent,
   };
 
+  const expectedAnnotationLines: Array<{ text: string; colorClass: string }> = [
+    ...(expectedIncome > 0
+      ? [{ text: t("expectedIncomeAnnotation", { amount: formatCurrency(expectedIncome, locale) }), colorClass: "text-emerald-600 dark:text-emerald-400" }]
+      : []),
+    ...(expectedExpenses > 0
+      ? [{ text: t("expectedExpensesAnnotation", { amount: formatCurrency(expectedExpenses, locale) }), colorClass: "text-rose-600 dark:text-rose-400" }]
+      : []),
+  ];
+
   const primaryMetrics: KpiMetric[] = [
     {
       label: t("estimatedBalance"),
@@ -136,6 +157,7 @@ export function KpiCards({
       note: t("estimatedBalanceNote"),
       comparison: t("startingBalanceKpi", { amount: formatCurrency(startingBalance, locale) }),
       tone: getMetricTone(balanceDelta, toneLabels),
+      expectedAnnotations: expectedAnnotationLines,
     },
     {
       label: t("totalSavings"),
@@ -143,6 +165,7 @@ export function KpiCards({
       note: t("totalSavingsNote"),
       comparison: t("activeMonths", { count: populated.length }),
       tone: getMetricTone(totalSavings, toneLabels),
+      expectedAnnotations: expectedAnnotationLines,
     },
   ];
 
@@ -191,6 +214,33 @@ export function KpiCards({
               {!readOnly ? (
                 <>
                   <div className="flex items-center gap-2">
+                    <Dialog>
+                      <DialogTrigger
+                        render={
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-9 w-9 border-border/70 bg-background/80 text-muted-foreground shadow-sm hover:border-primary/30 hover:bg-primary/[0.06] hover:text-primary"
+                          >
+                            <Sparkles className="h-4 w-4" />
+                            <span className="sr-only">{tAnnual("expectedEntriesButton")}</span>
+                          </Button>
+                        }
+                      />
+                      <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-2xl">
+                        <div className="max-h-[calc(100dvh-2rem)] overflow-y-auto">
+                          <DialogHeader className="sticky top-0 z-10 border-b border-border/50 bg-card/70 px-5 pt-5 pr-14 pb-4 backdrop-blur-xl supports-[backdrop-filter]:bg-card/55 md:px-6 md:pt-6 md:pr-16 md:pb-5">
+                            <DialogTitle>{tAnnual("expectedEntriesTitle")}</DialogTitle>
+                          </DialogHeader>
+                          <ExpectedEntriesDialog
+                            entries={expectedEntries}
+                            onAdd={onAddExpectedEntry}
+                            onDelete={onDeleteExpectedEntry}
+                          />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+
                     <Dialog>
                       <DialogTrigger
                         render={
@@ -312,6 +362,15 @@ export function KpiCards({
                   <div className="mt-4 space-y-1 text-sm leading-5 text-muted-foreground">
                     <p>{metric.note}</p>
                     <p className="finance-number text-xs text-muted-foreground/80">{metric.comparison}</p>
+                    {metric.expectedAnnotations && metric.expectedAnnotations.length > 0 ? (
+                      <div className="mt-2 space-y-0.5 border-t border-border/40 pt-2">
+                        {metric.expectedAnnotations.map((annotation) => (
+                          <p key={annotation.text} className={`finance-number text-xs ${annotation.colorClass}`}>
+                            {annotation.text}
+                          </p>
+                        ))}
+                      </div>
+                    ) : null}
                   </div>
                 </section>
               );

@@ -158,6 +158,20 @@ test("annual setup dialog has room for the grouped desktop layout", () => {
   assert.match(formSource, /items-stretch gap-3 lg:grid-cols-2/, "paired desktop setup cards should match the tallest card height");
 });
 
+test("KPI cards render expected entries dialog trigger and annotation lines", () => {
+  const source = readFileSync(new URL("./kpi-cards.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /ExpectedEntriesDialog/, "should import and render ExpectedEntriesDialog");
+  assert.match(source, /Sparkles/, "should use Sparkles icon for the trigger button");
+  assert.match(source, /expectedEntriesButton/, "trigger button should have a localized sr-only label");
+  assert.match(source, /expectedIncome:/, "should accept expectedIncome prop");
+  assert.match(source, /expectedExpenses:/, "should accept expectedExpenses prop");
+  assert.match(source, /onAddExpectedEntry:/, "should accept onAddExpectedEntry prop");
+  assert.match(source, /onDeleteExpectedEntry:/, "should accept onDeleteExpectedEntry prop");
+  assert.match(source, /expectedIncomeAnnotation/, "should render expectedIncomeAnnotation translation key");
+  assert.match(source, /expectedExpensesAnnotation/, "should render expectedExpensesAnnotation translation key");
+});
+
 test("annual KPI cards show total interest earned", () => {
   const source = readFileSync(new URL("./kpi-cards.tsx", import.meta.url), "utf8");
   assert.match(source, /m\.interests/, "should sum monthly interest");
