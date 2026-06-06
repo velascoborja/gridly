@@ -93,39 +93,37 @@ export function ExpectedEntriesDialog({ entries, onAdd, onDelete }: Props) {
 
       <div className="border-t border-border/50 pt-4">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <div className="flex gap-2 sm:contents">
-            <div className="flex shrink-0 rounded-md border border-border/60 bg-muted/20 p-0.5">
-              <button
-                type="button"
-                onClick={() => setType("income")}
-                className={`rounded px-3 py-1.5 text-xs font-medium transition-colors ${
-                  type === "income"
-                    ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {t("expectedEntryIncomeBadge")}
-              </button>
-              <button
-                type="button"
-                onClick={() => setType("expense")}
-                className={`rounded px-3 py-1.5 text-xs font-medium transition-colors ${
-                  type === "expense"
-                    ? "bg-rose-500/15 text-rose-700 dark:text-rose-300"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {t("expectedEntryExpenseBadge")}
-              </button>
-            </div>
-            <Input
-              placeholder={t("expectedEntryLabelPlaceholder")}
-              value={label}
-              onChange={(e) => setLabel(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="min-w-0 flex-1"
-            />
+          <div className="flex w-full rounded-md border border-border/60 bg-muted/20 p-0.5 sm:w-auto sm:shrink-0">
+            <button
+              type="button"
+              onClick={() => setType("income")}
+              className={`flex-1 rounded px-3 py-1.5 text-xs font-medium transition-colors sm:flex-none ${
+                type === "income"
+                  ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {t("expectedEntryIncomeBadge")}
+            </button>
+            <button
+              type="button"
+              onClick={() => setType("expense")}
+              className={`flex-1 rounded px-3 py-1.5 text-xs font-medium transition-colors sm:flex-none ${
+                type === "expense"
+                  ? "bg-rose-500/15 text-rose-700 dark:text-rose-300"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {t("expectedEntryExpenseBadge")}
+            </button>
           </div>
+          <Input
+            placeholder={t("expectedEntryLabelPlaceholder")}
+            value={label}
+            onChange={(e) => setLabel(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="w-full min-w-0 sm:flex-1"
+          />
           <div className="flex gap-2 sm:contents">
             <div className="relative flex-1 sm:w-28 sm:flex-none">
               <Input
