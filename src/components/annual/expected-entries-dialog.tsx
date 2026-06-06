@@ -124,7 +124,7 @@ export function ExpectedEntriesDialog({ entries, onAdd, onDelete }: Props) {
             onKeyDown={handleKeyDown}
             className="w-full min-w-0 sm:flex-1"
           />
-          <div className="flex gap-2 sm:contents">
+          <div className="flex items-center gap-2 sm:contents">
             <div className="relative flex-1 sm:w-28 sm:flex-none">
               <Input
                 type="number"
