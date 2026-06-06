@@ -140,7 +140,7 @@ export function ExpectedEntriesDialog({ entries, onAdd, onDelete }: Props) {
               onKeyDown={handleKeyDown}
               className="min-w-0 flex-1 sm:flex-1"
             />
-            <div className="relative w-32 shrink-0 sm:w-32">
+            <div className="relative w-28 shrink-0 sm:w-28">
               <Input
                 type="number"
                 placeholder="0"
