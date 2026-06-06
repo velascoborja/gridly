@@ -212,7 +212,7 @@
     "expectedEntriesButton": "Expected entries",
     "expectedEntriesTitle": "Expected entries",
     "expectedEntriesDescription": "Income and expenses you expect to receive or pay at some point this year. They only affect the summary estimate.",
-    "expectedEntriesEmptyState": "Add income or expenses you expect to have this year.",
+    "expectedEntriesEmptyState": "Income and expenses you add will appear here.",
     "expectedEntryLabelPlaceholder": "Description (e.g. annual bonus)",
     "expectedEntryAddButton": "Add",
     "expectedEntryIncomeBadge": "Income",

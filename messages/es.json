@@ -212,7 +212,7 @@
     "expectedEntriesButton": "Entradas esperadas",
     "expectedEntriesTitle": "Entradas esperadas",
     "expectedEntriesDescription": "Ingresos y gastos que esperas recibir o pagar en algún momento del año. Solo afectan a la estimación del resumen.",
-    "expectedEntriesEmptyState": "Añade ingresos o gastos que esperas tener este año.",
+    "expectedEntriesEmptyState": "Los ingresos y gastos que añadas aparecerán aquí.",
     "expectedEntryLabelPlaceholder": "Descripción (ej. bono anual)",
     "expectedEntryAddButton": "Añadir",
     "expectedEntryIncomeBadge": "Ingreso",
