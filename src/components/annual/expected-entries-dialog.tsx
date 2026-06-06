@@ -46,9 +46,24 @@ export function ExpectedEntriesDialog({ entries, onAdd, onDelete }: Props) {
       </p>
 
       {entries.length === 0 ? (
-        <p className="mb-4 text-sm text-muted-foreground">
-          {t("expectedEntriesEmptyState")}
-        </p>
+        <div className="mb-4 flex flex-col gap-2" aria-hidden="true">
+          {[
+            { labelW: "w-32", amountW: "w-14", badgeW: "w-10" },
+            { labelW: "w-24", amountW: "w-16", badgeW: "w-8" },
+          ].map((row, i) => (
+            <div
+              key={i}
+              className="flex items-center justify-between gap-3 rounded-md border border-border/40 bg-muted/10 px-3 py-2"
+            >
+              <div className="min-w-0 flex-1 space-y-1.5">
+                <div className={`h-3 rounded ${row.labelW} bg-muted-foreground/15`} />
+                <div className={`h-2.5 rounded ${row.badgeW} bg-muted-foreground/10`} />
+              </div>
+              <div className={`h-3 shrink-0 rounded ${row.amountW} bg-muted-foreground/15`} />
+              <div className="h-6 w-6 shrink-0 rounded bg-muted-foreground/10" />
+            </div>
+          ))}
+        </div>
       ) : (
         <div className="mb-4 flex flex-col gap-2">
           {entries.map((entry) => (
@@ -117,15 +132,15 @@ export function ExpectedEntriesDialog({ entries, onAdd, onDelete }: Props) {
               {t("expectedEntryExpenseBadge")}
             </button>
           </div>
-          <Input
-            placeholder={t("expectedEntryLabelPlaceholder")}
-            value={label}
-            onChange={(e) => setLabel(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="w-full min-w-0 sm:flex-1"
-          />
-          <div className="flex items-center gap-2 sm:contents">
-            <div className="relative flex-1 sm:w-28 sm:flex-none">
+          <div className="flex gap-2 sm:contents">
+            <Input
+              placeholder={t("expectedEntryLabelPlaceholder")}
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="min-w-0 flex-1 sm:flex-1"
+            />
+            <div className="relative w-24 shrink-0 sm:w-28">
               <Input
                 type="number"
                 placeholder="0"
@@ -143,16 +158,16 @@ export function ExpectedEntriesDialog({ entries, onAdd, onDelete }: Props) {
                 €
               </span>
             </div>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleAdd}
-              className="shrink-0 border-primary/20 bg-primary/[0.06] text-primary hover:border-primary/35 hover:bg-primary/[0.1] hover:text-primary"
-            >
-              {t("expectedEntryAddButton")}
-            </Button>
           </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleAdd}
+            className="w-full border-primary/20 bg-primary/[0.06] text-primary hover:border-primary/35 hover:bg-primary/[0.1] hover:text-primary sm:w-auto sm:shrink-0"
+          >
+            {t("expectedEntryAddButton")}
+          </Button>
         </div>
       </div>
     </div>
