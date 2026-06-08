@@ -145,7 +145,7 @@ export function EvolutionDashboard({ metrics, historicalYears, calendarYear, tag
             </h1>
           </div>
           <div className="flex w-full flex-col items-start gap-2 sm:w-auto sm:items-end">
-            <div className="flex items-center gap-2">
+            <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
               {hasFixedData && (
                 <Dialog
                   open={fixedDialogOpen}
@@ -291,7 +291,7 @@ export function EvolutionDashboard({ metrics, historicalYears, calendarYear, tag
               )}
               <Button
                 type="button"
-                className="w-full gap-2 rounded-md sm:w-auto"
+                className="min-w-0 flex-1 gap-2 rounded-md px-3 sm:flex-none"
                 onClick={() => setDialogOpen(true)}
               >
                 <Plus className="size-4" />
