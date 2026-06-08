@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useSyncExternalStore } from "react";
 import { useTranslations } from "next-intl";
 import { Keyboard } from "lucide-react";
 import {
@@ -14,15 +14,17 @@ import {
 type ShortcutDef = { keys: string[]; action: string };
 type GroupDef = { label: string; shortcuts: ShortcutDef[] };
 
+function getModifierKey() {
+  return navigator.userAgent.includes("Mac") ? "⌘" : "Ctrl";
+}
+
+function subscribeToModifierKey() {
+  return () => {};
+}
+
 export function ShortcutsCard() {
   const t = useTranslations("KeyboardShortcuts");
-  const [mod, setMod] = useState("⌘");
-
-  useEffect(() => {
-    if (!navigator.userAgent.includes("Mac")) {
-      setMod("Ctrl");
-    }
-  }, []);
+  const mod = useSyncExternalStore(subscribeToModifierKey, getModifierKey, () => "⌘");
 
   const groups: GroupDef[] = [
     {

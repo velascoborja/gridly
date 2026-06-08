@@ -41,7 +41,7 @@ Entry and group shortcuts are no-ops in read-only mode.
 
 ## Settings reference card
 
-The Settings page (`/settings`) displays a read-only reference card listing all shortcuts grouped by context. It lives in `src/components/settings/shortcuts-card.tsx` and detects the user's OS on mount (`navigator.userAgent`) to display `⌘` (macOS) or `Ctrl` (Windows/Linux). All strings are under the `KeyboardShortcuts` i18n namespace.
+The Settings page (`/settings`) displays a read-only reference card listing all shortcuts grouped by context. It lives in `src/components/settings/shortcuts-card.tsx` and detects the user's OS from `navigator.userAgent` through a hydration-safe client snapshot to display `⌘` (macOS) or `Ctrl` (Windows/Linux). All strings are under the `KeyboardShortcuts` i18n namespace.
 
 ## Implementation
 

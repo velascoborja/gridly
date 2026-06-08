@@ -11,6 +11,7 @@ const eslintConfig = defineConfig([
     ".next/**",
     "out/**",
     "build/**",
+    ".tmp-gridly-export-test-*/**",
     "next-env.d.ts",
   ]),
 ]);

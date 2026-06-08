@@ -19,9 +19,9 @@ test("ShortcutsCard has client directive, OS detection, and all shortcut groups"
   // client component with OS detection
   assert.match(source, /"use client"/);
   assert.match(source, /useTranslations\("KeyboardShortcuts"\)/);
-  assert.match(source, /useState\("⌘"\)/);
+  assert.match(source, /useSyncExternalStore/);
   assert.match(source, /navigator\.userAgent\.includes\("Mac"\)/);
-  assert.match(source, /setMod\("Ctrl"\)/);
+  assert.match(source, /"Ctrl"/);
 
   // Lucide Keyboard icon
   assert.match(source, /Keyboard/);

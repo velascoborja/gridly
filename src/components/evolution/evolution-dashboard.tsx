@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import { ChevronLeft, ChevronRight, LayoutList, Plus, Tags } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +24,31 @@ import { HistoricalYearDialog } from "./historical-year-dialog";
 import { EvolutionKpiCards } from "./evolution-kpi-cards";
 
 const STORAGE_KEY = "evolution_return_rate";
+const STORAGE_EVENT = "gridly:evolution-return-rate";
+
+function readStoredReturnRate() {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored === null) return null;
+
+  const parsed = parseFloat(stored);
+  return Number.isNaN(parsed) ? null : parsed;
+}
+
+function subscribeToStoredReturnRate(onStoreChange: () => void) {
+  const handleChange = () => onStoreChange();
+
+  window.addEventListener("storage", handleChange);
+  window.addEventListener(STORAGE_EVENT, handleChange);
+
+  return () => {
+    window.removeEventListener("storage", handleChange);
+    window.removeEventListener(STORAGE_EVENT, handleChange);
+  };
+}
+
+function notifyStoredReturnRateChanged() {
+  window.dispatchEvent(new Event(STORAGE_EVENT));
+}
 
 interface Props {
   metrics: EvolutionYearMetric[];
@@ -40,7 +65,11 @@ export function EvolutionDashboard({ metrics, historicalYears, calendarYear, tag
   const locale = useLocale();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingHistoricalYear, setEditingHistoricalYear] = useState<HistoricalYear | null>(null);
-  const [returnRate, setReturnRate] = useState<number | null>(null);
+  const returnRate = useSyncExternalStore(
+    subscribeToStoredReturnRate,
+    readStoredReturnRate,
+    () => null,
+  );
   const [includeFuture, setIncludeFuture] = useState(false);
   const [tagsDialogOpen, setTagsDialogOpen] = useState(false);
   const [tagPageIndex, setTagPageIndex] = useState(0);
@@ -95,24 +124,16 @@ export function EvolutionDashboard({ metrics, historicalYears, calendarYear, tag
   const currentMaxFixedAmount = currentFixedStats[0]?.totalAmount ?? 0;
   const currentFixedTotal = currentFixedPage?.stats.grandTotal ?? 0;
 
-  useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored !== null) {
-      const parsed = parseFloat(stored);
-      if (!isNaN(parsed)) setReturnRate(parsed);
-    }
-  }, []);
-
   function handleRateChange(e: React.ChangeEvent<HTMLInputElement>) {
     const raw = e.target.value;
     if (raw === "") {
-      setReturnRate(null);
       localStorage.removeItem(STORAGE_KEY);
+      notifyStoredReturnRateChanged();
     } else {
       const parsed = parseFloat(raw);
       if (!isNaN(parsed)) {
-        setReturnRate(parsed);
         localStorage.setItem(STORAGE_KEY, String(parsed));
+        notifyStoredReturnRateChanged();
       }
     }
   }

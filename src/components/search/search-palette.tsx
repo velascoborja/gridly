@@ -19,6 +19,18 @@ interface Props {
 }
 
 export function SearchPalette({ yearData, open, onClose, onSelect }: Props) {
+  if (!open) return null;
+
+  return (
+    <OpenSearchPalette
+      yearData={yearData}
+      onClose={onClose}
+      onSelect={onSelect}
+    />
+  );
+}
+
+function OpenSearchPalette({ yearData, onClose, onSelect }: Omit<Props, "open">) {
   const t = useTranslations("Search");
   const locale = useLocale();
   const [query, setQuery] = useState("");
@@ -26,13 +38,6 @@ export function SearchPalette({ yearData, open, onClose, onSelect }: Props) {
 
   const allEntries = useMemo(() => buildSearchIndex(yearData), [yearData]);
   const results = useMemo(() => filterSearchIndex(allEntries, query), [allEntries, query]);
-
-  useEffect(() => {
-    if (open) {
-      setQuery("");
-      setActiveIndex(0);
-    }
-  }, [open]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -89,7 +94,7 @@ export function SearchPalette({ yearData, open, onClose, onSelect }: Props) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
+    <Dialog open onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
       <DialogPortal>
         <DialogOverlay />
         <DialogPrimitive.Popup
