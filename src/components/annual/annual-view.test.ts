@@ -198,6 +198,7 @@ test("expected entries dialog renders a list and an add form", () => {
   assert.match(source, /type: "income" \| "expense"/, "entry type should be a union");
   assert.match(source, /onAdd:/, "dialog should accept an onAdd callback");
   assert.match(source, /onDelete:/, "dialog should accept an onDelete callback");
-  assert.match(source, /t\("expectedEntriesEmptyState"\)/, "should render empty state");
+  assert.match(source, /entries\.length === 0/, "should render an empty state branch");
+  assert.match(source, /aria-hidden="true"/, "empty state skeleton should be hidden from assistive tech");
   assert.match(source, /t\("expectedEntryAddButton"\)/, "should render an add button");
 });
