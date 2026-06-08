@@ -23,6 +23,7 @@ The Monthly View (`/locale/[year]/[month]`) is the primary workspace for users. 
 - Recurring expense edit/delete operations are saved via `/api/months/[monthId]/recurring-expenses/[entryId]`.
 - Additional income and expense entries can be moved between months from the month view. Dragging an entry onto a different month tab persists through `PATCH /api/months/[monthId]/entries/[entryId]` with a target `monthId`.
 - After most successful monthly mutations, `MonthOverview` recomputes the full month chain and lifts the updated `YearData` to `YearPageClient`, preserving the mounted client state while navigating between months. No `router.refresh()` is called — Next.js 16 sets `staleTimes.dynamic = 0`, so dynamic pages are never cached in the client router cache and always fetch fresh data from the server on navigation.
+- The fixed-values show/hide toggle renders both localized labels in the same layout cell and switches visibility only, keeping the month header width stable when the panel is expanded or collapsed.
 - The UI uses optimistic updates or instant feedback to ensure a smooth experience.
 
 ### Month Navigation

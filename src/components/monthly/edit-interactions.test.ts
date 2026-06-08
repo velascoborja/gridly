@@ -76,6 +76,16 @@ test("fixed editor reveal animates without an extra parent stack gap", () => {
   assert.match(source, /ref=\{fixedEditorsInnerRef\} className="overflow-hidden pb-6"/);
 });
 
+test("fixed editor toggle keeps a stable width across show and hide labels", () => {
+  const source = readFileSync(new URL("./month-overview.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /<span aria-hidden="true" className="grid">/);
+  assert.match(source, /showFixedEditors \? "visible" : "invisible"/);
+  assert.match(source, /showFixedEditors \? "invisible" : "visible"/);
+  assert.match(source, /tOverview\("hideMonthEditor"\)/);
+  assert.match(source, /tOverview\("editMonth"\)/);
+});
+
 test("extra payslip fixed row follows the year extra payments setting", () => {
   const incomeSource = readFileSync(new URL("./income-card.tsx", import.meta.url), "utf8");
   const overviewSource = readFileSync(new URL("./month-overview.tsx", import.meta.url), "utf8");

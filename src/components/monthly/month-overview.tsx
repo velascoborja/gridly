@@ -614,7 +614,14 @@ export function MonthOverview({
                     onClick={() => setShowFixedEditors((prev) => !prev)}
                   >
                     {showFixedEditors ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
-                    {showFixedEditors ? tOverview("hideMonthEditor") : tOverview("editMonth")}
+                    <span aria-hidden="true" className="grid">
+                      <span className={cn("col-start-1 row-start-1", showFixedEditors ? "visible" : "invisible")}>
+                        {tOverview("hideMonthEditor")}
+                      </span>
+                      <span className={cn("col-start-1 row-start-1", showFixedEditors ? "invisible" : "visible")}>
+                        {tOverview("editMonth")}
+                      </span>
+                    </span>
                   </button>
                 </div>
               </div>
