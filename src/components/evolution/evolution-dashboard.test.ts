@@ -32,6 +32,13 @@ test("evolution charts include final balance, savings, and investment series", (
   assert.match(source, /dataKey="investedAmount"/);
 });
 
+test("evolution chart containers guard against invalid responsive dimensions", () => {
+  const source = readFileSync(new URL("./evolution-charts.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /chartFrameClassName = "min-w-0 overflow-hidden"/);
+  assert.match(source, /ResponsiveContainer width="100%" height="100%" minWidth=\{0\} minHeight=\{0\}/);
+});
+
 test("evolution detail table renders savings rate with neutral fallback", () => {
   const source = readFileSync(new URL("./evolution-detail-table.tsx", import.meta.url), "utf8");
 

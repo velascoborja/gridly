@@ -15,6 +15,8 @@ function axisCurrency(value: number) {
   return `${(value / 1000).toFixed(0)}k`;
 }
 
+const chartFrameClassName = "min-w-0 overflow-hidden";
+
 export function EvolutionCharts({ metrics, estimatedValues }: Props) {
   const t = useTranslations("Evolution.charts");
   const locale = useLocale();
@@ -38,28 +40,28 @@ export function EvolutionCharts({ metrics, estimatedValues }: Props) {
         </CardHeader>
         <CardContent className="pt-0">
           <div className="rounded-lg border border-border/60 bg-muted/20 p-2 sm:p-3">
-            <div className="h-[200px] sm:h-[280px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={balanceData} margin={{ top: 6, right: 4, bottom: 0, left: 4 }}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border/80" />
-                <XAxis dataKey="year" tick={{ fontSize: 11 }} />
-                <YAxis tickFormatter={axisCurrency} tick={{ fontSize: 11 }} width={44} />
-                <Tooltip formatter={(value) => formatCurrency(Number(value), locale)} />
-                <Legend wrapperStyle={{ fontSize: 11, paddingTop: 8 }} />
-                <Line name={t("balanceLabel")} type="monotone" dataKey="finalBalance" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} stroke="var(--color-primary)" />
-                {estimatedValues ? (
-                  <>
-                    <Line name={t("estimatedPortfolioLabel")} type="monotone" dataKey="estimatedPortfolioValue" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} stroke="var(--color-chart-2)" strokeDasharray="5 3" />
-                    <Line name={t("estimatedTotalWealthLabel")} type="monotone" dataKey="estimatedTotalWealth" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} stroke="var(--color-chart-4)" strokeDasharray="2 2" />
-                  </>
-                ) : (
-                  <>
-                    <Line name={t("accumulatedInvestedLabel")} type="monotone" dataKey="accumulatedInvested" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} stroke="var(--color-chart-2)" strokeDasharray="5 3" />
-                    <Line name={t("totalWealthLabel")} type="monotone" dataKey="totalWealth" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} stroke="var(--color-chart-4)" strokeDasharray="2 2" />
-                  </>
-                )}
-              </LineChart>
-            </ResponsiveContainer>
+            <div className={`${chartFrameClassName} h-[200px] sm:h-[280px]`}>
+              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+                <LineChart data={balanceData} margin={{ top: 6, right: 4, bottom: 0, left: 4 }}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border/80" />
+                  <XAxis dataKey="year" tick={{ fontSize: 11 }} />
+                  <YAxis tickFormatter={axisCurrency} tick={{ fontSize: 11 }} width={44} />
+                  <Tooltip formatter={(value) => formatCurrency(Number(value), locale)} />
+                  <Legend wrapperStyle={{ fontSize: 11, paddingTop: 8 }} />
+                  <Line name={t("balanceLabel")} type="monotone" dataKey="finalBalance" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} stroke="var(--color-primary)" />
+                  {estimatedValues ? (
+                    <>
+                      <Line name={t("estimatedPortfolioLabel")} type="monotone" dataKey="estimatedPortfolioValue" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} stroke="var(--color-chart-2)" strokeDasharray="5 3" />
+                      <Line name={t("estimatedTotalWealthLabel")} type="monotone" dataKey="estimatedTotalWealth" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} stroke="var(--color-chart-4)" strokeDasharray="2 2" />
+                    </>
+                  ) : (
+                    <>
+                      <Line name={t("accumulatedInvestedLabel")} type="monotone" dataKey="accumulatedInvested" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} stroke="var(--color-chart-2)" strokeDasharray="5 3" />
+                      <Line name={t("totalWealthLabel")} type="monotone" dataKey="totalWealth" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} stroke="var(--color-chart-4)" strokeDasharray="2 2" />
+                    </>
+                  )}
+                </LineChart>
+              </ResponsiveContainer>
             </div>
           </div>
         </CardContent>
@@ -73,45 +75,45 @@ export function EvolutionCharts({ metrics, estimatedValues }: Props) {
           </CardHeader>
           <CardContent className="pt-0">
             <div className="rounded-lg border border-border/60 bg-muted/20 p-2 sm:p-3">
-              <div className="h-[180px] sm:h-[240px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={metrics} margin={{ top: 6, right: 8, bottom: 0, left: 4 }}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border/80" />
-                  <XAxis dataKey="year" tick={{ fontSize: 11 }} />
-                  <YAxis yAxisId="left" tickFormatter={axisCurrency} tick={{ fontSize: 11 }} width={44} />
-                  <YAxis
-                    yAxisId="right"
-                    orientation="right"
-                    tickFormatter={(v: number) => `${(v * 100).toFixed(0)}%`}
-                    tick={{ fontSize: 11 }}
-                    width={36}
-                  />
-                  <Tooltip
-                    formatter={(value, name) =>
-                      name === t("savingsRateLabel")
-                        ? `${(Number(value) * 100).toFixed(1)}%`
-                        : formatCurrency(Number(value), locale)
-                    }
-                  />
-                  <Legend wrapperStyle={{ fontSize: 11, paddingTop: 8 }} />
-                  <Bar yAxisId="left" name={t("savedLabel")} dataKey="savedAmount" radius={[3, 3, 0, 0]}>
-                    {metrics.map((metric) => (
-                      <Cell key={metric.year} fill={metric.savedAmount >= 0 ? "hsl(142 76% 36%)" : "hsl(0 84% 60%)"} />
-                    ))}
-                  </Bar>
-                  <Line
-                    yAxisId="right"
-                    name={t("savingsRateLabel")}
-                    type="monotone"
-                    dataKey="savingsRate"
-                    strokeWidth={2}
-                    dot={{ r: 3 }}
-                    activeDot={{ r: 5 }}
-                    stroke="var(--color-chart-3)"
-                    connectNulls={false}
-                  />
-                </ComposedChart>
-              </ResponsiveContainer>
+              <div className={`${chartFrameClassName} h-[180px] sm:h-[240px]`}>
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+                  <ComposedChart data={metrics} margin={{ top: 6, right: 8, bottom: 0, left: 4 }}>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-border/80" />
+                    <XAxis dataKey="year" tick={{ fontSize: 11 }} />
+                    <YAxis yAxisId="left" tickFormatter={axisCurrency} tick={{ fontSize: 11 }} width={44} />
+                    <YAxis
+                      yAxisId="right"
+                      orientation="right"
+                      tickFormatter={(v: number) => `${(v * 100).toFixed(0)}%`}
+                      tick={{ fontSize: 11 }}
+                      width={36}
+                    />
+                    <Tooltip
+                      formatter={(value, name) =>
+                        name === t("savingsRateLabel")
+                          ? `${(Number(value) * 100).toFixed(1)}%`
+                          : formatCurrency(Number(value), locale)
+                      }
+                    />
+                    <Legend wrapperStyle={{ fontSize: 11, paddingTop: 8 }} />
+                    <Bar yAxisId="left" name={t("savedLabel")} dataKey="savedAmount" radius={[3, 3, 0, 0]}>
+                      {metrics.map((metric) => (
+                        <Cell key={metric.year} fill={metric.savedAmount >= 0 ? "hsl(142 76% 36%)" : "hsl(0 84% 60%)"} />
+                      ))}
+                    </Bar>
+                    <Line
+                      yAxisId="right"
+                      name={t("savingsRateLabel")}
+                      type="monotone"
+                      dataKey="savingsRate"
+                      strokeWidth={2}
+                      dot={{ r: 3 }}
+                      activeDot={{ r: 5 }}
+                      stroke="var(--color-chart-3)"
+                      connectNulls={false}
+                    />
+                  </ComposedChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </CardContent>
@@ -124,16 +126,16 @@ export function EvolutionCharts({ metrics, estimatedValues }: Props) {
           </CardHeader>
           <CardContent className="pt-0">
             <div className="rounded-lg border border-border/60 bg-muted/20 p-2 sm:p-3">
-              <div className="h-[180px] sm:h-[240px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={metrics} margin={{ top: 6, right: 4, bottom: 0, left: 4 }}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border/80" />
-                  <XAxis dataKey="year" tick={{ fontSize: 11 }} />
-                  <YAxis tickFormatter={axisCurrency} tick={{ fontSize: 11 }} width={44} />
-                  <Tooltip formatter={(value) => formatCurrency(Number(value), locale)} />
-                  <Bar name={t("investedLabel")} dataKey="investedAmount" fill="hsl(var(--primary))" radius={[3, 3, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              <div className={`${chartFrameClassName} h-[180px] sm:h-[240px]`}>
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+                  <BarChart data={metrics} margin={{ top: 6, right: 4, bottom: 0, left: 4 }}>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-border/80" />
+                    <XAxis dataKey="year" tick={{ fontSize: 11 }} />
+                    <YAxis tickFormatter={axisCurrency} tick={{ fontSize: 11 }} width={44} />
+                    <Tooltip formatter={(value) => formatCurrency(Number(value), locale)} />
+                    <Bar name={t("investedLabel")} dataKey="investedAmount" fill="hsl(var(--primary))" radius={[3, 3, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </CardContent>
@@ -146,16 +148,16 @@ export function EvolutionCharts({ metrics, estimatedValues }: Props) {
           </CardHeader>
           <CardContent className="pt-0">
             <div className="rounded-lg border border-border/60 bg-muted/20 p-2 sm:p-3">
-              <div className="h-[180px] sm:h-[240px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={metrics} margin={{ top: 6, right: 4, bottom: 0, left: 4 }}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border/80" />
-                  <XAxis dataKey="year" tick={{ fontSize: 11 }} />
-                  <YAxis tickFormatter={axisCurrency} tick={{ fontSize: 11 }} width={44} />
-                  <Tooltip formatter={(value) => formatCurrency(Number(value), locale)} />
-                  <Bar name={t("interestLabel")} dataKey="interestsEarned" fill="var(--color-chart-2)" radius={[3, 3, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              <div className={`${chartFrameClassName} h-[180px] sm:h-[240px]`}>
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+                  <BarChart data={metrics} margin={{ top: 6, right: 4, bottom: 0, left: 4 }}>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-border/80" />
+                    <XAxis dataKey="year" tick={{ fontSize: 11 }} />
+                    <YAxis tickFormatter={axisCurrency} tick={{ fontSize: 11 }} width={44} />
+                    <Tooltip formatter={(value) => formatCurrency(Number(value), locale)} />
+                    <Bar name={t("interestLabel")} dataKey="interestsEarned" fill="var(--color-chart-2)" radius={[3, 3, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </CardContent>

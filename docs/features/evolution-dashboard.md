@@ -122,6 +122,8 @@ The user can enter an annual return rate (%) directly in the Total Wealth box. T
 
 Y-axes on all currency charts are formatted as `Xk` (thousands). The savings chart has a second right Y-axis formatted as `%` for the savings rate line.
 
+Each chart is hosted in a fixed-height, `min-w-0` frame, and each Recharts `ResponsiveContainer` sets `minWidth={0}` and `minHeight={0}` so responsive grid measurement cannot produce invalid negative dimensions.
+
 ### Detail Table
 
 Displays all `EvolutionYearMetric` fields for each eligible year: source, year, starting balance, final balance, saved amount, invested amount, accumulated invested, interest earned, total income, total expenses, and savings rate. Savings rate is shown as a percentage with one decimal place, or `—` when `null`. Historical rows expose edit and delete actions; full Gridly years remain read-only from this table.
