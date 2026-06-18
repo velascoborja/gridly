@@ -725,6 +725,12 @@ export function MonthOverview({
           readOnly={readOnly}
           title={tOverview("additionalExpensesTitle")}
           movingEntryId={movingEntry?.entryId ?? null}
+          moveTargets={sortedMonths
+            .filter((item) => item.id !== month.id)
+            .map((item) => ({ id: item.id, month: item.month }))}
+          onEntryMoveToMonth={(entry, targetMonthId) => {
+            void handleAdditionalEntryMove(entry, "expense", month.id, targetMonthId);
+          }}
           onEntryDragStart={(entry) => setDraggedEntry({
             entry,
             type: "expense",
@@ -749,6 +755,12 @@ export function MonthOverview({
           readOnly={readOnly}
           title={tOverview("additionalIncomeTitle")}
           movingEntryId={movingEntry?.entryId ?? null}
+          moveTargets={sortedMonths
+            .filter((item) => item.id !== month.id)
+            .map((item) => ({ id: item.id, month: item.month }))}
+          onEntryMoveToMonth={(entry, targetMonthId) => {
+            void handleAdditionalEntryMove(entry, "income", month.id, targetMonthId);
+          }}
           onEntryDragStart={(entry) => setDraggedEntry({
             entry,
             type: "income",

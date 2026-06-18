@@ -475,6 +475,7 @@
       "moving": "Moving...",
       "noGroup": "No group",
       "addToGroup": "Add entry to group",
+      "moveToMonth": "Move to month",
       "moveToGroup": "Move to group",
       "confirmDeleteTitle": "Delete this entry?",
       "confirmDeleteDescription": "\"{label}\" will be removed from the list. This action cannot be undone.",

@@ -475,6 +475,7 @@
       "moving": "Moviendo...",
       "noGroup": "Sin grupo",
       "addToGroup": "Añadir entrada al grupo",
+      "moveToMonth": "Mover a mes",
       "moveToGroup": "Mover a grupo",
       "confirmDeleteTitle": "¿Eliminar esta entrada?",
       "confirmDeleteDescription": "Se eliminará \"{label}\" de la lista. Esta acción no se puede deshacer.",

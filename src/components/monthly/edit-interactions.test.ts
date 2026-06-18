@@ -247,19 +247,24 @@ test("mobile month view supports horizontal swipe navigation through the local m
   assert.match(overviewSource, /direction === "previous" && previousMonth/);
 });
 
-test("additional entry rows move by drag and drop without a separate move button", () => {
+test("additional entry rows keep drag and drop and expose month moves only inside edit mode", () => {
   const entriesSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
   const overviewSource = readFileSync(new URL("./month-overview.tsx", import.meta.url), "utf8");
+  const esMessages = readFileSync(new URL("../../../messages/es.json", import.meta.url), "utf8");
+  const enMessages = readFileSync(new URL("../../../messages/en.json", import.meta.url), "utf8");
 
   assert.match(entriesSource, /onEntryDragStart\?: \(entry: AdditionalEntry\) => void/);
   assert.match(entriesSource, /draggable=\{canMoveEntry\(entry\)\}/);
   assert.match(entriesSource, /onDragStart=\{\(event\) => handleDragStart\(event, entry\)\}/);
-  assert.doesNotMatch(entriesSource, /ArrowRightLeft/);
-  assert.doesNotMatch(entriesSource, /movePickerOpenId/);
-  assert.doesNotMatch(entriesSource, /moveTargets\?: AdditionalEntryMoveTarget\[\]/);
-  assert.doesNotMatch(entriesSource, /onEntryMove\?: \(entry: AdditionalEntry, targetMonthId: number\) => void/);
-  assert.doesNotMatch(entriesSource, /t\("moveEntry"\)/);
-  assert.doesNotMatch(overviewSource, /moveTargets=\{additionalEntryMoveTargets\}/);
+  assert.match(entriesSource, /CalendarArrowUp/);
+  assert.match(entriesSource, /monthAction=\{onEntryMoveToMonth && moveTargets\.length > 0/);
+  assert.match(entriesSource, /onEntryMoveToMonth\?: \(entry: AdditionalEntry, targetMonthId: number\) => void/);
+  assert.match(entriesSource, /t\("moveToMonth"\)/);
+  assert.match(overviewSource, /moveTargets=\{sortedMonths/);
+  assert.match(overviewSource, /handleAdditionalEntryMove\(entry, "expense", month\.id, targetMonthId\)/);
+  assert.match(overviewSource, /handleAdditionalEntryMove\(entry, "income", month\.id, targetMonthId\)/);
+  assert.match(esMessages, /"moveToMonth": "Mover a mes"/);
+  assert.match(enMessages, /"moveToMonth": "Move to month"/);
 });
 
 test("additional expense group moves use a compact edit-row menu instead of selects", () => {
@@ -304,6 +309,7 @@ test("EntryFormRow exposes a tagAction slot and accounts for it in the grid colu
   const source = readFileSync(new URL("./entry-form-row.tsx", import.meta.url), "utf8");
 
   assert.match(source, /tagAction\?: React\.ReactNode/);
-  assert.match(source, /\[folderAction, recurringAction, tagAction\]\.filter\(Boolean\)\.length/);
-  assert.match(source, /extraCount === 3/);
+  assert.match(source, /monthAction\?: React\.ReactNode/);
+  assert.match(source, /\[folderAction, monthAction, recurringAction, tagAction\]\.filter\(Boolean\)\.length/);
+  assert.match(source, /extraCount === 4/);
 });

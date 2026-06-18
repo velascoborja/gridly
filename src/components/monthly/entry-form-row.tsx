@@ -22,6 +22,8 @@ interface EntryFormRowProps {
   cancelLabel: string;
   /** Optional slot for a folder/move action button rendered before Save/Cancel */
   folderAction?: React.ReactNode;
+  /** Optional slot for moving an entry to another month */
+  monthAction?: React.ReactNode;
   /** Optional slot for a recurring toggle button rendered before folderAction */
   recurringAction?: React.ReactNode;
   /** Optional slot for a tag action button rendered before recurringAction */
@@ -45,14 +47,17 @@ export function EntryFormRow({
   savingLabel,
   cancelLabel,
   folderAction,
+  monthAction,
   recurringAction,
   tagAction,
   onKeyDown,
   autoFocus = false,
 }: EntryFormRowProps) {
-  const extraCount = [folderAction, recurringAction, tagAction].filter(Boolean).length;
+  const extraCount = [folderAction, monthAction, recurringAction, tagAction].filter(Boolean).length;
   const smCols =
-    extraCount === 3
+    extraCount === 4
+      ? "sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto_auto_auto_auto_auto]"
+      : extraCount === 3
       ? "sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto_auto_auto_auto]"
       : extraCount === 2
       ? "sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto_auto_auto]"
@@ -91,6 +96,7 @@ export function EntryFormRow({
       <div className="col-span-2 flex items-center justify-end gap-1.5 sm:contents">
         {tagAction}
         {recurringAction}
+        {monthAction}
         {folderAction}
         <Button size="sm" className="h-9 px-3" onClick={onSave} disabled={disabled}>
           {isSaving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}

@@ -3,7 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "@/i18n/routing";
-import { FolderInput, FolderPlus, Loader2, Plus, Repeat, Trash2 } from "lucide-react";
+import { CalendarArrowUp, FolderInput, FolderPlus, Loader2, Plus, Repeat, Trash2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,10 +32,15 @@ import { EntryFormRow } from "./entry-form-row";
 import { TagPicker } from "./tag-picker";
 import { sortAdditionalEntriesDesc, sumAdditionalEntries } from "@/lib/additional-entries";
 import { TAG_COLORS } from "@/lib/tags";
-import { cn, formatCurrency } from "@/lib/utils";
+import { cn, formatCurrency, formatMonthName } from "@/lib/utils";
 import type { AdditionalEntry, AdditionalEntryGroup, Tag } from "@/lib/types";
 
 const NO_GROUPS: AdditionalEntryGroup[] = [];
+
+type MonthMoveTarget = {
+  id: number;
+  month: number;
+};
 
 interface Props {
   monthId: number;
@@ -48,6 +53,8 @@ interface Props {
   readOnly?: boolean;
   title: string;
   movingEntryId?: number | null;
+  moveTargets?: MonthMoveTarget[];
+  onEntryMoveToMonth?: (entry: AdditionalEntry, targetMonthId: number) => void;
   onEntryDragStart?: (entry: AdditionalEntry) => void;
   onEntryDragEnd?: () => void;
   highlightId?: string | null;
@@ -67,6 +74,8 @@ export function AdditionalEntriesCard({
   readOnly = false,
   title,
   movingEntryId = null,
+  moveTargets = [],
+  onEntryMoveToMonth,
   onEntryDragStart,
   onEntryDragEnd,
   highlightId = null,
@@ -497,7 +506,7 @@ export function AdditionalEntriesCard({
                   onAmountChange={setEditAmount}
                   onSave={() => handleEdit(entry.id)}
                   onCancel={() => setEditingId(null)}
-                  disabled={savingId === entry.id || movingToGroupId === entry.id}
+                  disabled={savingId === entry.id || movingToGroupId === entry.id || movingEntryId === entry.id}
                   isSaving={savingId === entry.id}
                   saveLabel={common("save")}
                   savingLabel={t("saving")}
@@ -514,7 +523,7 @@ export function AdditionalEntriesCard({
                         value={editTagId}
                         onChange={setEditTagId}
                         onCreateTag={handleCreateTag}
-                        disabled={savingId === entry.id || movingToGroupId === entry.id}
+                        disabled={savingId === entry.id || movingToGroupId === entry.id || movingEntryId === entry.id}
                       />
                     ) : undefined
                   }
@@ -532,11 +541,51 @@ export function AdditionalEntriesCard({
                       aria-label={t(editRecurring ? "recurringActive" : "recurringToggle")}
                       title={t(editRecurring ? "recurringActive" : "recurringToggle")}
                       onClick={() => setEditRecurring((v) => !v)}
-                      disabled={savingId === entry.id || movingToGroupId === entry.id}
+                      disabled={savingId === entry.id || movingToGroupId === entry.id || movingEntryId === entry.id}
                     >
                       <Repeat className="h-3.5 w-3.5" />
                     </Button>
                   }
+                  monthAction={onEntryMoveToMonth && moveTargets.length > 0 ? (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger
+                        render={
+                          <Button
+                            size="icon-sm"
+                            variant="ghost"
+                            className="h-9 w-9 text-muted-foreground hover:text-primary"
+                            aria-label={`${t("moveToMonth")} ${entry.label}`}
+                            disabled={savingId === entry.id || movingToGroupId === entry.id || movingEntryId === entry.id}
+                          >
+                            {movingEntryId === entry.id ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            ) : (
+                              <CalendarArrowUp className="h-3.5 w-3.5" />
+                            )}
+                          </Button>
+                        }
+                      />
+                      <DropdownMenuContent align="end" className="w-72 max-w-[calc(100vw-2rem)]">
+                        <DropdownMenuGroup>
+                          <DropdownMenuLabel>{t("moveToMonth")}</DropdownMenuLabel>
+                          <DropdownMenuRadioGroup
+                            value={String(monthId)}
+                            onValueChange={(value) => {
+                              const targetMonthId = parseInt(value, 10);
+                              if (targetMonthId === monthId || Number.isNaN(targetMonthId)) return;
+                              onEntryMoveToMonth(entry, targetMonthId);
+                            }}
+                          >
+                            {moveTargets.map((target) => (
+                              <DropdownMenuRadioItem key={target.id} value={String(target.id)}>
+                                <span className="truncate capitalize">{formatMonthName(target.month, locale)}</span>
+                              </DropdownMenuRadioItem>
+                            ))}
+                          </DropdownMenuRadioGroup>
+                        </DropdownMenuGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  ) : undefined}
                   folderAction={type === "expense" && groups.length > 0 ? (
                     <DropdownMenu>
                       <DropdownMenuTrigger
@@ -546,7 +595,7 @@ export function AdditionalEntriesCard({
                             variant="ghost"
                             className="h-9 w-9 text-muted-foreground hover:text-primary"
                             aria-label={`${t("moveToGroup")} ${entry.label}`}
-                            disabled={savingId === entry.id || movingToGroupId === entry.id}
+                            disabled={savingId === entry.id || movingToGroupId === entry.id || movingEntryId === entry.id}
                           >
                             {movingToGroupId === entry.id ? (
                               <Loader2 className="h-3.5 w-3.5 animate-spin" />

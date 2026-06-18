@@ -17,7 +17,7 @@ test("additional entries card source includes mutation feedback states", async (
   assert.match(source, /disabled=\{isAdding\}/, "the add action should disable while pending");
   assert.match(
     source,
-    /disabled=\{savingId === entry\.id(?: \|\| movingToGroupId === entry\.id)?\}/,
+    /disabled=\{savingId === entry\.id(?: \|\| movingToGroupId === entry\.id)?(?: \|\| movingEntryId === entry\.id)?\}/,
     "the save action should disable the active row while pending"
   );
   assert.match(source, /disabled=\{deletingId === entry\.id\}/, "the delete confirmation should disable while pending");
