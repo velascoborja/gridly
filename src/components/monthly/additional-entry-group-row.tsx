@@ -409,7 +409,7 @@ export function AdditionalEntryGroupRow({
                     </Button>
                   }
                 />
-                <DropdownMenuContent align="end" className="w-72 max-w-[calc(100vw-2rem)]">
+                <DropdownMenuContent align="end" className="w-52 max-w-[calc(100vw-2rem)]">
                   <DropdownMenuGroup>
                     <DropdownMenuLabel>{t("moveGroupToMonth")}</DropdownMenuLabel>
                     <DropdownMenuRadioGroup
@@ -538,7 +538,7 @@ export function AdditionalEntryGroupRow({
                           </Button>
                         }
                       />
-                      <DropdownMenuContent align="end" className="w-72 max-w-[calc(100vw-2rem)]">
+                      <DropdownMenuContent align="end" className="w-52 max-w-[calc(100vw-2rem)]">
                         <DropdownMenuGroup>
                           <DropdownMenuLabel>{t("moveToGroup")}</DropdownMenuLabel>
                           <DropdownMenuRadioGroup

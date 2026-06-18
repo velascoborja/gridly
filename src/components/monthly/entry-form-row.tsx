@@ -93,7 +93,7 @@ export function EntryFormRow({
           €
         </span>
       </div>
-      <div className="col-span-2 flex items-center justify-end gap-1.5 sm:contents">
+      <div className="col-span-2 flex items-center justify-end gap-0 sm:contents">
         {tagAction}
         {recurringAction}
         {monthAction}

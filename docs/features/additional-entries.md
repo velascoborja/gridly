@@ -62,6 +62,7 @@ Users can group related additional expenses within a month (e.g., "Viaje a Roma"
 - Group name is editable inline: click the group label to rename, Enter or blur to save, Escape to cancel.
 - Deleting a group opens a confirmation dialog listing the group name and entry count.
 - Entries can be moved to/from groups via the compact row-level group menu (available in both `AdditionalEntryGroupRow` and `AdditionalEntriesCard`), keeping edit forms focused on label and amount only.
+- The shared `EntryFormRow` keeps its mobile action toolbar flush between icon actions and Save/Cancel so tag, recurring, month move, and group move controls can fit in one row.
 
 ## Recurring Entries
 

@@ -345,3 +345,9 @@ test("EntryFormRow exposes a tagAction slot and accounts for it in the grid colu
   assert.match(source, /\[folderAction, monthAction, recurringAction, tagAction\]\.filter\(Boolean\)\.length/);
   assert.match(source, /extraCount === 4/);
 });
+
+test("EntryFormRow keeps mobile action controls flush when all action slots are present", () => {
+  const source = readFileSync(new URL("./entry-form-row.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /className="col-span-2 flex items-center justify-end gap-0 sm:contents"/);
+});

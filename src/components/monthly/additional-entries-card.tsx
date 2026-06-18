@@ -578,7 +578,7 @@ export function AdditionalEntriesCard({
                           </Button>
                         }
                       />
-                      <DropdownMenuContent align="end" className="w-72 max-w-[calc(100vw-2rem)]">
+                      <DropdownMenuContent align="end" className="w-52 max-w-[calc(100vw-2rem)]">
                         <DropdownMenuGroup>
                           <DropdownMenuLabel>{t("moveToMonth")}</DropdownMenuLabel>
                           <DropdownMenuRadioGroup
@@ -618,7 +618,7 @@ export function AdditionalEntriesCard({
                           </Button>
                         }
                       />
-                      <DropdownMenuContent align="end" className="w-72 max-w-[calc(100vw-2rem)]">
+                      <DropdownMenuContent align="end" className="w-52 max-w-[calc(100vw-2rem)]">
                         <DropdownMenuGroup>
                           <DropdownMenuLabel>{t("moveToGroup")}</DropdownMenuLabel>
                           <DropdownMenuRadioGroup
