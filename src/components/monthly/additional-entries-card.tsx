@@ -53,10 +53,14 @@ interface Props {
   readOnly?: boolean;
   title: string;
   movingEntryId?: number | null;
+  movingGroupId?: number | null;
   moveTargets?: MonthMoveTarget[];
   onEntryMoveToMonth?: (entry: AdditionalEntry, targetMonthId: number) => void;
+  onGroupMoveToMonth?: (group: AdditionalEntryGroup, targetMonthId: number) => void;
   onEntryDragStart?: (entry: AdditionalEntry) => void;
+  onGroupDragStart?: (group: AdditionalEntryGroup) => void;
   onEntryDragEnd?: () => void;
+  onGroupDragEnd?: () => void;
   highlightId?: string | null;
   openAddFormRef?: { current: (() => void) | null };
   openAddGroupFormRef?: { current: (() => void) | null };
@@ -74,10 +78,14 @@ export function AdditionalEntriesCard({
   readOnly = false,
   title,
   movingEntryId = null,
+  movingGroupId = null,
   moveTargets = [],
   onEntryMoveToMonth,
+  onGroupMoveToMonth,
   onEntryDragStart,
+  onGroupDragStart,
   onEntryDragEnd,
+  onGroupDragEnd,
   highlightId = null,
   openAddFormRef,
   openAddGroupFormRef,
@@ -471,12 +479,17 @@ export function AdditionalEntriesCard({
                 monthId={monthId}
                 group={group}
                 allGroups={groups}
+                moveTargets={moveTargets}
+                movingGroupId={movingGroupId}
                 onGroupUpdate={(updated) =>
                   onGroupsChange?.(groups.map((g) => (g.id === updated.id ? updated : g)))
                 }
                 onGroupDelete={(groupId) =>
                   onGroupsChange?.(groups.filter((g) => g.id !== groupId))
                 }
+                onGroupMoveToMonth={onGroupMoveToMonth}
+                onGroupDragStart={onGroupDragStart}
+                onGroupDragEnd={onGroupDragEnd}
                 onEntryGroupChanged={onEntryGroupChanged ?? (() => {})}
                 readOnly={readOnly}
                 highlightId={highlightId}

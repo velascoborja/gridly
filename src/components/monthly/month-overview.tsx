@@ -57,8 +57,19 @@ type DraggedAdditionalEntry = {
   sourceMonthNumber: number;
 };
 
+type DraggedAdditionalGroup = {
+  group: AdditionalEntryGroup;
+  sourceMonthId: number;
+  sourceMonthNumber: number;
+};
+
 type MovingAdditionalEntry = {
   entryId: number;
+  sourceMonthId: number;
+};
+
+type MovingAdditionalGroup = {
+  groupId: number;
   sourceMonthId: number;
 };
 
@@ -94,8 +105,10 @@ export function MonthOverview({
   const [fixedEditorsVisible, setFixedEditorsVisible] = useState(false);
   const [fixedEditorsHeight, setFixedEditorsHeight] = useState<number | "auto">(0);
   const [draggedEntry, setDraggedEntry] = useState<DraggedAdditionalEntry | null>(null);
+  const [draggedGroup, setDraggedGroup] = useState<DraggedAdditionalGroup | null>(null);
   const [dragOverMonthId, setDragOverMonthId] = useState<number | null>(null);
   const [movingEntry, setMovingEntry] = useState<MovingAdditionalEntry | null>(null);
+  const [movingGroup, setMovingGroup] = useState<MovingAdditionalGroup | null>(null);
   const monthsRef = useRef<MonthData[]>(initialYearData.months);
   const config = initialYearData.config;
   const yearRecurringExpenses = initialYearData.recurringExpenses;
@@ -352,16 +365,80 @@ export function MonthOverview({
     } finally {
       setMovingEntry(null);
       setDraggedEntry(null);
+      setDraggedGroup(null);
       setDragOverMonthId(null);
     }
   }, [commitMonthsChange, movingEntry?.entryId]);
 
+  const handleAdditionalGroupMove = useCallback(async (
+    group: AdditionalEntryGroup,
+    sourceMonthId: number,
+    targetMonthId: number
+  ) => {
+    if (sourceMonthId === targetMonthId || movingGroup?.groupId === group.id) return;
+
+    const currentMonths = monthsRef.current;
+    const sourceMonth = currentMonths.find((item) => item.id === sourceMonthId);
+    const targetMonth = currentMonths.find((item) => item.id === targetMonthId);
+    if (!sourceMonth || !targetMonth || sourceMonth.yearId !== targetMonth.yearId) return;
+
+    setMovingGroup({ groupId: group.id, sourceMonthId });
+    try {
+      const res = await fetch(`/api/months/${sourceMonthId}/entry-groups/${group.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ monthId: targetMonthId }),
+      });
+      if (!res.ok) return;
+
+      const updated = await res.json();
+      const movedGroup: AdditionalEntryGroup = {
+        ...group,
+        ...updated,
+        monthId: targetMonthId,
+        tagId: updated.tagId ?? group.tagId ?? null,
+        tag: group.tag,
+        entries: group.entries.map((entry) => ({
+          ...entry,
+          monthId: targetMonthId,
+        })),
+      };
+
+      commitMonthsChange((prev) =>
+        prev.map((item) => {
+          if (item.id === sourceMonthId) {
+            return {
+              ...item,
+              additionalExpenseGroups: item.additionalExpenseGroups.filter((candidate) => candidate.id !== group.id),
+            };
+          }
+          if (item.id === targetMonthId) {
+            return {
+              ...item,
+              additionalExpenseGroups: [
+                ...item.additionalExpenseGroups.filter((candidate) => candidate.id !== group.id),
+                movedGroup,
+              ],
+            };
+          }
+          return item;
+        })
+      );
+    } finally {
+      setMovingGroup(null);
+      setDraggedEntry(null);
+      setDraggedGroup(null);
+      setDragOverMonthId(null);
+    }
+  }, [commitMonthsChange, movingGroup?.groupId]);
+
   const handleMonthDragOver = useCallback((targetMonthId: number) => (event: React.DragEvent<HTMLAnchorElement>) => {
-    if (!draggedEntry || draggedEntry.sourceMonthId === targetMonthId || movingEntry) return;
+    const draggedItem = draggedEntry ?? draggedGroup;
+    if (!draggedItem || draggedItem.sourceMonthId === targetMonthId || movingEntry || movingGroup) return;
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
     setDragOverMonthId(targetMonthId);
-  }, [draggedEntry, movingEntry]);
+  }, [draggedEntry, draggedGroup, movingEntry, movingGroup]);
 
   const handleMonthDragLeave = useCallback((targetMonthId: number) => (event: React.DragEvent<HTMLAnchorElement>) => {
     if (event.currentTarget.contains(event.relatedTarget as Node | null)) return;
@@ -369,10 +446,17 @@ export function MonthOverview({
   }, []);
 
   const handleMonthDrop = useCallback((targetMonthId: number) => (event: React.DragEvent<HTMLAnchorElement>) => {
-    if (!draggedEntry || draggedEntry.sourceMonthId === targetMonthId) return;
+    const draggedItem = draggedEntry ?? draggedGroup;
+    if (!draggedItem || draggedItem.sourceMonthId === targetMonthId) return;
     event.preventDefault();
-    void handleAdditionalEntryMove(draggedEntry.entry, draggedEntry.type, draggedEntry.sourceMonthId, targetMonthId);
-  }, [draggedEntry, handleAdditionalEntryMove]);
+    if (draggedEntry) {
+      void handleAdditionalEntryMove(draggedEntry.entry, draggedEntry.type, draggedEntry.sourceMonthId, targetMonthId);
+      return;
+    }
+    if (draggedGroup) {
+      void handleAdditionalGroupMove(draggedGroup.group, draggedGroup.sourceMonthId, targetMonthId);
+    }
+  }, [draggedEntry, draggedGroup, handleAdditionalEntryMove, handleAdditionalGroupMove]);
 
   const handleGroupsChange = useCallback((groups: AdditionalEntryGroup[]) => {
     commitMonthsChange((prev) =>
@@ -479,7 +563,7 @@ export function MonthOverview({
                   config.year < today.getFullYear() || (config.year === today.getFullYear() && item.month < today.getMonth() + 1);
                 const monthLabel = formatMonthName(item.month, locale);
                 const isAdditionalEntryDropTarget =
-                  Boolean(draggedEntry) && draggedEntry?.sourceMonthId !== item.id && !movingEntry;
+                  Boolean(draggedEntry ?? draggedGroup) && (draggedEntry ?? draggedGroup)?.sourceMonthId !== item.id && !movingEntry && !movingGroup;
                 const isAdditionalEntryDropHovered = isAdditionalEntryDropTarget && dragOverMonthId === item.id;
                 const monthAriaLabel = isItemCurrentMonth ? `${monthLabel}, ${tOverview("currentMonthLabel")}` : monthLabel;
 
@@ -496,7 +580,11 @@ export function MonthOverview({
                       onDragLeave={handleMonthDragLeave(item.id)}
                       onDrop={handleMonthDrop(item.id)}
                       aria-current={isActive ? "page" : undefined}
-                      aria-label={isAdditionalEntryDropTarget ? tOverview("dropEntryOnMonth", { month: monthLabel }) : monthAriaLabel}
+                      aria-label={
+                        isAdditionalEntryDropTarget
+                          ? tOverview(draggedGroup ? "dropGroupOnMonth" : "dropEntryOnMonth", { month: monthLabel })
+                          : monthAriaLabel
+                      }
                       className={cn(
                         "inline-flex min-w-20 items-center justify-center gap-2 rounded-md border px-3 py-2 text-xs font-medium capitalize transition-all",
                         isActive
@@ -725,20 +813,39 @@ export function MonthOverview({
           readOnly={readOnly}
           title={tOverview("additionalExpensesTitle")}
           movingEntryId={movingEntry?.entryId ?? null}
+          movingGroupId={movingGroup?.groupId ?? null}
           moveTargets={sortedMonths
             .filter((item) => item.id !== month.id)
             .map((item) => ({ id: item.id, month: item.month }))}
           onEntryMoveToMonth={(entry, targetMonthId) => {
             void handleAdditionalEntryMove(entry, "expense", month.id, targetMonthId);
           }}
-          onEntryDragStart={(entry) => setDraggedEntry({
-            entry,
-            type: "expense",
-            sourceMonthId: month.id,
-            sourceMonthNumber: month.month,
-          })}
+          onGroupMoveToMonth={(group, targetMonthId) => {
+            void handleAdditionalGroupMove(group, month.id, targetMonthId);
+          }}
+          onEntryDragStart={(entry) => {
+            setDraggedGroup(null);
+            setDraggedEntry({
+              entry,
+              type: "expense",
+              sourceMonthId: month.id,
+              sourceMonthNumber: month.month,
+            });
+          }}
+          onGroupDragStart={(group) => {
+            setDraggedEntry(null);
+            setDraggedGroup({
+              group,
+              sourceMonthId: month.id,
+              sourceMonthNumber: month.month,
+            });
+          }}
           onEntryDragEnd={() => {
             setDraggedEntry(null);
+            setDragOverMonthId(null);
+          }}
+          onGroupDragEnd={() => {
+            setDraggedGroup(null);
             setDragOverMonthId(null);
           }}
           highlightId={highlightId}
@@ -761,12 +868,15 @@ export function MonthOverview({
           onEntryMoveToMonth={(entry, targetMonthId) => {
             void handleAdditionalEntryMove(entry, "income", month.id, targetMonthId);
           }}
-          onEntryDragStart={(entry) => setDraggedEntry({
-            entry,
-            type: "income",
-            sourceMonthId: month.id,
-            sourceMonthNumber: month.month,
-          })}
+          onEntryDragStart={(entry) => {
+            setDraggedGroup(null);
+            setDraggedEntry({
+              entry,
+              type: "income",
+              sourceMonthId: month.id,
+              sourceMonthNumber: month.month,
+            });
+          }}
           onEntryDragEnd={() => {
             setDraggedEntry(null);
             setDragOverMonthId(null);

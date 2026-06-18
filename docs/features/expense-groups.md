@@ -29,7 +29,7 @@ Two tables are involved:
 | Method | Route | Purpose |
 |---|---|---|
 | `POST` | `/api/months/[monthId]/entry-groups` | Create a group `{ label }` |
-| `PATCH` | `/api/months/[monthId]/entry-groups/[groupId]` | Rename a group `{ label }` or set its tag `{ label, tagId: number \| null }`. When `tagId` is present, all entries in the group are batch-updated to the same `tagId`. |
+| `PATCH` | `/api/months/[monthId]/entry-groups/[groupId]` | Rename a group `{ label }`, set its tag `{ label, tagId: number \| null }`, or move the full group to another month in the same year with `{ monthId }`. When `tagId` is present, all entries in the group are batch-updated to the same `tagId`; when `monthId` is present, the group and all child entries are batch-updated to the target month. |
 | `DELETE` | `/api/months/[monthId]/entry-groups/[groupId]` | Delete group and all its entries (DB cascade) |
 | `POST` | `/api/months/[monthId]/entries` | Create an entry; accepts optional `groupId` to assign it directly into a group |
 | `PATCH` | `/api/months/[monthId]/entries/[entryId]` | Accepts `groupId: number \| null` to move an entry into or out of a group |
@@ -57,6 +57,14 @@ Two tables are involved:
 - Selecting a target group sends `PATCH /api/months/[monthId]/entries/[entryId]` with `{ groupId: <targetId> }`.
 - Selecting "Sin grupo" sends `{ groupId: null }` to ungroup the entry.
 - Moving uses a per-entry `movingToGroupId` loading flag rather than a generic busy state.
+
+### Moving groups between months
+- Expense groups can be moved as a whole to another month in the same year.
+- Desktop users can drag the group header onto a different month in the month strip.
+- Touch and keyboard users can use the group header's compact "Move group to month" menu.
+- The move sends `PATCH /api/months/[monthId]/entry-groups/[groupId]` with `{ monthId: targetMonthId }`.
+- The API validates that the target month belongs to the same year and account, updates `additional_entry_groups.month_id`, and updates every child `additional_entries.month_id` for the group.
+- `MonthOverview` then removes the group from the source month, adds it to the target month, and recomputes the month chain without calling `router.refresh()`.
 
 ### Renaming a group
 - Click the group label text to enter inline rename mode.

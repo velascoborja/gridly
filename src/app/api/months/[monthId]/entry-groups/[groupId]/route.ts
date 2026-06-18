@@ -26,12 +26,30 @@ export async function PATCH(
   if (!group) return Response.json({ error: "Group not found" }, { status: 404 });
 
   const body = await request.json();
-  const label = typeof body.label === "string" ? body.label.trim() : "";
+  const hasLabel = body.label !== undefined;
+  const label = hasLabel ? (typeof body.label === "string" ? body.label.trim() : "") : group.label;
   if (!label) {
     return Response.json({ error: "label is required" }, { status: 400 });
   }
 
-  const groupUpdate: { label: string; tagId?: number | null } = { label };
+  const groupUpdate: { label: string; tagId?: number | null; monthId?: number } = { label };
+  let targetMonth = month;
+  if (body.monthId !== undefined) {
+    const targetMonthId = parseInt(String(body.monthId), 10);
+    if (Number.isNaN(targetMonthId)) {
+      return Response.json({ error: "Invalid target month" }, { status: 400 });
+    }
+    const ownedTargetMonth = await getOwnedMonth(user.id, targetMonthId);
+    if (!ownedTargetMonth) {
+      return Response.json({ error: "Target month not found" }, { status: 404 });
+    }
+    if (ownedTargetMonth.yearId !== month.yearId) {
+      return Response.json({ error: "Target month must be in the same year" }, { status: 400 });
+    }
+    targetMonth = ownedTargetMonth;
+    groupUpdate.monthId = ownedTargetMonth.id;
+  }
+
   if ("tagId" in body) {
     groupUpdate.tagId = body.tagId === null ? null : (typeof body.tagId === "number" ? body.tagId : undefined);
   }
@@ -41,6 +59,13 @@ export async function PATCH(
     .set(groupUpdate)
     .where(eq(additionalEntryGroups.id, group.id))
     .returning();
+
+  if (body.monthId !== undefined) {
+    await db
+      .update(additionalEntries)
+      .set({ monthId: targetMonth.id })
+      .where(eq(additionalEntries.groupId, group.id));
+  }
 
   if ("tagId" in body) {
     const newTagId = body.tagId === null ? null : (typeof body.tagId === "number" ? body.tagId : undefined);

@@ -267,6 +267,38 @@ test("additional entry rows keep drag and drop and expose month moves only insid
   assert.match(enMessages, /"moveToMonth": "Move to month"/);
 });
 
+test("additional expense groups can be moved between months with drag and the compact month menu", () => {
+  const entriesSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
+  const groupRowSource = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");
+  const overviewSource = readFileSync(new URL("./month-overview.tsx", import.meta.url), "utf8");
+  const esMessages = readFileSync(new URL("../../../messages/es.json", import.meta.url), "utf8");
+  const enMessages = readFileSync(new URL("../../../messages/en.json", import.meta.url), "utf8");
+
+  assert.match(entriesSource, /onGroupMoveToMonth\?: \(group: AdditionalEntryGroup, targetMonthId: number\) => void/);
+  assert.match(entriesSource, /onGroupDragStart\?: \(group: AdditionalEntryGroup\) => void/);
+  assert.match(groupRowSource, /draggable=\{canMoveGroup\}/);
+  assert.match(groupRowSource, /onDragStart=\{handleDragStart\}/);
+  assert.match(groupRowSource, /CalendarArrowUp/);
+  assert.match(groupRowSource, /t\("moveGroupToMonth"\)/);
+  assert.match(groupRowSource, /className="h-9 w-9 text-muted-foreground hover:text-primary"/);
+  assert.ok(
+    groupRowSource.indexOf("<TagPicker") < groupRowSource.indexOf('aria-label={`${t("moveGroupToMonth")} ${group.label}`}'),
+    "group month move button should render after the tag picker"
+  );
+  assert.ok(
+    groupRowSource.indexOf('aria-label={`${t("moveGroupToMonth")} ${group.label}`}') < groupRowSource.indexOf("{formatCurrency(groupTotal, locale)}"),
+    "group month move button should render before the amount"
+  );
+  assert.match(overviewSource, /type DraggedAdditionalGroup = /);
+  assert.match(overviewSource, /const \[draggedGroup, setDraggedGroup\] = useState<DraggedAdditionalGroup \| null>\(null\)/);
+  assert.match(overviewSource, /handleAdditionalGroupMove/);
+  assert.match(overviewSource, /fetch\(`\/api\/months\/\$\{sourceMonthId\}\/entry-groups\/\$\{group\.id\}`/);
+  assert.match(overviewSource, /body: JSON\.stringify\(\{ monthId: targetMonthId \}\)/);
+  assert.match(overviewSource, /dropGroupOnMonth/);
+  assert.match(esMessages, /"moveGroupToMonth": "Mover grupo a mes"/);
+  assert.match(enMessages, /"moveGroupToMonth": "Move group to month"/);
+});
+
 test("additional expense group moves use a compact edit-row menu instead of selects", () => {
   const entriesSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
   const groupRowSource = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");

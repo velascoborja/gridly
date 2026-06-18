@@ -22,6 +22,7 @@ Each entry consists of:
     - `PATCH /api/months/[monthId]/entries/[entryId]`: Edit an entry label/amount or move it to another month by sending `monthId`.
     - `DELETE /api/months/[monthId]/entries/[entryId]`: Remove an entry.
 - **Moving Entries:** In editable monthly views, additional income and expense rows can be moved to another month in the same year from the entry edit row's "Move to month" menu. Desktop users can also drag an entry onto another month in the month strip. Moving changes the entry's owning month only; it does not copy or duplicate the entry.
+- **Moving Expense Groups:** A grouped expense collection can be moved as a whole to another month in the same year from the group header's "Move group to month" menu or by dragging the group header onto the target month. The group and all child entries are moved together.
 - **Integration:** The sum of all additional income and expenses is automatically factored into the `totalIncome` and `totalExpenses` calculations in `src/lib/calculations.ts`.
 
 ## Year Summary View
@@ -48,13 +49,14 @@ Users can group related additional expenses within a month (e.g., "Viaje a Roma"
 
 ### API
 - `POST /api/months/[monthId]/entry-groups` — create a group `{ label }`.
-- `PATCH /api/months/[monthId]/entry-groups/[groupId]` — rename `{ label }`.
+- `PATCH /api/months/[monthId]/entry-groups/[groupId]` — rename `{ label }`, tag `{ label, tagId }`, or move the full group with `{ monthId }`.
 - `DELETE /api/months/[monthId]/entry-groups/[groupId]` — delete group and all its entries (DB cascade).
 - `PATCH /api/months/[monthId]/entries/[entryId]` — accepts `groupId: number | null` to move an entry into or out of a group.
 
 ### UI
 - **`AdditionalEntryGroupRow`** (`src/components/monthly/additional-entry-group-row.tsx`): self-contained collapsed/expanded group row. Owns its own UI state (collapsed, rename, add-entry form, per-entry edit/delete).
 - Groups render above ungrouped entries in `AdditionalEntriesCard`.
+- Groups can be moved to another month from the group header. Desktop drag-and-drop and the compact month menu both persist through `PATCH /api/months/[monthId]/entry-groups/[groupId]` with a target `monthId`.
 - Creating a group updates the mounted month state immediately, then calls `router.refresh()` to invalidate the App Router client cache for route restores after leaving and returning to the year workspace.
 - Collapsed state resets on reload (UI-only state, not persisted).
 - Group name is editable inline: click the group label to rename, Enter or blur to save, Escape to cancel.

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { ChevronRight, FolderInput, Loader2, Plus, Trash2 } from "lucide-react";
+import { CalendarArrowUp, ChevronRight, FolderInput, Loader2, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { EntryFormRow } from "./entry-form-row";
 import { sortAdditionalEntriesDesc } from "@/lib/additional-entries";
-import { cn, formatCurrency } from "@/lib/utils";
+import { cn, formatCurrency, formatMonthName } from "@/lib/utils";
 import type { AdditionalEntry, AdditionalEntryGroup, Tag } from "@/lib/types";
 import { TagPicker } from "./tag-picker";
 import { TAG_COLORS } from "@/lib/tags";
@@ -36,8 +36,13 @@ interface Props {
   monthId: number;
   group: AdditionalEntryGroup;
   allGroups: AdditionalEntryGroup[];
+  moveTargets?: { id: number; month: number }[];
+  movingGroupId?: number | null;
   onGroupUpdate: (group: AdditionalEntryGroup) => void;
   onGroupDelete: (groupId: number) => void;
+  onGroupMoveToMonth?: (group: AdditionalEntryGroup, targetMonthId: number) => void;
+  onGroupDragStart?: (group: AdditionalEntryGroup) => void;
+  onGroupDragEnd?: () => void;
   onEntryGroupChanged: (entry: AdditionalEntry, toGroupId: number | null) => void;
   readOnly?: boolean;
   highlightId?: string | null;
@@ -51,8 +56,13 @@ export function AdditionalEntryGroupRow({
   monthId,
   group,
   allGroups,
+  moveTargets = [],
+  movingGroupId = null,
   onGroupUpdate,
   onGroupDelete,
+  onGroupMoveToMonth,
+  onGroupDragStart,
+  onGroupDragEnd,
   onEntryGroupChanged,
   readOnly = false,
   highlightId = null,
@@ -84,6 +94,8 @@ export function AdditionalEntryGroupRow({
 
   const parseAmount = (v: string) => parseFloat(v.replace(",", "."));
   const groupTotal = group.entries.reduce((sum, e) => sum + e.amount, 0);
+  const isMovingGroup = movingGroupId === group.id;
+  const canMoveGroup = !readOnly && !isEditingName && !isDeletingGroup && !isSavingName && !isSavingTag && !isMovingGroup;
 
   useEffect(() => {
     if (highlightId && group.entries.some((e) => `entry-${e.id}` === highlightId)) {
@@ -93,6 +105,21 @@ export function AdditionalEntryGroupRow({
 
   const handleToggle = () => {
     if (!isEditingName) onCollapsedChange(!collapsed);
+  };
+
+  const handleDragStart = (event: React.DragEvent<HTMLDivElement>) => {
+    if (!canMoveGroup) {
+      event.preventDefault();
+      return;
+    }
+
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", `group-${group.id}`);
+    onGroupDragStart?.(group);
+  };
+
+  const handleDragEnd = () => {
+    onGroupDragEnd?.();
   };
 
   const handleRenameStart = (e: React.MouseEvent) => {
@@ -267,7 +294,16 @@ export function AdditionalEntryGroupRow({
   const displayGroupTag = tags.find((t) => t.id === group.tagId) ?? group.tag;
 
   return (
-    <div className="overflow-hidden rounded-xl border border-primary/20 bg-primary/[0.03]">
+    <div
+      className={cn(
+        "overflow-hidden rounded-xl border border-primary/20 bg-primary/[0.03]",
+        canMoveGroup && "cursor-grab active:cursor-grabbing",
+        isMovingGroup && "pointer-events-none opacity-60"
+      )}
+      draggable={canMoveGroup}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
       {/* Group header */}
       <div
         className={cn(
@@ -352,6 +388,48 @@ export function AdditionalEntryGroupRow({
                 ) : undefined
               }
             />
+            {onGroupMoveToMonth && moveTargets.length > 0 ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  render={
+                    <Button
+                      size="icon-sm"
+                      variant="ghost"
+                      type="button"
+                      className="h-9 w-9 text-muted-foreground hover:text-primary"
+                      aria-label={`${t("moveGroupToMonth")} ${group.label}`}
+                      title={t("moveGroupToMonth")}
+                      disabled={!canMoveGroup}
+                    >
+                      {isMovingGroup ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <CalendarArrowUp className="h-3.5 w-3.5" />
+                      )}
+                    </Button>
+                  }
+                />
+                <DropdownMenuContent align="end" className="w-72 max-w-[calc(100vw-2rem)]">
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel>{t("moveGroupToMonth")}</DropdownMenuLabel>
+                    <DropdownMenuRadioGroup
+                      value={String(monthId)}
+                      onValueChange={(value) => {
+                        const targetMonthId = parseInt(value, 10);
+                        if (targetMonthId === monthId || Number.isNaN(targetMonthId)) return;
+                        onGroupMoveToMonth(group, targetMonthId);
+                      }}
+                    >
+                      {moveTargets.map((target) => (
+                        <DropdownMenuRadioItem key={target.id} value={String(target.id)}>
+                          <span className="truncate capitalize">{formatMonthName(target.month, locale)}</span>
+                        </DropdownMenuRadioItem>
+                      ))}
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : null}
           </div>
         )}
 
@@ -361,6 +439,7 @@ export function AdditionalEntryGroupRow({
           </span>
 
           {!readOnly && (
+            <>
             <AlertDialog>
             <AlertDialogTrigger
               render={
@@ -406,6 +485,7 @@ export function AdditionalEntryGroupRow({
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+          </>
           )}
         </div>
       </div>
