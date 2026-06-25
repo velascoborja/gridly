@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Trash2 } from "lucide-react";
+import { CirclePlus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatCurrency } from "@/lib/utils";
@@ -46,23 +46,19 @@ export function ExpectedEntriesDialog({ entries, onAdd, onDelete }: Props) {
       </p>
 
       {entries.length === 0 ? (
-        <div className="mb-4 flex flex-col gap-2" aria-hidden="true">
-          {[
-            { labelW: "w-32", amountW: "w-14", badgeW: "w-10" },
-            { labelW: "w-24", amountW: "w-16", badgeW: "w-8" },
-          ].map((row, i) => (
-            <div
-              key={i}
-              className="flex items-center justify-between gap-3 rounded-md border border-border/40 bg-muted/10 px-3 py-2"
-            >
-              <div className="min-w-0 flex-1 space-y-1.5">
-                <div className={`h-3 rounded ${row.labelW} bg-muted-foreground/15`} />
-                <div className={`h-2.5 rounded ${row.badgeW} bg-muted-foreground/10`} />
-              </div>
-              <div className={`h-3 shrink-0 rounded ${row.amountW} bg-muted-foreground/15`} />
-              <div className="h-6 w-6 shrink-0 rounded bg-muted-foreground/10" />
-            </div>
-          ))}
+        <div className="mb-4 rounded-md border border-dashed border-primary/25 bg-primary/[0.035] px-4 py-5 text-center shadow-[0_15px_35px_0_rgba(23,23,23,0.06)]">
+          <div className="mx-auto flex size-9 items-center justify-center rounded-md border border-primary/15 bg-background text-primary shadow-sm">
+            <CirclePlus className="h-4 w-4" />
+          </div>
+          <p className="mt-3 text-sm font-medium text-foreground">
+            {t("expectedEntriesEmptyTitle")}
+          </p>
+          <p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-muted-foreground">
+            {t("expectedEntriesEmptyState")}
+          </p>
+          <p className="mt-3 text-xs font-medium text-primary">
+            {t("expectedEntriesEmptyAction")}
+          </p>
         </div>
       ) : (
         <div className="mb-4 flex flex-col gap-2">

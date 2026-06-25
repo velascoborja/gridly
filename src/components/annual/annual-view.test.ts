@@ -199,6 +199,10 @@ test("expected entries dialog renders a list and an add form", () => {
   assert.match(source, /onAdd:/, "dialog should accept an onAdd callback");
   assert.match(source, /onDelete:/, "dialog should accept an onDelete callback");
   assert.match(source, /entries\.length === 0/, "should render an empty state branch");
-  assert.match(source, /aria-hidden="true"/, "empty state skeleton should be hidden from assistive tech");
+  assert.match(source, /expectedEntriesEmptyTitle/, "empty state should make the empty condition explicit");
+  assert.match(source, /t\("expectedEntriesEmptyState"\)/, "empty state should explain that new entries appear there");
+  assert.match(source, /expectedEntriesEmptyAction/, "empty state should point users to the add form");
+  assert.doesNotMatch(source, /labelW: "w-/, "empty state should not render placeholder row widths");
+  assert.doesNotMatch(source, /bg-muted-foreground\/15/, "empty state should not render muted placeholder bars");
   assert.match(source, /t\("expectedEntryAddButton"\)/, "should render an add button");
 });
