@@ -25,6 +25,7 @@ The Monthly View (`/locale/[year]/[month]`) is the primary workspace for users. 
 - Additional expense groups can also be moved as a whole to another month in the same year. The group header exposes a compact "Move group to month" menu and can be dragged onto a month tab on desktop. The API updates both the group and all child entries to the target month.
 - After most successful monthly mutations, `MonthOverview` recomputes the full month chain and lifts the updated `YearData` to `YearPageClient`, preserving the mounted client state while navigating between months. No `router.refresh()` is called — Next.js 16 sets `staleTimes.dynamic = 0`, so dynamic pages are never cached in the client router cache and always fetch fresh data from the server on navigation.
 - The fixed-values show/hide toggle renders both localized labels in the same layout cell and switches visibility only, keeping the month header width stable when the panel is expanded or collapsed.
+- Each editable month header exposes a Markdown export action. It downloads `GET /api/years/[year]/months/[month]/export`, generating a single-month `.md` file that follows the visible monthly template sections: next-month expenses, fixed expenses, current-month expenses, income, and current balance.
 - The UI uses optimistic updates or instant feedback to ensure a smooth experience.
 
 ### Month Navigation

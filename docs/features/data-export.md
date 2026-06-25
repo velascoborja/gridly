@@ -4,15 +4,16 @@ This document describes the Excel export functionality.
 
 ## Overview
 
-Users can export their entire year's data into a formatted Excel workbook. This provides a portable backup and allows for custom offline analysis.
+Users can export their entire year's data into a formatted Excel workbook or a single month into a Markdown template. This provides a portable backup and allows for custom offline analysis.
 
 ## Implementation
 
-- **Library:** Uses `ExcelJS` to generate the `.xlsx` file.
-- **API:** `GET /api/years/[year]/export`.
+- **Library:** Uses `ExcelJS` to generate the annual `.xlsx` file and a Markdown builder for monthly exports.
+- **Annual API:** `GET /api/years/[year]/export`.
+- **Monthly API:** `GET /api/years/[year]/months/[month]/export`.
 - **Localization:** The export logic respects the user's locale (Spanish or English) for sheet names and labels.
 
-## Workbook Structure
+## Annual Workbook Structure
 
 The generated workbook contains 13 sheets, or 14 if the year has any tagged or untagged additional spending:
 
@@ -26,3 +27,15 @@ The generated workbook contains 13 sheets, or 14 if the year has any tagged or u
     - Right side (columns D–E): Income — fixed income subsection (salary, extra pay, interests, personal surplus), then additional income subsection, then total income.
     - Month summary below both sections: starting balance, savings (color-coded green/red), ending balance.
 - Formatting: Professional styling with Stripe-inspired colors and numeric formatting.
+
+## Monthly Markdown Structure
+
+The monthly export creates a `.md` file for the selected month. It follows the visible sections of the compact monthly template:
+
+- **Expenses for next month:** home expense.
+- **Fixed expenses:** personal budget, investment, and monthly recurring expense copies.
+- **Current month expenses:** ungrouped additional expenses plus grouped expense entries labelled as `Group - Entry`.
+- **Income:** fixed income rows (salary, interests, and personal surplus) followed by a separate additional income table that includes extra pay and additional income entries.
+- **Current summary:** starting balance, total income, total expenses, savings, and ending balance.
+
+The Markdown is generated from server-side year data via `buildMonthlyMarkdown` and downloaded from the month header.

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ArrowLeft, ChevronLeft, ChevronRight, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Download, Eye, EyeOff } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { buttonVariants } from "@/components/ui/button";
@@ -504,6 +504,11 @@ export function MonthOverview({
     );
   }, [commitMonthsChange, monthNumber]);
 
+  const handleExportMonth = useCallback(() => {
+    if (readOnly || !month) return;
+    window.open(`/api/years/${config.year}/months/${month.month}/export`, "_blank");
+  }, [config.year, month, readOnly]);
+
   if (!month) {
     return (
       <div className="flex items-center justify-center h-48 text-muted-foreground">
@@ -690,7 +695,7 @@ export function MonthOverview({
                   )}
 
                 </div>
-                <div className="mt-2">
+                <div className="mt-2 flex flex-wrap items-center justify-center gap-2 lg:justify-start">
                   <button
                     type="button"
                     aria-expanded={showFixedEditors}
@@ -711,6 +716,19 @@ export function MonthOverview({
                       </span>
                     </span>
                   </button>
+                  {!readOnly ? (
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1 rounded-md border border-white/18 bg-white/10 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:border-white/28 hover:bg-white/16"
+                      aria-label={tOverview("exportMonthAria", {
+                        month: formatMonthName(month.month, locale),
+                      })}
+                      title={tOverview("exportMonth")}
+                      onClick={handleExportMonth}
+                    >
+                      <Download className="size-3.5" />
+                    </button>
+                  ) : null}
                 </div>
               </div>
               
