@@ -8,10 +8,12 @@ import { BalanceChart } from "./balance-chart";
 import { SavingsChart } from "./savings-chart";
 import { AdditionalEntriesAverages } from "./additional-entries-averages";
 import type { YearData, YearConfig } from "@/lib/types";
+import type { AnnualKpiComparisonData } from "@/lib/annual-comparisons";
 import type { ExpectedEntry } from "./expected-entries-dialog";
 
 interface Props {
   yearData: YearData;
+  annualComparison?: AnnualKpiComparisonData;
   startingBalanceEditable: boolean;
   readOnly?: boolean;
   onYearDataChange?: (yearData: YearData) => void;
@@ -19,6 +21,7 @@ interface Props {
 
 export function AnnualView({
   yearData: initial,
+  annualComparison,
   startingBalanceEditable,
   readOnly = false,
   onYearDataChange,
@@ -137,6 +140,7 @@ export function AnnualView({
         onConfigChange={setConfig}
         onConfigApplied={applyConfigToMonths}
         yearData={initial}
+        annualComparison={annualComparison}
         recurringExpenses={recurringExpenses}
         onRecurringExpensesApplied={handleRecurringExpensesApplied}
         onExport={handleExport}

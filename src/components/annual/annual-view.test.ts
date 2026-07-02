@@ -47,6 +47,24 @@ test("year page lets annual summary update shared year data", () => {
   assert.match(source, /<AnnualView[\s\S]*onYearDataChange=\{setCurrentYearData\}/);
 });
 
+test("year pages pass annual KPI comparison context from evolution metrics", () => {
+  const summarySource = readFileSync(new URL("../../app/[locale]/[year]/summary/page.tsx", import.meta.url), "utf8");
+  const monthSource = readFileSync(new URL("../../app/[locale]/[year]/[month]/page.tsx", import.meta.url), "utf8");
+  const yearClientSource = readFileSync(new URL("../year/year-page-client.tsx", import.meta.url), "utf8");
+  const annualSource = readFileSync(new URL("./annual-view.tsx", import.meta.url), "utf8");
+
+  assert.match(summarySource, /getEvolutionSourcesForUser/);
+  assert.match(summarySource, /deriveAnnualKpiComparison\(deriveEvolutionMetrics\(evolutionSources\), year\)/);
+  assert.match(summarySource, /annualComparison=\{annualComparison\}/);
+  assert.match(monthSource, /getEvolutionSourcesForUser/);
+  assert.match(monthSource, /deriveAnnualKpiComparison\(deriveEvolutionMetrics\(evolutionSources\), year\)/);
+  assert.match(monthSource, /annualComparison=\{annualComparison\}/);
+  assert.match(yearClientSource, /annualComparison\?: AnnualKpiComparisonData/);
+  assert.match(yearClientSource, /<AnnualView[\s\S]*annualComparison=\{annualComparison\}/);
+  assert.match(annualSource, /annualComparison\?: AnnualKpiComparisonData/);
+  assert.match(annualSource, /<KpiCards[\s\S]*annualComparison=\{annualComparison\}/);
+});
+
 test("year route has a dedicated loading skeleton inside the app shell", () => {
   const source = readFileSync(new URL("../../app/[locale]/[year]/loading.tsx", import.meta.url), "utf8");
 
@@ -170,6 +188,17 @@ test("KPI cards render expected entries dialog trigger and annotation lines", ()
   assert.match(source, /onDeleteExpectedEntry:/, "should accept onDeleteExpectedEntry prop");
   assert.match(source, /expectedIncomeAnnotation/, "should render expectedIncomeAnnotation translation key");
   assert.match(source, /expectedExpensesAnnotation/, "should render expectedExpensesAnnotation translation key");
+});
+
+test("KPI cards render annual comparison translation lines", () => {
+  const source = readFileSync(new URL("./kpi-cards.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /annualComparison\?: AnnualKpiComparisonData/);
+  assert.match(source, /savingsVsPreviousYear/);
+  assert.match(source, /savingsVsAverage/);
+  assert.match(source, /balanceVsPreviousYear/);
+  assert.match(source, /formatSignedCurrency/);
+  assert.match(source, /formatSignedPercent/);
 });
 
 test("annual KPI cards show total interest earned", () => {

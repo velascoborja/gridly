@@ -16,6 +16,7 @@ import { CategoriesView } from "./categories-view";
 import { FixedExpensesView } from "./fixed-expenses-view";
 import { YearConfigForm } from "./year-config-form";
 import type { MonthData, YearConfig, YearData, YearRecurringExpense } from "@/lib/types";
+import type { AnnualKpiComparisonData } from "@/lib/annual-comparisons";
 import { ExpectedEntriesDialog, type ExpectedEntry } from "./expected-entries-dialog";
 
 interface Props {
@@ -26,6 +27,7 @@ interface Props {
   savingConfig: boolean;
   startingBalanceEditable: boolean;
   yearData: YearData;
+  annualComparison?: AnnualKpiComparisonData;
   readOnly?: boolean;
   onConfigChange: Dispatch<SetStateAction<YearConfig>>;
   onConfigApplied: (config: YearConfig, applyFromMonth: number) => void;
@@ -58,6 +60,7 @@ interface KpiMetric {
   value: number;
   note: string;
   comparison?: string;
+  comparisonLines?: Array<{ text: string; colorClassName: string }>;
   tone: MetricTone;
   isEstimate?: boolean;
   expectedAnnotations?: Array<{ text: string; colorClass: string }>;
@@ -90,6 +93,26 @@ function getMetricTone(value: number, labels: ToneLabels): MetricTone {
   };
 }
 
+function getComparisonColorClassName(value: number) {
+  if (value > 0) return "text-emerald-600 dark:text-emerald-400";
+  if (value < 0) return "text-rose-600 dark:text-rose-400";
+  return "text-muted-foreground/80";
+}
+
+function formatSignedCurrency(amount: number, locale: string) {
+  const formatted = formatCurrency(amount, locale);
+  return amount > 0 ? `+${formatted}` : formatted;
+}
+
+function formatSignedPercent(value: number, locale: string) {
+  return new Intl.NumberFormat(locale, {
+    style: "percent",
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+    signDisplay: "exceptZero",
+  }).format(value);
+}
+
 export function KpiCards({
   months,
   startingBalance,
@@ -98,6 +121,7 @@ export function KpiCards({
   savingConfig,
   startingBalanceEditable,
   yearData,
+  annualComparison,
   readOnly = false,
   onConfigChange,
   onConfigApplied,
@@ -146,6 +170,8 @@ export function KpiCards({
   const expectedNet = expectedIncome - expectedExpenses;
   const adjustedEndingBalance = endingBalance + expectedNet;
   const adjustedTotalSavings = totalSavings + expectedNet;
+  const displayedEndingBalance = hasExpected ? adjustedEndingBalance : endingBalance;
+  const displayedTotalSavings = hasExpected ? adjustedTotalSavings : totalSavings;
 
   const expectedAnnotationLines: Array<{ text: string; colorClass: string }> = [
     ...(expectedIncome > 0
@@ -155,27 +181,68 @@ export function KpiCards({
       ? [{ text: t("expectedExpensesAnnotation", { amount: formatCurrency(expectedExpenses, locale) }), colorClass: "text-rose-600 dark:text-rose-400" }]
       : []),
   ];
+  const savingsComparisonLines: KpiMetric["comparisonLines"] = [
+    ...(annualComparison?.previousYear
+      ? [
+          {
+            text: t("savingsVsPreviousYear", {
+              year: annualComparison.previousYear.year,
+              amount: formatSignedCurrency(displayedTotalSavings - annualComparison.previousYear.savedAmount, locale),
+            }),
+            colorClassName: getComparisonColorClassName(displayedTotalSavings - annualComparison.previousYear.savedAmount),
+          },
+        ]
+      : []),
+    ...(annualComparison?.averageSavings !== null && annualComparison?.averageSavings !== undefined
+      ? [
+          {
+            text: t("savingsVsAverage", {
+              amount: formatSignedCurrency(displayedTotalSavings - annualComparison.averageSavings, locale),
+            }),
+            colorClassName: getComparisonColorClassName(displayedTotalSavings - annualComparison.averageSavings),
+          },
+        ]
+      : []),
+  ];
+  const balanceComparisonLines: KpiMetric["comparisonLines"] =
+    annualComparison?.previousYear && annualComparison.previousYear.finalBalance !== 0
+      ? [
+          {
+            text: t("balanceVsPreviousYear", {
+              year: annualComparison.previousYear.year,
+              percent: formatSignedPercent(
+                (displayedEndingBalance - annualComparison.previousYear.finalBalance) /
+                  Math.abs(annualComparison.previousYear.finalBalance),
+                locale
+              ),
+            }),
+            colorClassName: getComparisonColorClassName(displayedEndingBalance - annualComparison.previousYear.finalBalance),
+          },
+        ]
+      : [];
 
   const primaryMetrics: KpiMetric[] = [
     {
       label: t("estimatedBalance"),
-      value: hasExpected ? adjustedEndingBalance : endingBalance,
+      value: displayedEndingBalance,
       note: hasExpected ? t("estimatedBalanceNoteWithExpected") : t("estimatedBalanceNote"),
       comparison: hasExpected
         ? t("baseValueComparison", { amount: formatCurrency(endingBalance, locale) })
         : t("startingBalanceKpi", { amount: formatCurrency(startingBalance, locale) }),
-      tone: getMetricTone(hasExpected ? adjustedEndingBalance - startingBalance : balanceDelta, toneLabels),
+      comparisonLines: balanceComparisonLines,
+      tone: getMetricTone(hasExpected ? displayedEndingBalance - startingBalance : balanceDelta, toneLabels),
       isEstimate: hasExpected,
       expectedAnnotations: hasExpected ? expectedAnnotationLines : [],
     },
     {
       label: t("totalSavings"),
-      value: hasExpected ? adjustedTotalSavings : totalSavings,
+      value: displayedTotalSavings,
       note: hasExpected ? t("totalSavingsNoteWithExpected") : t("totalSavingsNote"),
       comparison: hasExpected
         ? t("baseValueComparison", { amount: formatCurrency(totalSavings, locale) })
         : t("activeMonths", { count: populated.length }),
-      tone: getMetricTone(hasExpected ? adjustedTotalSavings : totalSavings, toneLabels),
+      comparisonLines: savingsComparisonLines,
+      tone: getMetricTone(displayedTotalSavings, toneLabels),
       isEstimate: hasExpected,
       expectedAnnotations: hasExpected ? expectedAnnotationLines : [],
     },
@@ -375,6 +442,15 @@ export function KpiCards({
                   <div className="mt-4 space-y-1 text-sm leading-5 text-muted-foreground">
                     <p className={metric.isEstimate ? "text-amber-600 dark:text-amber-400" : undefined}>{metric.note}</p>
                     <p className="finance-number text-xs text-muted-foreground/80">{metric.comparison}</p>
+                    {metric.comparisonLines && metric.comparisonLines.length > 0 ? (
+                      <div className="mt-2 space-y-0.5 border-t border-border/40 pt-2">
+                        {metric.comparisonLines.map((line) => (
+                          <p key={line.text} className={`finance-number text-xs ${line.colorClassName}`}>
+                            {line.text}
+                          </p>
+                        ))}
+                      </div>
+                    ) : null}
                     {metric.expectedAnnotations && metric.expectedAnnotations.length > 0 ? (
                       <div className="mt-2 space-y-0.5 border-t border-border/40 pt-2">
                         {metric.expectedAnnotations.map((annotation) => (

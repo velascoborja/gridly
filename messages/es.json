@@ -120,7 +120,10 @@
       "expectedExpensesAnnotation": "Gastos esperados: -{amount}",
       "estimatedBalanceNoteWithExpected": "Saldo previsto incluyendo entradas esperadas",
       "totalSavingsNoteWithExpected": "Ahorro neto incluyendo entradas esperadas",
-      "baseValueComparison": "Sin esperados: {amount}"
+      "baseValueComparison": "Sin esperados: {amount}",
+      "savingsVsPreviousYear": "Respecto a {year}: {amount}",
+      "savingsVsAverage": "Respecto a la media: {amount}",
+      "balanceVsPreviousYear": "Respecto a {year}: {percent}"
     },
     "charts": {
       "balanceTitle": "Saldo mes a mes",

@@ -8,6 +8,7 @@ import { SearchPalette } from "@/components/search/search-palette";
 import { SettingsForm } from "@/components/settings/settings-form";
 import { usePathname } from "@/i18n/routing";
 import type { YearData } from "@/lib/types";
+import type { AnnualKpiComparisonData } from "@/lib/annual-comparisons";
 import type { SearchEntry } from "@/lib/search-index";
 import {
   type YearRouteView,
@@ -20,6 +21,7 @@ import {
 
 interface Props {
   yearData: YearData;
+  annualComparison?: AnnualKpiComparisonData;
   initialMonth: number;
   initialView: "overview" | "summary";
   years: number[];
@@ -60,6 +62,7 @@ function getInitialStateFromPathname(
 
 export function YearPageClient({
   yearData,
+  annualComparison,
   initialMonth,
   initialView,
   years,
@@ -258,8 +261,9 @@ export function YearPageClient({
         </div>
       ) : selectedView === "summary" ? (
         <AnnualView
-          yearData={currentYearData}
-          startingBalanceEditable={startingBalanceEditable}
+        yearData={currentYearData}
+        annualComparison={annualComparison}
+        startingBalanceEditable={startingBalanceEditable}
           onYearDataChange={setCurrentYearData}
         />
       ) : (
