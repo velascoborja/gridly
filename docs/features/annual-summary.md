@@ -22,3 +22,7 @@ The hero KPI card adds extra context from Evolution metrics:
 - The final-balance percentage line is hidden when the previous final balance is zero.
 
 Annual savings follows the Evolution definition: cash balance growth, with investment tracked separately because Gridly counts monthly investment inside expenses.
+
+## Fixed Expenses Drilldown
+
+The Fixed expenses dialog groups annual fixed spend into home expense, personal budget, and recurring expenses. Expanding a row shows the chronological monthly drilldown. Month headers show a subtotal when that month contains more than one visible expense row, so recurring-expense months with multiple items can be read without manual addition.
