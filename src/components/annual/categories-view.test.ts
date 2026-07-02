@@ -52,6 +52,15 @@ test("DrilldownList shows month abbreviation, description, and amount", () => {
   assert.match(source, /entry\.groupName/);
 });
 
+test("DrilldownList shows month subtotals only when a month has multiple entries", () => {
+  const source = readFileSync(new URL("./drilldown-list.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /totalAmount: monthEntries\.reduce/);
+  assert.match(source, /monthEntries\.length > 1/);
+  assert.match(source, /formatCurrency\(totalAmount, locale\)/);
+  assert.match(source, /text-primary/);
+});
+
 test("DrilldownList collapses multi-year groups by default with year totals", () => {
   const source = readFileSync(new URL("./drilldown-list.tsx", import.meta.url), "utf8");
 

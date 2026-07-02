@@ -77,7 +77,7 @@ The dialog opens on page 0 — a combined **"Todos los años"** landing page —
 
 The set of years available in the pager respects the dashboard's **"incluir futuros" (`includeFuture`) toggle**: with it off (the default), only years `<= calendarYear` appear; with it on, configured future years appear as well. Historical summary-only imports are always excluded because they do not store entry-level expense or tag data. Gridly years with `totalAdditional === 0` (no tracked spending) are skipped so there are no blank pages.
 
-Each page shows a per-page summary line with total spend and tag count. On the "Todos" page, `DrilldownList` groups expanded entries by year; on per-year pages, it groups by month — identical to the annual Categorías view.
+Each page shows a per-page summary line with total spend and tag count. On the "Todos" page, `DrilldownList` groups expanded entries by year; on per-year pages, it groups by month — identical to the annual Categorías view, including month subtotals when a month contains multiple entries.
 
 **Data flow**: the route passes `tagStatsByYear` — a `{ year: number; stats: TagStats }[]` array sorted ascending, one entry per Gridly year with spending — to `EvolutionDashboard`. The client merges the visible years for the combined page by calling `mergeTagStatsByYear(visibleYears)` (which attaches a `year` field to each `DrilldownEntry`). The dashboard hides the Tags button when `tagStatsByYear` is empty or absent.
 
@@ -87,7 +87,7 @@ Grouped expenses are attributed to the group's tag, ungrouped additional expense
 
 When at least one full Gridly year has non-zero fixed expense data, the dashboard header shows a `LayoutList` icon button. The button opens a dialog titled by `Evolution.fixedExpensesTitle` with the same **year pager** structure as the Tags dialog.
 
-Three rows appear — home expense, personal budget, and aggregated recurring expenses — rendered using `FixedStatRow` (from `src/components/annual/fixed-stat-row.tsx`). Each row shows total, share of fixed spend, and a monthly (or cross-year) drilldown via the existing `DrilldownList` component. Rows with a zero total are omitted. Rows are sorted by total amount descending.
+Three rows appear — home expense, personal budget, and aggregated recurring expenses — rendered using `FixedStatRow` (from `src/components/annual/fixed-stat-row.tsx`). Each row shows total, share of fixed spend, and a monthly (or cross-year) drilldown via the existing `DrilldownList` component. Monthly drilldown headers show a subtotal when the month contains multiple visible expense rows. Rows with a zero total are omitted. Rows are sorted by total amount descending.
 
 The set of years in the pager respects the `includeFuture` toggle. Historical summary-only imports are excluded. The dialog resets to the combined "Todos los años" page each time it is opened.
 

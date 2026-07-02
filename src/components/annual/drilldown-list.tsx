@@ -90,17 +90,26 @@ export function DrilldownList({ entries, fallbackLabel }: Props) {
   }
 
   const months = Array.from(new Set(entries.map((e) => e.month)));
-  const grouped = months.map((month) => ({
-    month,
-    entries: entries.filter((e) => e.month === month),
-  }));
+  const grouped = months.map((month) => {
+    const monthEntries = entries.filter((e) => e.month === month);
+    return {
+      month,
+      entries: monthEntries,
+      totalAmount: monthEntries.reduce((sum, entry) => sum + entry.amount, 0),
+    };
+  });
 
   return (
     <div className="border-t border-border/50 bg-muted/30">
-      {grouped.map(({ month, entries: monthEntries }) => (
+      {grouped.map(({ month, entries: monthEntries, totalAmount }) => (
         <div key={month}>
-          <div className="border-b border-border/30 bg-muted/50 px-4 py-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            {formatMonthName(month, locale, "long")}
+          <div className="flex items-center justify-between gap-3 border-b border-border/30 bg-muted/50 px-4 py-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            <span>{formatMonthName(month, locale, "long")}</span>
+            {monthEntries.length > 1 && (
+              <span className="shrink-0 font-semibold tabular-nums text-primary">
+                {formatCurrency(totalAmount, locale)}
+              </span>
+            )}
           </div>
           {monthEntries.map((entry, i) => (
             <div

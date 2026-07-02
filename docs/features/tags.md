@@ -204,7 +204,7 @@ The tab appears in the same pill row as "Meses", "Año", and "Evolución". It is
 |---|---|---|
 | `CategoriesView` | `src/components/annual/categories-view.tsx` | Tab content — header strip + ranked tag rows |
 | `TagStatRow` | `src/components/annual/tag-stat-row.tsx` | Collapsible row with progress bar; expands to show entries |
-| `DrilldownList` | `src/components/annual/drilldown-list.tsx` | Chronological list of individual entries for an expanded tag |
+| `DrilldownList` | `src/components/annual/drilldown-list.tsx` | Chronological list of individual entries for an expanded tag; month headers show a subtotal when a month contains multiple entries |
 
 ### i18n
 
