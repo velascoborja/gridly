@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ArrowLeft, ChevronLeft, ChevronRight, Download, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Download, Eye, EyeOff } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { buttonVariants } from "@/components/ui/button";
@@ -524,6 +524,7 @@ export function MonthOverview({
     config.year < today.getFullYear() || (config.year === today.getFullYear() && month.month < today.getMonth() + 1);
   const isFutureMonth =
     config.year > today.getFullYear() || (config.year === today.getFullYear() && month.month > today.getMonth() + 1);
+  const CurrentMonthArrowIcon = isPastMonth ? ArrowRight : ArrowLeft;
   return (
     <div
       className="md:touch-auto touch-pan-y"
@@ -668,7 +669,7 @@ export function MonthOverview({
               aria-label={tOverview("backToCurrentMonth")}
               className="absolute top-3 right-4 inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1.5 sm:py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-300/80 transition-all hover:border-emerald-400/50 hover:bg-emerald-400/20 hover:text-emerald-200 hover:shadow-[0_0_14px_rgba(52,211,153,0.15)]"
             >
-              <ArrowLeft className="size-3 shrink-0" />
+              <CurrentMonthArrowIcon className="size-3 shrink-0" />
               <span className="hidden sm:inline leading-none">{formatMonthName(today.getMonth() + 1, locale)}</span>
             </Link>
           )}
