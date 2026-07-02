@@ -223,8 +223,20 @@ test("setup prefills form values and recurring expenses from previous year confi
   assert.match(source, /previousYearConfig: YearConfig \| null/);
   assert.match(source, /previousRecurringExpenses: RecurringExpenseInput\[\] \| null/);
   assert.match(source, /previousYearConfig \? String\(previousYearConfig\.estimatedExtraPayment\) : ""/);
-  assert.match(source, /if \(key === "interestRate"\) return \[key, String\(previousYearConfig\.interestRate \* 100\)\]/);
+  assert.match(source, /formatSetupPercentageInput/);
+  assert.match(source, /minimumFractionDigits: 2/);
+  assert.match(source, /maximumFractionDigits: 2/);
+  assert.match(source, /if \(key === "interestRate"\) return \[key, formatSetupPercentageInput\(previousYearConfig\.interestRate, locale\)\]/);
   assert.match(source, /return \[key, String\(previousYearConfig\[key\]\)\]/);
   assert.match(source, /previousYearConfig\?\.hasExtraPayments \?\? false/);
   assert.match(source, /previousRecurringExpenses \?\? \[\]/);
+});
+
+test("setup interest rate input shows a percentage suffix", () => {
+  const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
+  const renderNumericInput = source.match(/const renderNumericInput[\s\S]*?const summaryRows/)?.[0] ?? "";
+
+  assert.match(renderNumericInput, /const isPercentage = field\.key === "interestRate"/);
+  assert.match(renderNumericInput, /isPercentage && "pr-8"/);
+  assert.match(renderNumericInput, />\s*%\s*<\/span>/);
 });

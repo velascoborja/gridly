@@ -52,6 +52,11 @@ type SetupStepId = SetupStep["id"];
 
 const parseNumber = parseLocalizedNumber;
 const parseOptionalPercentage = (value: string) => (hasSetupFieldValue(value) ? parseNumber(value) / 100 : 0);
+const formatSetupPercentageInput = (value: number, locale: string) =>
+  new Intl.NumberFormat(locale, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value * 100);
 const setupMobileStepperQuery = "(max-width: 1023px)";
 const isSetupMobileStepper = () =>
   typeof window !== "undefined" && window.matchMedia(setupMobileStepperQuery).matches;
@@ -93,7 +98,7 @@ export function SetupPageClient({
       ["estimatedExtraPayment", previousYearConfig ? String(previousYearConfig.estimatedExtraPayment) : ""],
       ...NUMERIC_FIELDS.map((key) => {
         if (!previousYearConfig) return [key, ""];
-        if (key === "interestRate") return [key, String(previousYearConfig.interestRate * 100)];
+        if (key === "interestRate") return [key, formatSetupPercentageInput(previousYearConfig.interestRate, locale)];
         return [key, String(previousYearConfig[key])];
       }),
     ])
@@ -242,23 +247,41 @@ export function SetupPageClient({
     );
   };
 
-  const renderNumericInput = (field: { key: NumericField; label: string; placeholder: string }) => (
-    <div className="space-y-2">
-      <label className="text-sm font-medium text-[#273951]" htmlFor={field.key}>
-        {field.label}
-      </label>
-      <Input
-        id={field.key}
-        type="text"
-        inputMode="decimal"
-        value={values[field.key]}
-        onChange={(event) => setValues((prev) => ({ ...prev, [field.key]: sanitizeNumericInput(event.target.value) }))}
-        placeholder={field.placeholder}
-        disabled={submitting}
-        className={setupInputClassName}
-      />
-    </div>
-  );
+  const renderNumericInput = (field: { key: NumericField; label: string; placeholder: string }) => {
+    const value = values[field.key] ?? "";
+    const isPercentage = field.key === "interestRate";
+
+    return (
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-[#273951]" htmlFor={field.key}>
+          {field.label}
+        </label>
+        <div className="relative">
+          <Input
+            id={field.key}
+            type="text"
+            inputMode="decimal"
+            value={value}
+            onChange={(event) => setValues((prev) => ({ ...prev, [field.key]: sanitizeNumericInput(event.target.value) }))}
+            placeholder={field.placeholder}
+            disabled={submitting}
+            className={cn(setupInputClassName, isPercentage && "pr-8")}
+          />
+          {isPercentage ? (
+            <span
+              aria-hidden="true"
+              className={cn(
+                "pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#64748d] transition-opacity",
+                value.trim() ? "opacity-100" : "opacity-0"
+              )}
+            >
+              %
+            </span>
+          ) : null}
+        </div>
+      </div>
+    );
+  };
 
   const summaryRows = [
     {
