@@ -26,3 +26,7 @@ Annual savings follows the Evolution definition: cash balance growth, with inves
 ## Fixed Expenses Drilldown
 
 The Fixed expenses dialog groups annual fixed spend into home expense, personal budget, and recurring expenses. Expanding a row shows the chronological monthly drilldown. Month headers show a subtotal when that month contains more than one visible expense row, so recurring-expense months with multiple items can be read without manual addition.
+
+## Monthly Balance Chart
+
+The month-by-month balance chart plots each month's ending balance. Its Y axis is derived from the visible balance range with a small rounded margin, instead of always anchoring at zero, so high-balance years still show monthly movement without excessive empty space below the line.

@@ -207,6 +207,14 @@ test("annual KPI cards show total interest earned", () => {
   assert.match(source, /t\("interestEarned"\)/, "should render an interest KPI card");
 });
 
+test("balance chart zooms the Y axis around the annual balance range", () => {
+  const source = readFileSync(new URL("./balance-chart.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /export function getBalanceYAxisDomain\(values: number\[\]\): \[number, number\]/);
+  assert.match(source, /const yAxisDomain = getBalanceYAxisDomain\(data\.map\(\(m\) => m\.saldo\)\)/);
+  assert.match(source, /domain=\{yAxisDomain\}/);
+});
+
 test("annual view reads expected entries from localStorage on mount", () => {
   const source = readFileSync(new URL("./annual-view.tsx", import.meta.url), "utf8");
 
