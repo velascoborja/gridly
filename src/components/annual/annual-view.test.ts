@@ -215,6 +215,23 @@ test("balance chart zooms the Y axis around the annual balance range", () => {
   assert.match(source, /domain=\{yAxisDomain\}/);
 });
 
+test("balance chart highlights only the current month dot by viewed year", () => {
+  const source = readFileSync(new URL("./balance-chart.tsx", import.meta.url), "utf8");
+  const annualSource = readFileSync(new URL("./annual-view.tsx", import.meta.url), "utf8");
+
+  assert.match(annualSource, /<BalanceChart months=\{months\} year=\{config\.year\} \/>/);
+  assert.match(source, /year: number/);
+  assert.match(source, /export function isCurrentChartMonth\(year: number, month: number, now = new Date\(\)\)/);
+  assert.match(source, /isCurrentMonth: isCurrentChartMonth\(year, m\.month, now\)/);
+  assert.match(source, /function BalanceDot/);
+  assert.match(source, /<animate attributeName="r"/);
+  assert.match(source, /<animate attributeName="opacity"/);
+  assert.match(source, /dot=\{<BalanceDot \/>}/);
+  assert.match(source, /name=\{t\("balanceLabel"\)\}/);
+  assert.doesNotMatch(source, /pastSaldo/);
+  assert.doesNotMatch(source, /futureSaldo/);
+});
+
 test("annual view reads expected entries from localStorage on mount", () => {
   const source = readFileSync(new URL("./annual-view.tsx", import.meta.url), "utf8");
 

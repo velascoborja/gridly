@@ -30,3 +30,5 @@ The Fixed expenses dialog groups annual fixed spend into home expense, personal 
 ## Monthly Balance Chart
 
 The month-by-month balance chart plots each month's ending balance. Its Y axis is derived from the visible balance range with a small rounded margin, instead of always anchoring at zero, so high-balance years still show monthly movement without excessive empty space below the line.
+
+`AnnualView` passes the selected calendar year into `BalanceChart`, which compares it with the browser's current date to identify the current month. The line keeps a single consistent color, while only the current month's dot is emphasized with a subtle animated halo.

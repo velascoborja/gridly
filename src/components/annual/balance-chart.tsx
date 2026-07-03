@@ -8,6 +8,43 @@ import type { MonthData } from "@/lib/types";
 
 interface Props {
   months: MonthData[];
+  year: number;
+}
+
+interface BalanceDotProps {
+  cx?: number;
+  cy?: number;
+  payload?: {
+    isCurrentMonth?: boolean;
+  };
+}
+
+function BalanceDot({ cx, cy, payload }: BalanceDotProps) {
+  if (cx === undefined || cy === undefined) return null;
+
+  if (payload?.isCurrentMonth) {
+    return (
+      <g>
+        <circle cx={cx} cy={cy} r={9} fill="var(--color-primary)" opacity={0.14}>
+          <animate attributeName="r" values="7;14;7" dur="2.4s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.28;0;0.28" dur="2.4s" repeatCount="indefinite" />
+        </circle>
+        <circle cx={cx} cy={cy} r={6} fill="var(--color-card)" stroke="var(--color-primary)" strokeWidth={2.5} />
+        <circle cx={cx} cy={cy} r={3} fill="var(--color-primary)" />
+      </g>
+    );
+  }
+
+  return (
+    <circle
+      cx={cx}
+      cy={cy}
+      r={3}
+      fill="var(--color-card)"
+      stroke="var(--color-primary)"
+      strokeWidth={1.5}
+    />
+  );
 }
 
 function getNiceStep(value: number) {
@@ -41,13 +78,19 @@ export function getBalanceYAxisDomain(values: number[]): [number, number] {
   return [min >= 0 ? Math.max(0, lowerBound) : lowerBound, upperBound];
 }
 
-export function BalanceChart({ months }: Props) {
+export function isCurrentChartMonth(year: number, month: number, now = new Date()) {
+  return year === now.getFullYear() && month === now.getMonth() + 1;
+}
+
+export function BalanceChart({ months, year }: Props) {
   const t = useTranslations("Annual.charts");
   const locale = useLocale();
+  const now = new Date();
 
   const data = months.map((m) => ({
     name: formatMonthName(m.month, locale, "short"),
     saldo: m.endingBalance,
+    isCurrentMonth: isCurrentChartMonth(year, m.month, now),
   }));
   const yAxisDomain = getBalanceYAxisDomain(data.map((m) => m.saldo));
 
@@ -75,7 +118,7 @@ export function BalanceChart({ months }: Props) {
                 type="monotone"
                 dataKey="saldo"
                 strokeWidth={2}
-                dot={{ r: 3 }}
+                dot={<BalanceDot />}
                 activeDot={{ r: 5 }}
                 className="stroke-primary"
               />
