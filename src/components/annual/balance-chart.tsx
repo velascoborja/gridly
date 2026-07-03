@@ -19,6 +19,15 @@ interface BalanceDotProps {
   };
 }
 
+interface CurrentMonthAxisTickProps {
+  x?: number;
+  y?: number;
+  payload?: {
+    value?: string;
+  };
+  currentMonthName?: string;
+}
+
 function BalanceDot({ cx, cy, payload }: BalanceDotProps) {
   if (cx === undefined || cy === undefined) return null;
 
@@ -44,6 +53,29 @@ function BalanceDot({ cx, cy, payload }: BalanceDotProps) {
       stroke="var(--color-primary)"
       strokeWidth={1.5}
     />
+  );
+}
+
+function CurrentMonthAxisTick({ x, y, payload, currentMonthName }: CurrentMonthAxisTickProps) {
+  if (x === undefined || y === undefined || !payload?.value) return null;
+
+  const isCurrentMonth = payload.value === currentMonthName;
+
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text
+        x={0}
+        y={0}
+        dy={12}
+        textAnchor="middle"
+        fill={isCurrentMonth ? "var(--color-primary)" : "currentColor"}
+        fontSize={11}
+        fontWeight={isCurrentMonth ? 600 : 400}
+      >
+        {payload.value}
+      </text>
+      {isCurrentMonth ? <circle cx={0} cy={20} r={2.5} fill="var(--color-primary)" /> : null}
+    </g>
   );
 }
 
@@ -93,6 +125,7 @@ export function BalanceChart({ months, year }: Props) {
     isCurrentMonth: isCurrentChartMonth(year, m.month, now),
   }));
   const yAxisDomain = getBalanceYAxisDomain(data.map((m) => m.saldo));
+  const currentMonthName = data.find((m) => m.isCurrentMonth)?.name;
 
   return (
     <Card className="border-border/70 bg-card/90 shadow-sm">
@@ -103,9 +136,14 @@ export function BalanceChart({ months, year }: Props) {
       <CardContent className="pt-0">
         <div className="rounded-lg border border-border/60 bg-muted/20 p-3">
           <ResponsiveContainer width="100%" height={240}>
-            <LineChart data={data} margin={{ top: 6, right: 8, bottom: 0, left: 8 }}>
+            <LineChart data={data} margin={{ top: 6, right: 8, bottom: 4, left: 8 }}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-border/80" />
-              <XAxis dataKey="name" className="text-xs" tick={{ fontSize: 11 }} />
+              <XAxis
+                dataKey="name"
+                className="text-xs"
+                height={34}
+                tick={(props) => <CurrentMonthAxisTick {...props} currentMonthName={currentMonthName} />}
+              />
               <YAxis
                 domain={yAxisDomain}
                 tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}

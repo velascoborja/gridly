@@ -224,12 +224,36 @@ test("balance chart highlights only the current month dot by viewed year", () =>
   assert.match(source, /export function isCurrentChartMonth\(year: number, month: number, now = new Date\(\)\)/);
   assert.match(source, /isCurrentMonth: isCurrentChartMonth\(year, m\.month, now\)/);
   assert.match(source, /function BalanceDot/);
+  assert.match(source, /function CurrentMonthAxisTick/);
   assert.match(source, /<animate attributeName="r"/);
   assert.match(source, /<animate attributeName="opacity"/);
   assert.match(source, /dot=\{<BalanceDot \/>}/);
+  assert.match(source, /const currentMonthName = data\.find\(\(m\) => m\.isCurrentMonth\)\?\.name/);
+  assert.match(source, /tick=\{\(props\) => <CurrentMonthAxisTick \{\.\.\.props\} currentMonthName=\{currentMonthName\} \/>}/);
   assert.match(source, /name=\{t\("balanceLabel"\)\}/);
   assert.doesNotMatch(source, /pastSaldo/);
   assert.doesNotMatch(source, /futureSaldo/);
+});
+
+test("savings chart highlights the current month bar by viewed year", () => {
+  const source = readFileSync(new URL("./savings-chart.tsx", import.meta.url), "utf8");
+  const annualSource = readFileSync(new URL("./annual-view.tsx", import.meta.url), "utf8");
+  const esMessages = readFileSync(new URL("../../../messages/es.json", import.meta.url), "utf8");
+  const enMessages = readFileSync(new URL("../../../messages/en.json", import.meta.url), "utf8");
+
+  assert.match(annualSource, /<SavingsChart months=\{months\} year=\{config\.year\} \/>/);
+  assert.match(source, /year: number/);
+  assert.match(source, /export function isCurrentSavingsChartMonth\(year: number, month: number, now = new Date\(\)\)/);
+  assert.match(source, /isCurrentMonth: isCurrentSavingsChartMonth\(year, m\.month, now\)/);
+  assert.match(source, /function SavingsBarShape/);
+  assert.match(source, /function CurrentMonthAxisTick/);
+  assert.match(source, /shape=\{<SavingsBarShape \/>}/);
+  assert.match(source, /const currentMonthName = data\.find\(\(m\) => m\.isCurrentMonth\)\?\.name/);
+  assert.match(source, /tick=\{\(props\) => <CurrentMonthAxisTick \{\.\.\.props\} currentMonthName=\{currentMonthName\} \/>}/);
+  assert.match(source, /stroke="var\(--color-primary\)"/);
+  assert.match(source, /t\("currentMonthLabel"\)/);
+  assert.match(esMessages, /"currentMonthLabel": "Mes actual"/);
+  assert.match(enMessages, /"currentMonthLabel": "Current month"/);
 });
 
 test("annual view reads expected entries from localStorage on mount", () => {

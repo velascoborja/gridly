@@ -131,7 +131,8 @@
       "savingsTitle": "Ahorro mensual",
       "savingsDescription": "Ahorro neto generado en cada mes.",
       "balanceLabel": "Saldo",
-      "savingsLabel": "Ahorro"
+      "savingsLabel": "Ahorro",
+      "currentMonthLabel": "Mes actual"
     },
     "additionalAverages": {
       "expensesLabel": "Gasto adicional medio",

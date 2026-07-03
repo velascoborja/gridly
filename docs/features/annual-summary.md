@@ -32,3 +32,11 @@ The Fixed expenses dialog groups annual fixed spend into home expense, personal 
 The month-by-month balance chart plots each month's ending balance. Its Y axis is derived from the visible balance range with a small rounded margin, instead of always anchoring at zero, so high-balance years still show monthly movement without excessive empty space below the line.
 
 `AnnualView` passes the selected calendar year into `BalanceChart`, which compares it with the browser's current date to identify the current month. The line keeps a single consistent color, while only the current month's dot is emphasized with a subtle animated halo.
+
+When the viewed year is the current calendar year, the X-axis tick for the current month is also highlighted with primary-colored text and a small dot, so the temporal position remains visible even before reading the line marker.
+
+## Monthly Savings Chart
+
+The monthly savings chart plots each month's net savings as bars. Positive months stay green and negative months stay red so the savings direction remains the primary signal. `AnnualView` also passes the selected calendar year into `SavingsChart`; when the viewed year matches the browser's current year, the current month bar receives a subtle primary-colored outline and glow, and the tooltip labels it as the current month.
+
+The savings chart uses the same X-axis current-month tick treatment as the balance chart: the current month abbreviation turns primary-colored and gets a small dot beneath it.

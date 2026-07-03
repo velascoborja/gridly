@@ -154,7 +154,7 @@ export function AnnualView({
 
       <div className="grid gap-6 md:grid-cols-2">
         <BalanceChart months={months} year={config.year} />
-        <SavingsChart months={months} />
+        <SavingsChart months={months} year={config.year} />
       </div>
 
       <AdditionalEntriesAverages months={months} />

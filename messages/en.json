@@ -131,7 +131,8 @@
       "savingsTitle": "Monthly Savings",
       "savingsDescription": "Net savings generated each month.",
       "balanceLabel": "Balance",
-      "savingsLabel": "Savings"
+      "savingsLabel": "Savings",
+      "currentMonthLabel": "Current month"
     },
     "additionalAverages": {
       "expensesLabel": "Avg additional expenses",
