@@ -60,7 +60,7 @@ interface KpiMetric {
   value: number;
   note: string;
   comparison?: string;
-  comparisonLines?: Array<{ text: string; colorClassName: string }>;
+  comparisonLines?: Array<{ text: string; emphasizedText: string; colorClassName: string }>;
   tone: MetricTone;
   isEstimate?: boolean;
   expectedAnnotations?: Array<{ text: string; colorClass: string }>;
@@ -111,6 +111,23 @@ function formatSignedPercent(value: number, locale: string) {
     maximumFractionDigits: 1,
     signDisplay: "exceptZero",
   }).format(value);
+}
+
+function renderComparisonLine(line: NonNullable<KpiMetric["comparisonLines"]>[number]) {
+  const emphasizedIndex = line.text.indexOf(line.emphasizedText);
+
+  if (emphasizedIndex === -1) return line.text;
+
+  const before = line.text.slice(0, emphasizedIndex);
+  const after = line.text.slice(emphasizedIndex + line.emphasizedText.length);
+
+  return (
+    <>
+      {before}
+      <span className={line.colorClassName}>{line.emphasizedText}</span>
+      {after}
+    </>
+  );
 }
 
 export function KpiCards({
@@ -172,6 +189,16 @@ export function KpiCards({
   const adjustedTotalSavings = totalSavings + expectedNet;
   const displayedEndingBalance = hasExpected ? adjustedEndingBalance : endingBalance;
   const displayedTotalSavings = hasExpected ? adjustedTotalSavings : totalSavings;
+  const savingsVsPreviousYearDifference = annualComparison?.previousYear
+    ? displayedTotalSavings - annualComparison.previousYear.savedAmount
+    : null;
+  const savingsVsAverageDifference =
+    annualComparison?.averageSavings !== null && annualComparison?.averageSavings !== undefined
+      ? displayedTotalSavings - annualComparison.averageSavings
+      : null;
+  const balanceVsPreviousYearDifference = annualComparison?.previousYear
+    ? displayedEndingBalance - annualComparison.previousYear.finalBalance
+    : null;
 
   const expectedAnnotationLines: Array<{ text: string; colorClass: string }> = [
     ...(expectedIncome > 0
@@ -187,9 +214,10 @@ export function KpiCards({
           {
             text: t("savingsVsPreviousYear", {
               year: annualComparison.previousYear.year,
-              amount: formatSignedCurrency(displayedTotalSavings - annualComparison.previousYear.savedAmount, locale),
+              amount: formatSignedCurrency(savingsVsPreviousYearDifference ?? 0, locale),
             }),
-            colorClassName: getComparisonColorClassName(displayedTotalSavings - annualComparison.previousYear.savedAmount),
+            emphasizedText: formatSignedCurrency(savingsVsPreviousYearDifference ?? 0, locale),
+            colorClassName: getComparisonColorClassName(savingsVsPreviousYearDifference ?? 0),
           },
         ]
       : []),
@@ -197,9 +225,10 @@ export function KpiCards({
       ? [
           {
             text: t("savingsVsAverage", {
-              amount: formatSignedCurrency(displayedTotalSavings - annualComparison.averageSavings, locale),
+              amount: formatSignedCurrency(savingsVsAverageDifference ?? 0, locale),
             }),
-            colorClassName: getComparisonColorClassName(displayedTotalSavings - annualComparison.averageSavings),
+            emphasizedText: formatSignedCurrency(savingsVsAverageDifference ?? 0, locale),
+            colorClassName: getComparisonColorClassName(savingsVsAverageDifference ?? 0),
           },
         ]
       : []),
@@ -211,12 +240,15 @@ export function KpiCards({
             text: t("balanceVsPreviousYear", {
               year: annualComparison.previousYear.year,
               percent: formatSignedPercent(
-                (displayedEndingBalance - annualComparison.previousYear.finalBalance) /
-                  Math.abs(annualComparison.previousYear.finalBalance),
+                (balanceVsPreviousYearDifference ?? 0) / Math.abs(annualComparison.previousYear.finalBalance),
                 locale
               ),
             }),
-            colorClassName: getComparisonColorClassName(displayedEndingBalance - annualComparison.previousYear.finalBalance),
+            emphasizedText: formatSignedPercent(
+              (balanceVsPreviousYearDifference ?? 0) / Math.abs(annualComparison.previousYear.finalBalance),
+              locale
+            ),
+            colorClassName: getComparisonColorClassName(balanceVsPreviousYearDifference ?? 0),
           },
         ]
       : [];
@@ -445,8 +477,8 @@ export function KpiCards({
                     {metric.comparisonLines && metric.comparisonLines.length > 0 ? (
                       <div className="mt-2 space-y-0.5 border-t border-border/40 pt-2">
                         {metric.comparisonLines.map((line) => (
-                          <p key={line.text} className={`finance-number text-xs ${line.colorClassName}`}>
-                            {line.text}
+                          <p key={line.text} className="finance-number text-xs text-muted-foreground/80">
+                            {renderComparisonLine(line)}
                           </p>
                         ))}
                       </div>

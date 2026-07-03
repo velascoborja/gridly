@@ -16,6 +16,7 @@ The hero KPI card adds extra context from Evolution metrics:
 
 - Under **Total savings**, the card shows the difference versus the previous available year and versus the multi-year average.
 - Under **Final balance**, the card shows the percentage change versus the previous available year.
+- Comparison line labels stay muted; only the amount or percentage fragment receives the green/red/neutral comparison color.
 - The previous baseline prefers the exact previous calendar year. If it does not exist, Gridly uses the nearest earlier registered Evolution year. If no earlier year exists, the previous-year line is hidden.
 - The average baseline uses all Evolution metrics except the viewed year, including summary-only historical imports.
 - If expected entries are present, comparison lines use the same displayed estimate as the large KPI value.
