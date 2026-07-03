@@ -23,8 +23,8 @@ interface SavingsBarShapeProps {
 }
 
 interface CurrentMonthAxisTickProps {
-  x?: number;
-  y?: number;
+  x?: string | number;
+  y?: string | number;
   payload?: {
     value?: string;
   };
