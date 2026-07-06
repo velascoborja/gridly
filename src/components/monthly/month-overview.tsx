@@ -706,7 +706,11 @@ export function MonthOverview({
                       })}
                     >
                       <span aria-hidden="true" className="hidden text-white/25 sm:inline">/</span>
-                      <span className="tabular-nums text-white/65">{formatCurrency(yearEndMonth.endingBalance, locale)}</span>
+                      <span className="tabular-nums text-white/65">
+                        {tOverview("yearEndBalanceInline", {
+                          amount: formatCurrency(yearEndMonth.endingBalance, locale),
+                        })}
+                      </span>
                     </div>
                   ) : null}
                 </div>

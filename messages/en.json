@@ -416,6 +416,7 @@
       "futureMonth": "Forecast",
       "netSavings": "Net savings",
       "endingBalance": "Ending balance",
+      "yearEndBalanceInline": "Year close: {amount}",
       "yearEndBalanceAria": "Projected end-of-year balance: {amount}",
       "startingBalance": "Starting balance",
       "totalIncome": "Income",

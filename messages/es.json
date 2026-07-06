@@ -416,6 +416,7 @@
       "futureMonth": "Previsión",
       "netSavings": "Ahorro neto",
       "endingBalance": "Saldo final",
+      "yearEndBalanceInline": "Cierre de año: {amount}",
       "yearEndBalanceAria": "Saldo previsto al cierre del año: {amount}",
       "startingBalance": "Saldo inicial",
       "totalIncome": "Ingresos",

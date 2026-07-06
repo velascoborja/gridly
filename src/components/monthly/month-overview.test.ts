@@ -21,6 +21,7 @@ test("month overview exposes projected year-end balance beside the month status"
   assert.match(source, /sm:flex-row sm:justify-center lg:justify-start/);
   assert.match(source, /normal-case tracking-normal text-white\/45/);
   assert.match(source, /hidden text-white\/25 sm:inline/);
+  assert.match(source, /yearEndBalanceInline/);
   assert.match(source, /yearEndBalanceAria/);
   assert.match(source, /yearEndMonth\.endingBalance/);
 });
