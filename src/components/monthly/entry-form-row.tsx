@@ -4,7 +4,6 @@ import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { sanitizeNumericInput } from "@/lib/currency-input";
-import { cn } from "@/lib/utils";
 
 interface EntryFormRowProps {
   labelValue: string;
@@ -53,20 +52,8 @@ export function EntryFormRow({
   onKeyDown,
   autoFocus = false,
 }: EntryFormRowProps) {
-  const extraCount = [folderAction, monthAction, recurringAction, tagAction].filter(Boolean).length;
-  const smCols =
-    extraCount === 4
-      ? "sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto_auto_auto_auto_auto]"
-      : extraCount === 3
-      ? "sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto_auto_auto_auto]"
-      : extraCount === 2
-      ? "sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto_auto_auto]"
-      : extraCount === 1
-      ? "sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto_auto]"
-      : "sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto]";
-
   return (
-    <div className={cn("grid gap-2 grid-cols-[1fr_auto] sm:items-center", smCols)}>
+    <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2">
       <Input
         className="h-9 min-w-0 text-sm"
         placeholder={labelPlaceholder}
@@ -93,12 +80,12 @@ export function EntryFormRow({
           €
         </span>
       </div>
-      <div className="col-span-2 flex items-center justify-end gap-0 sm:contents">
+      <div className="col-span-2 flex items-center justify-end gap-0">
         {tagAction}
         {recurringAction}
         {monthAction}
         {folderAction}
-        <Button size="sm" className="h-9 px-3" onClick={onSave} disabled={disabled}>
+        <Button size="sm" className="ml-2 h-9 px-3" onClick={onSave} disabled={disabled}>
           {isSaving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
           {isSaving ? savingLabel : saveLabel}
         </Button>

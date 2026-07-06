@@ -337,17 +337,17 @@ test("additional expense group delete loading action fits the compact dialog foo
   assert.match(groupRowSource, /isDeletingGroup \? t\("deletingGroup"\) : t\("confirmDeleteGroupAction"\)/);
 });
 
-test("EntryFormRow exposes a tagAction slot and accounts for it in the grid column formula", () => {
+test("EntryFormRow exposes action slots and keeps them on a second row", () => {
   const source = readFileSync(new URL("./entry-form-row.tsx", import.meta.url), "utf8");
 
   assert.match(source, /tagAction\?: React\.ReactNode/);
   assert.match(source, /monthAction\?: React\.ReactNode/);
-  assert.match(source, /\[folderAction, monthAction, recurringAction, tagAction\]\.filter\(Boolean\)\.length/);
-  assert.match(source, /extraCount === 4/);
+  assert.match(source, /className="grid grid-cols-\[minmax\(0,1fr\)_auto\] gap-2"/);
+  assert.match(source, /className="col-span-2 flex items-center justify-end gap-0"/);
 });
 
-test("EntryFormRow keeps mobile action controls flush when all action slots are present", () => {
+test("EntryFormRow renders only actions in the lower row", () => {
   const source = readFileSync(new URL("./entry-form-row.tsx", import.meta.url), "utf8");
 
-  assert.match(source, /className="col-span-2 flex items-center justify-end gap-0 sm:contents"/);
+  assert.match(source, /<div className="col-span-2 flex items-center justify-end gap-0">\s*\{tagAction\}\s*\{recurringAction\}\s*\{monthAction\}\s*\{folderAction\}/);
 });
