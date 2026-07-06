@@ -16,6 +16,8 @@ test("month overview exposes projected year-end balance beside the month status"
   const source = readFileSync(new URL("./month-overview.tsx", import.meta.url), "utf8");
 
   assert.match(source, /yearEndMonth = sortedMonths\.find\(\(item\) => item\.month === 12\)/);
+  assert.match(source, /shouldShowYearEndBalance = Boolean\(yearEndMonth && month\?\.month !== 12\)/);
+  assert.match(source, /shouldShowYearEndBalance && yearEndMonth/);
   assert.match(source, /sm:flex-row sm:justify-center lg:justify-start/);
   assert.match(source, /normal-case tracking-normal text-white\/45/);
   assert.match(source, /hidden text-white\/25 sm:inline/);

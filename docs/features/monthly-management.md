@@ -13,7 +13,7 @@ The Monthly View (`/locale/[year]/[month]`) is the primary workspace for users. 
 - **Recurring Expenses Section:** Shows named planned expenses copied from the year template inside the Fixed Expenses card. Users can edit or delete rows for the current month only.
 - **Summary Card:** Provides a real-time breakdown of `Total Income`, `Total Expenses`, and the resulting `Savings`.
 - **Month Chain:** Shows the `Starting Balance` (inherited from the previous month) and the `Ending Balance` (starting balance + savings).
-- **Year-End Projection:** The monthly header shows a subtle projected December balance next to the month status on desktop and underneath it on smaller screens, using the same recomputed month chain.
+- **Year-End Projection:** For January through November, the monthly header shows a subtle projected December balance next to the month status on desktop and underneath it on smaller screens, using the same recomputed month chain.
 
 ## Logic & Interactions
 

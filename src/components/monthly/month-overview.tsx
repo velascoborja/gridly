@@ -208,6 +208,7 @@ export function MonthOverview({
   const previousMonth = activeIndex > 0 ? sortedMonths[activeIndex - 1] : null;
   const nextMonth = activeIndex >= 0 && activeIndex < sortedMonths.length - 1 ? sortedMonths[activeIndex + 1] : null;
   const yearEndMonth = sortedMonths.find((item) => item.month === 12);
+  const shouldShowYearEndBalance = Boolean(yearEndMonth && month?.month !== 12);
   const monthBasePath = monthPathPrefix ?? `/${config.year}`;
   const currentMonthRoute = `${currentMonthPathPrefix ?? `/${today.getFullYear()}`}/${today.getMonth() + 1}`;
   const canHandleCurrentMonthLocally = Boolean(onMonthSelect) && config.year === today.getFullYear();
@@ -697,7 +698,7 @@ export function MonthOverview({
                       isSelectedMonthCurrent ? "currentMonth" : isPastMonth ? "pastMonth" : isFutureMonth ? "futureMonth" : "activeMonth"
                     )}
                   </div>
-                  {yearEndMonth ? (
+                  {shouldShowYearEndBalance && yearEndMonth ? (
                     <div
                       className="inline-flex items-center gap-1.5 text-[10px] font-medium normal-case tracking-normal text-white/45"
                       aria-label={tOverview("yearEndBalanceAria", {
