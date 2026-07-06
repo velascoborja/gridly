@@ -207,6 +207,7 @@ export function MonthOverview({
   const activeIndex = month ? sortedMonths.findIndex((item) => item.id === month.id) : -1;
   const previousMonth = activeIndex > 0 ? sortedMonths[activeIndex - 1] : null;
   const nextMonth = activeIndex >= 0 && activeIndex < sortedMonths.length - 1 ? sortedMonths[activeIndex + 1] : null;
+  const yearEndMonth = sortedMonths.find((item) => item.month === 12);
   const monthBasePath = monthPathPrefix ?? `/${config.year}`;
   const currentMonthRoute = `${currentMonthPathPrefix ?? `/${today.getFullYear()}`}/${today.getMonth() + 1}`;
   const canHandleCurrentMonthLocally = Boolean(onMonthSelect) && config.year === today.getFullYear();
@@ -680,21 +681,33 @@ export function MonthOverview({
                 <h2 className="text-2xl font-bold tracking-tight capitalize">
                   {formatMonthName(month.month, locale)} {config.year}
                 </h2>
-                <div className="mt-1 inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-white/40">
-                  <span
-                    className={cn(
-                      "size-1.5 rounded-full",
-                      isSelectedMonthCurrent
-                        ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]"
-                        : isPastMonth
-                          ? "bg-slate-400 shadow-[0_0_8px_rgba(148,163,184,0.5)]"
-                          : "bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.5)]"
+                <div className="mt-1 flex flex-col items-center gap-1.5 sm:flex-row sm:justify-center lg:justify-start">
+                  <div className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-white/40">
+                    <span
+                      className={cn(
+                        "size-1.5 rounded-full",
+                        isSelectedMonthCurrent
+                          ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]"
+                          : isPastMonth
+                            ? "bg-slate-400 shadow-[0_0_8px_rgba(148,163,184,0.5)]"
+                            : "bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.5)]"
+                      )}
+                    />
+                    {tOverview(
+                      isSelectedMonthCurrent ? "currentMonth" : isPastMonth ? "pastMonth" : isFutureMonth ? "futureMonth" : "activeMonth"
                     )}
-                  />
-                  {tOverview(
-                    isSelectedMonthCurrent ? "currentMonth" : isPastMonth ? "pastMonth" : isFutureMonth ? "futureMonth" : "activeMonth"
-                  )}
-
+                  </div>
+                  {yearEndMonth ? (
+                    <div
+                      className="inline-flex items-center gap-1.5 text-[10px] font-medium normal-case tracking-normal text-white/45"
+                      aria-label={tOverview("yearEndBalanceAria", {
+                        amount: formatCurrency(yearEndMonth.endingBalance, locale),
+                      })}
+                    >
+                      <span aria-hidden="true" className="hidden text-white/25 sm:inline">/</span>
+                      <span className="tabular-nums text-white/65">{formatCurrency(yearEndMonth.endingBalance, locale)}</span>
+                    </div>
+                  ) : null}
                 </div>
                 <div className="mt-2 flex flex-wrap items-center justify-center gap-2 lg:justify-start">
                   <button

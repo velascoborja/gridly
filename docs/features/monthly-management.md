@@ -13,6 +13,7 @@ The Monthly View (`/locale/[year]/[month]`) is the primary workspace for users. 
 - **Recurring Expenses Section:** Shows named planned expenses copied from the year template inside the Fixed Expenses card. Users can edit or delete rows for the current month only.
 - **Summary Card:** Provides a real-time breakdown of `Total Income`, `Total Expenses`, and the resulting `Savings`.
 - **Month Chain:** Shows the `Starting Balance` (inherited from the previous month) and the `Ending Balance` (starting balance + savings).
+- **Year-End Projection:** The monthly header shows a subtle projected December balance next to the month status on desktop and underneath it on smaller screens, using the same recomputed month chain.
 
 ## Logic & Interactions
 
@@ -24,6 +25,7 @@ The Monthly View (`/locale/[year]/[month]`) is the primary workspace for users. 
 - Additional income and expense entries can be moved between months from the month view. The edit row exposes a "Move to month" menu for touch and keyboard-friendly movement, while desktop drag-and-drop onto a different month tab remains available as a shortcut. Both paths persist through `PATCH /api/months/[monthId]/entries/[entryId]` with a target `monthId`.
 - Additional expense groups can also be moved as a whole to another month in the same year. The group header exposes a compact "Move group to month" menu and can be dragged onto a month tab on desktop. The API updates both the group and all child entries to the target month.
 - After most successful monthly mutations, `MonthOverview` recomputes the full month chain and lifts the updated `YearData` to `YearPageClient`, preserving the mounted client state while navigating between months. No `router.refresh()` is called — Next.js 16 sets `staleTimes.dynamic = 0`, so dynamic pages are never cached in the client router cache and always fetch fresh data from the server on navigation.
+- Because the full month chain is recomputed after edits, the projected year-end balance displayed in the month status area updates immediately without switching to the Annual Summary tab.
 - The fixed-values show/hide toggle renders both localized labels in the same layout cell and switches visibility only, keeping the month header width stable when the panel is expanded or collapsed.
 - Each editable month header exposes a Markdown export action. It downloads `GET /api/years/[year]/months/[month]/export`, generating a single-month `.md` file that follows the visible monthly template sections: next-month expenses, fixed expenses, current-month expenses, income, and current balance.
 - The UI uses optimistic updates or instant feedback to ensure a smooth experience.
