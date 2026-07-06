@@ -37,8 +37,27 @@ test("inline fixed amount inputs reject non numeric characters while editing", (
 test("additional entry amounts remain direct edit triggers", () => {
   const source = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
 
-  assert.match(source, /onClick=\{\(\) => openEditForm\(entry\)\}/);
+  assert.match(source, /onClick=\{\(\) => openEditForm\(entry, "amount"\)\}/);
   assert.match(source, /aria-label=\{`\$\{t\("edit"\)\} \$\{entry\.label\}`\}/);
+});
+
+test("entry edit focus follows whether the user clicked label or amount", () => {
+  const formRowSource = readFileSync(new URL("./entry-form-row.tsx", import.meta.url), "utf8");
+  const additionalEntriesSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
+  const groupRowSource = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");
+  const recurringSource = readFileSync(new URL("./recurring-expenses-list.tsx", import.meta.url), "utf8");
+
+  assert.match(formRowSource, /autoFocus\?: boolean \| "label" \| "amount"/);
+  assert.match(formRowSource, /autoFocus=\{autoFocusTarget === "label"\}/);
+  assert.match(formRowSource, /autoFocus=\{autoFocusTarget === "amount"\}/);
+
+  for (const source of [additionalEntriesSource, groupRowSource, recurringSource]) {
+    assert.match(source, /const \[editFocusTarget, setEditFocusTarget\] = useState<EntryEditFocusTarget>\("label"\)/);
+    assert.match(source, /setEditFocusTarget\(focusTarget\)/);
+    assert.match(source, /autoFocus=\{editFocusTarget\}/);
+    assert.match(source, /onClick=\{\(\) => openEditForm\(entry, "label"\)\}/);
+    assert.match(source, /onClick=\{\(\) => openEditForm\(entry, "amount"\)\}/);
+  }
 });
 
 test("additional expense group creation refreshes the app router cache after local state updates", () => {

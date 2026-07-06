@@ -32,6 +32,8 @@ import type { AdditionalEntry, AdditionalEntryGroup, Tag } from "@/lib/types";
 import { TagPicker } from "./tag-picker";
 import { TAG_COLORS } from "@/lib/tags";
 
+type EntryEditFocusTarget = "label" | "amount";
+
 interface Props {
   monthId: number;
   group: AdditionalEntryGroup;
@@ -85,6 +87,7 @@ export function AdditionalEntryGroupRow({
   const [newAmount, setNewAmount] = useState("");
 
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [editFocusTarget, setEditFocusTarget] = useState<EntryEditFocusTarget>("label");
   const [editLabel, setEditLabel] = useState("");
   const [editAmount, setEditAmount] = useState("");
   const [savingId, setSavingId] = useState<number | null>(null);
@@ -199,8 +202,9 @@ export function AdditionalEntryGroupRow({
     }
   };
 
-  const openEditForm = (entry: AdditionalEntry) => {
+  const openEditForm = (entry: AdditionalEntry, focusTarget: EntryEditFocusTarget = "label") => {
     setEditingId(entry.id);
+    setEditFocusTarget(focusTarget);
     setEditLabel(entry.label);
     setEditAmount(String(entry.amount));
   };
@@ -518,7 +522,7 @@ export function AdditionalEntryGroupRow({
                     if (e.key === "Enter") handleEdit(entry.id);
                     if (e.key === "Escape" && savingId !== entry.id) setEditingId(null);
                   }}
-                  autoFocus
+                  autoFocus={editFocusTarget}
                   folderAction={
                     <DropdownMenu>
                       <DropdownMenuTrigger
@@ -587,7 +591,7 @@ export function AdditionalEntryGroupRow({
                   ) : (
                     <button
                       className="min-w-0 flex-1 truncate text-left text-sm font-medium text-foreground transition-colors hover:text-primary focus-visible:text-primary"
-                      onClick={() => openEditForm(entry)}
+                      onClick={() => openEditForm(entry, "label")}
                       type="button"
                       aria-label={`${t("edit")} ${entry.label}`}
                       disabled={deletingId === entry.id}
@@ -603,7 +607,7 @@ export function AdditionalEntryGroupRow({
                     ) : (
                       <button
                         className="whitespace-nowrap rounded-md px-2 py-1 text-sm font-semibold tabular-nums text-foreground transition-colors hover:bg-background hover:text-primary"
-                        onClick={() => openEditForm(entry)}
+                        onClick={() => openEditForm(entry, "amount")}
                         type="button"
                         aria-label={`${t("edit")} ${entry.label}`}
                         disabled={deletingId === entry.id}

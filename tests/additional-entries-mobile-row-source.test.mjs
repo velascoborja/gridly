@@ -36,7 +36,7 @@ test("additional entry rows do not render a separate edit action", async () => {
 
   assert.match(
     source,
-    /onClick=\{\(\) => openEditForm\(entry\)\}/,
+    /onClick=\{\(\) => openEditForm\(entry, "label"\)\}/,
     "display rows should remain editable by clicking the row label",
   );
   assert.doesNotMatch(

@@ -36,6 +36,7 @@ import { cn, formatCurrency, formatMonthName } from "@/lib/utils";
 import type { AdditionalEntry, AdditionalEntryGroup, Tag } from "@/lib/types";
 
 const NO_GROUPS: AdditionalEntryGroup[] = [];
+type EntryEditFocusTarget = "label" | "amount";
 
 type MonthMoveTarget = {
   id: number;
@@ -102,6 +103,7 @@ export function AdditionalEntriesCard({
   const [newLabel, setNewLabel] = useState("");
   const [newAmount, setNewAmount] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [editFocusTarget, setEditFocusTarget] = useState<EntryEditFocusTarget>("label");
   const [editLabel, setEditLabel] = useState("");
   const [editAmount, setEditAmount] = useState("");
   const [addingGroupOpen, setAddingGroupOpen] = useState(false);
@@ -177,8 +179,9 @@ export function AdditionalEntriesCard({
     setNewTagId(null);
   };
 
-  const openEditForm = (entry: AdditionalEntry) => {
+  const openEditForm = (entry: AdditionalEntry, focusTarget: EntryEditFocusTarget = "label") => {
     setEditingId(entry.id);
+    setEditFocusTarget(focusTarget);
     setEditLabel(entry.label);
     setEditAmount(String(entry.amount));
     setEditRecurring(entry.isRecurring);
@@ -528,7 +531,7 @@ export function AdditionalEntriesCard({
                     if (e.key === "Enter") handleEdit(entry.id);
                     if (e.key === "Escape" && savingId !== entry.id) setEditingId(null);
                   }}
-                  autoFocus
+                  autoFocus={editFocusTarget}
                   tagAction={
                     type === "expense" ? (
                       <TagPicker
@@ -699,7 +702,7 @@ export function AdditionalEntriesCard({
                   ) : (
                     <button
                       className="min-w-0 flex-1 truncate text-left text-sm font-medium text-foreground transition-colors hover:text-primary focus-visible:text-primary"
-                      onClick={() => openEditForm(entry)}
+                      onClick={() => openEditForm(entry, "label")}
                       type="button"
                       aria-label={`${t("edit")} ${entry.label}`}
                       title={entry.label}
@@ -750,7 +753,7 @@ export function AdditionalEntriesCard({
                     ) : (
                       <button
                         className="whitespace-nowrap rounded-md px-2 py-1 text-sm font-semibold tabular-nums text-foreground transition-colors hover:bg-background hover:text-primary"
-                        onClick={() => openEditForm(entry)}
+                        onClick={() => openEditForm(entry, "amount")}
                         type="button"
                         aria-label={`${t("edit")} ${entry.label}`}
                         disabled={deletingId === entry.id}

@@ -23,6 +23,8 @@ import { TAG_COLORS } from "@/lib/tags";
 import { useRouter } from "@/i18n/routing";
 import type { RecurringExpense, Tag } from "@/lib/types";
 
+type EntryEditFocusTarget = "label" | "amount";
+
 interface Props {
   monthId: number;
   entries: RecurringExpense[];
@@ -39,6 +41,7 @@ export function RecurringExpensesList({ monthId, entries, onEntriesChange, readO
   const [savingId, setSavingId] = useState<number | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [editFocusTarget, setEditFocusTarget] = useState<EntryEditFocusTarget>("label");
   const [editLabel, setEditLabel] = useState("");
   const [editAmount, setEditAmount] = useState("");
   const [tags, setTags] = useState<Tag[]>([]);
@@ -54,8 +57,9 @@ export function RecurringExpensesList({ monthId, entries, onEntriesChange, readO
       .catch(() => {});
   }, [readOnly]);
 
-  const openEditForm = (entry: RecurringExpense) => {
+  const openEditForm = (entry: RecurringExpense, focusTarget: EntryEditFocusTarget = "label") => {
     setEditingId(entry.id);
+    setEditFocusTarget(focusTarget);
     setEditLabel(entry.label);
     setEditAmount(String(entry.amount));
   };
@@ -159,7 +163,7 @@ export function RecurringExpensesList({ monthId, entries, onEntriesChange, readO
                 saveLabel={common("save")}
                 savingLabel={common("saving")}
                 cancelLabel={common("cancel")}
-                autoFocus
+                autoFocus={editFocusTarget}
               />
             </div>
           ) : (
@@ -175,7 +179,7 @@ export function RecurringExpensesList({ monthId, entries, onEntriesChange, readO
               <div className="flex min-w-0 items-center justify-between gap-2">
                 <button
                   className="min-w-0 flex-1 truncate text-left text-sm font-medium text-foreground transition-colors hover:text-primary focus-visible:text-primary disabled:pointer-events-none"
-                  onClick={() => openEditForm(entry)}
+                  onClick={() => openEditForm(entry, "label")}
                   type="button"
                   title={entry.label}
                   disabled={readOnly || deletingId === entry.id}
@@ -186,7 +190,7 @@ export function RecurringExpensesList({ monthId, entries, onEntriesChange, readO
                   {!readOnly ? (
                     <button
                       className="whitespace-nowrap text-sm font-semibold tabular-nums transition-colors hover:text-primary focus-visible:text-primary disabled:pointer-events-none"
-                      onClick={() => openEditForm(entry)}
+                      onClick={() => openEditForm(entry, "amount")}
                       type="button"
                       disabled={deletingId === entry.id}
                     >

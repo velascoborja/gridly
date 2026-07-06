@@ -28,7 +28,7 @@ interface EntryFormRowProps {
   /** Optional slot for a tag action button rendered before recurringAction */
   tagAction?: React.ReactNode;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
-  autoFocus?: boolean;
+  autoFocus?: boolean | "label" | "amount";
 }
 
 export function EntryFormRow({
@@ -52,6 +52,8 @@ export function EntryFormRow({
   onKeyDown,
   autoFocus = false,
 }: EntryFormRowProps) {
+  const autoFocusTarget = autoFocus === true ? "label" : autoFocus;
+
   return (
     <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2">
       <Input
@@ -61,7 +63,7 @@ export function EntryFormRow({
         onChange={(e) => onLabelChange(e.target.value)}
         disabled={disabled}
         onKeyDown={onKeyDown}
-        autoFocus={autoFocus}
+        autoFocus={autoFocusTarget === "label"}
       />
       <div className="relative w-28">
         <Input
@@ -72,6 +74,7 @@ export function EntryFormRow({
           disabled={disabled}
           onKeyDown={onKeyDown}
           inputMode="decimal"
+          autoFocus={autoFocusTarget === "amount"}
         />
         <span
           aria-hidden="true"
