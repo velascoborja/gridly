@@ -97,6 +97,7 @@ test("EntryFormRow renders stable preview and error feedback for amount expressi
   assert.match(source, /aria-invalid=\{amountError \? true : undefined\}/);
   assert.match(source, /aria-live="polite"/);
   assert.match(source, /amountError \? amountError : amountPreview/);
+  assert.match(source, /\{\(amountMode === "expression" \|\| hasAmountFeedback\) && \(/);
   assert.match(source, /min-h-4 text-right text-\[11px\] leading-4 tabular-nums/);
 });
 

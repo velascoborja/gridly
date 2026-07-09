@@ -100,15 +100,17 @@ export function EntryFormRow({
           €
         </span>
       </div>
-      <div
-        id={amountFeedbackId}
-        aria-live="polite"
-        className={`col-span-2 min-h-4 text-right text-[11px] leading-4 tabular-nums ${
-          amountError ? "text-destructive" : "text-muted-foreground"
-        }`}
-      >
-        {amountError ? amountError : amountPreview}
-      </div>
+      {(amountMode === "expression" || hasAmountFeedback) && (
+        <div
+          id={amountFeedbackId}
+          aria-live="polite"
+          className={`col-span-2 min-h-4 text-right text-[11px] leading-4 tabular-nums ${
+            amountError ? "text-destructive" : "text-muted-foreground"
+          }`}
+        >
+          {amountError ? amountError : amountPreview}
+        </div>
+      )}
       <div className="col-span-2 flex items-center justify-end gap-0">
         {tagAction}
         {recurringAction}
