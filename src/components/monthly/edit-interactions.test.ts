@@ -103,28 +103,53 @@ test("additional entry expression invalid message is translated", () => {
 
 test("additional entry add and edit handlers block invalid expressions before fetch", () => {
   const cardSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
-  const addHandlerSource = cardSource.slice(
-    cardSource.indexOf("const handleAdd = async () => {"),
-    cardSource.indexOf("const handleDelete = async")
+  const parseEntryAmountStart = cardSource.indexOf(
+    "const parseEntryAmount = (value: string, onInvalid: () => void): number | null =>"
   );
-  const editHandlerSource = cardSource.slice(
-    cardSource.indexOf("const handleEdit = async (id: number) => {"),
-    cardSource.indexOf("const handleMoveToGroup = async")
-  );
+  const parseEntryAmountEnd = cardSource.indexOf("const handleAdd = async () => {");
+  const addHandlerStart = parseEntryAmountEnd;
+  const addHandlerEnd = cardSource.indexOf("const handleDelete = async");
+  const editHandlerStart = cardSource.indexOf("const handleEdit = async (id: number) => {");
+  const editHandlerEnd = cardSource.indexOf("const handleMoveToGroup = async");
+  const addHandlerSource = cardSource.slice(addHandlerStart, addHandlerEnd);
+  const editHandlerSource = cardSource.slice(editHandlerStart, editHandlerEnd);
+  const parseEntryAmountSource = cardSource.slice(parseEntryAmountStart, parseEntryAmountEnd);
+  const parseInvalidBranchStart = parseEntryAmountSource.indexOf("if (!parsed.ok) {");
+  const parseInvalidBranchEnd = parseEntryAmountSource.indexOf("}", parseInvalidBranchStart);
+  const parseInvalidBranchSource = parseEntryAmountSource.slice(parseInvalidBranchStart, parseInvalidBranchEnd);
+  const addInvalidGuard = "if (!newLabel.trim() || amount === null) return;";
+  const addFetch = "fetch(`/api/months/${monthId}/entries`";
+  const editInvalidGuard = "if (!editLabel.trim() || amount === null) return;";
+  const editFetch = "fetch(`/api/months/${monthId}/entries/${id}`";
 
-  assert.match(cardSource, /const parseEntryAmount = \(value: string, onInvalid: \(\) => void\): number \| null =>/);
-  assert.match(cardSource, /const parsed = parseMoneyExpression\(value\)/);
-  assert.match(cardSource, /if \(!parsed\.ok\) \{/);
-  assert.match(cardSource, /onInvalid\(\)/);
+  assert.notEqual(parseEntryAmountStart, -1, "Expected source to contain parseEntryAmount");
+  assert.notEqual(parseEntryAmountEnd, -1, "Expected source to contain handleAdd after parseEntryAmount");
+  assert.ok(parseEntryAmountStart < parseEntryAmountEnd, "Expected parseEntryAmount to appear before handleAdd");
+  assert.match(parseEntryAmountSource, /const parsed = parseMoneyExpression\(value\)/);
+  assert.notEqual(parseInvalidBranchStart, -1, "Expected parseEntryAmount to contain parsed failure branch");
+  assert.notEqual(parseInvalidBranchEnd, -1, "Expected parseEntryAmount parsed failure branch to close");
+  assert.match(parseInvalidBranchSource, /onInvalid\(\)/);
+  assert.match(parseInvalidBranchSource, /return null;/);
+
+  assert.notEqual(addHandlerStart, -1, "Expected source to contain handleAdd");
+  assert.notEqual(addHandlerEnd, -1, "Expected source to contain handleDelete after handleAdd");
+  assert.ok(addHandlerStart < addHandlerEnd, "Expected handleAdd to appear before handleDelete");
   assert.match(addHandlerSource, /const amount = parseEntryAmount\(newAmount, \(\) => setNewAmountError\(true\)\);/);
-  assert.match(addHandlerSource, /if \(!newLabel\.trim\(\) \|\| amount === null\) return;/);
+  assert.ok(addHandlerSource.includes(addInvalidGuard), `Expected handleAdd to contain ${addInvalidGuard}`);
+  assert.ok(addHandlerSource.includes(addFetch), `Expected handleAdd to contain ${addFetch}`);
   assertInOrder(addHandlerSource, "setNewAmountError(false);", "setIsAdding(true);");
-  assertInOrder(addHandlerSource, "if (!newLabel.trim() || amount === null) return;", "setNewAmountError(false);");
+  assertInOrder(addHandlerSource, addInvalidGuard, "setNewAmountError(false);");
+  assertInOrder(addHandlerSource, addInvalidGuard, addFetch);
 
+  assert.notEqual(editHandlerStart, -1, "Expected source to contain handleEdit");
+  assert.notEqual(editHandlerEnd, -1, "Expected source to contain handleMoveToGroup after handleEdit");
+  assert.ok(editHandlerStart < editHandlerEnd, "Expected handleEdit to appear before handleMoveToGroup");
   assert.match(editHandlerSource, /const amount = parseEntryAmount\(editAmount, \(\) => setEditAmountError\(true\)\);/);
-  assert.match(editHandlerSource, /if \(!editLabel\.trim\(\) \|\| amount === null\) return;/);
+  assert.ok(editHandlerSource.includes(editInvalidGuard), `Expected handleEdit to contain ${editInvalidGuard}`);
+  assert.ok(editHandlerSource.includes(editFetch), `Expected handleEdit to contain ${editFetch}`);
   assertInOrder(editHandlerSource, "setEditAmountError(false);", "setSavingId(id);");
-  assertInOrder(editHandlerSource, "if (!editLabel.trim() || amount === null) return;", "setEditAmountError(false);");
+  assertInOrder(editHandlerSource, editInvalidGuard, "setEditAmountError(false);");
+  assertInOrder(editHandlerSource, editInvalidGuard, editFetch);
 });
 
 test("EntryFormRow supports numeric and expression amount modes", () => {
