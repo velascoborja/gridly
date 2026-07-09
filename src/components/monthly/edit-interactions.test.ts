@@ -68,16 +68,31 @@ test("additional expense group creation refreshes the app router cache after loc
   assert.match(source, /onGroupsChange\?\.\(\[\.\.\.groups, newGroup\]\);\s*router\.refresh\(\);/);
 });
 
-test("additional entry amount inputs show a Euro suffix as soon as they are editable", () => {
+test("additional entry amount inputs use expression parsing and preview props", () => {
   const cardSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
   const formRowSource = readFileSync(new URL("./entry-form-row.tsx", import.meta.url), "utf8");
 
   assert.match(formRowSource, />\s*€\s*<\/span>/);
-  assert.match(cardSource, /const parseAmountInput = \(value: string\) => parseFloat\(value\.replace\(",", "\."\)\)/);
-  assert.match(cardSource, /const amount = parseAmountInput\(newAmount\)/);
-  assert.match(cardSource, /const amount = parseAmountInput\(editAmount\)/);
-  assert.match(cardSource, /amountValue=\{newAmount\}/);
-  assert.match(cardSource, /amountValue=\{editAmount\}/);
+  assert.match(cardSource, /parseMoneyExpression/);
+  assert.doesNotMatch(cardSource, /const parseAmountInput = \(value: string\) => parseFloat\(value\.replace\(",", "\."\)\)/);
+  assert.match(cardSource, /const newAmountPreview = getAmountPreview\(newAmount\)/);
+  assert.match(cardSource, /const editAmountPreview = getAmountPreview\(editAmount\)/);
+  assert.match(cardSource, /amountMode="expression"/);
+  assert.match(cardSource, /amountPreview=\{newAmountPreview\}/);
+  assert.match(cardSource, /amountPreview=\{editAmountPreview\}/);
+  assert.match(cardSource, /amountError=\{newAmountError \? t\("amountExpressionInvalid"\) : null\}/);
+  assert.match(cardSource, /amountError=\{editAmountError \? t\("amountExpressionInvalid"\) : null\}/);
+});
+
+test("additional entry add and edit handlers block invalid expressions before fetch", () => {
+  const cardSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
+
+  assert.match(cardSource, /const parseEntryAmount = \(value: string, onInvalid: \(\) => void\): number \| null =>/);
+  assert.match(cardSource, /const parsed = parseMoneyExpression\(value\)/);
+  assert.match(cardSource, /if \(!parsed\.ok\) \{/);
+  assert.match(cardSource, /onInvalid\(\)/);
+  assert.match(cardSource, /const amount = parseEntryAmount\(newAmount, \(\) => setNewAmountError\(true\)\)/);
+  assert.match(cardSource, /const amount = parseEntryAmount\(editAmount, \(\) => setEditAmountError\(true\)\)/);
 });
 
 test("EntryFormRow supports numeric and expression amount modes", () => {
