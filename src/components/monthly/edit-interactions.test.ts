@@ -80,11 +80,24 @@ test("additional entry amount inputs show a Euro suffix as soon as they are edit
   assert.match(cardSource, /amountValue=\{editAmount\}/);
 });
 
-test("additional entry amount inputs reject non numeric characters while editing", () => {
+test("EntryFormRow supports numeric and expression amount modes", () => {
   const source = readFileSync(new URL("./entry-form-row.tsx", import.meta.url), "utf8");
 
-  assert.match(source, /sanitizeNumericInput/);
-  assert.match(source, /onAmountChange\(sanitizeNumericInput\(e\.target\.value\)\)/);
+  assert.match(source, /amountMode\?: "numeric" \| "expression"/);
+  assert.match(source, /amountPreview\?: string \| null/);
+  assert.match(source, /amountError\?: string \| null/);
+  assert.match(source, /sanitizeMoneyExpressionInput/);
+  assert.match(source, /amountMode === "expression"[\s\S]*\? sanitizeMoneyExpressionInput\(e\.target\.value\)[\s\S]*: sanitizeNumericInput\(e\.target\.value\)/);
+  assert.match(source, /inputMode=\{amountMode === "expression" \? "text" : "decimal"\}/);
+});
+
+test("EntryFormRow renders stable preview and error feedback for amount expressions", () => {
+  const source = readFileSync(new URL("./entry-form-row.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /aria-invalid=\{amountError \? true : undefined\}/);
+  assert.match(source, /aria-live="polite"/);
+  assert.match(source, /amountError \? amountError : amountPreview/);
+  assert.match(source, /min-h-4 text-right text-\[11px\] leading-4 tabular-nums/);
 });
 
 test("fixed editor reveal animates without an extra parent stack gap", () => {
