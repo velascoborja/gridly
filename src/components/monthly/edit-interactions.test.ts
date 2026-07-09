@@ -2,6 +2,15 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
+function assertInOrder(source: string, before: string, after: string) {
+  const beforeIndex = source.indexOf(before);
+  const afterIndex = source.indexOf(after);
+
+  assert.notEqual(beforeIndex, -1, `Expected source to contain ${before}`);
+  assert.notEqual(afterIndex, -1, `Expected source to contain ${after}`);
+  assert.ok(beforeIndex < afterIndex, `Expected ${before} to appear before ${after}`);
+}
+
 test("inline fixed fields support row press activation", () => {
   const source = readFileSync(new URL("./inline-edit-field.tsx", import.meta.url), "utf8");
 
@@ -84,15 +93,38 @@ test("additional entry amount inputs use expression parsing and preview props", 
   assert.match(cardSource, /amountError=\{editAmountError \? t\("amountExpressionInvalid"\) : null\}/);
 });
 
+test("additional entry expression invalid message is translated", () => {
+  const esMessages = readFileSync(new URL("../../../messages/es.json", import.meta.url), "utf8");
+  const enMessages = readFileSync(new URL("../../../messages/en.json", import.meta.url), "utf8");
+
+  assert.match(esMessages, /"amountExpressionInvalid": "Introduce una cantidad o fórmula válida\."/);
+  assert.match(enMessages, /"amountExpressionInvalid": "Enter a valid amount or formula\."/);
+});
+
 test("additional entry add and edit handlers block invalid expressions before fetch", () => {
   const cardSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
+  const addHandlerSource = cardSource.slice(
+    cardSource.indexOf("const handleAdd = async () => {"),
+    cardSource.indexOf("const handleDelete = async")
+  );
+  const editHandlerSource = cardSource.slice(
+    cardSource.indexOf("const handleEdit = async (id: number) => {"),
+    cardSource.indexOf("const handleMoveToGroup = async")
+  );
 
   assert.match(cardSource, /const parseEntryAmount = \(value: string, onInvalid: \(\) => void\): number \| null =>/);
   assert.match(cardSource, /const parsed = parseMoneyExpression\(value\)/);
   assert.match(cardSource, /if \(!parsed\.ok\) \{/);
   assert.match(cardSource, /onInvalid\(\)/);
-  assert.match(cardSource, /const amount = parseEntryAmount\(newAmount, \(\) => setNewAmountError\(true\)\)/);
-  assert.match(cardSource, /const amount = parseEntryAmount\(editAmount, \(\) => setEditAmountError\(true\)\)/);
+  assert.match(addHandlerSource, /const amount = parseEntryAmount\(newAmount, \(\) => setNewAmountError\(true\)\);/);
+  assert.match(addHandlerSource, /if \(!newLabel\.trim\(\) \|\| amount === null\) return;/);
+  assertInOrder(addHandlerSource, "setNewAmountError(false);", "setIsAdding(true);");
+  assertInOrder(addHandlerSource, "if (!newLabel.trim() || amount === null) return;", "setNewAmountError(false);");
+
+  assert.match(editHandlerSource, /const amount = parseEntryAmount\(editAmount, \(\) => setEditAmountError\(true\)\);/);
+  assert.match(editHandlerSource, /if \(!editLabel\.trim\(\) \|\| amount === null\) return;/);
+  assertInOrder(editHandlerSource, "setEditAmountError(false);", "setSavingId(id);");
+  assertInOrder(editHandlerSource, "if (!editLabel.trim() || amount === null) return;", "setEditAmountError(false);");
 });
 
 test("EntryFormRow supports numeric and expression amount modes", () => {
