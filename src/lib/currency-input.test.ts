@@ -58,10 +58,18 @@ test("rejects invalid money expressions", () => {
   assert.deepEqual(parseMoneyExpression(""), { ok: false, reason: "empty" });
   assert.deepEqual(parseMoneyExpression("20+"), { ok: false, reason: "syntax" });
   assert.deepEqual(parseMoneyExpression("(20+30"), { ok: false, reason: "syntax" });
-  assert.deepEqual(parseMoneyExpression("abc"), { ok: false, reason: "empty" });
+  assert.deepEqual(parseMoneyExpression("abc"), { ok: false, reason: "syntax" });
+  assert.deepEqual(parseMoneyExpression("20abc30"), { ok: false, reason: "syntax" });
+  assert.deepEqual(parseMoneyExpression("1..2"), { ok: false, reason: "syntax" });
+  assert.deepEqual(parseMoneyExpression("1,2,3"), { ok: false, reason: "syntax" });
 });
 
 test("rejects division by zero and non-finite money expression results", () => {
   assert.deepEqual(parseMoneyExpression("10/0"), { ok: false, reason: "division-by-zero" });
   assert.deepEqual(parseMoneyExpression("10/(5-5)"), { ok: false, reason: "division-by-zero" });
+  assert.deepEqual(parseMoneyExpression("10/0.000000000000000000001"), {
+    ok: true,
+    value: 1e22,
+    isExpression: true,
+  });
 });

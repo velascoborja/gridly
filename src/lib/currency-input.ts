@@ -60,8 +60,7 @@ export function parseLocalizedNumber(value: string): number {
 }
 
 export function parseMoneyExpression(value: string): MoneyExpressionResult {
-  const sanitized = sanitizeMoneyExpressionInput(value);
-  const compact = sanitized.replace(/\s/g, "");
+  const compact = value.replace(/[€\s]/g, "");
 
   if (!compact) return { ok: false, reason: "empty" };
 
@@ -110,7 +109,7 @@ function tokenizeMoneyExpression(value: string): Token[] {
       }
 
       const parsed = parseLocalizedNumber(rawNumber);
-      if (!Number.isFinite(parsed)) {
+      if (!isValidMoneyExpressionNumber(rawNumber) || !Number.isFinite(parsed)) {
         throw new MoneyExpressionSyntaxError();
       }
 
@@ -176,7 +175,7 @@ class MoneyExpressionParser {
       if (operator.value === "*") {
         value *= right;
       } else {
-        if (Math.abs(right) < Number.EPSILON) {
+        if (right === 0) {
           throw new MoneyExpressionDivisionByZeroError();
         }
         value /= right;
@@ -238,4 +237,47 @@ class MoneyExpressionParser {
   private isAtEnd(): boolean {
     return this.index >= this.tokens.length;
   }
+}
+
+function isValidMoneyExpressionNumber(value: string): boolean {
+  if (!/^\d[\d,.]*$/.test(value)) return false;
+
+  const commaCount = countOccurrences(value, ",");
+  const dotCount = countOccurrences(value, ".");
+
+  if (commaCount === 0 && dotCount === 0) return true;
+  if (commaCount > 0 && dotCount > 0) return isValidMixedSeparatorNumber(value);
+  if (commaCount === 1 || dotCount === 1) return true;
+
+  const separator = commaCount > 1 ? "," : ".";
+  return isValidGroupedInteger(value, separator);
+}
+
+function isValidMixedSeparatorNumber(value: string): boolean {
+  const lastComma = value.lastIndexOf(",");
+  const lastDot = value.lastIndexOf(".");
+  const decimalSeparator = lastComma > lastDot ? "," : ".";
+  const groupingSeparator = decimalSeparator === "," ? "." : ",";
+  const decimalIndex = value.lastIndexOf(decimalSeparator);
+  const integerPart = value.slice(0, decimalIndex);
+  const fractionalPart = value.slice(decimalIndex + 1);
+
+  if (!integerPart || !/^\d+$/.test(fractionalPart)) return false;
+  if (fractionalPart.includes(groupingSeparator)) return false;
+
+  return isValidGroupedInteger(integerPart, groupingSeparator);
+}
+
+function isValidGroupedInteger(value: string, separator: "," | "."): boolean {
+  const groups = value.split(separator);
+
+  return (
+    groups.length > 1 &&
+    /^\d{1,3}$/.test(groups[0]) &&
+    groups.slice(1).every((group) => /^\d{3}$/.test(group))
+  );
+}
+
+function countOccurrences(value: string, search: string): number {
+  return value.split(search).length - 1;
 }
