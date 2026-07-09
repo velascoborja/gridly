@@ -1,9 +1,10 @@
 "use client";
 
+import { useId } from "react";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { sanitizeNumericInput } from "@/lib/currency-input";
+import { sanitizeMoneyExpressionInput, sanitizeNumericInput } from "@/lib/currency-input";
 
 interface EntryFormRowProps {
   labelValue: string;
@@ -12,6 +13,9 @@ interface EntryFormRowProps {
   amountValue: string;
   onAmountChange: (v: string) => void;
   amountPlaceholder?: string;
+  amountMode?: "numeric" | "expression";
+  amountPreview?: string | null;
+  amountError?: string | null;
   onSave: () => void;
   onCancel: () => void;
   disabled?: boolean;
@@ -38,6 +42,9 @@ export function EntryFormRow({
   amountValue,
   onAmountChange,
   amountPlaceholder,
+  amountMode = "numeric",
+  amountPreview = null,
+  amountError = null,
   onSave,
   onCancel,
   disabled = false,
@@ -53,6 +60,8 @@ export function EntryFormRow({
   autoFocus = false,
 }: EntryFormRowProps) {
   const autoFocusTarget = autoFocus === true ? "label" : autoFocus;
+  const amountFeedbackId = useId();
+  const hasAmountFeedback = Boolean(amountPreview || amountError);
 
   return (
     <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2">
@@ -70,11 +79,19 @@ export function EntryFormRow({
           className="h-9 w-full pr-8 text-right text-sm"
           placeholder={amountPlaceholder}
           value={amountValue}
-          onChange={(e) => onAmountChange(sanitizeNumericInput(e.target.value))}
+          onChange={(e) =>
+            onAmountChange(
+              amountMode === "expression"
+                ? sanitizeMoneyExpressionInput(e.target.value)
+                : sanitizeNumericInput(e.target.value)
+            )
+          }
           disabled={disabled}
           onKeyDown={onKeyDown}
-          inputMode="decimal"
+          inputMode={amountMode === "expression" ? "text" : "decimal"}
           autoFocus={autoFocusTarget === "amount"}
+          aria-invalid={amountError ? true : undefined}
+          aria-describedby={hasAmountFeedback ? amountFeedbackId : undefined}
         />
         <span
           aria-hidden="true"
@@ -82,6 +99,15 @@ export function EntryFormRow({
         >
           €
         </span>
+      </div>
+      <div
+        id={amountFeedbackId}
+        aria-live="polite"
+        className={`col-span-2 min-h-4 text-right text-[11px] leading-4 tabular-nums ${
+          amountError ? "text-destructive" : "text-muted-foreground"
+        }`}
+      >
+        {amountError ? amountError : amountPreview}
       </div>
       <div className="col-span-2 flex items-center justify-end gap-0">
         {tagAction}
