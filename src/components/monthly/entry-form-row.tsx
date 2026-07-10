@@ -62,9 +62,11 @@ export function EntryFormRow({
   const autoFocusTarget = autoFocus === true ? "label" : autoFocus;
   const amountFeedbackId = useId();
   const hasAmountFeedback = Boolean(amountPreview || amountError);
+  const isAmountCalculationInProgress = amountMode === "expression" && /[-+*/()]/.test(amountValue);
+  const shouldShowAmountFeedback = isAmountCalculationInProgress || hasAmountFeedback;
 
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2">
+    <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-2">
       <Input
         className="h-9 min-w-0 text-sm"
         placeholder={labelPlaceholder}
@@ -100,7 +102,11 @@ export function EntryFormRow({
           €
         </span>
       </div>
-      {(amountMode === "expression" || hasAmountFeedback) && (
+      <div
+        className={`col-span-2 overflow-hidden transition-[max-height,margin-top,opacity] duration-200 ease-out motion-reduce:transition-none ${
+          shouldShowAmountFeedback ? "mt-2 max-h-4 opacity-100" : "mt-0 max-h-0 opacity-0"
+        }`}
+      >
         <div
           id={amountFeedbackId}
           aria-live="polite"
@@ -110,8 +116,8 @@ export function EntryFormRow({
         >
           {amountError ? amountError : amountPreview}
         </div>
-      )}
-      <div className="col-span-2 flex items-center justify-end gap-0">
+      </div>
+      <div className="col-span-2 mt-2 flex items-center justify-end gap-0">
         {tagAction}
         {recurringAction}
         {monthAction}

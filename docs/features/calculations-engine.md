@@ -31,3 +31,7 @@ homeExpense + personalExpense + investment + recurringExpensesTotal + additional
 - **Automatic:** Calculated as `(Starting Balance * YearConfig.interestRate) / 12`.
 - **Manual Override:** Users can toggle `interestsManualOverride` to set a specific interest amount for a month, bypassing the automatic calculation. This is useful for high-yield accounts where interests are paid differently.
 - **Annual Setup Reapply:** Saving year setup values from the annual summary resets monthly interest overrides and reapplies the annual baseline fields with `applyYearConfigToMonth`, so the annual balance reflects the latest setup immediately.
+
+## Amount Expression Feedback
+
+Additional income and expense forms accept arithmetic expressions in their amount fields. `EntryFormRow` detects arithmetic operators while the user is typing and expands its result/error line only then (or when an error is present). The line transitions its height, spacing, and opacity over 200 ms; plain numeric amounts keep the compact pre-expression layout.

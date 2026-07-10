@@ -230,13 +230,16 @@ test("EntryFormRow supports numeric and expression amount modes", () => {
   assert.match(source, /inputMode=\{amountMode === "expression" \? "text" : "decimal"\}/);
 });
 
-test("EntryFormRow renders stable preview and error feedback for amount expressions", () => {
+test("EntryFormRow reveals expression feedback only while a calculation or message is present", () => {
   const source = readFileSync(new URL("./entry-form-row.tsx", import.meta.url), "utf8");
 
   assert.match(source, /aria-invalid=\{amountError \? true : undefined\}/);
   assert.match(source, /aria-live="polite"/);
   assert.match(source, /amountError \? amountError : amountPreview/);
-  assert.match(source, /\{\(amountMode === "expression" \|\| hasAmountFeedback\) && \(/);
+  assert.match(source, /const isAmountCalculationInProgress = amountMode === "expression"/);
+  assert.match(source, /const shouldShowAmountFeedback = isAmountCalculationInProgress \|\| hasAmountFeedback;/);
+  assert.match(source, /shouldShowAmountFeedback \? "mt-2 max-h-4 opacity-100" : "mt-0 max-h-0 opacity-0"/);
+  assert.match(source, /transition-\[max-height,margin-top,opacity\] duration-200 ease-out motion-reduce:transition-none/);
   assert.match(source, /min-h-4 text-right text-\[11px\] leading-4 tabular-nums/);
 });
 
@@ -514,13 +517,13 @@ test("EntryFormRow reserves more horizontal space for the amount and keeps actio
 
   assert.match(source, /tagAction\?: React\.ReactNode/);
   assert.match(source, /monthAction\?: React\.ReactNode/);
-  assert.match(source, /className="grid grid-cols-\[minmax\(0,1fr\)_auto\] gap-2"/);
+  assert.match(source, /className="grid grid-cols-\[minmax\(0,1fr\)_auto\] gap-x-2"/);
   assert.match(source, /className="relative w-36"/);
-  assert.match(source, /className="col-span-2 flex items-center justify-end gap-0"/);
+  assert.match(source, /className="col-span-2 mt-2 flex items-center justify-end gap-0"/);
 });
 
 test("EntryFormRow renders only actions in the lower row", () => {
   const source = readFileSync(new URL("./entry-form-row.tsx", import.meta.url), "utf8");
 
-  assert.match(source, /<div className="col-span-2 flex items-center justify-end gap-0">\s*\{tagAction\}\s*\{recurringAction\}\s*\{monthAction\}\s*\{folderAction\}/);
+  assert.match(source, /<div className="col-span-2 mt-2 flex items-center justify-end gap-0">\s*\{tagAction\}\s*\{recurringAction\}\s*\{monthAction\}\s*\{folderAction\}/);
 });
