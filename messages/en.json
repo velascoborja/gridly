@@ -473,6 +473,7 @@
       "addGroup": "Add group",
       "noEntries": "No entries yet.",
       "descriptionPlaceholder": "Description",
+      "amountExpressionInvalid": "Enter a valid amount or formula.",
       "groupNamePlaceholder": "Group name",
       "add": "Add",
       "adding": "Adding...",

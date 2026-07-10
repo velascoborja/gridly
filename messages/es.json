@@ -473,6 +473,7 @@
       "addGroup": "Añadir grupo",
       "noEntries": "Sin entradas todavía.",
       "descriptionPlaceholder": "Descripción",
+      "amountExpressionInvalid": "Introduce una cantidad o fórmula válida.",
       "groupNamePlaceholder": "Nombre del grupo",
       "add": "Añadir",
       "adding": "Añadiendo...",

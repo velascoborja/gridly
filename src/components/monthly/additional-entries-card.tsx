@@ -31,6 +31,7 @@ import { AdditionalEntryGroupRow } from "./additional-entry-group-row";
 import { EntryFormRow } from "./entry-form-row";
 import { TagPicker } from "./tag-picker";
 import { sortAdditionalEntriesDesc, sumAdditionalEntries } from "@/lib/additional-entries";
+import { parseMoneyExpression } from "@/lib/currency-input";
 import { TAG_COLORS } from "@/lib/tags";
 import { cn, formatCurrency, formatMonthName } from "@/lib/utils";
 import type { AdditionalEntry, AdditionalEntryGroup, Tag } from "@/lib/types";
@@ -102,10 +103,12 @@ export function AdditionalEntriesCard({
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [newLabel, setNewLabel] = useState("");
   const [newAmount, setNewAmount] = useState("");
+  const [newAmountError, setNewAmountError] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editFocusTarget, setEditFocusTarget] = useState<EntryEditFocusTarget>("label");
   const [editLabel, setEditLabel] = useState("");
   const [editAmount, setEditAmount] = useState("");
+  const [editAmountError, setEditAmountError] = useState(false);
   const [addingGroupOpen, setAddingGroupOpen] = useState(false);
   const [isAddingGroup, setIsAddingGroup] = useState(false);
   const [newGroupLabel, setNewGroupLabel] = useState("");
@@ -175,6 +178,7 @@ export function AdditionalEntriesCard({
     setAddingFormOpen(false);
     setNewLabel("");
     setNewAmount("");
+    setNewAmountError(false);
     setNewRecurring(false);
     setNewTagId(null);
   };
@@ -184,6 +188,7 @@ export function AdditionalEntriesCard({
     setEditFocusTarget(focusTarget);
     setEditLabel(entry.label);
     setEditAmount(String(entry.amount));
+    setEditAmountError(false);
     setEditRecurring(entry.isRecurring);
     setEditTagId(entry.tagId);
   };
@@ -206,13 +211,30 @@ export function AdditionalEntriesCard({
     onEntryDragEnd?.();
   };
 
-  const parseAmountInput = (value: string) => parseFloat(value.replace(",", "."));
+  const getAmountPreview = (value: string) => {
+    const parsed = parseMoneyExpression(value);
+    return parsed.ok && parsed.isExpression ? `= ${formatCurrency(parsed.value, locale)}` : null;
+  };
+
+  const parseEntryAmount = (value: string, onInvalid: () => void): number | null => {
+    const parsed = parseMoneyExpression(value);
+    if (!parsed.ok) {
+      onInvalid();
+      return null;
+    }
+
+    return parsed.value;
+  };
+
+  const newAmountPreview = getAmountPreview(newAmount);
+  const editAmountPreview = getAmountPreview(editAmount);
 
   const handleAdd = async () => {
     if (isAdding) return;
-    const amount = parseAmountInput(newAmount);
-    if (!newLabel.trim() || isNaN(amount)) return;
+    const amount = parseEntryAmount(newAmount, () => setNewAmountError(true));
+    if (!newLabel.trim() || amount === null) return;
 
+    setNewAmountError(false);
     setIsAdding(true);
     try {
       const res = await fetch(`/api/months/${monthId}/entries`, {
@@ -250,9 +272,10 @@ export function AdditionalEntriesCard({
 
   const handleEdit = async (id: number) => {
     if (savingId === id) return;
-    const amount = parseAmountInput(editAmount);
-    if (!editLabel.trim() || isNaN(amount)) return;
+    const amount = parseEntryAmount(editAmount, () => setEditAmountError(true));
+    if (!editLabel.trim() || amount === null) return;
 
+    setEditAmountError(false);
     setSavingId(id);
     try {
       const body: Record<string, unknown> = { label: editLabel.trim(), amount, isRecurring: editRecurring, tagId: editTagId };
@@ -399,7 +422,13 @@ export function AdditionalEntriesCard({
                 onLabelChange={setNewLabel}
                 labelPlaceholder={t("descriptionPlaceholder")}
                 amountValue={newAmount}
-                onAmountChange={setNewAmount}
+                onAmountChange={(value) => {
+                  setNewAmount(value);
+                  setNewAmountError(false);
+                }}
+                amountMode="expression"
+                amountPreview={newAmountPreview}
+                amountError={newAmountError ? t("amountExpressionInvalid") : null}
                 amountPlaceholder="0.00"
                 onSave={handleAdd}
                 onCancel={closeAddForm}
@@ -519,9 +548,18 @@ export function AdditionalEntriesCard({
                   labelValue={editLabel}
                   onLabelChange={setEditLabel}
                   amountValue={editAmount}
-                  onAmountChange={setEditAmount}
+                  onAmountChange={(value) => {
+                    setEditAmount(value);
+                    setEditAmountError(false);
+                  }}
+                  amountMode="expression"
+                  amountPreview={editAmountPreview}
+                  amountError={editAmountError ? t("amountExpressionInvalid") : null}
                   onSave={() => handleEdit(entry.id)}
-                  onCancel={() => setEditingId(null)}
+                  onCancel={() => {
+                    setEditingId(null);
+                    setEditAmountError(false);
+                  }}
                   disabled={savingId === entry.id || movingToGroupId === entry.id || movingEntryId === entry.id}
                   isSaving={savingId === entry.id}
                   saveLabel={common("save")}
@@ -529,7 +567,10 @@ export function AdditionalEntriesCard({
                   cancelLabel={t("cancel")}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") handleEdit(entry.id);
-                    if (e.key === "Escape" && savingId !== entry.id) setEditingId(null);
+                    if (e.key === "Escape" && savingId !== entry.id) {
+                      setEditingId(null);
+                      setEditAmountError(false);
+                    }
                   }}
                   autoFocus={editFocusTarget}
                   tagAction={
