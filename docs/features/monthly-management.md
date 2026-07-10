@@ -20,6 +20,7 @@ The Monthly View (`/locale/[year]/[month]`) is the primary workspace for users. 
 ### Data Persistence
 - Client-side edits to fields (e.g., `payslip`, `homeExpense`) are saved via `PATCH /api/months/[monthId]`.
 - Fixed income and expense edit inputs keep numeric text in component state, show an in-input Euro suffix once a value is entered, and sanitize typed or pasted text through `sanitizeNumericInput`, keeping only digits plus `,` and `.` decimal separators before parsing the amount sent to the API.
+- Additional income and expense entry amount inputs also accept temporary arithmetic expressions such as `20+30+40`, `(12,50+8,25)*2`, or `100/4`. The expression is evaluated client-side for preview and save, but only the final numeric value is persisted.
 - Setup-backed monthly fields track explicit manual override flags: `payslipManualOverride`, `additionalPayslipManualOverride`, `homeExpenseManualOverride`, `personalExpenseManualOverride`, and `investmentManualOverride`. User edits set the related flag to `true`; reset actions clear it to `false`.
 - Recurring expense edit/delete operations are saved via `/api/months/[monthId]/recurring-expenses/[entryId]`.
 - Additional income and expense entries can be moved between months from the month view. The edit row exposes a "Move to month" menu for touch and keyboard-friendly movement, while desktop drag-and-drop onto a different month tab remains available as a shortcut. Both paths persist through `PATCH /api/months/[monthId]/entries/[entryId]` with a target `monthId`.
