@@ -509,12 +509,13 @@ test("additional expense group delete loading action fits the compact dialog foo
   assert.match(groupRowSource, /isDeletingGroup \? t\("deletingGroup"\) : t\("confirmDeleteGroupAction"\)/);
 });
 
-test("EntryFormRow exposes action slots and keeps them on a second row", () => {
+test("EntryFormRow reserves more horizontal space for the amount and keeps actions on a second row", () => {
   const source = readFileSync(new URL("./entry-form-row.tsx", import.meta.url), "utf8");
 
   assert.match(source, /tagAction\?: React\.ReactNode/);
   assert.match(source, /monthAction\?: React\.ReactNode/);
   assert.match(source, /className="grid grid-cols-\[minmax\(0,1fr\)_auto\] gap-2"/);
+  assert.match(source, /className="relative w-36"/);
   assert.match(source, /className="col-span-2 flex items-center justify-end gap-0"/);
 });
 

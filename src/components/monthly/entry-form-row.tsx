@@ -74,7 +74,7 @@ export function EntryFormRow({
         onKeyDown={onKeyDown}
         autoFocus={autoFocusTarget === "label"}
       />
-      <div className="relative w-28">
+      <div className="relative w-36">
         <Input
           className="h-9 w-full pr-8 text-right text-sm"
           placeholder={amountPlaceholder}
