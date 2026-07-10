@@ -77,6 +77,73 @@ test("additional expense group creation refreshes the app router cache after loc
   assert.match(source, /onGroupsChange\?\.\(\[\.\.\.groups, newGroup\]\);\s*router\.refresh\(\);/);
 });
 
+test("grouped additional expense amount inputs use expression parsing and preview props", () => {
+  const groupRowSource = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");
+
+  assert.match(groupRowSource, /parseMoneyExpression/);
+  assert.doesNotMatch(groupRowSource, /const parseAmount = \(v: string\) => parseFloat\(v\.replace\(",", "\."\)\)/);
+  assert.match(groupRowSource, /const newAmountPreview = getAmountPreview\(newAmount\)/);
+  assert.match(groupRowSource, /const editAmountPreview = getAmountPreview\(editAmount\)/);
+  assert.match(groupRowSource, /const amount = parseEntryAmount\(newAmount, \(\) => setNewAmountError\(true\)\)/);
+  assert.match(groupRowSource, /const amount = parseEntryAmount\(editAmount, \(\) => setEditAmountError\(true\)\)/);
+  assert.match(groupRowSource, /amountMode="expression"/);
+  assert.match(groupRowSource, /amountPreview=\{newAmountPreview\}/);
+  assert.match(groupRowSource, /amountPreview=\{editAmountPreview\}/);
+  assert.match(groupRowSource, /amountError=\{newAmountError \? t\("amountExpressionInvalid"\) : null\}/);
+  assert.match(groupRowSource, /amountError=\{editAmountError \? t\("amountExpressionInvalid"\) : null\}/);
+});
+
+test("grouped additional expense add and edit handlers block invalid expressions before fetch", () => {
+  const groupRowSource = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");
+  const parseEntryAmountStart = groupRowSource.indexOf(
+    "const parseEntryAmount = (value: string, onInvalid: () => void): number | null =>"
+  );
+  const parseEntryAmountEnd = groupRowSource.indexOf("const handleAdd = async () => {");
+  const addHandlerStart = parseEntryAmountEnd;
+  const addHandlerEnd = groupRowSource.indexOf("const openEditForm =");
+  const editHandlerStart = groupRowSource.indexOf("const handleEdit = async (entryId: number) => {");
+  const editHandlerEnd = groupRowSource.indexOf("const handleMoveToGroup = async");
+  const addHandlerSource = groupRowSource.slice(addHandlerStart, addHandlerEnd);
+  const editHandlerSource = groupRowSource.slice(editHandlerStart, editHandlerEnd);
+  const parseEntryAmountSource = groupRowSource.slice(parseEntryAmountStart, parseEntryAmountEnd);
+  const parseInvalidBranchStart = parseEntryAmountSource.indexOf("if (!parsed.ok) {");
+  const parseInvalidBranchEnd = parseEntryAmountSource.indexOf("}", parseInvalidBranchStart);
+  const parseInvalidBranchSource = parseEntryAmountSource.slice(parseInvalidBranchStart, parseInvalidBranchEnd);
+  const addInvalidGuard = "if (!newLabel.trim() || amount === null) return;";
+  const addFetch = "fetch(`/api/months/${monthId}/entries`";
+  const editInvalidGuard = "if (!editLabel.trim() || amount === null) return;";
+  const editFetch = "fetch(`/api/months/${monthId}/entries/${entryId}`";
+
+  assert.notEqual(parseEntryAmountStart, -1, "Expected group row source to contain parseEntryAmount");
+  assert.notEqual(parseEntryAmountEnd, -1, "Expected group row source to contain handleAdd after parseEntryAmount");
+  assert.ok(parseEntryAmountStart < parseEntryAmountEnd, "Expected parseEntryAmount to appear before handleAdd");
+  assert.match(parseEntryAmountSource, /const parsed = parseMoneyExpression\(value\)/);
+  assert.notEqual(parseInvalidBranchStart, -1, "Expected parseEntryAmount to contain parsed failure branch");
+  assert.notEqual(parseInvalidBranchEnd, -1, "Expected parseEntryAmount parsed failure branch to close");
+  assert.match(parseInvalidBranchSource, /onInvalid\(\)/);
+  assert.match(parseInvalidBranchSource, /return null;/);
+
+  assert.notEqual(addHandlerStart, -1, "Expected group row source to contain handleAdd");
+  assert.notEqual(addHandlerEnd, -1, "Expected group row source to contain openEditForm after handleAdd");
+  assert.ok(addHandlerStart < addHandlerEnd, "Expected handleAdd to appear before openEditForm");
+  assert.match(addHandlerSource, /const amount = parseEntryAmount\(newAmount, \(\) => setNewAmountError\(true\)\);/);
+  assert.ok(addHandlerSource.includes(addInvalidGuard), `Expected handleAdd to contain ${addInvalidGuard}`);
+  assert.ok(addHandlerSource.includes(addFetch), `Expected handleAdd to contain ${addFetch}`);
+  assertInOrder(addHandlerSource, "setNewAmountError(false);", "setIsAdding(true);");
+  assertInOrder(addHandlerSource, addInvalidGuard, "setNewAmountError(false);");
+  assertInOrder(addHandlerSource, addInvalidGuard, addFetch);
+
+  assert.notEqual(editHandlerStart, -1, "Expected group row source to contain handleEdit");
+  assert.notEqual(editHandlerEnd, -1, "Expected group row source to contain handleMoveToGroup after handleEdit");
+  assert.ok(editHandlerStart < editHandlerEnd, "Expected handleEdit to appear before handleMoveToGroup");
+  assert.match(editHandlerSource, /const amount = parseEntryAmount\(editAmount, \(\) => setEditAmountError\(true\)\);/);
+  assert.ok(editHandlerSource.includes(editInvalidGuard), `Expected handleEdit to contain ${editInvalidGuard}`);
+  assert.ok(editHandlerSource.includes(editFetch), `Expected handleEdit to contain ${editFetch}`);
+  assertInOrder(editHandlerSource, "setEditAmountError(false);", "setSavingId(entryId);");
+  assertInOrder(editHandlerSource, editInvalidGuard, "setEditAmountError(false);");
+  assertInOrder(editHandlerSource, editInvalidGuard, editFetch);
+});
+
 test("additional entry amount inputs use expression parsing and preview props", () => {
   const cardSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
   const formRowSource = readFileSync(new URL("./entry-form-row.tsx", import.meta.url), "utf8");
