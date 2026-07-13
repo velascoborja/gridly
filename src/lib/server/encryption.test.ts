@@ -5,7 +5,7 @@ import { randomBytes } from "node:crypto";
 // Set before any test runs — functions read the key lazily
 process.env.ENCRYPTION_KEY = randomBytes(32).toString("base64");
 
-import { encryptField, decryptField, isEncrypted } from "./encryption.ts";
+import { decryptField, encryptField, encryptSecret, isEncrypted } from "./encryption.ts";
 
 test("encryptField returns an enc:-prefixed string", () => {
   const result = encryptField("user@example.com");
@@ -29,6 +29,15 @@ test("encryptField is deterministic — same input produces same output", () => 
 
 test("encryptField produces different ciphertext for different inputs", () => {
   assert.notEqual(encryptField("a@example.com"), encryptField("b@example.com"));
+});
+
+test("encryptSecret uses a random IV while remaining decryptable", () => {
+  const first = encryptSecret("oauth-token");
+  const second = encryptSecret("oauth-token");
+
+  assert.notEqual(first, second);
+  assert.equal(decryptField(first), "oauth-token");
+  assert.equal(decryptField(second), "oauth-token");
 });
 
 test("isEncrypted returns true for encrypted values", () => {

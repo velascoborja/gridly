@@ -1,4 +1,4 @@
-import { createCipheriv, createDecipheriv, createHmac } from "node:crypto";
+import { createCipheriv, createDecipheriv, createHmac, randomBytes } from "node:crypto";
 
 const ENC_PREFIX = "enc:";
 
@@ -14,6 +14,14 @@ export function encryptField(plaintext: string): string {
   const key = getKey();
   const ivKey = createHmac("sha256", key).update("iv-derivation").digest();
   const iv = createHmac("sha256", ivKey).update(plaintext).digest().slice(0, 12);
+  return encryptWithIv(plaintext, key, iv);
+}
+
+export function encryptSecret(plaintext: string): string {
+  return encryptWithIv(plaintext, getKey(), randomBytes(12));
+}
+
+function encryptWithIv(plaintext: string, key: Buffer, iv: Buffer): string {
   const cipher = createCipheriv("aes-256-gcm", key, iv);
   const ciphertext = Buffer.concat([cipher.update(plaintext, "utf8"), cipher.final()]);
   const authTag = cipher.getAuthTag();

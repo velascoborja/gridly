@@ -127,3 +127,4 @@ When changing any of the features listed below, update the related documentation
 - [Keyboard Shortcuts](docs/features/keyboard-shortcuts.md): Full shortcut reference and implementation notes for the keyboard navigation system.
 - [Tags](docs/features/tags.md): Color-coded tags assignable to ungrouped expense entries, with inline creation.
 - [Help Page](docs/features/help.md): Tabbed in-app feature reference accessible from the Settings page.
+- [Application Security](docs/features/application-security.md): At-rest encryption for authentication data and global browser security headers.
