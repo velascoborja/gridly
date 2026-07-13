@@ -34,3 +34,9 @@ test("entries POST route persists isRecurring in the database insert", () => {
 test("entries POST route uses group tagId when groupId is provided", () => {
   assert.match(routeSource, /group\.tagId/);
 });
+
+test("entries POST route only accepts a tag owned by the authenticated user", () => {
+  assert.match(routeSource, /eq\(tags\.id, tagId\)/);
+  assert.match(routeSource, /eq\(tags\.userId, user\.id\)/);
+  assert.match(routeSource, /ownedTag\.length === 0/);
+});

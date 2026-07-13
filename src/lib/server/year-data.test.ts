@@ -11,3 +11,8 @@ test("year-data includes recurring expense tagIds in usedTagIds", () => {
 test("year-data resolves tag on each recurring expense", () => {
   assert.match(source, /parseMonthlyRecurringExpense\(r, resolveTag\(r\.tagId\)\)/);
 });
+
+test("year-data only hydrates tags owned by the requested user", () => {
+  assert.match(source, /eq\(tags\.userId, userId\)/);
+  assert.match(source, /inArray\(tags\.id, usedTagIds\)/);
+});

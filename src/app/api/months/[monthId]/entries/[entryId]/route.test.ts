@@ -28,3 +28,9 @@ test("entries PATCH route sets isRecurring on the updates object", () => {
 test("entries PATCH route applies destination group tagId when moving entry into a group", () => {
   assert.match(source, /updates\.tagId = group\.tagId \?\? null/);
 });
+
+test("entries PATCH route only accepts a tag owned by the authenticated user", () => {
+  assert.match(source, /eq\(tags\.id, newTagId\)/);
+  assert.match(source, /eq\(tags\.userId, user\.id\)/);
+  assert.match(source, /ownedTag\.length === 0/);
+});

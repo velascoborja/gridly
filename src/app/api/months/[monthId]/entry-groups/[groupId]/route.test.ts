@@ -20,3 +20,9 @@ test("entry-groups PATCH route can move a full group to another month in the sam
   assert.match(source, /groupUpdate\.monthId = ownedTargetMonth\.id/);
   assert.match(source, /set\(\{ monthId: targetMonth\.id \}\)/);
 });
+
+test("entry-groups PATCH route only accepts a tag owned by the authenticated user", () => {
+  assert.match(source, /eq\(tags\.id, validatedTagId\)/);
+  assert.match(source, /eq\(tags\.userId, user\.id\)/);
+  assert.match(source, /ownedTag\.length === 0/);
+});
