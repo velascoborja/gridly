@@ -10,11 +10,13 @@ import { AdditionalEntriesAverages } from "./additional-entries-averages";
 import type { YearData, YearConfig } from "@/lib/types";
 import type { AnnualKpiComparisonData } from "@/lib/annual-comparisons";
 import type { ExpectedEntry } from "./expected-entries-dialog";
+import { getExpectedEntriesStorageKey } from "@/lib/expected-entries-storage";
 
 interface Props {
   yearData: YearData;
   annualComparison?: AnnualKpiComparisonData;
   startingBalanceEditable: boolean;
+  expectedEntriesStorageNamespace: string;
   readOnly?: boolean;
   onYearDataChange?: (yearData: YearData) => void;
 }
@@ -23,6 +25,7 @@ export function AnnualView({
   yearData: initial,
   annualComparison,
   startingBalanceEditable,
+  expectedEntriesStorageNamespace,
   readOnly = false,
   onYearDataChange,
 }: Props) {
@@ -31,7 +34,10 @@ export function AnnualView({
   const [monthRows, setMonthRows] = useState(initial.months);
   const [recurringExpenses, setRecurringExpenses] = useState(initial.recurringExpenses);
   const [savingConfig, setSavingConfig] = useState(false);
-  const EXPECTED_STORAGE_KEY = `expected_entries_${initial.config.year}`;
+  const expectedStorageKey = getExpectedEntriesStorageKey(
+    expectedEntriesStorageNamespace,
+    initial.config.year
+  );
   const [expectedEntries, setExpectedEntries] = useState<ExpectedEntry[]>([]);
   const pendingSaveCountRef = useRef(0);
   const pendingSavesRef = useRef(new Set<Promise<void>>());
@@ -50,8 +56,9 @@ export function AnnualView({
   }, [initial]);
 
   useEffect(() => {
+    setExpectedEntries([]);
     try {
-      const stored = localStorage.getItem(EXPECTED_STORAGE_KEY);
+      const stored = localStorage.getItem(expectedStorageKey);
       if (stored) {
         const parsed = JSON.parse(stored) as ExpectedEntry[];
         if (Array.isArray(parsed)) setExpectedEntries(parsed);
@@ -59,19 +66,18 @@ export function AnnualView({
     } catch {
       // ignore malformed storage
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [expectedStorageKey]);
 
   const handleAddExpectedEntry = (entry: Omit<ExpectedEntry, "id">) => {
     const next = [...expectedEntries, { ...entry, id: crypto.randomUUID() }];
     setExpectedEntries(next);
-    localStorage.setItem(EXPECTED_STORAGE_KEY, JSON.stringify(next));
+    localStorage.setItem(expectedStorageKey, JSON.stringify(next));
   };
 
   const handleDeleteExpectedEntry = (id: string) => {
     const next = expectedEntries.filter((e) => e.id !== id);
     setExpectedEntries(next);
-    localStorage.setItem(EXPECTED_STORAGE_KEY, JSON.stringify(next));
+    localStorage.setItem(expectedStorageKey, JSON.stringify(next));
   };
 
   const applyConfigToMonths = (nextConfig: YearConfig, applyFromMonth: number) => {

@@ -52,6 +52,7 @@ export default async function DemoSummaryPage({
       <AnnualView
         yearData={getDemoYearData()}
         startingBalanceEditable={false}
+        expectedEntriesStorageNamespace="demo"
         readOnly
       />
     </PublicDemoShell>

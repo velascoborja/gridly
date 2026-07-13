@@ -259,7 +259,8 @@ test("savings chart highlights the current month bar by viewed year", () => {
 test("annual view reads expected entries from localStorage on mount", () => {
   const source = readFileSync(new URL("./annual-view.tsx", import.meta.url), "utf8");
 
-  assert.match(source, /expected_entries_\$\{/, "storage key should be scoped to the year");
+  assert.match(source, /expectedEntriesStorageNamespace/, "storage key should be scoped to an account or demo");
+  assert.match(source, /getExpectedEntriesStorageKey/, "storage keys should use the shared namespace helper");
   assert.match(source, /localStorage\.getItem/, "should read from localStorage on mount");
   assert.match(source, /localStorage\.setItem/, "should write to localStorage on mutation");
   assert.match(source, /expectedIncome/, "should derive expectedIncome total");

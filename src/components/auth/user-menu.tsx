@@ -9,6 +9,10 @@ import { useTransition } from "react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import {
+  clearExpectedEntriesStorage,
+  getUserExpectedEntriesNamespace,
+} from "@/lib/expected-entries-storage";
+import {
   Dialog,
   DialogClose,
   DialogContent,
@@ -20,6 +24,7 @@ import {
 } from "@/components/ui/dialog";
 
 interface Props {
+  userId: string;
   email?: string | null;
   name?: string | null;
   image?: string | null;
@@ -28,13 +33,18 @@ interface Props {
   onSettingsSelect?: () => void;
 }
 
-export function UserMenu({ email, name, image, active, variant = "header", onSettingsSelect }: Props) {
+export function UserMenu({ userId, email, name, image, active, variant = "header", onSettingsSelect }: Props) {
   const t = useTranslations("Common");
   const [pending, startTransition] = useTransition();
 
   const handleLogout = () => {
     startTransition(async () => {
       await signOut();
+      try {
+        clearExpectedEntriesStorage(localStorage, getUserExpectedEntriesNamespace(userId));
+      } catch {
+        // Storage cleanup is best-effort and must not block logout.
+      }
       window.location.href = "/";
     });
   };

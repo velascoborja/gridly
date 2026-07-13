@@ -15,6 +15,7 @@ interface Props {
   view: "overview" | "summary" | "settings" | "evolution";
   years: number[] | YearOption[];
   user: {
+    id: string;
     email?: string | null;
     name?: string | null;
     image?: string | null;
@@ -62,6 +63,7 @@ export function AppShell({
               years={years}
             />
             <UserMenu
+              userId={user.id}
               email={user.email}
               name={user.name}
               image={user.image}

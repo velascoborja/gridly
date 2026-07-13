@@ -18,6 +18,7 @@ import {
   buildYearSummaryHref,
   buildSettingsHref,
 } from "@/lib/year-routes";
+import { getUserExpectedEntriesNamespace } from "@/lib/expected-entries-storage";
 
 interface Props {
   yearData: YearData;
@@ -27,6 +28,7 @@ interface Props {
   years: number[];
   startingBalanceEditable?: boolean;
   user: {
+    id: string;
     email?: string | null;
     name?: string | null;
     image?: string | null;
@@ -257,13 +259,14 @@ export function YearPageClient({
     >
       {selectedView === "settings" ? (
         <div className="mx-auto max-w-4xl py-6">
-          <SettingsForm />
+          <SettingsForm userId={user.id} />
         </div>
       ) : selectedView === "summary" ? (
         <AnnualView
-        yearData={currentYearData}
-        annualComparison={annualComparison}
-        startingBalanceEditable={startingBalanceEditable}
+          yearData={currentYearData}
+          annualComparison={annualComparison}
+          startingBalanceEditable={startingBalanceEditable}
+          expectedEntriesStorageNamespace={getUserExpectedEntriesNamespace(user.id)}
           onYearDataChange={setCurrentYearData}
         />
       ) : (

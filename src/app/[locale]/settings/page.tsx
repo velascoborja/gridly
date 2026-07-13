@@ -22,7 +22,7 @@ export default async function SettingsPage() {
       user={user}
     >
       <div className="mx-auto max-w-4xl py-6">
-        <SettingsForm />
+        <SettingsForm userId={user.id} />
       </div>
     </AppShell>
   );

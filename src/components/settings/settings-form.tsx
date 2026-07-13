@@ -28,10 +28,18 @@ import { Globe, Trash2, AlertCircle } from "lucide-react";
 import { ShortcutsCard } from "./shortcuts-card";
 import { TagManagerCard } from "./tag-manager-card";
 import { HelpCard } from "./help-card";
+import {
+  clearExpectedEntriesStorage,
+  getUserExpectedEntriesNamespace,
+} from "@/lib/expected-entries-storage";
 
 type DeleteConfirmationStep = "impact" | "typed";
 
-export function SettingsForm() {
+interface Props {
+  userId: string;
+}
+
+export function SettingsForm({ userId }: Props) {
   const t = useTranslations("Settings");
   const common = useTranslations("Common");
   const locale = useLocale();
@@ -92,6 +100,11 @@ export function SettingsForm() {
         throw new Error(`Failed to delete account: ${res.statusText}`);
       }
 
+      try {
+        clearExpectedEntriesStorage(localStorage, getUserExpectedEntriesNamespace(userId));
+      } catch {
+        // Storage cleanup is best-effort after the account has been deleted.
+      }
       window.location.assign(`/${locale}?accountDeleted=1`);
     } catch (err) {
       console.error("Failed to delete account:", err);

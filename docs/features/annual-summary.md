@@ -8,7 +8,7 @@ The main card shows the final balance and total savings for the selected year.
 
 - **Final balance:** December ending balance, adjusted by expected entries when any are present.
 - **Total savings:** Sum of savings across months with activity, adjusted by expected entries when any are present.
-- **Expected entries:** Stored in browser local storage per year and displayed as estimate annotations in the hero card.
+- **Expected entries:** Stored in browser local storage per account and year and displayed as estimate annotations in the hero card. Public demo projections use a separate namespace, and account projection keys are cleared after logout or account deletion.
 
 ## Comparison Lines
 

@@ -34,7 +34,7 @@ The year summary page displays average additional entries alongside the Balance 
 
 These statistics appear as two stat cards on the year summary page, providing a quick view of typical monthly variable transactions.
 
-The annual KPI header also includes an **Expected Entries** dialog for temporary, local-only income or expense estimates that adjust the summary projection without writing to the database. The dialog stores entries in year-scoped `localStorage`; when no expected entries exist, it renders an explicit empty state with copy pointing users to the add form instead of placeholder skeleton rows, so the empty state is not mistaken for loading.
+The annual KPI header also includes an **Expected Entries** dialog for temporary, local-only income or expense estimates that adjust the summary projection without writing to the database. The dialog stores entries in account-and-year-scoped `localStorage`, with a separate namespace for public demo data. Logout and account deletion clear the current account's keys as well as obsolete unscoped keys. When no expected entries exist, the dialog renders an explicit empty state with copy pointing users to the add form instead of placeholder skeleton rows, so the empty state is not mistaken for loading.
 
 **Relevant Code:**
 - `avgAdditionalEntriesPerMonth()` in `src/lib/additional-entries.ts`: Calculates the yearly average for a given entry type (includes grouped entries for expense type).
