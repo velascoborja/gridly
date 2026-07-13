@@ -59,7 +59,10 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
     ...allRecurringExpenses.map((e) => e.tagId).filter((id): id is number => id !== null),
   ])];
   const tagRows = usedTagIds.length > 0
-    ? await db.select().from(tags).where(inArray(tags.id, usedTagIds))
+    ? await db
+        .select()
+        .from(tags)
+        .where(and(eq(tags.userId, userId), inArray(tags.id, usedTagIds)))
     : [];
   const tagsById = new Map<number, Tag>(
     tagRows.map((t) => [t.id, { id: t.id, name: t.name, color: t.color }])

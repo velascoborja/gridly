@@ -74,6 +74,8 @@ Both `POST /api/months/[monthId]/entries` (create) and `PATCH /api/months/[month
 
 `PATCH /api/months/[monthId]/entry-groups/[groupId]` (edit group) accepts an optional `tagId?: number | null`. Assigning a tag to a group automatically updates all entries within that group to the same tag.
 
+Every non-null `tagId` supplied to these endpoints is resolved against both `tags.id` and the authenticated user's `tags.userId` before any write. Invalid or unowned IDs return 404, preventing tags from being attached across accounts without revealing whether another user's tag exists.
+
 ### Recurring expense endpoint
 
 `PATCH /api/months/[monthId]/recurring-expenses/[entryId]` also accepts an optional `tagId?: number | null`. When present:
@@ -89,7 +91,7 @@ The UI always shows a confirmation dialog before applying a tag change on a recu
 
 ## Server-Side Data Loading
 
-`src/lib/server/year-data.ts` resolves tags when loading year data: after fetching all entries, groups, and recurring expenses, it collects the unique non-null `tagId` values from all three sources into a single `usedTagIds` set, runs a single `inArray` query against the `tags` table, and builds a `Map<number, Tag>`. Each entry, group, and recurring expense's `tag` field is populated from this map via `resolveTag` (or `null`). No additional client-side fetches are needed for display.
+`src/lib/server/year-data.ts` resolves tags when loading year data: after fetching all entries, groups, and recurring expenses, it collects the unique non-null `tagId` values from all three sources into a single `usedTagIds` set, runs a single query against the `tags` table constrained by both `tags.userId` and `inArray(tags.id, usedTagIds)`, and builds a `Map<number, Tag>`. Each entry, group, and recurring expense's `tag` field is populated from this map via `resolveTag` (or `null`). No additional client-side fetches are needed for display, and a stale or inconsistent cross-user foreign key cannot hydrate another user's tag metadata.
 
 ## Component Architecture
 
@@ -173,6 +175,7 @@ All Settings tag-management keys live under `Settings.tags` in `messages/es.json
 ## Error Handling
 
 - `POST /api/tags` returns 400 if `name` is empty or `color` is not a valid palette key.
+- Entry, group, and recurring-expense assignment endpoints return 404 when a non-null `tagId` is malformed or is not owned by the authenticated user.
 - If the tags fetch fails on mount, the tag action button is hidden for that session (no hard error shown).
 - Tag assignment is always optional — saving an entry without a tag is valid.
 - Settings tag management shows explicit localized errors for failed loading, saving, and deletion. Save is disabled for unchanged rows and blank names; API validation remains authoritative.

@@ -1,6 +1,6 @@
 import { db } from "@/db";
-import { additionalEntryGroups, additionalEntries } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { additionalEntryGroups, additionalEntries, tags } from "@/db/schema";
+import { and, eq } from "drizzle-orm";
 import { getSessionUser } from "@/lib/server/session";
 import { getOwnedMonth, getOwnedGroup } from "@/lib/server/ownership";
 import { getYearNumberForYearId, propagateYearCarryOver } from "@/lib/server/year-carry-over";
@@ -50,8 +50,23 @@ export async function PATCH(
     groupUpdate.monthId = ownedTargetMonth.id;
   }
 
-  if ("tagId" in body) {
-    groupUpdate.tagId = body.tagId === null ? null : (typeof body.tagId === "number" ? body.tagId : undefined);
+  let newTagId: number | null | undefined;
+  if (body.tagId !== undefined) {
+    const validatedTagId: number | null = body.tagId;
+    if (validatedTagId !== null && !(Number.isInteger(validatedTagId) && validatedTagId > 0)) {
+      return Response.json({ error: "Tag not found" }, { status: 404 });
+    }
+    if (validatedTagId !== null) {
+      const ownedTag = await db
+        .select({ id: tags.id })
+        .from(tags)
+        .where(and(eq(tags.id, validatedTagId), eq(tags.userId, user.id)));
+      if (ownedTag.length === 0) {
+        return Response.json({ error: "Tag not found" }, { status: 404 });
+      }
+    }
+    newTagId = validatedTagId;
+    groupUpdate.tagId = validatedTagId;
   }
 
   const [updated] = await db
@@ -67,14 +82,11 @@ export async function PATCH(
       .where(eq(additionalEntries.groupId, group.id));
   }
 
-  if ("tagId" in body) {
-    const newTagId = body.tagId === null ? null : (typeof body.tagId === "number" ? body.tagId : undefined);
-    if (newTagId !== undefined) {
-      await db
-        .update(additionalEntries)
-        .set({ tagId: newTagId })
-        .where(eq(additionalEntries.groupId, group.id));
-    }
+  if (newTagId !== undefined) {
+    await db
+      .update(additionalEntries)
+      .set({ tagId: newTagId })
+      .where(eq(additionalEntries.groupId, group.id));
   }
 
   const yearNumber = await getYearNumberForYearId(month.yearId);

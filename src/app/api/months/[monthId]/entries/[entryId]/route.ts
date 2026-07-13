@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { additionalEntries, additionalEntryGroups } from "@/db/schema";
+import { additionalEntries, additionalEntryGroups, tags } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { getYearNumberForYearId, propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getSessionUser } from "@/lib/server/session";
@@ -70,7 +70,20 @@ export async function PATCH(
   }
 
   if (body.tagId !== undefined && body.groupId === undefined) {
-    updates.tagId = body.tagId === null ? null : (typeof body.tagId === "number" ? body.tagId : undefined);
+    const newTagId: number | null = body.tagId;
+    if (newTagId !== null && !(Number.isInteger(newTagId) && newTagId > 0)) {
+      return Response.json({ error: "Tag not found" }, { status: 404 });
+    }
+    if (newTagId !== null) {
+      const ownedTag = await db
+        .select({ id: tags.id })
+        .from(tags)
+        .where(and(eq(tags.id, newTagId), eq(tags.userId, user.id)));
+      if (ownedTag.length === 0) {
+        return Response.json({ error: "Tag not found" }, { status: 404 });
+      }
+    }
+    updates.tagId = newTagId;
   }
 
   const [updated] = await db

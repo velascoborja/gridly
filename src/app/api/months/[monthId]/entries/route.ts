@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { additionalEntries, additionalEntryGroups } from "@/db/schema";
+import { additionalEntries, additionalEntryGroups, tags } from "@/db/schema";
 import { getYearNumberForYearId, propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getSessionUser } from "@/lib/server/session";
 import { getOwnedMonth } from "@/lib/server/ownership";
@@ -31,7 +31,7 @@ export async function POST(
     return Response.json({ error: "Month not found" }, { status: 404 });
   }
 
-  let entryTagId: number | null = typeof tagId === "number" ? tagId : null;
+  let entryTagId: number | null = null;
 
   if (groupId != null) {
     const group = await db.query.additionalEntryGroups.findFirst({
@@ -44,6 +44,18 @@ export async function POST(
       return Response.json({ error: "Group not found" }, { status: 404 });
     }
     entryTagId = group.tagId ?? null;
+  } else if (tagId !== undefined && tagId !== null) {
+    if (!(Number.isInteger(tagId) && tagId > 0)) {
+      return Response.json({ error: "Tag not found" }, { status: 404 });
+    }
+    const ownedTag = await db
+      .select({ id: tags.id })
+      .from(tags)
+      .where(and(eq(tags.id, tagId), eq(tags.userId, user.id)));
+    if (ownedTag.length === 0) {
+      return Response.json({ error: "Tag not found" }, { status: 404 });
+    }
+    entryTagId = tagId;
   }
 
   const [entry] = await db.insert(additionalEntries).values({
