@@ -494,11 +494,31 @@ test("additional expense group moves use a compact edit-row menu instead of sele
   assert.match(enMessages, /"moveToGroup": "Move to group"/);
 });
 
-test("additional expense group header keeps trailing controls tighter on mobile", () => {
+test("additional expense group keeps compact mobile actions above expenses without a duplicate add trigger", () => {
   const groupRowSource = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");
+  const entriesStart = groupRowSource.indexOf("{group.entries.map((entry) =>");
+  const mobileActionsStart = groupRowSource.indexOf("{/* Mobile group actions */}");
 
   assert.match(groupRowSource, /"flex cursor-pointer select-none items-center gap-1 px-2\.5 py-1\.5 sm:gap-2"/);
-  assert.match(groupRowSource, /className="flex shrink-0 items-center gap-1 h-9"/);
+  assert.match(groupRowSource, /className="shrink-0 rounded-full bg-muted\/40[^\n]+"/);
+  assert.match(groupRowSource, /className="hidden h-9 shrink-0 items-center gap-1 sm:flex"/);
+  assert.notEqual(entriesStart, -1);
+  assert.notEqual(mobileActionsStart, -1);
+  assert.ok(mobileActionsStart < entriesStart, "mobile actions should render before the grouped expenses");
+  assert.match(
+    groupRowSource,
+    /className="flex w-full flex-wrap items-center justify-between gap-1\.5[^\n]+px-3[^\n]+sm:hidden"/
+  );
+  assert.match(groupRowSource, /className="inline-flex h-7 max-w-32 items-center/);
+  assert.doesNotMatch(groupRowSource, /groupExpenseCount/);
+  assert.match(groupRowSource, /<TagIcon className="h-3 w-3" \/>/);
+  assert.match(groupRowSource, /<span className="hidden min-\[360px\]:inline">\{t\("moveToMonth"\)\}<\/span>/);
+  assert.match(groupRowSource, /onClick=\{\(\) => setAddingFormOpen\(true\)\}/);
+  assert.match(groupRowSource, /disabled=\{addingFormOpen\}/);
+  assert.match(
+    groupRowSource,
+    /className="hidden items-center gap-1\.5 rounded-md[^\n]+sm:inline-flex"/
+  );
 });
 
 test("additional expense group delete loading action fits the compact dialog footer", () => {

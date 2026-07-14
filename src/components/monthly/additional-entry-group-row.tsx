@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { CalendarArrowUp, ChevronRight, FolderInput, Loader2, Plus, Trash2 } from "lucide-react";
+import { CalendarArrowUp, ChevronRight, FolderInput, Loader2, Plus, Tag as TagIcon, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -380,7 +380,7 @@ export function AdditionalEntryGroupRow({
 
         {!readOnly && (
           <div
-            className="flex shrink-0 items-center gap-1 h-9"
+            className="hidden h-9 shrink-0 items-center gap-1 sm:flex"
             onClick={(e) => e.stopPropagation()}
           >
             <TagPicker
@@ -526,6 +526,117 @@ export function AdditionalEntryGroupRow({
       >
         <div className={cn("overflow-hidden transition-opacity duration-200", collapsed ? "opacity-0" : "opacity-100")}>
         <div className="border-t border-primary/10 bg-background/60 px-2 py-1.5 flex flex-col gap-1.5">
+          {/* Mobile group actions */}
+          {!readOnly ? (
+            <div
+              className="flex w-full flex-wrap items-center justify-between gap-1.5 rounded-lg border border-primary/10 bg-primary/[0.035] px-3 py-1.5 sm:hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <TagPicker
+                tags={tags}
+                value={group.tagId}
+                onChange={handleGroupTagChange}
+                onCreateTag={onCreateTag}
+                disabled={isSavingTag}
+                isLoading={isSavingTag}
+                customTrigger={
+                  displayGroupTag && TAG_COLORS[displayGroupTag.color] ? (
+                    <button
+                      type="button"
+                      className="inline-flex h-7 max-w-32 items-center gap-1.5 rounded border px-2 text-[11px] font-medium transition-colors hover:opacity-80 disabled:opacity-50"
+                      style={{
+                        background: TAG_COLORS[displayGroupTag.color].bg,
+                        borderColor: TAG_COLORS[displayGroupTag.color].border,
+                        color: TAG_COLORS[displayGroupTag.color].text,
+                      }}
+                      disabled={isSavingTag}
+                    >
+                      {isSavingTag ? (
+                        <Loader2 className="h-3 w-3 shrink-0 animate-spin" />
+                      ) : (
+                        <span
+                          className="h-2 w-2 shrink-0 rounded-full"
+                          style={{ background: TAG_COLORS[displayGroupTag.color].text }}
+                        />
+                      )}
+                      <span className="truncate">{displayGroupTag.name}</span>
+                    </button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      type="button"
+                      className="h-7 gap-1.5 px-2 text-[11px] text-muted-foreground hover:text-primary"
+                      disabled={isSavingTag}
+                    >
+                      {isSavingTag ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <TagIcon className="h-3 w-3" />
+                      )}
+                      {t("tagButton")}
+                    </Button>
+                  )
+                }
+              />
+
+              {onGroupMoveToMonth && moveTargets.length > 0 ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger
+                    render={
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        type="button"
+                        className="h-7 gap-1.5 px-2 text-[11px] text-muted-foreground hover:text-primary"
+                        aria-label={`${t("moveGroupToMonth")} ${group.label}`}
+                        disabled={!canMoveGroup}
+                      >
+                        {isMovingGroup ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <CalendarArrowUp className="h-3 w-3" />
+                        )}
+                        <span className="hidden min-[360px]:inline">{t("moveToMonth")}</span>
+                      </Button>
+                    }
+                  />
+                  <DropdownMenuContent align="end" className="w-52 max-w-[calc(100vw-2rem)]">
+                    <DropdownMenuGroup>
+                      <DropdownMenuLabel>{t("moveGroupToMonth")}</DropdownMenuLabel>
+                      <DropdownMenuRadioGroup
+                        value={String(monthId)}
+                        onValueChange={(value) => {
+                          const targetMonthId = parseInt(value, 10);
+                          if (targetMonthId === monthId || Number.isNaN(targetMonthId)) return;
+                          onGroupMoveToMonth(group, targetMonthId);
+                        }}
+                      >
+                        {moveTargets.map((target) => (
+                          <DropdownMenuRadioItem key={target.id} value={String(target.id)}>
+                            <span className="truncate capitalize">{formatMonthName(target.month, locale)}</span>
+                          </DropdownMenuRadioItem>
+                        ))}
+                      </DropdownMenuRadioGroup>
+                    </DropdownMenuGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : null}
+
+              <Button
+                size="sm"
+                variant="ghost"
+                type="button"
+                className="h-7 gap-1.5 px-2 text-[11px] text-muted-foreground hover:text-primary"
+                onClick={() => setAddingFormOpen(true)}
+                disabled={addingFormOpen}
+              >
+                <Plus className="h-3 w-3" />
+                {t("addToGroup")}
+              </Button>
+            </div>
+          ) : null}
+
           {group.entries.map((entry) =>
             !readOnly && editingId === entry.id ? (
               <div key={entry.id} className="rounded-xl border border-border/70 bg-muted/20 p-1.5">
@@ -732,7 +843,7 @@ export function AdditionalEntryGroupRow({
             </div>
           ) : !readOnly ? (
             <button
-              className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground"
+              className="hidden items-center gap-1.5 rounded-md px-1.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground sm:inline-flex"
               onClick={() => setAddingFormOpen(true)}
               type="button"
             >

@@ -77,8 +77,10 @@ Two tables are involved:
 
 ### Setting a group tag
 - The group header shows a tag icon button (a `TagPicker`) between the entry count and the total amount.
-- On mobile, the group header uses tighter spacing between trailing controls so longer group names keep more horizontal room.
-- When a tag is assigned, a colored chip is also shown in the header.
+- The entry count remains visible in the group header on every viewport size.
+- On mobile, the tag picker and move-to-month menu are hidden from the header so longer group names have more horizontal room. They appear in a compact action row above the expanded group's expense entries, distributed with `space-between` and a small horizontal inset; the selected tag name and the move action label are shown when space allows.
+- The mobile action row is also the only visible "Add entry to group" trigger on mobile. It opens the existing local add-entry form immediately and disables itself while that form is open; the standalone trigger below the entries remains desktop-only.
+- When a tag is assigned, a colored chip is shown in the desktop header and the mobile action row.
 - Selecting a tag sends `PATCH /api/months/[monthId]/entry-groups/[groupId]` with `{ label, tagId }` and batch-updates all entries in the group to the same tag.
 - New entries added to the group automatically receive the group's tag.
 - Entries moved into the group receive the destination group's tag.
