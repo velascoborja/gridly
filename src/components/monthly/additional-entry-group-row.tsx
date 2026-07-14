@@ -529,7 +529,7 @@ export function AdditionalEntryGroupRow({
           {/* Mobile group actions */}
           {!readOnly ? (
             <div
-              className="flex w-full flex-wrap items-center justify-between gap-1.5 rounded-lg border border-primary/10 bg-primary/[0.035] px-3 py-1.5 sm:hidden"
+              className="flex w-full flex-nowrap items-center justify-between gap-1.5 rounded-lg border border-primary/10 bg-primary/[0.035] px-3 py-1.5 sm:hidden"
               onClick={(e) => e.stopPropagation()}
             >
               <TagPicker
@@ -543,7 +543,7 @@ export function AdditionalEntryGroupRow({
                   displayGroupTag && TAG_COLORS[displayGroupTag.color] ? (
                     <button
                       type="button"
-                      className="inline-flex h-7 max-w-32 items-center gap-1.5 rounded border px-2 text-[11px] font-medium transition-colors hover:opacity-80 disabled:opacity-50"
+                      className="inline-flex h-7 max-w-24 items-center gap-1.5 rounded border px-1.5 text-[11px] font-medium transition-colors hover:opacity-80 disabled:opacity-50 min-[480px]:max-w-32 min-[480px]:px-2"
                       style={{
                         background: TAG_COLORS[displayGroupTag.color].bg,
                         borderColor: TAG_COLORS[displayGroupTag.color].border,
@@ -555,7 +555,7 @@ export function AdditionalEntryGroupRow({
                         <Loader2 className="h-3 w-3 shrink-0 animate-spin" />
                       ) : (
                         <span
-                          className="h-2 w-2 shrink-0 rounded-full"
+                          className="hidden h-2 w-2 shrink-0 rounded-full min-[480px]:inline-block"
                           style={{ background: TAG_COLORS[displayGroupTag.color].text }}
                         />
                       )}
@@ -566,13 +566,13 @@ export function AdditionalEntryGroupRow({
                       size="sm"
                       variant="ghost"
                       type="button"
-                      className="h-7 gap-1.5 px-2 text-[11px] text-muted-foreground hover:text-primary"
+                      className="h-7 gap-1.5 whitespace-nowrap px-1.5 text-[11px] text-muted-foreground hover:text-primary min-[480px]:px-2"
                       disabled={isSavingTag}
                     >
                       {isSavingTag ? (
                         <Loader2 className="h-3 w-3 animate-spin" />
                       ) : (
-                        <TagIcon className="h-3 w-3" />
+                        <TagIcon className="hidden h-3 w-3 min-[480px]:block" />
                       )}
                       {t("tagButton")}
                     </Button>
@@ -588,16 +588,16 @@ export function AdditionalEntryGroupRow({
                         size="sm"
                         variant="ghost"
                         type="button"
-                        className="h-7 gap-1.5 px-2 text-[11px] text-muted-foreground hover:text-primary"
+                        className="h-7 gap-1.5 whitespace-nowrap px-1.5 text-[11px] text-muted-foreground hover:text-primary min-[480px]:px-2"
                         aria-label={`${t("moveGroupToMonth")} ${group.label}`}
                         disabled={!canMoveGroup}
                       >
                         {isMovingGroup ? (
                           <Loader2 className="h-3 w-3 animate-spin" />
                         ) : (
-                          <CalendarArrowUp className="h-3 w-3" />
+                          <CalendarArrowUp className="hidden h-3 w-3 min-[480px]:block" />
                         )}
-                        <span className="hidden min-[360px]:inline">{t("moveToMonth")}</span>
+                        <span>{t("moveToMonth")}</span>
                       </Button>
                     }
                   />
@@ -627,12 +627,13 @@ export function AdditionalEntryGroupRow({
                 size="sm"
                 variant="ghost"
                 type="button"
-                className="h-7 gap-1.5 px-2 text-[11px] text-muted-foreground hover:text-primary"
+                className="h-7 gap-1.5 whitespace-nowrap px-1.5 text-[11px] text-muted-foreground hover:text-primary min-[480px]:px-2"
                 onClick={() => setAddingFormOpen(true)}
                 disabled={addingFormOpen}
               >
-                <Plus className="h-3 w-3" />
-                {t("addToGroup")}
+                <Plus className="hidden h-3 w-3 min-[480px]:block" />
+                <span className="min-[480px]:hidden">{t("add")}</span>
+                <span className="hidden min-[480px]:inline">{t("addToGroup")}</span>
               </Button>
             </div>
           ) : null}
