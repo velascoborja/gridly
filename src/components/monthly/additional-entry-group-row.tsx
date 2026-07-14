@@ -543,7 +543,7 @@ export function AdditionalEntryGroupRow({
                   displayGroupTag && TAG_COLORS[displayGroupTag.color] ? (
                     <button
                       type="button"
-                      className="inline-flex h-7 w-7 shrink-0 items-center justify-center gap-1.5 rounded border px-0 text-[11px] font-medium transition-colors hover:opacity-80 disabled:opacity-50 min-[480px]:w-auto min-[480px]:max-w-32 min-[480px]:justify-start min-[480px]:px-2"
+                      className="inline-flex h-7 max-w-32 shrink-0 items-center justify-start gap-1.5 rounded border px-2 text-[11px] font-medium transition-colors hover:opacity-80 disabled:opacity-50"
                       style={{
                         background: TAG_COLORS[displayGroupTag.color].bg,
                         borderColor: TAG_COLORS[displayGroupTag.color].border,
@@ -564,14 +564,14 @@ export function AdditionalEntryGroupRow({
                           />
                         </>
                       )}
-                      <span className="hidden truncate min-[480px]:inline">{displayGroupTag.name}</span>
+                      <span className="truncate">{displayGroupTag.name}</span>
                     </button>
                   ) : (
                     <Button
                       size="sm"
                       variant="ghost"
                       type="button"
-                      className="h-7 w-7 shrink-0 gap-1.5 whitespace-nowrap px-0 text-[11px] text-muted-foreground hover:text-primary min-[480px]:w-auto min-[480px]:px-2"
+                      className="h-7 max-w-32 shrink-0 gap-1.5 whitespace-nowrap px-2 text-[11px] text-muted-foreground hover:text-primary"
                       disabled={isSavingTag}
                       aria-label={t("tagButton")}
                       title={t("tagButton")}
@@ -581,7 +581,7 @@ export function AdditionalEntryGroupRow({
                       ) : (
                         <TagIcon className="h-3 w-3" />
                       )}
-                      <span className="hidden min-[480px]:inline">{t("tagButton")}</span>
+                      <span className="truncate">{t("tagButton")}</span>
                     </Button>
                   )
                 }

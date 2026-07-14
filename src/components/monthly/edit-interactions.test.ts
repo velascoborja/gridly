@@ -509,10 +509,12 @@ test("additional expense group keeps compact mobile actions above expenses witho
     groupRowSource,
     /className="flex w-full flex-nowrap items-center justify-start gap-1[^\n]+px-2[^\n]+sm:hidden"/
   );
-  assert.match(groupRowSource, /className="inline-flex h-7 w-7 shrink-0 items-center justify-center[^\n]+min-\[480px\]:max-w-32/);
+  assert.match(groupRowSource, /className="inline-flex h-7 max-w-32 shrink-0 items-center justify-start/);
   assert.doesNotMatch(groupRowSource, /groupExpenseCount/);
   assert.match(groupRowSource, /<TagIcon className="h-3 w-3 min-\[480px\]:hidden" \/>/);
   assert.match(groupRowSource, /<TagIcon className="h-3 w-3" \/>/);
+  assert.match(groupRowSource, /<span className="truncate">\{displayGroupTag\.name\}<\/span>/);
+  assert.match(groupRowSource, /<span className="truncate">\{t\("tagButton"\)\}<\/span>/);
   assert.match(groupRowSource, /<CalendarArrowUp className="h-3 w-3" \/>/);
   assert.match(groupRowSource, /<Plus className="h-3 w-3" \/>/);
   assert.match(groupRowSource, /aria-label=\{t\("addToGroup"\)\}/);
