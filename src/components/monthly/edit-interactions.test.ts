@@ -507,15 +507,17 @@ test("additional expense group keeps compact mobile actions above expenses witho
   assert.ok(mobileActionsStart < entriesStart, "mobile actions should render before the grouped expenses");
   assert.match(
     groupRowSource,
-    /className="flex w-full flex-nowrap items-center justify-between gap-1\.5[^\n]+px-3[^\n]+sm:hidden"/
+    /className="flex w-full flex-nowrap items-center justify-start gap-1[^\n]+px-2[^\n]+sm:hidden"/
   );
-  assert.match(groupRowSource, /className="inline-flex h-7 max-w-24 items-center[^\n]+min-\[480px\]:max-w-32/);
+  assert.match(groupRowSource, /className="inline-flex h-7 w-7 shrink-0 items-center justify-center[^\n]+min-\[480px\]:max-w-32/);
   assert.doesNotMatch(groupRowSource, /groupExpenseCount/);
-  assert.match(groupRowSource, /<TagIcon className="hidden h-3 w-3 min-\[480px\]:block" \/>/);
-  assert.match(groupRowSource, /<CalendarArrowUp className="hidden h-3 w-3 min-\[480px\]:block" \/>/);
-  assert.match(groupRowSource, /<span>\{t\("moveToMonth"\)\}<\/span>/);
-  assert.match(groupRowSource, /<Plus className="hidden h-3 w-3 min-\[480px\]:block" \/>/);
-  assert.match(groupRowSource, /<span className="min-\[480px\]:hidden">\{t\("add"\)\}<\/span>/);
+  assert.match(groupRowSource, /<TagIcon className="h-3 w-3 min-\[480px\]:hidden" \/>/);
+  assert.match(groupRowSource, /<TagIcon className="h-3 w-3" \/>/);
+  assert.match(groupRowSource, /<CalendarArrowUp className="h-3 w-3" \/>/);
+  assert.match(groupRowSource, /<Plus className="h-3 w-3" \/>/);
+  assert.match(groupRowSource, /aria-label=\{t\("addToGroup"\)\}/);
+  assert.match(groupRowSource, /title=\{t\("addToGroup"\)\}/);
+  assert.match(groupRowSource, /<span className="hidden min-\[480px\]:inline">\{t\("moveToMonth"\)\}<\/span>/);
   assert.match(groupRowSource, /<span className="hidden min-\[480px\]:inline">\{t\("addToGroup"\)\}<\/span>/);
   assert.match(groupRowSource, /onClick=\{\(\) => setAddingFormOpen\(true\)\}/);
   assert.match(groupRowSource, /disabled=\{addingFormOpen\}/);
