@@ -39,15 +39,15 @@ test("demo year data contains 12 chained months with extra pays in June and Dece
   assert.deepEqual(data.recurringExpenses.map((entry) => entry.label), ["Alquiler", "Gimnasio"]);
   assert.deepEqual(data.months[0].recurringExpenses.map((entry) => entry.label), ["Alquiler", "Gimnasio"]);
   assert.deepEqual(data.months[0].additionalExpenses, [
-    { id: 101, monthId: 1, type: "expense", label: "Seguro anual", amount: 320, isRecurring: false, tagId: null, tag: null },
-    { id: 102, monthId: 1, type: "expense", label: "Cena Reyes", amount: 85, isRecurring: false, tagId: null, tag: null },
+    { id: 101, monthId: 1, type: "expense", label: "Seguro anual", amount: 320, isRecurring: false, isCompleted: false, tagId: null, tag: null },
+    { id: 102, monthId: 1, type: "expense", label: "Cena Reyes", amount: 85, isRecurring: false, isCompleted: false, tagId: null, tag: null },
   ]);
   assert.deepEqual(data.months[3].additionalIncomes, [
-    { id: 401, monthId: 4, type: "income", label: "Devolución IRPF", amount: 540, isRecurring: false, tagId: null, tag: null },
-    { id: 404, monthId: 4, type: "income", label: "Venta Wallapop", amount: 35, isRecurring: false, tagId: null, tag: null },
+    { id: 401, monthId: 4, type: "income", label: "Devolución IRPF", amount: 540, isRecurring: false, isCompleted: false, tagId: null, tag: null },
+    { id: 404, monthId: 4, type: "income", label: "Venta Wallapop", amount: 35, isRecurring: false, isCompleted: false, tagId: null, tag: null },
   ]);
   assert.deepEqual(data.months[8].additionalExpenses, [
-    { id: 901, monthId: 9, type: "expense", label: "Material oficina/estudios", amount: 85, isRecurring: false, tagId: null, tag: null },
-    { id: 902, monthId: 9, type: "expense", label: "Suscripción gimnasio", amount: 45, isRecurring: false, tagId: null, tag: null },
+    { id: 901, monthId: 9, type: "expense", label: "Material oficina/estudios", amount: 85, isRecurring: false, isCompleted: false, tagId: null, tag: null },
+    { id: 902, monthId: 9, type: "expense", label: "Suscripción gimnasio", amount: 45, isRecurring: false, isCompleted: false, tagId: null, tag: null },
   ]);
   });

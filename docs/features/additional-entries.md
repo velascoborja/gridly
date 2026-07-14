@@ -12,6 +12,7 @@ Each entry consists of:
 - `label`: A description of the transaction.
 - `amount`: The financial value (stored as numeric in DB).
 - `type`: Either `income` or `expense`.
+- `isCompleted`: Whether the expected transaction has occurred and is locked from further mutation.
 
 ## UI & Implementation
 
@@ -23,6 +24,7 @@ Each entry consists of:
     - `PATCH /api/months/[monthId]/entries/[entryId]`: Edit an entry label/amount or move it to another month by sending `monthId`.
     - `DELETE /api/months/[monthId]/entries/[entryId]`: Remove an entry.
 - **Moving Entries:** In editable monthly views, additional income and expense rows can be moved to another month in the same year from the entry edit row's "Move to month" menu. Desktop users can also drag an entry onto another month in the month strip. Moving changes the entry's owning month only; it does not copy or duplicate the entry.
+- **Completion lock:** Income and expense rows expose the animated lock only inside their contextual editor, after the user opens the row; the control is not shown in the resting list. `EntryFormRow` renders it through `completionAction` in the shared action row, between the recurring and movement controls on both desktop and mobile, using the same `icon-sm` sizing as adjacent action buttons. Completed rows remain openable so the same mounted control can animate and reopen them, while their financial fields stay disabled, Save and mutation actions are hidden, and the Cancel action changes to Exit so the user can close the expanded row. Completing a row updates local state immediately and persists through the existing entry `PATCH` endpoint. A completed row is visually muted and cannot be edited, tagged, moved, regrouped, deleted, or dragged until it is reopened. The API enforces the same rule and returns `409 { error: "completed_locked" }` for blocked mutations.
 - **Moving Expense Groups:** A grouped expense collection can be moved as a whole to another month in the same year from the group header's "Move group to month" menu or by dragging the group header onto the target month. The group and all child entries are moved together.
 - **Integration:** The sum of all additional income and expenses is automatically factored into the `totalIncome` and `totalExpenses` calculations in `src/lib/calculations.ts`.
 
@@ -56,6 +58,7 @@ Users can group related additional expenses within a month (e.g., "Viaje a Roma"
 - `PATCH /api/months/[monthId]/entry-groups/[groupId]` — rename `{ label }`, tag `{ label, tagId }`, or move the full group with `{ monthId }`.
 - `DELETE /api/months/[monthId]/entry-groups/[groupId]` — delete group and all its entries (DB cascade).
 - `PATCH /api/months/[monthId]/entries/[entryId]` — accepts `groupId: number | null` to move an entry into or out of a group.
+- Both item `PATCH` endpoints accept `{ isCompleted: boolean }`. Reopening must be sent as the only mutation when the current resource is completed.
 
 ### UI
 - **`AdditionalEntryGroupRow`** (`src/components/monthly/additional-entry-group-row.tsx`): self-contained collapsed/expanded group row. Owns its own UI state (collapsed, rename, add-entry form, per-entry edit/delete).
@@ -77,3 +80,4 @@ Any **ungrouped** additional entry (income or expense) can be marked as recurrin
 - **Amount carry-over:** The amount is read from the source entry at the moment the new year is created (not fixed at time of marking).
 - **Schema:** `additionalEntries.isRecurring` (`boolean NOT NULL DEFAULT false` in `src/db/schema.ts`).
 - **Year creation hook:** Implemented as step 4b in `createAndPrefillYear` in `src/lib/server/actions/years.ts`. Runs after monthly recurring expenses are linked and before carry-over propagation.
+- **Completion reset:** Recurring entries copied into a newly created year always start with `isCompleted = false`, even when the source entry was completed.

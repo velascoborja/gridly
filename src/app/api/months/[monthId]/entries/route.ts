@@ -43,6 +43,9 @@ export async function POST(
     if (!group) {
       return Response.json({ error: "Group not found" }, { status: 404 });
     }
+    if (group.isCompleted) {
+      return Response.json({ error: "completed_locked" }, { status: 409 });
+    }
     entryTagId = group.tagId ?? null;
   } else if (tagId !== undefined && tagId !== null) {
     if (!(Number.isInteger(tagId) && tagId > 0)) {
@@ -65,6 +68,7 @@ export async function POST(
     amount: String(amount),
     groupId: groupId ?? null,
     isRecurring: isRecurring === true,
+    isCompleted: false,
     tagId: entryTagId,
   }).returning();
 

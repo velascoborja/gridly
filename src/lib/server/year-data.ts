@@ -100,6 +100,7 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
       id: group.id,
       monthId: group.monthId,
       label: group.label,
+      isCompleted: group.isCompleted,
       tagId: group.tagId ?? null,
       tag: resolveTag(group.tagId),
       entries: sortAdditionalEntriesDesc(
@@ -112,6 +113,7 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
             label: e.label,
             amount: parseFloat(e.amount),
             isRecurring: e.isRecurring,
+            isCompleted: e.isCompleted,
             tagId: e.tagId ?? null,
             tag: resolveTag(e.tagId),
           }))
@@ -152,6 +154,7 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
             label: e.label,
             amount: parseFloat(e.amount),
             isRecurring: e.isRecurring,
+            isCompleted: e.isCompleted,
             tagId: e.tagId ?? null,
             tag: resolveTag(e.tagId),
           }))
@@ -167,6 +170,7 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
             label: e.label,
             amount: parseFloat(e.amount),
             isRecurring: e.isRecurring,
+            isCompleted: e.isCompleted,
             tagId: e.tagId ?? null,
             tag: resolveTag(e.tagId),
           }))

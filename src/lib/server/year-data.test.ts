@@ -16,3 +16,8 @@ test("year-data only hydrates tags owned by the requested user", () => {
   assert.match(source, /eq\(tags\.userId, userId\)/);
   assert.match(source, /inArray\(tags\.id, usedTagIds\)/);
 });
+
+test("year-data hydrates completion for entries and groups", () => {
+  assert.match(source, /isCompleted: group\.isCompleted/);
+  assert.match(source, /isCompleted: e\.isCompleted/);
+});

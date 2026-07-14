@@ -26,3 +26,10 @@ test("entry-groups PATCH route only accepts a tag owned by the authenticated use
   assert.match(source, /eq\(tags\.userId, user\.id\)/);
   assert.match(source, /ownedTag\.length === 0/);
 });
+
+test("entry-groups route only lets completed groups reopen", () => {
+  assert.match(source, /isCompletionOnlyRequest\(body, group\.isCompleted\)/);
+  assert.match(source, /groupUpdate\.isCompleted = body\.isCompleted/);
+  assert.match(source, /if \(group\.isCompleted\)/);
+  assert.match(source, /status: 409/);
+});

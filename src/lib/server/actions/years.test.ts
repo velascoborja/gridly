@@ -19,3 +19,7 @@ test("createAndPrefillYear looks up the previous year by data.year - 1", () => {
 test("createAndPrefillYear carries tagId when copying recurring entries", () => {
   assert.match(source, /tagId: e\.tagId/);
 });
+
+test("createAndPrefillYear reopens copied recurring entries", () => {
+  assert.match(source, /isCompleted: false/);
+});

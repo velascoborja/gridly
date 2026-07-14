@@ -12,9 +12,21 @@ test("entry PATCH supports moving an entry to another owned month in the same ye
 });
 
 test("entry PATCH keeps existing label and amount edits while validating the source entry", () => {
-  assert.match(source, /if \(body\.label !== undefined\) updates\.label = body\.label/);
+  assert.match(source, /if \(body\.label !== undefined\)/);
+  assert.match(source, /updates\.label = body\.label/);
   assert.match(source, /if \(body\.amount !== undefined\) updates\.amount = String\(body\.amount\)/);
   assert.match(source, /entry\.monthId !== month\.id/);
+});
+
+test("entry mutations enforce completion locks from the entry and its group", () => {
+  assert.match(source, /isCompletionOnlyRequest\(body, entry\.isCompleted\)/);
+  assert.match(source, /sourceGroup\?\.isCompleted/);
+  assert.match(source, /group\.isCompleted/);
+  assert.match(source, /status: 409/);
+});
+
+test("entry PATCH persists completion state", () => {
+  assert.match(source, /updates\.isCompleted = body\.isCompleted/);
 });
 
 test("entries PATCH route reads isRecurring from the request body", () => {

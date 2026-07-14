@@ -56,76 +56,76 @@ export function getDemoYearData(): YearData {
 
   // Enero
   baseMonths[0].additionalExpenses = [
-    { id: 101, monthId: 1, type: "expense", label: "Seguro anual", amount: 320, isRecurring: false, tagId: null, tag: null },
-    { id: 102, monthId: 1, type: "expense", label: "Cena Reyes", amount: 85, isRecurring: false, tagId: null, tag: null },
+    { id: 101, monthId: 1, type: "expense", label: "Seguro anual", amount: 320, isRecurring: false, isCompleted: false, tagId: null, tag: null },
+    { id: 102, monthId: 1, type: "expense", label: "Cena Reyes", amount: 85, isRecurring: false, isCompleted: false, tagId: null, tag: null },
   ];
 
   // Febrero
   baseMonths[1].additionalExpenses = [
-    { id: 201, monthId: 2, type: "expense", label: "Regalo San Valentín", amount: 65, isRecurring: false, tagId: null, tag: null },
-    { id: 202, monthId: 2, type: "expense", label: "Ajuste calefacción", amount: 45, isRecurring: false, tagId: null, tag: null },
+    { id: 201, monthId: 2, type: "expense", label: "Regalo San Valentín", amount: 65, isRecurring: false, isCompleted: false, tagId: null, tag: null },
+    { id: 202, monthId: 2, type: "expense", label: "Ajuste calefacción", amount: 45, isRecurring: false, isCompleted: false, tagId: null, tag: null },
   ];
 
   // Marzo
   baseMonths[2].additionalExpenses = [
-    { id: 301, monthId: 3, type: "expense", label: "Escapada fin de semana", amount: 210, isRecurring: false, tagId: null, tag: null },
-    { id: 302, monthId: 3, type: "expense", label: "Suscripción anual", amount: 99, isRecurring: false, tagId: null, tag: null },
+    { id: 301, monthId: 3, type: "expense", label: "Escapada fin de semana", amount: 210, isRecurring: false, isCompleted: false, tagId: null, tag: null },
+    { id: 302, monthId: 3, type: "expense", label: "Suscripción anual", amount: 99, isRecurring: false, isCompleted: false, tagId: null, tag: null },
   ];
 
   // Abril
   baseMonths[3].additionalExpenses = [
-    { id: 402, monthId: 4, type: "expense", label: "Mantenimiento coche", amount: 120, isRecurring: false, tagId: null, tag: null },
-    { id: 403, monthId: 4, type: "expense", label: "Cena amigos", amount: 55, isRecurring: false, tagId: null, tag: null },
+    { id: 402, monthId: 4, type: "expense", label: "Mantenimiento coche", amount: 120, isRecurring: false, isCompleted: false, tagId: null, tag: null },
+    { id: 403, monthId: 4, type: "expense", label: "Cena amigos", amount: 55, isRecurring: false, isCompleted: false, tagId: null, tag: null },
   ];
   baseMonths[3].additionalIncomes = [
-    { id: 401, monthId: 4, type: "income", label: "Devolución IRPF", amount: 540, isRecurring: false, tagId: null, tag: null },
-    { id: 404, monthId: 4, type: "income", label: "Venta Wallapop", amount: 35, isRecurring: false, tagId: null, tag: null },
+    { id: 401, monthId: 4, type: "income", label: "Devolución IRPF", amount: 540, isRecurring: false, isCompleted: false, tagId: null, tag: null },
+    { id: 404, monthId: 4, type: "income", label: "Venta Wallapop", amount: 35, isRecurring: false, isCompleted: false, tagId: null, tag: null },
   ];
 
   // Mayo
   baseMonths[4].additionalExpenses = [
-    { id: 501, monthId: 5, type: "expense", label: "Ropa temporada", amount: 145, isRecurring: false, tagId: null, tag: null },
+    { id: 501, monthId: 5, type: "expense", label: "Ropa temporada", amount: 145, isRecurring: false, isCompleted: false, tagId: null, tag: null },
   ];
   baseMonths[4].additionalIncomes = [
-    { id: 502, monthId: 5, type: "income", label: "Regalo cumpleaños", amount: 100, isRecurring: false, tagId: null, tag: null },
+    { id: 502, monthId: 5, type: "income", label: "Regalo cumpleaños", amount: 100, isRecurring: false, isCompleted: false, tagId: null, tag: null },
   ];
 
   // Junio
   baseMonths[5].additionalExpenses = [
-    { id: 601, monthId: 6, type: "expense", label: "Reserva vacaciones", amount: 450, isRecurring: false, tagId: null, tag: null },
+    { id: 601, monthId: 6, type: "expense", label: "Reserva vacaciones", amount: 450, isRecurring: false, isCompleted: false, tagId: null, tag: null },
   ];
 
   // Julio
   baseMonths[6].additionalExpenses = [
-    { id: 701, monthId: 7, type: "expense", label: "Vuelos verano", amount: 320, isRecurring: false, tagId: null, tag: null },
+    { id: 701, monthId: 7, type: "expense", label: "Vuelos verano", amount: 320, isRecurring: false, isCompleted: false, tagId: null, tag: null },
   ];
 
   // Agosto
   baseMonths[7].additionalExpenses = [
-    { id: 801, monthId: 8, type: "expense", label: "Restaurantes playa", amount: 280, isRecurring: false, tagId: null, tag: null },
-    { id: 802, monthId: 8, type: "expense", label: "Actividades ocio", amount: 150, isRecurring: false, tagId: null, tag: null },
+    { id: 801, monthId: 8, type: "expense", label: "Restaurantes playa", amount: 280, isRecurring: false, isCompleted: false, tagId: null, tag: null },
+    { id: 802, monthId: 8, type: "expense", label: "Actividades ocio", amount: 150, isRecurring: false, isCompleted: false, tagId: null, tag: null },
   ];
 
   // Septiembre
   baseMonths[8].additionalExpenses = [
-    { id: 901, monthId: 9, type: "expense", label: "Material oficina/estudios", amount: 85, isRecurring: false, tagId: null, tag: null },
-    { id: 902, monthId: 9, type: "expense", label: "Suscripción gimnasio", amount: 45, isRecurring: false, tagId: null, tag: null },
+    { id: 901, monthId: 9, type: "expense", label: "Material oficina/estudios", amount: 85, isRecurring: false, isCompleted: false, tagId: null, tag: null },
+    { id: 902, monthId: 9, type: "expense", label: "Suscripción gimnasio", amount: 45, isRecurring: false, isCompleted: false, tagId: null, tag: null },
   ];
 
   // Octubre
   baseMonths[9].additionalExpenses = [
-    { id: 1001, monthId: 10, type: "expense", label: "Revisión dental", amount: 75, isRecurring: false, tagId: null, tag: null },
+    { id: 1001, monthId: 10, type: "expense", label: "Revisión dental", amount: 75, isRecurring: false, isCompleted: false, tagId: null, tag: null },
   ];
 
   // Noviembre
   baseMonths[10].additionalExpenses = [
-    { id: 1101, monthId: 11, type: "expense", label: "Black Friday", amount: 215, isRecurring: false, tagId: null, tag: null },
+    { id: 1101, monthId: 11, type: "expense", label: "Black Friday", amount: 215, isRecurring: false, isCompleted: false, tagId: null, tag: null },
   ];
 
   // Diciembre
   baseMonths[11].additionalExpenses = [
-    { id: 1201, monthId: 12, type: "expense", label: "Regalos Navidad", amount: 480, isRecurring: false, tagId: null, tag: null },
-    { id: 1202, monthId: 12, type: "expense", label: "Cena Nochebuena", amount: 120, isRecurring: false, tagId: null, tag: null },
+    { id: 1201, monthId: 12, type: "expense", label: "Regalos Navidad", amount: 480, isRecurring: false, isCompleted: false, tagId: null, tag: null },
+    { id: 1202, monthId: 12, type: "expense", label: "Cena Nochebuena", amount: 120, isRecurring: false, isCompleted: false, tagId: null, tag: null },
   ];
 
   return {
@@ -157,4 +157,3 @@ interface RawMonthData {
   additionalExpenseGroups: AdditionalEntryGroup[];
   additionalIncomes: AdditionalEntry[];
 }
-

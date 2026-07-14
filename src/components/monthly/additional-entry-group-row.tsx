@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { CalendarArrowUp, ChevronRight, FolderInput, Loader2, Plus, Tag as TagIcon, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,7 @@ import { cn, formatCurrency, formatMonthName } from "@/lib/utils";
 import type { AdditionalEntry, AdditionalEntryGroup, Tag } from "@/lib/types";
 import { TagPicker } from "./tag-picker";
 import { TAG_COLORS } from "@/lib/tags";
+import { CompletionLockButton } from "./completion-lock-button";
 
 type EntryEditFocusTarget = "label" | "amount";
 
@@ -97,6 +98,9 @@ export function AdditionalEntryGroupRow({
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [movingToGroupId, setMovingToGroupId] = useState<number | null>(null);
   const [isSavingTag, setIsSavingTag] = useState(false);
+  const [isSavingCompletion, setIsSavingCompletion] = useState(false);
+  const [completionSavingId, setCompletionSavingId] = useState<number | null>(null);
+  const [completionError, setCompletionError] = useState<string | null>(null);
 
   const getAmountPreview = (value: string) => {
     const parsed = parseMoneyExpression(value);
@@ -117,7 +121,14 @@ export function AdditionalEntryGroupRow({
   const editAmountPreview = getAmountPreview(editAmount);
   const groupTotal = group.entries.reduce((sum, e) => sum + e.amount, 0);
   const isMovingGroup = movingGroupId === group.id;
-  const canMoveGroup = !readOnly && !isEditingName && !isDeletingGroup && !isSavingName && !isSavingTag && !isMovingGroup;
+  const groupRef = useRef(group);
+  groupRef.current = group;
+  const groupLocked = readOnly || group.isCompleted;
+  const groupMutationLocked = groupLocked || isSavingCompletion;
+  const hasConflictingMutation = isEditingName || isSavingName || isDeletingGroup
+    || addingFormOpen || isAdding || savingId !== null
+    || deletingId !== null || movingToGroupId !== null || isSavingTag || isMovingGroup;
+  const canMoveGroup = !groupMutationLocked && !isEditingName && !isDeletingGroup && !isSavingName && !isSavingTag && !isMovingGroup;
 
   useEffect(() => {
     if (highlightId && group.entries.some((e) => `entry-${e.id}` === highlightId)) {
@@ -146,6 +157,7 @@ export function AdditionalEntryGroupRow({
 
   const handleRenameStart = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (groupMutationLocked) return;
     setNameValue(group.label);
     setIsEditingName(true);
   };
@@ -210,6 +222,7 @@ export function AdditionalEntryGroupRow({
       const newEntry: AdditionalEntry = {
         ...entry,
         amount: parseFloat(entry.amount),
+        isCompleted: entry.isCompleted ?? false,
         tagId: entry.tagId ?? null,
         tag: entry.tagId != null ? (tags.find((t) => t.id === entry.tagId) ?? null) : null,
       };
@@ -224,6 +237,7 @@ export function AdditionalEntryGroupRow({
   };
 
   const openEditForm = (entry: AdditionalEntry, focusTarget: EntryEditFocusTarget = "label") => {
+    if (groupMutationLocked || completionSavingId === entry.id) return;
     setEditingId(entry.id);
     setEditFocusTarget(focusTarget);
     setEditLabel(entry.label);
@@ -296,6 +310,78 @@ export function AdditionalEntryGroupRow({
     }
   };
 
+  const handleEntryCompletionToggle = async (entry: AdditionalEntry) => {
+    if (groupMutationLocked || completionSavingId !== null || hasConflictingMutation) return;
+
+    const nextCompleted = !entry.isCompleted;
+    setCompletionError(null);
+    setCompletionSavingId(entry.id);
+    onGroupUpdate({
+      ...groupRef.current,
+      entries: groupRef.current.entries.map((item) =>
+        item.id === entry.id ? { ...item, isCompleted: nextCompleted } : item
+      ),
+    });
+
+    try {
+      const res = await fetch(`/api/months/${monthId}/entries/${entry.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isCompleted: nextCompleted }),
+      });
+      if (!res.ok) throw new Error("completion update failed");
+
+      const raw = await res.json();
+      onGroupUpdate({
+        ...groupRef.current,
+        entries: groupRef.current.entries.map((item) => item.id === entry.id ? {
+          ...item,
+          ...raw,
+          amount: parseFloat(raw.amount),
+          isCompleted: raw.isCompleted,
+          tagId: raw.tagId ?? null,
+          tag: item.tag,
+        } : item),
+      });
+    } catch {
+      onGroupUpdate({
+        ...groupRef.current,
+        entries: groupRef.current.entries.map((item) =>
+          item.id === entry.id ? { ...item, isCompleted: entry.isCompleted } : item
+        ),
+      });
+      setCompletionError(t("completionError"));
+    } finally {
+      setCompletionSavingId(null);
+    }
+  };
+
+  const handleGroupCompletionToggle = async () => {
+    if (readOnly || isSavingCompletion || completionSavingId !== null || editingId !== null || hasConflictingMutation) return;
+
+    const nextCompleted = !group.isCompleted;
+    setCompletionError(null);
+    setIsSavingCompletion(true);
+    onGroupUpdate({ ...groupRef.current, isCompleted: nextCompleted });
+
+    try {
+      const res = await fetch(`/api/months/${monthId}/entry-groups/${group.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isCompleted: nextCompleted }),
+      });
+      if (!res.ok) throw new Error("completion update failed");
+
+      const raw = await res.json();
+      onGroupUpdate({ ...groupRef.current, ...raw, isCompleted: raw.isCompleted });
+    } catch {
+      onGroupUpdate({ ...groupRef.current, isCompleted: group.isCompleted });
+      setCompletionError(t("completionError"));
+    } finally {
+      setIsSavingCompletion(false);
+    }
+  };
+
   const handleGroupTagChange = async (tagId: number | null, selectedTag?: Tag | null) => {
     if (isSavingTag) return;
     setIsSavingTag(true);
@@ -324,6 +410,7 @@ export function AdditionalEntryGroupRow({
     <div
       className={cn(
         "overflow-hidden rounded-xl border border-primary/20 bg-primary/[0.03]",
+        group.isCompleted && "border-emerald-500/15 bg-muted/40",
         canMoveGroup && "cursor-grab active:cursor-grabbing",
         isMovingGroup && "pointer-events-none opacity-60"
       )}
@@ -335,7 +422,7 @@ export function AdditionalEntryGroupRow({
       <div
         className={cn(
           "flex cursor-pointer select-none items-center gap-1 px-2.5 py-1.5 sm:gap-2",
-          !readOnly && "hover:bg-primary/[0.05]"
+          !group.isCompleted && !readOnly && "hover:bg-primary/[0.05]"
         )}
         onClick={handleToggle}
       >
@@ -346,7 +433,16 @@ export function AdditionalEntryGroupRow({
           )}
         />
 
-        {!readOnly && isEditingName ? (
+        {groupMutationLocked ? (
+          <span
+            className={cn(
+              "flex-1 truncate text-left text-sm font-semibold text-foreground",
+              group.isCompleted && "text-muted-foreground/65"
+            )}
+          >
+            {group.label}
+          </span>
+        ) : isEditingName ? (
           <Input
             className="h-7 flex-1 text-sm font-semibold"
             value={nameValue}
@@ -362,13 +458,9 @@ export function AdditionalEntryGroupRow({
           />
         ) : (
           <button
-            className={cn(
-              "flex-1 truncate text-left text-sm font-semibold text-foreground",
-              !readOnly && "transition-colors hover:text-primary"
-            )}
-            onClick={!readOnly ? handleRenameStart : undefined}
+            className="flex-1 truncate text-left text-sm font-semibold text-foreground transition-colors hover:text-primary"
+            onClick={handleRenameStart}
             type="button"
-            disabled={readOnly}
           >
             {group.label}
           </button>
@@ -378,7 +470,7 @@ export function AdditionalEntryGroupRow({
           {group.entries.length}
         </span>
 
-        {!readOnly && (
+        {!groupMutationLocked && (
           <div
             className="hidden h-9 shrink-0 items-center gap-1 sm:flex"
             onClick={(e) => e.stopPropagation()}
@@ -461,12 +553,16 @@ export function AdditionalEntryGroupRow({
         )}
 
         <div className="flex shrink-0 items-center gap-1 ml-1.5 sm:ml-0">
-          <span className="text-sm font-semibold tabular-nums text-violet-600 dark:text-violet-400">
+          <span className={cn(
+            "text-sm font-semibold tabular-nums text-violet-600 dark:text-violet-400",
+            group.isCompleted && "text-muted-foreground/65 dark:text-muted-foreground/65"
+          )}>
             {formatCurrency(groupTotal, locale)}
           </span>
 
           {!readOnly && (
             <>
+            {!group.isCompleted && !isSavingCompletion ? (
             <AlertDialog>
             <AlertDialogTrigger
               render={
@@ -512,6 +608,7 @@ export function AdditionalEntryGroupRow({
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+            ) : null}
           </>
           )}
         </div>
@@ -532,6 +629,8 @@ export function AdditionalEntryGroupRow({
               className="flex w-full flex-nowrap items-center justify-start gap-1 rounded-lg border border-primary/10 bg-primary/[0.035] px-2 py-1.5 sm:hidden"
               onClick={(e) => e.stopPropagation()}
             >
+              {!group.isCompleted && !isSavingCompletion ? (
+                <>
               <TagPicker
                 tags={tags}
                 value={group.tagId}
@@ -644,11 +743,23 @@ export function AdditionalEntryGroupRow({
                 <Plus className="h-3 w-3" />
                 <span className="hidden min-[480px]:inline">{t("addToGroup")}</span>
               </Button>
+                </>
+              ) : null}
+
+              <CompletionLockButton
+                completed={group.isCompleted}
+                pending={isSavingCompletion}
+                disabled={completionSavingId !== null || editingId !== null || hasConflictingMutation}
+                onToggle={() => void handleGroupCompletionToggle()}
+                completeLabel={t("markCompleted")}
+                reopenLabel={t("reopen")}
+              />
+
             </div>
           ) : null}
 
           {group.entries.map((entry) =>
-            !readOnly && editingId === entry.id ? (
+            !groupMutationLocked && editingId === entry.id ? (
               <div key={entry.id} className="rounded-xl border border-border/70 bg-muted/20 p-1.5">
                 <EntryFormRow
                   labelValue={editLabel}
@@ -666,11 +777,14 @@ export function AdditionalEntryGroupRow({
                     setEditingId(null);
                     setEditAmountError(false);
                   }}
-                  disabled={savingId === entry.id || movingToGroupId === entry.id}
+                  disabled={savingId === entry.id || movingToGroupId === entry.id || completionSavingId === entry.id}
+                  fieldsDisabled={entry.isCompleted || completionSavingId === entry.id}
+                  saveDisabled={entry.isCompleted || completionSavingId === entry.id || savingId === entry.id || movingToGroupId === entry.id}
+                  showSaveAction={!entry.isCompleted && completionSavingId !== entry.id}
                   isSaving={savingId === entry.id}
                   saveLabel={common("save")}
                   savingLabel={t("saving")}
-                  cancelLabel={t("cancel")}
+                  cancelLabel={entry.isCompleted ? t("exit") : t("cancel")}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") handleEdit(entry.id);
                     if (e.key === "Escape" && savingId !== entry.id) {
@@ -678,8 +792,25 @@ export function AdditionalEntryGroupRow({
                       setEditAmountError(false);
                     }
                   }}
-                  autoFocus={editFocusTarget}
-                  folderAction={
+                  autoFocus={entry.isCompleted ? false : editFocusTarget}
+                  completionAction={
+                    <CompletionLockButton
+                      completed={entry.isCompleted}
+                      pending={completionSavingId === entry.id}
+                      disabled={
+                        isSavingCompletion
+                        || savingId === entry.id
+                        || movingToGroupId === entry.id
+                        || (completionSavingId !== null && completionSavingId !== entry.id)
+                        || hasConflictingMutation
+                      }
+                      onToggle={() => void handleEntryCompletionToggle(entry)}
+                      completeLabel={t("markCompleted")}
+                      reopenLabel={t("reopen")}
+                      actionSize
+                    />
+                  }
+                  folderAction={!entry.isCompleted && completionSavingId !== entry.id ? (
                     <DropdownMenu>
                       <DropdownMenuTrigger
                         render={
@@ -726,7 +857,7 @@ export function AdditionalEntryGroupRow({
                         </DropdownMenuGroup>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                  }
+                  ) : undefined}
                 />
               </div>
             ) : (
@@ -735,18 +866,25 @@ export function AdditionalEntryGroupRow({
                 data-highlight-id={`entry-${entry.id}`}
                 className={cn(
                   "rounded-lg border border-transparent px-2 py-1.5 transition-all hover:border-border/70 hover:bg-muted/40",
+                  (group.isCompleted || entry.isCompleted) && "border-emerald-500/10 bg-muted/45 hover:border-emerald-500/15 hover:bg-muted/55",
                   deletingId === entry.id && "pointer-events-none opacity-60",
                   highlightId === `entry-${entry.id}` && "animate-entry-highlight"
                 )}
               >
                 <div className="flex min-w-0 items-center justify-between gap-2">
-                  {readOnly ? (
-                    <span className="min-w-0 flex-1 truncate text-left text-sm font-medium text-foreground">
+                  {groupMutationLocked || completionSavingId === entry.id ? (
+                    <span className={cn(
+                      "min-w-0 flex-1 truncate text-left text-sm font-medium text-foreground",
+                      (group.isCompleted || entry.isCompleted) && "text-muted-foreground/65"
+                    )}>
                       {entry.label}
                     </span>
                   ) : (
                     <button
-                      className="min-w-0 flex-1 truncate text-left text-sm font-medium text-foreground transition-colors hover:text-primary focus-visible:text-primary"
+                      className={cn(
+                        "min-w-0 flex-1 truncate text-left text-sm font-medium text-foreground transition-colors hover:text-primary focus-visible:text-primary",
+                        entry.isCompleted && "text-muted-foreground/65"
+                      )}
                       onClick={() => openEditForm(entry, "label")}
                       type="button"
                       aria-label={`${t("edit")} ${entry.label}`}
@@ -756,13 +894,19 @@ export function AdditionalEntryGroupRow({
                     </button>
                   )}
                   <div className="flex shrink-0 items-center gap-1.5">
-                    {readOnly ? (
-                      <span className="whitespace-nowrap text-sm font-semibold tabular-nums">
+                    {groupMutationLocked || completionSavingId === entry.id ? (
+                      <span className={cn(
+                        "whitespace-nowrap text-sm font-semibold tabular-nums",
+                        (group.isCompleted || entry.isCompleted) && "text-muted-foreground/65"
+                      )}>
                         {formatCurrency(entry.amount, locale)}
                       </span>
                     ) : (
                       <button
-                        className="whitespace-nowrap rounded-md px-2 py-1 text-sm font-semibold tabular-nums text-foreground transition-colors hover:bg-background hover:text-primary"
+                        className={cn(
+                          "whitespace-nowrap rounded-md px-2 py-1 text-sm font-semibold tabular-nums text-foreground transition-colors hover:bg-background hover:text-primary",
+                          entry.isCompleted && "text-muted-foreground/65"
+                        )}
                         onClick={() => openEditForm(entry, "amount")}
                         type="button"
                         aria-label={`${t("edit")} ${entry.label}`}
@@ -771,7 +915,7 @@ export function AdditionalEntryGroupRow({
                         {formatCurrency(entry.amount, locale)}
                       </button>
                     )}
-                    {!readOnly && (
+                    {!groupMutationLocked && !entry.isCompleted && completionSavingId !== entry.id && (
                       <AlertDialog>
                         <AlertDialogTrigger
                           render={
@@ -822,7 +966,7 @@ export function AdditionalEntryGroupRow({
           )}
 
           {/* Add entry to group form */}
-          {!readOnly && addingFormOpen ? (
+          {!groupMutationLocked && addingFormOpen ? (
             <div className="rounded-xl border border-border/70 bg-muted/20 p-1.5" aria-busy={isAdding}>
               <EntryFormRow
                 labelValue={newLabel}
@@ -851,14 +995,38 @@ export function AdditionalEntryGroupRow({
                 autoFocus
               />
             </div>
-          ) : !readOnly ? (
-            <button
-              className="hidden items-center gap-1.5 rounded-md px-1.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground sm:inline-flex"
-              onClick={() => setAddingFormOpen(true)}
-              type="button"
+          ) : null}
+
+          {!readOnly ? (
+            <div className="hidden items-center justify-between gap-2 sm:flex">
+              {!groupMutationLocked && !addingFormOpen ? (
+                <button
+                  className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground"
+                  onClick={() => setAddingFormOpen(true)}
+                  type="button"
+                >
+                  <Plus className="h-3 w-3" /> {t("addToGroup")}
+                </button>
+              ) : null}
+              <CompletionLockButton
+                completed={group.isCompleted}
+                pending={isSavingCompletion}
+                disabled={completionSavingId !== null || editingId !== null || hasConflictingMutation}
+                onToggle={() => void handleGroupCompletionToggle()}
+                completeLabel={t("markCompleted")}
+                reopenLabel={t("reopen")}
+                className="ml-auto"
+              />
+            </div>
+          ) : null}
+
+          {completionError ? (
+            <p
+              role="alert"
+              className="rounded-md border border-destructive/20 bg-destructive/[0.06] px-2.5 py-2 text-xs text-destructive"
             >
-              <Plus className="h-3 w-3" /> {t("addToGroup")}
-            </button>
+              {completionError}
+            </p>
           ) : null}
         </div>
         </div>

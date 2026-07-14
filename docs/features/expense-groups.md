@@ -10,8 +10,8 @@ Two tables are involved:
 
 | Table | Key columns | Notes |
 |---|---|---|
-| `additional_entry_groups` | `id`, `month_id`, `label`, `tag_id`, `created_at` | `tag_id` nullable FK → `tags.id`, `onDelete: set null`; cascade-deleted when the month is deleted |
-| `additional_entries` | …, `group_id` (nullable FK → `additional_entry_groups`) | `null` = ungrouped |
+| `additional_entry_groups` | `id`, `month_id`, `label`, `is_completed`, `tag_id`, `created_at` | `is_completed` defaults to `false`; `tag_id` nullable FK → `tags.id`, `onDelete: set null` |
+| `additional_entries` | …, `group_id` (nullable FK → `additional_entry_groups`), `is_completed` | `null` group = ungrouped; `is_completed` defaults to `false` |
 
 - `group_id` is nullable; a `null` value means the entry is ungrouped.
 - Deleting a group cascades to all its entries (DB `ON DELETE CASCADE`).
@@ -33,6 +33,8 @@ Two tables are involved:
 | `DELETE` | `/api/months/[monthId]/entry-groups/[groupId]` | Delete group and all its entries (DB cascade) |
 | `POST` | `/api/months/[monthId]/entries` | Create an entry; accepts optional `groupId` to assign it directly into a group |
 | `PATCH` | `/api/months/[monthId]/entries/[entryId]` | Accepts `groupId: number \| null` to move an entry into or out of a group |
+
+Both item `PATCH` routes also accept `{ isCompleted: boolean }`. Completed resources only accept the exact reopen mutation `{ isCompleted: false }`; other changes and deletion return `409 { error: "completed_locked" }`. Creating or moving an entry into a completed group is rejected with the same response.
 
 **Important:** The entries `POST` route must receive `groupId` in the request body and forward it to the DB insert. Omitting it results in the entry being saved as ungrouped (`group_id = NULL`) even though the client shows it inside the group (optimistic UI). This was a bug that was fixed — the test `entries POST route persists groupId to the database insert` guards against regression.
 
@@ -92,6 +94,14 @@ Two tables are involved:
 - Collapsed state is lifted to `AdditionalEntriesCard` (a `Record<groupId, boolean>` map) and passed to each `AdditionalEntryGroupRow` as `collapsed` / `onCollapsedChange` props. This allows the card to coordinate all groups atomically for bulk expand/collapse.
 - If a highlighted entry (from search/navigation) belongs to a group, the group auto-expands via a `useEffect` watching `highlightId`.
 - `Cmd+Shift+.` expands all groups if any are collapsed, or collapses all if every group is already expanded. See [Keyboard Shortcuts](keyboard-shortcuts.md).
+
+### Completion lock
+- A group can be marked completed from its lock action. The group surface and contents become muted while totals remain legible.
+- Completing a group locks its name, tag, movement, deletion, add-entry action, and every child entry. Child `isCompleted` values are unchanged, so reopening restores each child's individual state.
+- Expanding and collapsing remains available because it does not mutate financial data.
+- The interactive group lock is contextual on every viewport: it is rendered only inside the expanded body and never in the resting header. On desktop it sits at the bottom-right opposite the bottom-left "Add entry" action. On mobile it shares the compact action bar with tag, move-to-month, and add-entry controls. Completed child rows can likewise be opened to reveal their lock in the shared entry action row after the parent group is reopened.
+- Group deletion remains directly available from the header on desktop and mobile while the group is incomplete. Completed groups still hide deletion until they are reopened.
+- Lock changes are optimistic, prevent duplicate submission, roll back on failure, and animate between open and closed states unless the user prefers reduced motion.
 
 ## Calculations
 

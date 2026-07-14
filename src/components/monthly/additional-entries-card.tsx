@@ -30,6 +30,7 @@ import {
 import { AdditionalEntryGroupRow } from "./additional-entry-group-row";
 import { EntryFormRow } from "./entry-form-row";
 import { TagPicker } from "./tag-picker";
+import { CompletionLockButton } from "./completion-lock-button";
 import { sortAdditionalEntriesDesc, sumAdditionalEntries } from "@/lib/additional-entries";
 import { parseMoneyExpression } from "@/lib/currency-input";
 import { TAG_COLORS } from "@/lib/tags";
@@ -118,11 +119,15 @@ export function AdditionalEntriesCard({
   const [tags, setTags] = useState<Tag[]>([]);
   const [newTagId, setNewTagId] = useState<number | null>(null);
   const [editTagId, setEditTagId] = useState<number | null>(null);
+  const [completionSavingId, setCompletionSavingId] = useState<number | null>(null);
+  const [completionError, setCompletionError] = useState<string | null>(null);
   const [groupCollapsedState, setGroupCollapsedState] = useState<Record<number, boolean>>(
     () => Object.fromEntries(groups.map(g => [g.id, true]))
   );
   const groupsRef = useRef(groups);
   groupsRef.current = groups;
+  const entriesRef = useRef(entries);
+  entriesRef.current = entries;
   const groupCollapsedStateRef = useRef(groupCollapsedState);
   groupCollapsedStateRef.current = groupCollapsedState;
 
@@ -184,6 +189,7 @@ export function AdditionalEntriesCard({
   };
 
   const openEditForm = (entry: AdditionalEntry, focusTarget: EntryEditFocusTarget = "label") => {
+    if (completionSavingId === entry.id) return;
     setEditingId(entry.id);
     setEditFocusTarget(focusTarget);
     setEditLabel(entry.label);
@@ -194,7 +200,7 @@ export function AdditionalEntriesCard({
   };
 
   const canMoveEntry = (entry: AdditionalEntry) =>
-    !readOnly && editingId !== entry.id && deletingId !== entry.id && savingId !== entry.id && movingEntryId !== entry.id;
+    !readOnly && !entry.isCompleted && completionSavingId !== entry.id && editingId !== entry.id && deletingId !== entry.id && savingId !== entry.id && movingEntryId !== entry.id;
 
   const handleDragStart = (event: React.DragEvent<HTMLDivElement>, entry: AdditionalEntry) => {
     if (!canMoveEntry(entry)) {
@@ -247,6 +253,7 @@ export function AdditionalEntriesCard({
       const entry: AdditionalEntry = {
         ...raw,
         amount: parseFloat(raw.amount),
+        isCompleted: raw.isCompleted ?? false,
         tagId: raw.tagId ?? null,
         tag: resolveTag(raw.tagId ?? null),
       };
@@ -305,6 +312,43 @@ export function AdditionalEntriesCard({
     }
   };
 
+  const handleCompletionToggle = async (entry: AdditionalEntry) => {
+    if (completionSavingId !== null) return;
+
+    const nextCompleted = !entry.isCompleted;
+    setCompletionError(null);
+    setCompletionSavingId(entry.id);
+    onEntriesChange(entriesRef.current.map((item) =>
+      item.id === entry.id ? { ...item, isCompleted: nextCompleted } : item
+    ));
+
+    try {
+      const res = await fetch(`/api/months/${monthId}/entries/${entry.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isCompleted: nextCompleted }),
+      });
+      if (!res.ok) throw new Error("completion update failed");
+
+      const raw = await res.json();
+      onEntriesChange(entriesRef.current.map((item) => item.id === entry.id ? {
+        ...item,
+        ...raw,
+        amount: parseFloat(raw.amount),
+        isCompleted: raw.isCompleted,
+        tagId: raw.tagId ?? null,
+        tag: resolveTag(raw.tagId ?? null),
+      } : item));
+    } catch {
+      onEntriesChange(entriesRef.current.map((item) =>
+        item.id === entry.id ? { ...item, isCompleted: entry.isCompleted } : item
+      ));
+      setCompletionError(t("completionError"));
+    } finally {
+      setCompletionSavingId(null);
+    }
+  };
+
   const handleMoveToGroup = async (entry: AdditionalEntry, toGroupId: number | null) => {
     if (movingToGroupId === entry.id) return;
 
@@ -359,7 +403,7 @@ export function AdditionalEntriesCard({
       });
       if (!res.ok) return;
       const group = await res.json();
-      const newGroup: AdditionalEntryGroup = { id: group.id, monthId: group.monthId, label: group.label, tagId: group.tagId ?? null, tag: group.tag ?? null, entries: [] };
+      const newGroup: AdditionalEntryGroup = { id: group.id, monthId: group.monthId, label: group.label, isCompleted: group.isCompleted ?? false, tagId: group.tagId ?? null, tag: group.tag ?? null, entries: [] };
       onGroupsChange?.([...groups, newGroup]);
       router.refresh();
       setAddingGroupOpen(false);
@@ -503,6 +547,15 @@ export function AdditionalEntriesCard({
           ) : null}
         </div>
 
+        {completionError ? (
+          <p
+            role="alert"
+            className="rounded-md border border-destructive/20 bg-destructive/[0.06] px-2.5 py-2 text-xs text-destructive"
+          >
+            {completionError}
+          </p>
+        ) : null}
+
         {type === "expense" && groups.length > 0 && (
           <div className="flex flex-col gap-2">
             {sortedGroups.map((group) => (
@@ -542,6 +595,7 @@ export function AdditionalEntriesCard({
           )}
           {sortedEntries.map((entry) => {
             const displayTag = resolveTag(entry.tagId) ?? entry.tag;
+            const completionPending = completionSavingId === entry.id;
             return !readOnly && editingId === entry.id ? (
               <div key={entry.id} className="rounded-xl border border-border/70 bg-muted/20 p-1.5">
                 <EntryFormRow
@@ -560,11 +614,14 @@ export function AdditionalEntriesCard({
                     setEditingId(null);
                     setEditAmountError(false);
                   }}
-                  disabled={savingId === entry.id || movingToGroupId === entry.id || movingEntryId === entry.id}
+                  disabled={savingId === entry.id || movingToGroupId === entry.id || movingEntryId === entry.id || completionPending}
+                  fieldsDisabled={entry.isCompleted || completionPending}
+                  saveDisabled={entry.isCompleted || completionPending || savingId === entry.id || movingToGroupId === entry.id || movingEntryId === entry.id}
+                  showSaveAction={!entry.isCompleted && !completionPending}
                   isSaving={savingId === entry.id}
                   saveLabel={common("save")}
                   savingLabel={t("saving")}
-                  cancelLabel={t("cancel")}
+                  cancelLabel={entry.isCompleted ? t("exit") : t("cancel")}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") handleEdit(entry.id);
                     if (e.key === "Escape" && savingId !== entry.id) {
@@ -572,9 +629,9 @@ export function AdditionalEntriesCard({
                       setEditAmountError(false);
                     }
                   }}
-                  autoFocus={editFocusTarget}
+                  autoFocus={entry.isCompleted ? false : editFocusTarget}
                   tagAction={
-                    type === "expense" ? (
+                    type === "expense" && !entry.isCompleted && !completionPending ? (
                       <TagPicker
                         tags={tags}
                         value={editTagId}
@@ -585,6 +642,7 @@ export function AdditionalEntriesCard({
                     ) : undefined
                   }
                   recurringAction={
+                    !entry.isCompleted && !completionPending ? (
                     <Button
                       size="icon-sm"
                       variant="ghost"
@@ -602,8 +660,25 @@ export function AdditionalEntriesCard({
                     >
                       <Repeat className="h-3.5 w-3.5" />
                     </Button>
+                    ) : undefined
                   }
-                  monthAction={onEntryMoveToMonth && moveTargets.length > 0 ? (
+                  completionAction={
+                    <CompletionLockButton
+                      completed={entry.isCompleted}
+                      pending={completionPending}
+                      disabled={
+                        savingId === entry.id
+                        || movingToGroupId === entry.id
+                        || movingEntryId === entry.id
+                        || (completionSavingId !== null && !completionPending)
+                      }
+                      onToggle={() => void handleCompletionToggle(entry)}
+                      completeLabel={t("markCompleted")}
+                      reopenLabel={t("reopen")}
+                      actionSize
+                    />
+                  }
+                  monthAction={!entry.isCompleted && !completionPending && onEntryMoveToMonth && moveTargets.length > 0 ? (
                     <DropdownMenu>
                       <DropdownMenuTrigger
                         render={
@@ -643,7 +718,7 @@ export function AdditionalEntriesCard({
                       </DropdownMenuContent>
                     </DropdownMenu>
                   ) : undefined}
-                  folderAction={type === "expense" && groups.length > 0 ? (
+                  folderAction={!entry.isCompleted && !completionPending && type === "expense" && groups.length > 0 ? (
                     <DropdownMenu>
                       <DropdownMenuTrigger
                         render={
@@ -696,14 +771,18 @@ export function AdditionalEntriesCard({
                 onDragEnd={handleDragEnd}
                 className={cn(
                   "rounded-xl border border-transparent px-2 py-1.5 transition-all hover:border-border/70 hover:bg-muted/40",
+                  entry.isCompleted && "border-emerald-500/10 bg-muted/45 hover:border-emerald-500/15 hover:bg-muted/55",
                   canMoveEntry(entry) && "cursor-grab active:cursor-grabbing",
                   (deletingId === entry.id || movingEntryId === entry.id) && "pointer-events-none opacity-60",
                   highlightId === `entry-${entry.id}` && "animate-entry-highlight"
                 )}
               >
                 <div className="flex min-w-0 items-center justify-between gap-2">
-                  {readOnly ? (
-                    <span className="min-w-0 flex-1 truncate text-left text-sm font-medium text-foreground" title={entry.label}>
+                  {readOnly || completionPending ? (
+                    <span className={cn(
+                      "min-w-0 flex-1 truncate text-left text-sm font-medium text-foreground",
+                      entry.isCompleted && "text-muted-foreground/65"
+                    )} title={entry.label}>
                       <span className="flex min-w-0 items-center gap-1.5">
                         <span className="truncate">{entry.label}</span>
                         {displayTag && TAG_COLORS[displayTag.color] && (
@@ -742,7 +821,10 @@ export function AdditionalEntriesCard({
                     </span>
                   ) : (
                     <button
-                      className="min-w-0 flex-1 truncate text-left text-sm font-medium text-foreground transition-colors hover:text-primary focus-visible:text-primary"
+                      className={cn(
+                        "min-w-0 flex-1 truncate text-left text-sm font-medium text-foreground transition-colors hover:text-primary focus-visible:text-primary",
+                        entry.isCompleted && "text-muted-foreground/65"
+                      )}
                       onClick={() => openEditForm(entry, "label")}
                       type="button"
                       aria-label={`${t("edit")} ${entry.label}`}
@@ -787,13 +869,19 @@ export function AdditionalEntriesCard({
                     </button>
                   )}
                   <div className="flex shrink-0 items-center gap-1.5">
-                    {readOnly ? (
-                      <span className="whitespace-nowrap text-sm font-semibold tabular-nums">
+                    {readOnly || completionPending ? (
+                      <span className={cn(
+                        "whitespace-nowrap text-sm font-semibold tabular-nums",
+                        entry.isCompleted && "text-muted-foreground/65"
+                      )}>
                         {formatCurrency(entry.amount, locale)}
                       </span>
                     ) : (
                       <button
-                        className="whitespace-nowrap rounded-md px-2 py-1 text-sm font-semibold tabular-nums text-foreground transition-colors hover:bg-background hover:text-primary"
+                        className={cn(
+                          "whitespace-nowrap rounded-md px-2 py-1 text-sm font-semibold tabular-nums text-foreground transition-colors hover:bg-background hover:text-primary",
+                          entry.isCompleted && "text-muted-foreground/65"
+                        )}
                         onClick={() => openEditForm(entry, "amount")}
                         type="button"
                         aria-label={`${t("edit")} ${entry.label}`}
@@ -802,7 +890,7 @@ export function AdditionalEntriesCard({
                         {formatCurrency(entry.amount, locale)}
                       </button>
                     )}
-                    {!readOnly ? (
+                    {!readOnly && !entry.isCompleted && !completionPending ? (
                       <AlertDialog>
                         <AlertDialogTrigger
                           render={

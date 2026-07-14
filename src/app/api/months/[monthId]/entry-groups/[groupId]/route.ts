@@ -4,6 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { getSessionUser } from "@/lib/server/session";
 import { getOwnedMonth, getOwnedGroup } from "@/lib/server/ownership";
 import { getYearNumberForYearId, propagateYearCarryOver } from "@/lib/server/year-carry-over";
+import { COMPLETED_LOCK_ERROR, isCompletionOnlyRequest } from "@/lib/additional-entry-completion";
 
 export async function PATCH(
   request: Request,
@@ -25,14 +26,23 @@ export async function PATCH(
   );
   if (!group) return Response.json({ error: "Group not found" }, { status: 404 });
 
-  const body = await request.json();
+  const body: Record<string, unknown> = await request.json();
+  if (!isCompletionOnlyRequest(body, group.isCompleted)) {
+    return Response.json({ error: COMPLETED_LOCK_ERROR }, { status: 409 });
+  }
   const hasLabel = body.label !== undefined;
   const label = hasLabel ? (typeof body.label === "string" ? body.label.trim() : "") : group.label;
   if (!label) {
     return Response.json({ error: "label is required" }, { status: 400 });
   }
 
-  const groupUpdate: { label: string; tagId?: number | null; monthId?: number } = { label };
+  const groupUpdate: { label: string; tagId?: number | null; monthId?: number; isCompleted?: boolean } = { label };
+  if (body.isCompleted !== undefined) {
+    if (typeof body.isCompleted !== "boolean") {
+      return Response.json({ error: "isCompleted must be a boolean" }, { status: 400 });
+    }
+    groupUpdate.isCompleted = body.isCompleted;
+  }
   let targetMonth = month;
   if (body.monthId !== undefined) {
     const targetMonthId = parseInt(String(body.monthId), 10);
@@ -52,7 +62,7 @@ export async function PATCH(
 
   let newTagId: number | null | undefined;
   if (body.tagId !== undefined) {
-    const validatedTagId: number | null = body.tagId;
+    const validatedTagId = body.tagId as number | null;
     if (validatedTagId !== null && !(Number.isInteger(validatedTagId) && validatedTagId > 0)) {
       return Response.json({ error: "Tag not found" }, { status: 404 });
     }
@@ -116,6 +126,10 @@ export async function DELETE(
     parseInt(groupId, 10)
   );
   if (!group) return Response.json({ error: "Group not found" }, { status: 404 });
+
+  if (group.isCompleted) {
+    return Response.json({ error: COMPLETED_LOCK_ERROR }, { status: 409 });
+  }
 
   await db
     .delete(additionalEntryGroups)

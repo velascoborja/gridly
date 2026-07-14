@@ -35,6 +35,12 @@ test("entries POST route uses group tagId when groupId is provided", () => {
   assert.match(routeSource, /group\.tagId/);
 });
 
+test("entries POST route rejects additions to completed groups", () => {
+  assert.match(routeSource, /if \(group\.isCompleted\)/);
+  assert.match(routeSource, /completed_locked/);
+  assert.match(routeSource, /status: 409/);
+});
+
 test("entries POST route only accepts a tag owned by the authenticated user", () => {
   assert.match(routeSource, /eq\(tags\.id, tagId\)/);
   assert.match(routeSource, /eq\(tags\.userId, user\.id\)/);

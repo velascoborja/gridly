@@ -63,10 +63,12 @@ test("entry edit focus follows whether the user clicked label or amount", () => 
   for (const source of [additionalEntriesSource, groupRowSource, recurringSource]) {
     assert.match(source, /const \[editFocusTarget, setEditFocusTarget\] = useState<EntryEditFocusTarget>\("label"\)/);
     assert.match(source, /setEditFocusTarget\(focusTarget\)/);
-    assert.match(source, /autoFocus=\{editFocusTarget\}/);
     assert.match(source, /onClick=\{\(\) => openEditForm\(entry, "label"\)\}/);
     assert.match(source, /onClick=\{\(\) => openEditForm\(entry, "amount"\)\}/);
   }
+  assert.match(additionalEntriesSource, /autoFocus=\{entry\.isCompleted \? false : editFocusTarget\}/);
+  assert.match(groupRowSource, /autoFocus=\{entry\.isCompleted \? false : editFocusTarget\}/);
+  assert.match(recurringSource, /autoFocus=\{editFocusTarget\}/);
 });
 
 test("additional expense group creation refreshes the app router cache after local state updates", () => {
@@ -368,7 +370,7 @@ test("fixed expenses card embeds recurring expenses without month-level add", ()
   assert.match(expensesSource, /RecurringExpensesList/);
   assert.match(expensesSource, /{t\("recurringExpensesTitle"\)}/);
   assert.match(listSource, /\/api\/months\/\$\{monthId\}\/recurring-expenses\/\$\{id\}/);
-  assert.doesNotMatch(listSource, /fetch\(`\/api\/months\/\$\{monthId\}\/recurring-expenses`[^)]*method:\s*"POST"/s);
+  assert.doesNotMatch(listSource, /fetch\(`\/api\/months\/\$\{monthId\}\/recurring-expenses`[\s\S]*?method:\s*"POST"/);
   assert.doesNotMatch(listSource, /addEntry/);
   assert.match(listSource, /deletingId === entry\.id/);
 });
@@ -432,7 +434,7 @@ test("additional entry rows keep drag and drop and expose month moves only insid
   assert.match(entriesSource, /draggable=\{canMoveEntry\(entry\)\}/);
   assert.match(entriesSource, /onDragStart=\{\(event\) => handleDragStart\(event, entry\)\}/);
   assert.match(entriesSource, /CalendarArrowUp/);
-  assert.match(entriesSource, /monthAction=\{onEntryMoveToMonth && moveTargets\.length > 0/);
+  assert.match(entriesSource, /monthAction=\{!entry\.isCompleted && !completionPending && onEntryMoveToMonth && moveTargets\.length > 0/);
   assert.match(entriesSource, /onEntryMoveToMonth\?: \(entry: AdditionalEntry, targetMonthId: number\) => void/);
   assert.match(entriesSource, /t\("moveToMonth"\)/);
   assert.match(overviewSource, /moveTargets=\{sortedMonths/);
@@ -498,6 +500,7 @@ test("additional expense group keeps compact mobile actions above expenses witho
   const groupRowSource = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");
   const entriesStart = groupRowSource.indexOf("{group.entries.map((entry) =>");
   const mobileActionsStart = groupRowSource.indexOf("{/* Mobile group actions */}");
+  const mobileLockStart = groupRowSource.indexOf("<CompletionLockButton", mobileActionsStart);
 
   assert.match(groupRowSource, /"flex cursor-pointer select-none items-center gap-1 px-2\.5 py-1\.5 sm:gap-2"/);
   assert.match(groupRowSource, /className="shrink-0 rounded-full bg-muted\/40[^\n]+"/);
@@ -505,6 +508,7 @@ test("additional expense group keeps compact mobile actions above expenses witho
   assert.notEqual(entriesStart, -1);
   assert.notEqual(mobileActionsStart, -1);
   assert.ok(mobileActionsStart < entriesStart, "mobile actions should render before the grouped expenses");
+  assert.ok(mobileActionsStart < mobileLockStart && mobileLockStart < entriesStart);
   assert.match(
     groupRowSource,
     /className="flex w-full flex-nowrap items-center justify-start gap-1[^\n]+px-2[^\n]+sm:hidden"/
@@ -525,7 +529,7 @@ test("additional expense group keeps compact mobile actions above expenses witho
   assert.match(groupRowSource, /disabled=\{addingFormOpen\}/);
   assert.match(
     groupRowSource,
-    /className="hidden items-center gap-1\.5 rounded-md[^\n]+sm:inline-flex"/
+    /className="hidden items-center justify-between gap-2 sm:flex"/
   );
 });
 
@@ -545,13 +549,73 @@ test("EntryFormRow reserves more horizontal space for the amount and keeps actio
 
   assert.match(source, /tagAction\?: React\.ReactNode/);
   assert.match(source, /monthAction\?: React\.ReactNode/);
+  assert.match(source, /completionAction\?: React\.ReactNode/);
+  assert.match(source, /fieldsDisabled\?: boolean/);
+  assert.match(source, /saveDisabled\?: boolean/);
+  assert.match(source, /showSaveAction\?: boolean/);
+  assert.match(source, /showCancelAction\?: boolean/);
   assert.match(source, /className="grid grid-cols-\[minmax\(0,1fr\)_auto\] gap-x-2"/);
   assert.match(source, /className="relative w-36"/);
   assert.match(source, /className="col-span-2 mt-2 flex items-center justify-end gap-0"/);
 });
 
-test("EntryFormRow renders only actions in the lower row", () => {
+test("EntryFormRow keeps the completion lock beside recurring and movement actions", () => {
   const source = readFileSync(new URL("./entry-form-row.tsx", import.meta.url), "utf8");
 
-  assert.match(source, /<div className="col-span-2 mt-2 flex items-center justify-end gap-0">\s*\{tagAction\}\s*\{recurringAction\}\s*\{monthAction\}\s*\{folderAction\}/);
+  assert.match(source, /<div className="col-span-2 mt-2 flex items-center justify-end gap-0">\s*\{tagAction\}\s*\{recurringAction\}\s*\{completionAction\}\s*\{monthAction\}\s*\{folderAction\}/);
+});
+
+test("completion locks update optimistically and expose accessible pending feedback", () => {
+  const lockSource = readFileSync(new URL("./completion-lock-button.tsx", import.meta.url), "utf8");
+  const entriesSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
+  const groupSource = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");
+
+  assert.match(lockSource, /LockKeyholeOpen/);
+  assert.match(lockSource, /animate-lock-open/);
+  assert.match(lockSource, /animate-lock-close/);
+  assert.match(lockSource, /motion-reduce:animate-none/);
+  assert.match(lockSource, /aria-busy=\{pending\}/);
+  assert.match(lockSource, /actionSize \? "icon-sm" : "icon-xs"/);
+  for (const source of [entriesSource, groupSource]) {
+    assert.match(source, /JSON\.stringify\(\{ isCompleted: nextCompleted \}\)/);
+    assert.match(source, /setCompletionError\(t\("completionError"\)\)/);
+    assert.match(source, /role="alert"/);
+  }
+});
+
+test("completion locks are contextual while group delete stays visible in the mobile header", () => {
+  const entriesSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
+  const groupSource = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");
+  const esMessages = readFileSync(new URL("../../../messages/es.json", import.meta.url), "utf8");
+  const enMessages = readFileSync(new URL("../../../messages/en.json", import.meta.url), "utf8");
+  const entriesListStart = entriesSource.indexOf("{sortedEntries.map((entry) => {");
+  const entryEditorStart = entriesSource.indexOf("return !readOnly && editingId === entry.id", entriesListStart);
+  const entryLockStart = entriesSource.indexOf("<CompletionLockButton", entryEditorStart);
+  const entryDisplayStart = entriesSource.indexOf("data-highlight-id={`entry-${entry.id}`}", entryEditorStart);
+  const expandedGroupStart = groupSource.indexOf("{/* Expanded body */}");
+  const groupLockStart = groupSource.indexOf("<CompletionLockButton", expandedGroupStart);
+  const groupedEntriesStart = groupSource.indexOf("{group.entries.map((entry) =>", expandedGroupStart);
+  const desktopGroupActionsStart = groupSource.indexOf("className=\"hidden items-center justify-between gap-2 sm:flex\"", groupedEntriesStart);
+  const desktopAddStart = groupSource.indexOf("onClick={() => setAddingFormOpen(true)}", desktopGroupActionsStart);
+  const desktopGroupLockStart = groupSource.indexOf("<CompletionLockButton", desktopAddStart);
+
+  assert.notEqual(entryEditorStart, -1);
+  assert.ok(entryEditorStart < entryLockStart && entryLockStart < entryDisplayStart);
+  assert.match(entriesSource, /return !readOnly && editingId === entry\.id/);
+  assert.match(entriesSource, /!readOnly && !entry\.isCompleted/);
+  assert.doesNotMatch(entriesSource, /LockKeyhole/);
+  assert.match(groupSource, /const groupLocked = readOnly \|\| group\.isCompleted/);
+  assert.ok(expandedGroupStart < groupLockStart && groupLockStart < groupedEntriesStart);
+  assert.ok(desktopGroupActionsStart < desktopAddStart && desktopAddStart < desktopGroupLockStart);
+  assert.match(entriesSource, /completionAction=\{[\s\S]*?<CompletionLockButton[\s\S]*?actionSize/);
+  assert.match(groupSource, /completionAction=\{[\s\S]*?<CompletionLockButton[\s\S]*?actionSize/);
+  assert.match(entriesSource, /showSaveAction=\{!entry\.isCompleted && !completionPending\}/);
+  assert.match(groupSource, /showSaveAction=\{!entry\.isCompleted && completionSavingId !== entry\.id\}/);
+  assert.match(entriesSource, /cancelLabel=\{entry\.isCompleted \? t\("exit"\) : t\("cancel"\)\}/);
+  assert.match(groupSource, /cancelLabel=\{entry\.isCompleted \? t\("exit"\) : t\("cancel"\)\}/);
+  assert.match(esMessages, /"exit": "Salir"/);
+  assert.match(enMessages, /"exit": "Exit"/);
+  assert.doesNotMatch(groupSource, /LockKeyhole/);
+  assert.match(groupSource, /className="shrink-0 text-muted-foreground hover:text-destructive"/);
+  assert.doesNotMatch(groupSource, /className="hidden shrink-0 text-muted-foreground hover:text-destructive sm:inline-flex"/);
 });

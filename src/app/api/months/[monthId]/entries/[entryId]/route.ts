@@ -4,6 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { getYearNumberForYearId, propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getSessionUser } from "@/lib/server/session";
 import { getOwnedEntry, getOwnedMonth } from "@/lib/server/ownership";
+import { COMPLETED_LOCK_ERROR, isCompletionOnlyRequest } from "@/lib/additional-entry-completion";
 
 export async function PATCH(
   request: Request,
@@ -17,15 +18,37 @@ export async function PATCH(
   const { monthId, entryId } = await params;
   const month = await getOwnedMonth(user.id, parseInt(monthId, 10));
   const id = parseInt(entryId, 10);
-  const body = await request.json();
+  const body: Record<string, unknown> = await request.json();
 
   const updates: Partial<typeof additionalEntries.$inferInsert> = {};
-  if (body.label !== undefined) updates.label = body.label;
+  if (body.label !== undefined) {
+    if (typeof body.label !== "string") {
+      return Response.json({ error: "label must be a string" }, { status: 400 });
+    }
+    updates.label = body.label;
+  }
   if (body.amount !== undefined) updates.amount = String(body.amount);
 
   const entry = await getOwnedEntry(user.id, id);
   if (!month || !entry || entry.monthId !== month.id)
     return Response.json({ error: "Entry not found" }, { status: 404 });
+
+  const sourceGroup = entry.groupId == null
+    ? null
+    : await db.query.additionalEntryGroups.findFirst({
+        where: eq(additionalEntryGroups.id, entry.groupId),
+      });
+
+  if (sourceGroup?.isCompleted || !isCompletionOnlyRequest(body, entry.isCompleted)) {
+    return Response.json({ error: COMPLETED_LOCK_ERROR }, { status: 409 });
+  }
+
+  if (body.isCompleted !== undefined) {
+    if (typeof body.isCompleted !== "boolean") {
+      return Response.json({ error: "isCompleted must be a boolean" }, { status: 400 });
+    }
+    updates.isCompleted = body.isCompleted;
+  }
 
   if (body.monthId !== undefined) {
     const targetMonthId = parseInt(String(body.monthId), 10);
@@ -59,6 +82,9 @@ export async function PATCH(
       if (!group) {
         return Response.json({ error: "Group not found" }, { status: 404 });
       }
+      if (group.isCompleted) {
+        return Response.json({ error: COMPLETED_LOCK_ERROR }, { status: 409 });
+      }
       updates.groupId = groupId;
       updates.isRecurring = false;
       updates.tagId = group.tagId ?? null;
@@ -70,7 +96,7 @@ export async function PATCH(
   }
 
   if (body.tagId !== undefined && body.groupId === undefined) {
-    const newTagId: number | null = body.tagId;
+    const newTagId = body.tagId as number | null;
     if (newTagId !== null && !(Number.isInteger(newTagId) && newTagId > 0)) {
       return Response.json({ error: "Tag not found" }, { status: 404 });
     }
@@ -115,6 +141,15 @@ export async function DELETE(
 
   const entry = await getOwnedEntry(user.id, id);
   if (!month || !entry || entry.monthId !== month.id) return Response.json({ error: "Entry not found" }, { status: 404 });
+
+  const sourceGroup = entry.groupId == null
+    ? null
+    : await db.query.additionalEntryGroups.findFirst({
+        where: eq(additionalEntryGroups.id, entry.groupId),
+      });
+  if (entry.isCompleted || sourceGroup?.isCompleted) {
+    return Response.json({ error: COMPLETED_LOCK_ERROR }, { status: 409 });
+  }
 
   await db.delete(additionalEntries).where(eq(additionalEntries.id, entry.id));
   const yearNumber = await getYearNumberForYearId(month.yearId);

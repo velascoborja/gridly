@@ -24,6 +24,7 @@ export interface AdditionalEntry {
   label: string;
   amount: number;
   isRecurring: boolean;
+  isCompleted: boolean;
   tagId: number | null;
   tag: Tag | null;
 }
@@ -32,6 +33,7 @@ export interface AdditionalEntryGroup {
   id: number;
   monthId: number;
   label: string;
+  isCompleted: boolean;
   tagId: number | null;
   tag: Tag | null;
   entries: AdditionalEntry[];

@@ -132,6 +132,7 @@ export const additionalEntryGroups = pgTable("additional_entry_groups", {
     .notNull()
     .references(() => months.id, { onDelete: "cascade" }),
   label: text("label").notNull(),
+  isCompleted: boolean("is_completed").notNull().default(false),
   tagId: integer("tag_id")
     .references(() => tags.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at").defaultNow(),
@@ -148,6 +149,7 @@ export const additionalEntries = pgTable("additional_entries", {
   label: text("label").notNull(),
   amount: numeric("amount", { precision: 12, scale: 2 }).notNull().default("0"),
   isRecurring: boolean("is_recurring").notNull().default(false),
+  isCompleted: boolean("is_completed").notNull().default(false),
   tagId: integer("tag_id")
     .references(() => tags.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at").defaultNow(),

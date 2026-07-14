@@ -19,6 +19,10 @@ interface EntryFormRowProps {
   onSave: () => void;
   onCancel: () => void;
   disabled?: boolean;
+  fieldsDisabled?: boolean;
+  saveDisabled?: boolean;
+  showSaveAction?: boolean;
+  showCancelAction?: boolean;
   isSaving?: boolean;
   saveLabel: string;
   savingLabel: string;
@@ -29,6 +33,8 @@ interface EntryFormRowProps {
   monthAction?: React.ReactNode;
   /** Optional slot for a recurring toggle button rendered before folderAction */
   recurringAction?: React.ReactNode;
+  /** Optional slot for the completion lock rendered with the other row actions */
+  completionAction?: React.ReactNode;
   /** Optional slot for a tag action button rendered before recurringAction */
   tagAction?: React.ReactNode;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
@@ -48,6 +54,10 @@ export function EntryFormRow({
   onSave,
   onCancel,
   disabled = false,
+  fieldsDisabled = disabled,
+  saveDisabled = disabled,
+  showSaveAction = true,
+  showCancelAction = true,
   isSaving = false,
   saveLabel,
   savingLabel,
@@ -55,6 +65,7 @@ export function EntryFormRow({
   folderAction,
   monthAction,
   recurringAction,
+  completionAction,
   tagAction,
   onKeyDown,
   autoFocus = false,
@@ -72,7 +83,7 @@ export function EntryFormRow({
         placeholder={labelPlaceholder}
         value={labelValue}
         onChange={(e) => onLabelChange(e.target.value)}
-        disabled={disabled}
+        disabled={fieldsDisabled}
         onKeyDown={onKeyDown}
         autoFocus={autoFocusTarget === "label"}
       />
@@ -88,7 +99,7 @@ export function EntryFormRow({
                 : sanitizeNumericInput(e.target.value)
             )
           }
-          disabled={disabled}
+          disabled={fieldsDisabled}
           onKeyDown={onKeyDown}
           inputMode={amountMode === "expression" ? "text" : "decimal"}
           autoFocus={autoFocusTarget === "amount"}
@@ -120,15 +131,20 @@ export function EntryFormRow({
       <div className="col-span-2 mt-2 flex items-center justify-end gap-0">
         {tagAction}
         {recurringAction}
+        {completionAction}
         {monthAction}
         {folderAction}
-        <Button size="sm" className="ml-2 h-9 px-3" onClick={onSave} disabled={disabled}>
-          {isSaving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
-          {isSaving ? savingLabel : saveLabel}
-        </Button>
-        <Button size="sm" variant="ghost" className="h-9 px-3" onClick={onCancel} disabled={disabled}>
-          {cancelLabel}
-        </Button>
+        {showSaveAction ? (
+          <Button size="sm" className="ml-2 h-9 px-3" onClick={onSave} disabled={saveDisabled}>
+            {isSaving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+            {isSaving ? savingLabel : saveLabel}
+          </Button>
+        ) : null}
+        {showCancelAction ? (
+          <Button size="sm" variant="ghost" className="h-9 px-3" onClick={onCancel} disabled={disabled}>
+            {cancelLabel}
+          </Button>
+        ) : null}
       </div>
     </div>
   );
