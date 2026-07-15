@@ -690,3 +690,20 @@ test("completed groups and grouped entries replace Delete without changing heade
     /!readOnly && !group\.isCompleted && !isSavingCompletion \? \(/
   );
 });
+
+test("ungrouped completion collapses the editor and restores it after a failed lock", () => {
+  const source = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
+  const handlerStart = source.indexOf("const handleCompletionToggle = async (entry: AdditionalEntry) => {");
+  const handlerEnd = source.indexOf("const handleMoveToGroup = async", handlerStart);
+  const handlerSource = source.slice(handlerStart, handlerEnd);
+  const tryStart = handlerSource.indexOf("try {");
+  const catchStart = handlerSource.indexOf("} catch {");
+  const finallyStart = handlerSource.indexOf("} finally {");
+  const optimisticSource = handlerSource.slice(0, tryStart);
+  const failureSource = handlerSource.slice(catchStart, finallyStart);
+
+  assert.notEqual(handlerStart, -1, "expected the ungrouped completion handler");
+  assert.notEqual(handlerEnd, -1, "expected the handler boundary");
+  assert.match(optimisticSource, /if \(nextCompleted\) setEditingId\(null\);/);
+  assert.match(failureSource, /if \(nextCompleted\) setEditingId\(entry\.id\);/);
+});

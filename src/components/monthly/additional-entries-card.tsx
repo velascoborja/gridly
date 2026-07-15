@@ -318,6 +318,7 @@ export function AdditionalEntriesCard({
     const nextCompleted = !entry.isCompleted;
     setCompletionError(null);
     setCompletionSavingId(entry.id);
+    if (nextCompleted) setEditingId(null);
     onEntriesChange(entriesRef.current.map((item) =>
       item.id === entry.id ? { ...item, isCompleted: nextCompleted } : item
     ));
@@ -343,6 +344,7 @@ export function AdditionalEntriesCard({
       onEntriesChange(entriesRef.current.map((item) =>
         item.id === entry.id ? { ...item, isCompleted: entry.isCompleted } : item
       ));
+      if (nextCompleted) setEditingId(entry.id);
       setCompletionError(t("completionError"));
     } finally {
       setCompletionSavingId(null);
