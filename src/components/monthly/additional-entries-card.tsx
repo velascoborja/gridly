@@ -921,6 +921,21 @@ export function AdditionalEntriesCard({
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
+                    ) : !readOnly && (entry.isCompleted || completionPending) ? (
+                      <CompletionLockButton
+                        completed={entry.isCompleted || completionPending}
+                        pending={completionPending}
+                        disabled={
+                          savingId === entry.id
+                          || movingToGroupId === entry.id
+                          || movingEntryId === entry.id
+                          || (completionSavingId !== null && !completionPending)
+                        }
+                        onToggle={() => void handleCompletionToggle(entry)}
+                        completeLabel={t("markCompleted")}
+                        reopenLabel={t("reopen")}
+                        className="h-6 w-6"
+                      />
                     ) : null}
                   </div>
                 </div>

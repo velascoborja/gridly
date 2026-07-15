@@ -583,7 +583,7 @@ test("completion locks update optimistically and expose accessible pending feedb
   }
 });
 
-test("completion locks are contextual while group delete stays visible in the mobile header", () => {
+test("completion locks remain available in contextual editors before completion", () => {
   const entriesSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
   const groupSource = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");
   const esMessages = readFileSync(new URL("../../../messages/es.json", import.meta.url), "utf8");
@@ -618,4 +618,28 @@ test("completion locks are contextual while group delete stays visible in the mo
   assert.doesNotMatch(groupSource, /LockKeyhole/);
   assert.match(groupSource, /className="shrink-0 text-muted-foreground hover:text-destructive"/);
   assert.doesNotMatch(groupSource, /className="hidden shrink-0 text-muted-foreground hover:text-destructive sm:inline-flex"/);
+});
+
+test("completed ungrouped entries replace Delete with a direct compact reopen action", () => {
+  const source = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
+  const restingRowStart = source.indexOf('data-highlight-id={`entry-${entry.id}`}');
+  const trailingActionsStart = source.indexOf(
+    'className="flex shrink-0 items-center gap-1.5"',
+    restingRowStart
+  );
+  const cardEnd = source.indexOf("</CardContent>", trailingActionsStart);
+  const deleteStart = source.indexOf("<AlertDialog>", trailingActionsStart);
+  const reopenStart = source.indexOf("<CompletionLockButton", deleteStart);
+  const trailingActionsSource = source.slice(trailingActionsStart, cardEnd);
+
+  assert.notEqual(restingRowStart, -1, "expected the resting entry row");
+  assert.notEqual(trailingActionsStart, -1, "expected the resting entry action area");
+  assert.notEqual(deleteStart, -1, "expected Delete in the resting entry action area");
+  assert.notEqual(reopenStart, -1, "expected a direct reopen lock after Delete");
+  assert.ok(deleteStart < reopenStart && reopenStart < cardEnd);
+  assert.match(trailingActionsSource, /entry\.isCompleted \|\| completionPending/);
+  assert.match(trailingActionsSource, /completed=\{entry\.isCompleted \|\| completionPending\}/);
+  assert.match(trailingActionsSource, /pending=\{completionPending\}/);
+  assert.match(trailingActionsSource, /onToggle=\{\(\) => void handleCompletionToggle\(entry\)\}/);
+  assert.match(trailingActionsSource, /className="h-6 w-6"/);
 });
