@@ -584,6 +584,15 @@ test("completion locks update optimistically and expose accessible pending feedb
   }
 });
 
+test("group completion errors render after the collapsible body boundary", () => {
+  const source = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");
+
+  assert.match(
+    source,
+    /<\/div>\s*<\/div>\s*<\/div>\s*\{completionError \? \([\s\S]*?role="alert"/
+  );
+});
+
 test("completion locks remain available in contextual editors before completion", () => {
   const entriesSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
   const groupSource = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");

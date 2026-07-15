@@ -1050,17 +1050,18 @@ export function AdditionalEntryGroupRow({
             </div>
           ) : null}
 
-          {completionError ? (
-            <p
-              role="alert"
-              className="rounded-md border border-destructive/20 bg-destructive/[0.06] px-2.5 py-2 text-xs text-destructive"
-            >
-              {completionError}
-            </p>
-          ) : null}
         </div>
         </div>
       </div>
+
+      {completionError ? (
+        <p
+          role="alert"
+          className="rounded-md border border-destructive/20 bg-destructive/[0.06] px-2.5 py-2 text-xs text-destructive"
+        >
+          {completionError}
+        </p>
+      ) : null}
     </div>
   );
 }
