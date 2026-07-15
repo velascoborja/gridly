@@ -90,7 +90,7 @@ Both item `PATCH` routes also accept `{ isCompleted: boolean }`. Completed resou
 
 ### Collapsed state
 - Groups render collapsed by default. State is UI-only and resets on page reload.
-- The collapsed group header uses compact vertical padding so grouped expense headers align visually with the density of regular entry rows while retaining the same controls.
+- The group header keeps a uniform 48px minimum height at every breakpoint across incomplete, pending, and completed states.
 - Collapsed state is lifted to `AdditionalEntriesCard` (a `Record<groupId, boolean>` map) and passed to each `AdditionalEntryGroupRow` as `collapsed` / `onCollapsedChange` props. This allows the card to coordinate all groups atomically for bulk expand/collapse.
 - If a highlighted entry (from search/navigation) belongs to a group, the group auto-expands via a `useEffect` watching `highlightId`.
 - `Cmd+Shift+.` expands all groups if any are collapsed, or collapses all if every group is already expanded. See [Keyboard Shortcuts](keyboard-shortcuts.md).
@@ -99,9 +99,11 @@ Both item `PATCH` routes also accept `{ isCompleted: boolean }`. Completed resou
 - A group can be marked completed from its lock action. The group surface and contents become muted while totals remain legible.
 - Completing a group locks its name, tag, movement, deletion, add-entry action, and every child entry. Child `isCompleted` values are unchanged, so reopening restores each child's individual state.
 - Expanding and collapsing remains available because it does not mutate financial data.
-- The interactive group lock is contextual on every viewport: it is rendered only inside the expanded body and never in the resting header. On desktop it sits at the bottom-right opposite the bottom-left "Add entry" action. On mobile it shares the compact action bar with tag, move-to-month, and add-entry controls. Completed child rows can likewise be opened to reveal their lock in the shared entry action row after the parent group is reopened.
-- Group deletion remains directly available from the header on desktop and mobile while the group is incomplete. Completed groups still hide deletion until they are reopened.
-- Lock changes are optimistic, prevent duplicate submission, roll back on failure, and animate between open and closed states unless the user prefers reduced motion.
+- Completing a group optimistically collapses its body. If completion fails, the prior completion state is restored and the group expands before the localized error is shown; reopening does not automatically expand it.
+- Incomplete groups expose their open lock contextually in the expanded body. Completed groups replace header Delete with the authoritative compact closed lock, so reopening remains directly available while the group is collapsed and no duplicate reopen control appears in the body.
+- Group deletion remains directly available from the header on desktop and mobile while the group is incomplete. Completed groups hide deletion until they are reopened.
+- While a parent group is completed, it also locks every child entry without overwriting each child's `isCompleted` value. After the parent reopens, individually completed child rows expose their compact closed lock directly in the resting row.
+- Lock changes are optimistic, retain a visible disabled pending action to prevent duplicate submission, roll back on failure, and animate between open and closed states unless the user prefers reduced motion.
 
 ## Calculations
 
