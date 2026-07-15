@@ -502,7 +502,8 @@ test("additional expense group keeps compact mobile actions above expenses witho
   const mobileActionsStart = groupRowSource.indexOf("{/* Mobile group actions */}");
   const mobileLockStart = groupRowSource.indexOf("<CompletionLockButton", mobileActionsStart);
 
-  assert.match(groupRowSource, /"flex cursor-pointer select-none items-center gap-1 px-2\.5 py-1\.5 sm:min-h-12 sm:gap-2"/);
+  assert.match(groupRowSource, /"flex min-h-12 cursor-pointer select-none items-center gap-1 px-2\.5 py-1\.5 sm:gap-2"/);
+  assert.doesNotMatch(groupRowSource, /sm:min-h-12/);
   assert.match(groupRowSource, /className="shrink-0 rounded-full bg-muted\/40[^\n]+"/);
   assert.match(groupRowSource, /className="hidden h-9 shrink-0 items-center gap-1 sm:flex"/);
   assert.notEqual(entriesStart, -1);
@@ -669,7 +670,8 @@ test("completed groups and grouped entries replace Delete without changing heade
   assert.notEqual(headerDeleteStart, -1, "expected group Delete in the header");
   assert.notEqual(headerReopenStart, -1, "expected direct group reopen in the header");
   assert.ok(headerDeleteStart < headerReopenStart && headerReopenStart < expandedStart);
-  assert.match(headerSource, /sm:min-h-12/);
+  assert.match(headerSource, /min-h-12/);
+  assert.doesNotMatch(headerSource, /sm:min-h-12/);
   assert.match(headerSource, /completed=\{group\.isCompleted \|\| isSavingCompletion\}/);
   assert.match(headerSource, /pending=\{isSavingCompletion\}/);
   assert.match(headerSource, /className="h-6 w-6"/);
@@ -688,6 +690,38 @@ test("completed groups and grouped entries replace Delete without changing heade
   assert.match(
     desktopActionsSource,
     /!readOnly && !group\.isCompleted && !isSavingCompletion \? \(/
+  );
+});
+
+test("group completion collapses visual state and restores it after a failed lock", () => {
+  const source = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");
+  const entryHandlerStart = source.indexOf("const handleEntryCompletionToggle = async (entry: AdditionalEntry) => {");
+  const groupHandlerStart = source.indexOf("const handleGroupCompletionToggle = async () => {");
+  const handlerEnd = source.indexOf("const handleGroupTagChange = async", groupHandlerStart);
+  const entryHandlerSource = source.slice(entryHandlerStart, groupHandlerStart);
+  const groupHandlerSource = source.slice(groupHandlerStart, handlerEnd);
+  const entryTryStart = entryHandlerSource.indexOf("try {");
+  const entryCatchStart = entryHandlerSource.indexOf("} catch {");
+  const entryFinallyStart = entryHandlerSource.indexOf("} finally {");
+  const groupTryStart = groupHandlerSource.indexOf("try {");
+  const groupCatchStart = groupHandlerSource.indexOf("} catch {");
+  const groupFinallyStart = groupHandlerSource.indexOf("} finally {");
+
+  assert.match(
+    entryHandlerSource.slice(0, entryTryStart),
+    /if \(nextCompleted\) setEditingId\(null\);/
+  );
+  assert.match(
+    entryHandlerSource.slice(entryCatchStart, entryFinallyStart),
+    /if \(nextCompleted\) setEditingId\(entry\.id\);/
+  );
+  assert.match(
+    groupHandlerSource.slice(0, groupTryStart),
+    /if \(nextCompleted\) onCollapsedChange\(true\);/
+  );
+  assert.match(
+    groupHandlerSource.slice(groupCatchStart, groupFinallyStart),
+    /if \(nextCompleted\) onCollapsedChange\(false\);/
   );
 });
 

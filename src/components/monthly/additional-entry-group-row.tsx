@@ -316,6 +316,7 @@ export function AdditionalEntryGroupRow({
     const nextCompleted = !entry.isCompleted;
     setCompletionError(null);
     setCompletionSavingId(entry.id);
+    if (nextCompleted) setEditingId(null);
     onGroupUpdate({
       ...groupRef.current,
       entries: groupRef.current.entries.map((item) =>
@@ -350,6 +351,7 @@ export function AdditionalEntryGroupRow({
           item.id === entry.id ? { ...item, isCompleted: entry.isCompleted } : item
         ),
       });
+      if (nextCompleted) setEditingId(entry.id);
       setCompletionError(t("completionError"));
     } finally {
       setCompletionSavingId(null);
@@ -362,6 +364,7 @@ export function AdditionalEntryGroupRow({
     const nextCompleted = !group.isCompleted;
     setCompletionError(null);
     setIsSavingCompletion(true);
+    if (nextCompleted) onCollapsedChange(true);
     onGroupUpdate({ ...groupRef.current, isCompleted: nextCompleted });
 
     try {
@@ -376,6 +379,7 @@ export function AdditionalEntryGroupRow({
       onGroupUpdate({ ...groupRef.current, ...raw, isCompleted: raw.isCompleted });
     } catch {
       onGroupUpdate({ ...groupRef.current, isCompleted: group.isCompleted });
+      if (nextCompleted) onCollapsedChange(false);
       setCompletionError(t("completionError"));
     } finally {
       setIsSavingCompletion(false);
@@ -421,7 +425,7 @@ export function AdditionalEntryGroupRow({
       {/* Group header */}
       <div
         className={cn(
-          "flex cursor-pointer select-none items-center gap-1 px-2.5 py-1.5 sm:min-h-12 sm:gap-2",
+          "flex min-h-12 cursor-pointer select-none items-center gap-1 px-2.5 py-1.5 sm:gap-2",
           !group.isCompleted && !readOnly && "hover:bg-primary/[0.05]"
         )}
         onClick={handleToggle}
