@@ -502,7 +502,7 @@ test("additional expense group keeps compact mobile actions above expenses witho
   const mobileActionsStart = groupRowSource.indexOf("{/* Mobile group actions */}");
   const mobileLockStart = groupRowSource.indexOf("<CompletionLockButton", mobileActionsStart);
 
-  assert.match(groupRowSource, /"flex cursor-pointer select-none items-center gap-1 px-2\.5 py-1\.5 sm:gap-2"/);
+  assert.match(groupRowSource, /"flex cursor-pointer select-none items-center gap-1 px-2\.5 py-1\.5 sm:min-h-12 sm:gap-2"/);
   assert.match(groupRowSource, /className="shrink-0 rounded-full bg-muted\/40[^\n]+"/);
   assert.match(groupRowSource, /className="hidden h-9 shrink-0 items-center gap-1 sm:flex"/);
   assert.notEqual(entriesStart, -1);
@@ -642,4 +642,51 @@ test("completed ungrouped entries replace Delete with a direct compact reopen ac
   assert.match(trailingActionsSource, /pending=\{completionPending\}/);
   assert.match(trailingActionsSource, /onToggle=\{\(\) => void handleCompletionToggle\(entry\)\}/);
   assert.match(trailingActionsSource, /className="h-6 w-6"/);
+});
+
+test("completed groups and grouped entries replace Delete without changing header height", () => {
+  const source = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");
+  const headerStart = source.indexOf("{/* Group header */}");
+  const expandedStart = source.indexOf("{/* Expanded body */}", headerStart);
+  const headerDeleteStart = source.indexOf("<AlertDialog>", headerStart);
+  const headerReopenStart = source.indexOf("<CompletionLockButton", headerDeleteStart);
+  const mobileActionsStart = source.indexOf("{/* Mobile group actions */}", expandedStart);
+  const groupedEntriesStart = source.indexOf("{group.entries.map((entry) =>", mobileActionsStart);
+  const groupedDeleteStart = source.indexOf("<AlertDialog>", groupedEntriesStart);
+  const groupedReopenStart = source.indexOf("<CompletionLockButton", groupedDeleteStart);
+  const addFormStart = source.indexOf("{/* Add entry to group form */}", groupedEntriesStart);
+  const desktopFooterStart = source.indexOf("{!readOnly", addFormStart);
+  const desktopActionsStart = source.indexOf(
+    'className="hidden items-center justify-between gap-2 sm:flex"',
+    desktopFooterStart
+  );
+  const completionErrorStart = source.indexOf("{completionError ? (", desktopActionsStart);
+  const headerSource = source.slice(headerStart, expandedStart);
+  const mobileActionsSource = source.slice(mobileActionsStart, groupedEntriesStart);
+  const groupedRowsSource = source.slice(groupedEntriesStart, addFormStart);
+  const desktopActionsSource = source.slice(desktopFooterStart, completionErrorStart);
+
+  assert.notEqual(headerDeleteStart, -1, "expected group Delete in the header");
+  assert.notEqual(headerReopenStart, -1, "expected direct group reopen in the header");
+  assert.ok(headerDeleteStart < headerReopenStart && headerReopenStart < expandedStart);
+  assert.match(headerSource, /sm:min-h-12/);
+  assert.match(headerSource, /completed=\{group\.isCompleted \|\| isSavingCompletion\}/);
+  assert.match(headerSource, /pending=\{isSavingCompletion\}/);
+  assert.match(headerSource, /className="h-6 w-6"/);
+
+  assert.notEqual(groupedDeleteStart, -1, "expected grouped-entry Delete");
+  assert.notEqual(groupedReopenStart, -1, "expected direct grouped-entry reopen");
+  assert.ok(groupedDeleteStart < groupedReopenStart && groupedReopenStart < addFormStart);
+  assert.match(groupedRowsSource, /entry\.isCompleted \|\| completionSavingId === entry\.id/);
+  assert.match(groupedRowsSource, /pending=\{completionSavingId === entry\.id\}/);
+  assert.match(groupedRowsSource, /className="h-6 w-6"/);
+
+  assert.match(
+    mobileActionsSource,
+    /!readOnly && !group\.isCompleted && !isSavingCompletion \? \(/
+  );
+  assert.match(
+    desktopActionsSource,
+    /!readOnly && !group\.isCompleted && !isSavingCompletion \? \(/
+  );
 });

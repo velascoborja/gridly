@@ -421,7 +421,7 @@ export function AdditionalEntryGroupRow({
       {/* Group header */}
       <div
         className={cn(
-          "flex cursor-pointer select-none items-center gap-1 px-2.5 py-1.5 sm:gap-2",
+          "flex cursor-pointer select-none items-center gap-1 px-2.5 py-1.5 sm:min-h-12 sm:gap-2",
           !group.isCompleted && !readOnly && "hover:bg-primary/[0.05]"
         )}
         onClick={handleToggle}
@@ -608,7 +608,17 @@ export function AdditionalEntryGroupRow({
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-            ) : null}
+            ) : (
+              <CompletionLockButton
+                completed={group.isCompleted || isSavingCompletion}
+                pending={isSavingCompletion}
+                disabled={completionSavingId !== null || editingId !== null || hasConflictingMutation}
+                onToggle={() => void handleGroupCompletionToggle()}
+                completeLabel={t("markCompleted")}
+                reopenLabel={t("reopen")}
+                className="h-6 w-6"
+              />
+            )}
           </>
           )}
         </div>
@@ -624,7 +634,7 @@ export function AdditionalEntryGroupRow({
         <div className={cn("overflow-hidden transition-opacity duration-200", collapsed ? "opacity-0" : "opacity-100")}>
         <div className="border-t border-primary/10 bg-background/60 px-2 py-1.5 flex flex-col gap-1.5">
           {/* Mobile group actions */}
-          {!readOnly ? (
+          {!readOnly && !group.isCompleted && !isSavingCompletion ? (
             <div
               className="flex w-full flex-nowrap items-center justify-start gap-1 rounded-lg border border-primary/10 bg-primary/[0.035] px-2 py-1.5 sm:hidden"
               onClick={(e) => e.stopPropagation()}
@@ -915,7 +925,7 @@ export function AdditionalEntryGroupRow({
                         {formatCurrency(entry.amount, locale)}
                       </button>
                     )}
-                    {!groupMutationLocked && !entry.isCompleted && completionSavingId !== entry.id && (
+                    {!groupMutationLocked && !entry.isCompleted && completionSavingId !== entry.id ? (
                       <AlertDialog>
                         <AlertDialogTrigger
                           render={
@@ -958,7 +968,23 @@ export function AdditionalEntryGroupRow({
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
-                    )}
+                    ) : !groupMutationLocked && (entry.isCompleted || completionSavingId === entry.id) ? (
+                      <CompletionLockButton
+                        completed={entry.isCompleted || completionSavingId === entry.id}
+                        pending={completionSavingId === entry.id}
+                        disabled={
+                          isSavingCompletion
+                          || savingId === entry.id
+                          || movingToGroupId === entry.id
+                          || (completionSavingId !== null && completionSavingId !== entry.id)
+                          || hasConflictingMutation
+                        }
+                        onToggle={() => void handleEntryCompletionToggle(entry)}
+                        completeLabel={t("markCompleted")}
+                        reopenLabel={t("reopen")}
+                        className="h-6 w-6"
+                      />
+                    ) : null}
                   </div>
                 </div>
               </div>
@@ -997,7 +1023,7 @@ export function AdditionalEntryGroupRow({
             </div>
           ) : null}
 
-          {!readOnly ? (
+          {!readOnly && !group.isCompleted && !isSavingCompletion ? (
             <div className="hidden items-center justify-between gap-2 sm:flex">
               {!groupMutationLocked && !addingFormOpen ? (
                 <button
