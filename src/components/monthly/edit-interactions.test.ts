@@ -566,22 +566,48 @@ test("EntryFormRow keeps the completion lock beside recurring and movement actio
   assert.match(source, /<div className="col-span-2 mt-2 flex items-center justify-end gap-0">\s*\{tagAction\}\s*\{recurringAction\}\s*\{completionAction\}\s*\{monthAction\}\s*\{folderAction\}/);
 });
 
-test("completion locks update optimistically and expose accessible pending feedback", () => {
+test("completion locks replace the icon with centered pending feedback and articulate confirmation", () => {
   const lockSource = readFileSync(new URL("./completion-lock-button.tsx", import.meta.url), "utf8");
   const entriesSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
   const groupSource = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");
+  const globalStyles = readFileSync(new URL("../../app/globals.css", import.meta.url), "utf8");
 
-  assert.match(lockSource, /LockKeyholeOpen/);
+  assert.doesNotMatch(lockSource, /LockKeyhole(?:Open)?/);
+  assert.match(lockSource, /animateConfirmation\?: boolean/);
+  assert.match(lockSource, /onConfirmationAnimationEnd\?: \(\) => void/);
+  assert.match(lockSource, /pending \? \(\s*<LoaderCircle className="h-3\.5 w-3\.5 animate-spin text-primary motion-reduce:animate-none" \/>/);
+  assert.doesNotMatch(lockSource, /absolute -right-1 -top-1/);
+  assert.match(lockSource, /<path[\s\S]*data-slot="completion-lock-shackle"/);
   assert.match(lockSource, /animate-lock-open/);
   assert.match(lockSource, /animate-lock-close/);
   assert.match(lockSource, /motion-reduce:animate-none/);
   assert.match(lockSource, /aria-busy=\{pending\}/);
   assert.match(lockSource, /actionSize \? "icon-sm" : "icon-xs"/);
+  assert.match(globalStyles, /@keyframes lock-close \{[\s\S]*translate\(4px, -2px\) rotate\(16deg\)[\s\S]*translate\(0, 0\) rotate\(0deg\)/);
+  assert.match(globalStyles, /@keyframes lock-open \{[\s\S]*translate\(0, 0\) rotate\(0deg\)[\s\S]*translate\(4px, -2px\) rotate\(16deg\)/);
   for (const source of [entriesSource, groupSource]) {
     assert.match(source, /JSON\.stringify\(\{ isCompleted: nextCompleted \}\)/);
     assert.match(source, /setCompletionError\(t\("completionError"\)\)/);
     assert.match(source, /role="alert"/);
   }
+});
+
+test("successful completion mutations keep a confirmation phase until the lock animation ends", () => {
+  const entriesSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
+  const groupSource = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");
+
+  assert.match(entriesSource, /const \[completionConfirmationId, setCompletionConfirmationId\] = useState<number \| null>\(null\);/);
+  assert.match(entriesSource, /setCompletionConfirmationId\(entry\.id\);/);
+  assert.match(entriesSource, /animateConfirmation=\{completionConfirming\}/);
+  assert.match(entriesSource, /onConfirmationAnimationEnd=\{\(\) => setCompletionConfirmationId\(null\)\}/);
+  assert.match(entriesSource, /entry\.isCompleted \|\| completionPending \|\| completionConfirming/);
+
+  assert.match(groupSource, /const \[entryCompletionConfirmationId, setEntryCompletionConfirmationId\] = useState<number \| null>\(null\);/);
+  assert.match(groupSource, /const \[isGroupCompletionConfirming, setIsGroupCompletionConfirming\] = useState\(false\);/);
+  assert.match(groupSource, /setEntryCompletionConfirmationId\(entry\.id\);/);
+  assert.match(groupSource, /setIsGroupCompletionConfirming\(true\);/);
+  assert.match(groupSource, /onConfirmationAnimationEnd=\{\(\) => setEntryCompletionConfirmationId\(null\)\}/);
+  assert.match(groupSource, /onConfirmationAnimationEnd=\{\(\) => setIsGroupCompletionConfirming\(false\)\}/);
 });
 
 test("group completion errors render after the collapsible body boundary", () => {
@@ -694,11 +720,11 @@ test("completed groups and grouped entries replace Delete without changing heade
 
   assert.match(
     mobileActionsSource,
-    /!readOnly && !group\.isCompleted && !isSavingCompletion \? \(/
+    /!readOnly && !group\.isCompleted && !isSavingCompletion && !isGroupCompletionConfirming \? \(/
   );
   assert.match(
     desktopActionsSource,
-    /!readOnly && !group\.isCompleted && !isSavingCompletion \? \(/
+    /!readOnly && !group\.isCompleted && !isSavingCompletion && !isGroupCompletionConfirming \? \(/
   );
 });
 

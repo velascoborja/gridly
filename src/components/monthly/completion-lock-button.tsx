@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { LoaderCircle, LockKeyhole, LockKeyholeOpen } from "lucide-react";
+import { useEffect } from "react";
+import { LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +12,8 @@ interface CompletionLockButtonProps {
   onToggle: () => void;
   completeLabel: string;
   reopenLabel: string;
+  animateConfirmation?: boolean;
+  onConfirmationAnimationEnd?: () => void;
   showText?: boolean;
   actionSize?: boolean;
   className?: string;
@@ -24,13 +26,24 @@ export function CompletionLockButton({
   onToggle,
   completeLabel,
   reopenLabel,
+  animateConfirmation = false,
+  onConfirmationAnimationEnd,
   showText = false,
   actionSize = false,
   className,
 }: CompletionLockButtonProps) {
   const label = completed ? reopenLabel : completeLabel;
-  const Icon = completed ? LockKeyhole : LockKeyholeOpen;
-  const [hasInteracted, setHasInteracted] = useState(false);
+
+  useEffect(() => {
+    if (
+      !animateConfirmation
+      || !onConfirmationAnimationEnd
+      || !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) return;
+
+    const frame = window.requestAnimationFrame(onConfirmationAnimationEnd);
+    return () => window.cancelAnimationFrame(frame);
+  }, [animateConfirmation, onConfirmationAnimationEnd]);
 
   return (
     <Button
@@ -52,27 +65,45 @@ export function CompletionLockButton({
       )}
       onClick={(event) => {
         event.stopPropagation();
-        setHasInteracted(true);
         onToggle();
       }}
-      disabled={disabled || pending}
+      disabled={disabled || pending || animateConfirmation}
       aria-label={label}
       title={label}
       aria-pressed={completed}
       aria-busy={pending}
     >
-      <Icon
-        key={completed ? "locked" : "open"}
-        className={cn(
-          "h-3.5 w-3.5 motion-reduce:animate-none",
-          hasInteracted && (completed ? "animate-lock-close" : "animate-lock-open"),
-          pending && "animate-pulse motion-reduce:animate-none"
-        )}
-      />
-      {showText ? <span>{label}</span> : null}
       {pending ? (
-        <LoaderCircle className="absolute -right-1 -top-1 h-2.5 w-2.5 animate-spin text-primary motion-reduce:animate-none" />
-      ) : null}
+        <LoaderCircle className="h-3.5 w-3.5 animate-spin text-primary motion-reduce:animate-none" />
+      ) : (
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="h-3.5 w-3.5"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <circle cx="12" cy="16" r="1" />
+          <rect x="3" y="10" width="18" height="12" rx="2" />
+          <path
+            data-slot="completion-lock-shackle"
+            d="M7 10V7a5 5 0 0 1 10 0v3"
+            className={cn(
+              completed ? "completion-lock-shackle-closed" : "completion-lock-shackle-open",
+              animateConfirmation && (completed ? "animate-lock-close" : "animate-lock-open"),
+              "motion-reduce:animate-none"
+            )}
+            onAnimationEnd={() => {
+              if (animateConfirmation) onConfirmationAnimationEnd?.();
+            }}
+          />
+        </svg>
+      )}
+      {showText ? <span>{label}</span> : null}
     </Button>
   );
 }

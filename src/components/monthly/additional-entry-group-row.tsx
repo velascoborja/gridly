@@ -100,6 +100,8 @@ export function AdditionalEntryGroupRow({
   const [isSavingTag, setIsSavingTag] = useState(false);
   const [isSavingCompletion, setIsSavingCompletion] = useState(false);
   const [completionSavingId, setCompletionSavingId] = useState<number | null>(null);
+  const [entryCompletionConfirmationId, setEntryCompletionConfirmationId] = useState<number | null>(null);
+  const [isGroupCompletionConfirming, setIsGroupCompletionConfirming] = useState(false);
   const [completionError, setCompletionError] = useState<string | null>(null);
 
   const getAmountPreview = (value: string) => {
@@ -124,10 +126,11 @@ export function AdditionalEntryGroupRow({
   const groupRef = useRef(group);
   groupRef.current = group;
   const groupLocked = readOnly || group.isCompleted;
-  const groupMutationLocked = groupLocked || isSavingCompletion;
+  const groupMutationLocked = groupLocked || isSavingCompletion || isGroupCompletionConfirming;
   const hasConflictingMutation = isEditingName || isSavingName || isDeletingGroup
     || addingFormOpen || isAdding || savingId !== null
-    || deletingId !== null || movingToGroupId !== null || isSavingTag || isMovingGroup;
+    || deletingId !== null || movingToGroupId !== null || isSavingTag || isMovingGroup
+    || entryCompletionConfirmationId !== null;
   const canMoveGroup = !groupMutationLocked && !isEditingName && !isDeletingGroup && !isSavingName && !isSavingTag && !isMovingGroup;
 
   useEffect(() => {
@@ -237,7 +240,7 @@ export function AdditionalEntryGroupRow({
   };
 
   const openEditForm = (entry: AdditionalEntry, focusTarget: EntryEditFocusTarget = "label") => {
-    if (groupMutationLocked || completionSavingId === entry.id) return;
+    if (groupMutationLocked || completionSavingId === entry.id || entryCompletionConfirmationId !== null) return;
     setEditingId(entry.id);
     setEditFocusTarget(focusTarget);
     setEditLabel(entry.label);
@@ -311,7 +314,7 @@ export function AdditionalEntryGroupRow({
   };
 
   const handleEntryCompletionToggle = async (entry: AdditionalEntry) => {
-    if (groupMutationLocked || completionSavingId !== null || hasConflictingMutation) return;
+    if (groupMutationLocked || completionSavingId !== null || entryCompletionConfirmationId !== null || hasConflictingMutation) return;
 
     const nextCompleted = !entry.isCompleted;
     setCompletionError(null);
@@ -344,6 +347,7 @@ export function AdditionalEntryGroupRow({
           tag: item.tag,
         } : item),
       });
+      setEntryCompletionConfirmationId(entry.id);
     } catch {
       onGroupUpdate({
         ...groupRef.current,
@@ -359,7 +363,7 @@ export function AdditionalEntryGroupRow({
   };
 
   const handleGroupCompletionToggle = async () => {
-    if (readOnly || isSavingCompletion || completionSavingId !== null || editingId !== null || hasConflictingMutation) return;
+    if (readOnly || isSavingCompletion || isGroupCompletionConfirming || completionSavingId !== null || editingId !== null || hasConflictingMutation) return;
 
     const nextCompleted = !group.isCompleted;
     setCompletionError(null);
@@ -377,6 +381,7 @@ export function AdditionalEntryGroupRow({
 
       const raw = await res.json();
       onGroupUpdate({ ...groupRef.current, ...raw, isCompleted: raw.isCompleted });
+      setIsGroupCompletionConfirming(true);
     } catch {
       onGroupUpdate({ ...groupRef.current, isCompleted: group.isCompleted });
       if (nextCompleted) onCollapsedChange(false);
@@ -566,7 +571,7 @@ export function AdditionalEntryGroupRow({
 
           {!readOnly && (
             <>
-            {!group.isCompleted && !isSavingCompletion ? (
+            {!group.isCompleted && !isSavingCompletion && !isGroupCompletionConfirming ? (
             <AlertDialog>
             <AlertDialogTrigger
               render={
@@ -616,6 +621,8 @@ export function AdditionalEntryGroupRow({
               <CompletionLockButton
                 completed={group.isCompleted || isSavingCompletion}
                 pending={isSavingCompletion}
+                animateConfirmation={isGroupCompletionConfirming}
+                onConfirmationAnimationEnd={() => setIsGroupCompletionConfirming(false)}
                 disabled={completionSavingId !== null || editingId !== null || hasConflictingMutation}
                 onToggle={() => void handleGroupCompletionToggle()}
                 completeLabel={t("markCompleted")}
@@ -638,12 +645,12 @@ export function AdditionalEntryGroupRow({
         <div className={cn("overflow-hidden transition-opacity duration-200", collapsed ? "opacity-0" : "opacity-100")}>
         <div className="border-t border-primary/10 bg-background/60 px-2 py-1.5 flex flex-col gap-1.5">
           {/* Mobile group actions */}
-          {!readOnly && !group.isCompleted && !isSavingCompletion ? (
+          {!readOnly && !group.isCompleted && !isSavingCompletion && !isGroupCompletionConfirming ? (
             <div
               className="flex w-full flex-nowrap items-center justify-start gap-1 rounded-lg border border-primary/10 bg-primary/[0.035] px-2 py-1.5 sm:hidden"
               onClick={(e) => e.stopPropagation()}
             >
-              {!group.isCompleted && !isSavingCompletion ? (
+              {!group.isCompleted && !isSavingCompletion && !isGroupCompletionConfirming ? (
                 <>
               <TagPicker
                 tags={tags}
@@ -886,7 +893,7 @@ export function AdditionalEntryGroupRow({
                 )}
               >
                 <div className="flex min-w-0 items-center justify-between gap-2">
-                  {groupMutationLocked || completionSavingId === entry.id ? (
+                  {groupMutationLocked || completionSavingId === entry.id || entryCompletionConfirmationId === entry.id ? (
                     <span className={cn(
                       "min-w-0 flex-1 truncate text-left text-sm font-medium text-foreground",
                       (group.isCompleted || entry.isCompleted) && "text-muted-foreground/65"
@@ -908,7 +915,7 @@ export function AdditionalEntryGroupRow({
                     </button>
                   )}
                   <div className="flex shrink-0 items-center gap-1.5">
-                    {groupMutationLocked || completionSavingId === entry.id ? (
+                    {groupMutationLocked || completionSavingId === entry.id || entryCompletionConfirmationId === entry.id ? (
                       <span className={cn(
                         "whitespace-nowrap text-sm font-semibold tabular-nums",
                         (group.isCompleted || entry.isCompleted) && "text-muted-foreground/65"
@@ -929,7 +936,7 @@ export function AdditionalEntryGroupRow({
                         {formatCurrency(entry.amount, locale)}
                       </button>
                     )}
-                    {!groupMutationLocked && !entry.isCompleted && completionSavingId !== entry.id ? (
+                    {!groupMutationLocked && !entry.isCompleted && completionSavingId !== entry.id && entryCompletionConfirmationId !== entry.id ? (
                       <AlertDialog>
                         <AlertDialogTrigger
                           render={
@@ -972,10 +979,12 @@ export function AdditionalEntryGroupRow({
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
-                    ) : !groupMutationLocked && (entry.isCompleted || completionSavingId === entry.id) ? (
+                    ) : !groupMutationLocked && (entry.isCompleted || completionSavingId === entry.id || entryCompletionConfirmationId === entry.id) ? (
                       <CompletionLockButton
                         completed={entry.isCompleted || completionSavingId === entry.id}
                         pending={completionSavingId === entry.id}
+                        animateConfirmation={entryCompletionConfirmationId === entry.id}
+                        onConfirmationAnimationEnd={() => setEntryCompletionConfirmationId(null)}
                         disabled={
                           isSavingCompletion
                           || savingId === entry.id
@@ -1027,7 +1036,7 @@ export function AdditionalEntryGroupRow({
             </div>
           ) : null}
 
-          {!readOnly && !group.isCompleted && !isSavingCompletion ? (
+          {!readOnly && !group.isCompleted && !isSavingCompletion && !isGroupCompletionConfirming ? (
             <div className="hidden items-center justify-between gap-2 sm:flex">
               {!groupMutationLocked && !addingFormOpen ? (
                 <button

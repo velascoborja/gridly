@@ -120,6 +120,7 @@ export function AdditionalEntriesCard({
   const [newTagId, setNewTagId] = useState<number | null>(null);
   const [editTagId, setEditTagId] = useState<number | null>(null);
   const [completionSavingId, setCompletionSavingId] = useState<number | null>(null);
+  const [completionConfirmationId, setCompletionConfirmationId] = useState<number | null>(null);
   const [completionError, setCompletionError] = useState<string | null>(null);
   const [groupCollapsedState, setGroupCollapsedState] = useState<Record<number, boolean>>(
     () => Object.fromEntries(groups.map(g => [g.id, true]))
@@ -189,7 +190,7 @@ export function AdditionalEntriesCard({
   };
 
   const openEditForm = (entry: AdditionalEntry, focusTarget: EntryEditFocusTarget = "label") => {
-    if (completionSavingId === entry.id) return;
+    if (completionSavingId === entry.id || completionConfirmationId !== null) return;
     setEditingId(entry.id);
     setEditFocusTarget(focusTarget);
     setEditLabel(entry.label);
@@ -200,7 +201,7 @@ export function AdditionalEntriesCard({
   };
 
   const canMoveEntry = (entry: AdditionalEntry) =>
-    !readOnly && !entry.isCompleted && completionSavingId !== entry.id && editingId !== entry.id && deletingId !== entry.id && savingId !== entry.id && movingEntryId !== entry.id;
+    !readOnly && !entry.isCompleted && completionSavingId !== entry.id && completionConfirmationId === null && editingId !== entry.id && deletingId !== entry.id && savingId !== entry.id && movingEntryId !== entry.id;
 
   const handleDragStart = (event: React.DragEvent<HTMLDivElement>, entry: AdditionalEntry) => {
     if (!canMoveEntry(entry)) {
@@ -313,7 +314,7 @@ export function AdditionalEntriesCard({
   };
 
   const handleCompletionToggle = async (entry: AdditionalEntry) => {
-    if (completionSavingId !== null) return;
+    if (completionSavingId !== null || completionConfirmationId !== null) return;
 
     const nextCompleted = !entry.isCompleted;
     setCompletionError(null);
@@ -340,6 +341,7 @@ export function AdditionalEntriesCard({
         tagId: raw.tagId ?? null,
         tag: resolveTag(raw.tagId ?? null),
       } : item));
+      setCompletionConfirmationId(entry.id);
     } catch {
       onEntriesChange(entriesRef.current.map((item) =>
         item.id === entry.id ? { ...item, isCompleted: entry.isCompleted } : item
@@ -598,6 +600,7 @@ export function AdditionalEntriesCard({
           {sortedEntries.map((entry) => {
             const displayTag = resolveTag(entry.tagId) ?? entry.tag;
             const completionPending = completionSavingId === entry.id;
+            const completionConfirming = completionConfirmationId === entry.id;
             return !readOnly && editingId === entry.id ? (
               <div key={entry.id} className="rounded-xl border border-border/70 bg-muted/20 p-1.5">
                 <EntryFormRow
@@ -780,7 +783,7 @@ export function AdditionalEntriesCard({
                 )}
               >
                 <div className="flex min-w-0 items-center justify-between gap-2">
-                  {readOnly || completionPending ? (
+                  {readOnly || completionPending || completionConfirming ? (
                     <span className={cn(
                       "min-w-0 flex-1 truncate text-left text-sm font-medium text-foreground",
                       entry.isCompleted && "text-muted-foreground/65"
@@ -871,7 +874,7 @@ export function AdditionalEntriesCard({
                     </button>
                   )}
                   <div className="flex shrink-0 items-center gap-1.5">
-                    {readOnly || completionPending ? (
+                    {readOnly || completionPending || completionConfirming ? (
                       <span className={cn(
                         "whitespace-nowrap text-sm font-semibold tabular-nums",
                         entry.isCompleted && "text-muted-foreground/65"
@@ -892,7 +895,7 @@ export function AdditionalEntriesCard({
                         {formatCurrency(entry.amount, locale)}
                       </button>
                     )}
-                    {!readOnly && !entry.isCompleted && !completionPending ? (
+                    {!readOnly && !entry.isCompleted && !completionPending && !completionConfirming ? (
                       <AlertDialog>
                         <AlertDialogTrigger
                           render={
@@ -923,10 +926,12 @@ export function AdditionalEntriesCard({
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
-                    ) : !readOnly && (entry.isCompleted || completionPending) ? (
+                    ) : !readOnly && (entry.isCompleted || completionPending || completionConfirming) ? (
                       <CompletionLockButton
                         completed={entry.isCompleted || completionPending}
                         pending={completionPending}
+                        animateConfirmation={completionConfirming}
+                        onConfirmationAnimationEnd={() => setCompletionConfirmationId(null)}
                         disabled={
                           savingId === entry.id
                           || movingToGroupId === entry.id

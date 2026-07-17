@@ -103,7 +103,7 @@ Both item `PATCH` routes also accept `{ isCompleted: boolean }`. Completed resou
 - Incomplete groups expose their open lock contextually in the expanded body. Completed groups replace header Delete with the authoritative compact closed lock, so reopening remains directly available while the group is collapsed and no duplicate reopen control appears in the body.
 - Group deletion remains directly available from the header on desktop and mobile while the group is incomplete. Completed groups hide deletion until they are reopened.
 - While a parent group is completed, it also locks every child entry without overwriting each child's `isCompleted` value. After the parent reopens, individually completed child rows expose their compact closed lock directly in the resting row.
-- Lock changes are optimistic, retain a visible disabled pending action to prevent duplicate submission, roll back on failure, and animate between open and closed states unless the user prefers reduced motion.
+- Lock changes are optimistic and retain the same disabled action footprint throughout the request. Pending replaces the lock with a centered spinner; success then articulates only the shackle for 300ms. Reopening keeps the temporary open lock until that confirmation finishes before restoring Delete, without expanding the group. Failures skip confirmation and roll back to the prior state, while reduced-motion users receive the final action immediately.
 
 ## Calculations
 
