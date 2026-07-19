@@ -199,8 +199,6 @@ export function EntryFormRow({
   const mobileSelector = actions.find(
     (action): action is EntryFormSelectorAction => action.kind === "selector" && action.id === mobileSelectorId
   );
-  const hasPrimaryActiveAction = actions.some((action) => action.active && action.activeTone !== "success");
-  const hasSuccessActiveAction = actions.some((action) => action.active && action.activeTone === "success");
   const hasPendingAction = internalPendingId !== null || actions.some((action) => action.pending);
 
   const handleMoreOpenChange = (open: boolean) => {
@@ -281,14 +279,7 @@ export function EntryFormRow({
                     size="sm"
                     variant="ghost"
                     type="button"
-                    className={cn(
-                      "relative mr-auto h-9 min-w-0 gap-1.5 px-2 sm:hidden",
-                      hasSuccessActiveAction
-                        ? "bg-emerald-500/10 text-emerald-700 shadow-[inset_0_0_0_1px_rgb(21_190_83_/_0.18)] hover:bg-emerald-500/15 hover:text-emerald-800 aria-expanded:bg-emerald-500/15 aria-expanded:text-emerald-800 dark:text-emerald-300 dark:hover:text-emerald-200 dark:aria-expanded:text-emerald-200"
-                        : hasPrimaryActiveAction
-                          ? "bg-primary/10 text-primary shadow-[inset_0_0_0_1px_rgb(83_58_253_/_0.14)] hover:bg-primary/15 hover:text-primary aria-expanded:bg-primary/15 aria-expanded:text-primary"
-                          : "text-muted-foreground hover:text-foreground"
-                    )}
+                    className="relative mr-auto h-9 min-w-0 gap-1.5 px-2 text-muted-foreground hover:text-foreground sm:hidden"
                     aria-busy={hasPendingAction || undefined}
                     disabled={disabled || hasPendingAction}
                   >

@@ -121,7 +121,7 @@ Settings card for global tag maintenance:
 
 ### `src/components/monthly/entry-form-row.tsx`
 
-Accepts typed `EntryFormAction[]` metadata rather than opaque action slots. Tag assignment is a `selector` action: it renders as an icon popover at `sm` and above, and as an icon-and-label item inside the mobile **Actions** popover below 640px. Selecting it on mobile replaces the action list with an inline tag subview and a Back control. An assigned tag marks the action active and gives the full mobile trigger a lavender surface; no separate indicator dot, counter, or badge is shown.
+Accepts typed `EntryFormAction[]` metadata rather than opaque action slots. Tag assignment is a `selector` action: it renders as an icon popover at `sm` and above, and as an icon-and-label item inside the mobile **Actions** popover below 640px. Selecting it on mobile replaces the action list with an inline tag subview and a Back control. An assigned tag marks the corresponding action active while the full mobile trigger remains neutral, matching income entries; no separate indicator dot, counter, or badge is shown.
 
 ### `src/components/monthly/additional-entries-card.tsx`
 

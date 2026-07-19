@@ -572,8 +572,6 @@ test("EntryFormRow keeps Save and Cancel visible beside the responsive action co
   assert.match(source, /<div className=\{cn\("flex shrink-0 items-center"/);
   assert.match(source, /\{showSaveAction \? \(/);
   assert.match(source, /\{showCancelAction \? \(/);
-  assert.match(source, /hasPrimaryActiveAction/);
-  assert.match(source, /hasSuccessActiveAction/);
   assert.match(source, /aria-busy=\{hasPendingAction \|\| undefined\}/);
   assert.match(source, /setMobileSelectorId\(action\.id\)/);
   assert.match(source, /setMobileSelectorId\(null\)/);
@@ -586,7 +584,7 @@ test("EntryFormRow keeps Save and Cancel visible beside the responsive action co
   assert.doesNotMatch(source, /h-1\.5 w-1\.5 rounded-full/);
 });
 
-test("EntryFormRow mobile Actions trigger communicates neutral, active, open, and pending states", () => {
+test("EntryFormRow mobile Actions trigger stays neutral across entry states", () => {
   const source = readFileSync(new URL("./entry-form-row.tsx", import.meta.url), "utf8");
   const triggerStart = source.indexOf('<Popover.Root open={moreOpen}');
   const triggerEnd = source.indexOf("<Popover.Portal>", triggerStart);
@@ -595,9 +593,9 @@ test("EntryFormRow mobile Actions trigger communicates neutral, active, open, an
   assert.match(trigger, /h-9 min-w-0/);
   assert.match(trigger, /sm:hidden/);
   assert.match(trigger, /text-muted-foreground hover:text-foreground/);
-  assert.match(trigger, /bg-primary\/10 text-primary/);
-  assert.match(trigger, /bg-emerald-500\/10 text-emerald-700/);
-  assert.match(trigger, /dark:text-emerald-300/);
+  assert.doesNotMatch(trigger, /bg-primary\/10 text-primary/);
+  assert.doesNotMatch(trigger, /bg-emerald-500\/10 text-emerald-700/);
+  assert.doesNotMatch(trigger, /shadow-\[inset/);
   assert.match(trigger, /<span>\{t\("actions"\)\}<\/span>/);
   assert.match(trigger, /hasPendingAction \? \([\s\S]*?<Loader2/);
   assert.match(trigger, /disabled=\{disabled \|\| hasPendingAction\}/);
