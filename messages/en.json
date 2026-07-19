@@ -505,12 +505,17 @@
       "recurringToggle": "Repeat every year",
       "recurringActive": "Repeats every year",
       "recurringBadge": "annual",
+      "actions": "Actions",
+      "back": "Back",
       "tagButton": "Assign tag",
       "yourTags": "Your tags",
       "noTag": "No tag",
       "newTag": "+ New tag",
       "tagName": "Name...",
-      "createAndAssign": "Create & assign"
+      "tagColor": "Tag color",
+      "createAndAssign": "Create & assign",
+      "creatingTag": "Creating...",
+      "tagCreateError": "The tag could not be created. Please try again."
     },
     "summary": {
       "title": "Summary",

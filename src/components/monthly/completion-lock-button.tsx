@@ -19,6 +19,34 @@ interface CompletionLockButtonProps {
   className?: string;
 }
 
+export function CompletionLockIcon({ completed, animateConfirmation = false }: { completed: boolean; animateConfirmation?: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-3.5 w-3.5"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <circle cx="12" cy="16" r="1" />
+      <rect x="3" y="10" width="18" height="12" rx="2" />
+      <path
+        data-slot="completion-lock-shackle"
+        d="M7 10V7a5 5 0 0 1 10 0v3"
+        className={cn(
+          completed ? "completion-lock-shackle-closed" : "completion-lock-shackle-open",
+          animateConfirmation && (completed ? "animate-lock-close" : "animate-lock-open"),
+          "motion-reduce:animate-none"
+        )}
+      />
+    </svg>
+  );
+}
+
 export function CompletionLockButton({
   completed,
   pending = false,
@@ -76,32 +104,13 @@ export function CompletionLockButton({
       {pending ? (
         <LoaderCircle className="h-3.5 w-3.5 animate-spin text-primary motion-reduce:animate-none" />
       ) : (
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="h-3.5 w-3.5"
-          aria-hidden="true"
-          focusable="false"
+        <span
+          onAnimationEnd={() => {
+            if (animateConfirmation) onConfirmationAnimationEnd?.();
+          }}
         >
-          <circle cx="12" cy="16" r="1" />
-          <rect x="3" y="10" width="18" height="12" rx="2" />
-          <path
-            data-slot="completion-lock-shackle"
-            d="M7 10V7a5 5 0 0 1 10 0v3"
-            className={cn(
-              completed ? "completion-lock-shackle-closed" : "completion-lock-shackle-open",
-              animateConfirmation && (completed ? "animate-lock-close" : "animate-lock-open"),
-              "motion-reduce:animate-none"
-            )}
-            onAnimationEnd={() => {
-              if (animateConfirmation) onConfirmationAnimationEnd?.();
-            }}
-          />
-        </svg>
+          <CompletionLockIcon completed={completed} animateConfirmation={animateConfirmation} />
+        </span>
       )}
       {showText ? <span>{label}</span> : null}
     </Button>

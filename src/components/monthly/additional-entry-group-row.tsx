@@ -25,14 +25,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { EntryFormRow } from "./entry-form-row";
+import { EntryFormRow, EntryFormSelectorItem, EntryFormSelectorList } from "./entry-form-row";
 import { sortAdditionalEntriesDesc } from "@/lib/additional-entries";
 import { parseMoneyExpression } from "@/lib/currency-input";
 import { cn, formatCurrency, formatMonthName } from "@/lib/utils";
 import type { AdditionalEntry, AdditionalEntryGroup, Tag } from "@/lib/types";
 import { TagPicker } from "./tag-picker";
 import { TAG_COLORS } from "@/lib/tags";
-import { CompletionLockButton } from "./completion-lock-button";
+import { CompletionLockButton, CompletionLockIcon } from "./completion-lock-button";
 
 type EntryEditFocusTarget = "label" | "amount";
 
@@ -814,71 +814,52 @@ export function AdditionalEntryGroupRow({
                     }
                   }}
                   autoFocus={entry.isCompleted ? false : editFocusTarget}
-                  completionAction={
-                    <CompletionLockButton
-                      completed={entry.isCompleted}
-                      pending={completionSavingId === entry.id}
-                      disabled={
-                        isSavingCompletion
-                        || savingId === entry.id
-                        || movingToGroupId === entry.id
-                        || (completionSavingId !== null && completionSavingId !== entry.id)
-                        || hasConflictingMutation
-                      }
-                      onToggle={() => void handleEntryCompletionToggle(entry)}
-                      completeLabel={t("markCompleted")}
-                      reopenLabel={t("reopen")}
-                      actionSize
-                    />
-                  }
-                  folderAction={!entry.isCompleted && completionSavingId !== entry.id ? (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger
-                        render={
-                          <Button
-                            size="icon-sm"
-                            variant="ghost"
-                            className="h-9 w-9 text-muted-foreground hover:text-primary"
-                            aria-label={`${t("moveToGroup")} ${entry.label}`}
-                            disabled={savingId === entry.id || movingToGroupId === entry.id}
-                          >
-                            {movingToGroupId === entry.id ? (
-                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                            ) : (
-                              <FolderInput className="h-3.5 w-3.5" />
-                            )}
-                          </Button>
-                        }
-                      />
-                      <DropdownMenuContent align="end" className="w-52 max-w-[calc(100vw-2rem)]">
-                        <DropdownMenuGroup>
-                          <DropdownMenuLabel>{t("moveToGroup")}</DropdownMenuLabel>
-                          <DropdownMenuRadioGroup
-                            value={String(group.id)}
-                            onValueChange={(value) => {
-                              void handleMoveToGroup(
-                                entry,
-                                value === "none" ? null : parseInt(value, 10)
-                              );
+                  actions={[
+                    {
+                      id: "completion",
+                      kind: "command",
+                      label: t(entry.isCompleted ? "reopen" : "markCompleted"),
+                      icon: <CompletionLockIcon completed={entry.isCompleted} />,
+                      active: entry.isCompleted,
+                      activeTone: "success",
+                      pending: completionSavingId === entry.id,
+                      disabled: isSavingCompletion || savingId === entry.id || movingToGroupId === entry.id || (completionSavingId !== null && completionSavingId !== entry.id) || hasConflictingMutation,
+                      onSelect: () => handleEntryCompletionToggle(entry),
+                    },
+                    ...(!entry.isCompleted && completionSavingId !== entry.id ? [{
+                      id: "group" as const,
+                      kind: "selector" as const,
+                      label: t("moveToGroup"),
+                      icon: <FolderInput className="h-3.5 w-3.5" />,
+                      pending: movingToGroupId === entry.id,
+                      disabled: savingId === entry.id || movingToGroupId === entry.id,
+                      renderPanel: ({ close }: { close: () => void }) => (
+                        <EntryFormSelectorList>
+                          <EntryFormSelectorItem
+                            onSelect={async () => {
+                              await handleMoveToGroup(entry, null);
+                              close();
                             }}
                           >
-                            <DropdownMenuRadioItem value="none">
-                              {t("noGroup")}
-                            </DropdownMenuRadioItem>
-                            {allGroups.map((g) => (
-                              <DropdownMenuRadioItem
-                                key={g.id}
-                                value={String(g.id)}
-                                disabled={g.id === group.id}
-                              >
-                                <span className="truncate">{g.label}</span>
-                              </DropdownMenuRadioItem>
-                            ))}
-                          </DropdownMenuRadioGroup>
-                        </DropdownMenuGroup>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  ) : undefined}
+                            {t("noGroup")}
+                          </EntryFormSelectorItem>
+                          {allGroups.map((targetGroup) => (
+                            <EntryFormSelectorItem
+                              key={targetGroup.id}
+                              selected={targetGroup.id === group.id}
+                              disabled={targetGroup.id === group.id}
+                              onSelect={async () => {
+                                await handleMoveToGroup(entry, targetGroup.id);
+                                close();
+                              }}
+                            >
+                              {targetGroup.label}
+                            </EntryFormSelectorItem>
+                          ))}
+                        </EntryFormSelectorList>
+                      ),
+                    }] : []),
+                  ]}
                 />
               </div>
             ) : (

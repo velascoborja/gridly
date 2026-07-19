@@ -3,19 +3,10 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "@/i18n/routing";
-import { CalendarArrowUp, FolderInput, FolderPlus, Loader2, Plus, Repeat, Trash2 } from "lucide-react";
+import { CalendarArrowUp, FolderInput, FolderPlus, Loader2, Plus, Repeat, Tag as TagIcon, Trash2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,9 +19,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { AdditionalEntryGroupRow } from "./additional-entry-group-row";
-import { EntryFormRow } from "./entry-form-row";
-import { TagPicker } from "./tag-picker";
-import { CompletionLockButton } from "./completion-lock-button";
+import { EntryFormRow, EntryFormSelectorItem, EntryFormSelectorList } from "./entry-form-row";
+import { TagPickerContent } from "./tag-picker";
+import { CompletionLockButton, CompletionLockIcon } from "./completion-lock-button";
 import { sortAdditionalEntriesDesc, sumAdditionalEntries } from "@/lib/additional-entries";
 import { parseMoneyExpression } from "@/lib/currency-input";
 import { TAG_COLORS } from "@/lib/tags";
@@ -490,36 +481,35 @@ export function AdditionalEntriesCard({
                   if (e.key === "Escape" && !isAdding) closeAddForm();
                 }}
                 autoFocus
-                tagAction={
-                  type === "expense" ? (
-                    <TagPicker
-                      tags={tags}
-                      value={newTagId}
-                      onChange={setNewTagId}
-                      onCreateTag={handleCreateTag}
-                      disabled={isAdding}
-                    />
-                  ) : undefined
-                }
-                recurringAction={
-                  <Button
-                    size="icon-sm"
-                    variant="ghost"
-                    type="button"
-                    className={cn(
-                      "h-9 w-9",
-                      newRecurring
-                        ? "bg-primary/10 text-primary hover:bg-primary/20"
-                        : "text-muted-foreground hover:text-primary"
-                    )}
-                    aria-label={t(newRecurring ? "recurringActive" : "recurringToggle")}
-                    title={t(newRecurring ? "recurringActive" : "recurringToggle")}
-                    onClick={() => setNewRecurring((v) => !v)}
-                    disabled={isAdding}
-                  >
-                    <Repeat className="h-3.5 w-3.5" />
-                  </Button>
-                }
+                actions={[
+                  ...(type === "expense" ? [{
+                    id: "tag" as const,
+                    kind: "selector" as const,
+                    label: t("tagButton"),
+                    icon: <TagIcon className="h-3.5 w-3.5" />,
+                    active: newTagId !== null,
+                    disabled: isAdding,
+                    renderPanel: ({ close }: { close: () => void }) => (
+                      <TagPickerContent
+                        tags={tags}
+                        value={newTagId}
+                        onChange={setNewTagId}
+                        onCreateTag={handleCreateTag}
+                        disabled={isAdding}
+                        onClose={close}
+                      />
+                    ),
+                  }] : []),
+                  {
+                    id: "recurring",
+                    kind: "command",
+                    label: t(newRecurring ? "recurringActive" : "recurringToggle"),
+                    icon: <Repeat className="h-3.5 w-3.5" />,
+                    active: newRecurring,
+                    disabled: isAdding,
+                    onSelect: () => setNewRecurring((value) => !value),
+                  },
+                ]}
               />
             </div>
           ) : null}
@@ -635,136 +625,93 @@ export function AdditionalEntriesCard({
                     }
                   }}
                   autoFocus={entry.isCompleted ? false : editFocusTarget}
-                  tagAction={
-                    type === "expense" && !entry.isCompleted && !completionPending ? (
-                      <TagPicker
-                        tags={tags}
-                        value={editTagId}
-                        onChange={setEditTagId}
-                        onCreateTag={handleCreateTag}
-                        disabled={savingId === entry.id || movingToGroupId === entry.id || movingEntryId === entry.id}
-                      />
-                    ) : undefined
-                  }
-                  recurringAction={
-                    !entry.isCompleted && !completionPending ? (
-                    <Button
-                      size="icon-sm"
-                      variant="ghost"
-                      type="button"
-                      className={cn(
-                        "h-9 w-9",
-                        editRecurring
-                          ? "bg-primary/10 text-primary hover:bg-primary/20"
-                          : "text-muted-foreground hover:text-primary"
-                      )}
-                      aria-label={t(editRecurring ? "recurringActive" : "recurringToggle")}
-                      title={t(editRecurring ? "recurringActive" : "recurringToggle")}
-                      onClick={() => setEditRecurring((v) => !v)}
-                      disabled={savingId === entry.id || movingToGroupId === entry.id || movingEntryId === entry.id}
-                    >
-                      <Repeat className="h-3.5 w-3.5" />
-                    </Button>
-                    ) : undefined
-                  }
-                  completionAction={
-                    <CompletionLockButton
-                      completed={entry.isCompleted}
-                      pending={completionPending}
-                      disabled={
-                        savingId === entry.id
-                        || movingToGroupId === entry.id
-                        || movingEntryId === entry.id
-                        || (completionSavingId !== null && !completionPending)
-                      }
-                      onToggle={() => void handleCompletionToggle(entry)}
-                      completeLabel={t("markCompleted")}
-                      reopenLabel={t("reopen")}
-                      actionSize
-                    />
-                  }
-                  monthAction={!entry.isCompleted && !completionPending && onEntryMoveToMonth && moveTargets.length > 0 ? (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger
-                        render={
-                          <Button
-                            size="icon-sm"
-                            variant="ghost"
-                            className="h-9 w-9 text-muted-foreground hover:text-primary"
-                            aria-label={`${t("moveToMonth")} ${entry.label}`}
-                            disabled={savingId === entry.id || movingToGroupId === entry.id || movingEntryId === entry.id}
-                          >
-                            {movingEntryId === entry.id ? (
-                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                            ) : (
-                              <CalendarArrowUp className="h-3.5 w-3.5" />
-                            )}
-                          </Button>
-                        }
-                      />
-                      <DropdownMenuContent align="end" className="w-52 max-w-[calc(100vw-2rem)]">
-                        <DropdownMenuGroup>
-                          <DropdownMenuLabel>{t("moveToMonth")}</DropdownMenuLabel>
-                          <DropdownMenuRadioGroup
-                            value={String(monthId)}
-                            onValueChange={(value) => {
-                              const targetMonthId = parseInt(value, 10);
-                              if (targetMonthId === monthId || Number.isNaN(targetMonthId)) return;
-                              onEntryMoveToMonth(entry, targetMonthId);
-                            }}
-                          >
-                            {moveTargets.map((target) => (
-                              <DropdownMenuRadioItem key={target.id} value={String(target.id)}>
-                                <span className="truncate capitalize">{formatMonthName(target.month, locale)}</span>
-                              </DropdownMenuRadioItem>
-                            ))}
-                          </DropdownMenuRadioGroup>
-                        </DropdownMenuGroup>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  ) : undefined}
-                  folderAction={!entry.isCompleted && !completionPending && type === "expense" && groups.length > 0 ? (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger
-                        render={
-                          <Button
-                            size="icon-sm"
-                            variant="ghost"
-                            className="h-9 w-9 text-muted-foreground hover:text-primary"
-                            aria-label={`${t("moveToGroup")} ${entry.label}`}
-                            disabled={savingId === entry.id || movingToGroupId === entry.id || movingEntryId === entry.id}
-                          >
-                            {movingToGroupId === entry.id ? (
-                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                            ) : (
-                              <FolderInput className="h-3.5 w-3.5" />
-                            )}
-                          </Button>
-                        }
-                      />
-                      <DropdownMenuContent align="end" className="w-52 max-w-[calc(100vw-2rem)]">
-                        <DropdownMenuGroup>
-                          <DropdownMenuLabel>{t("moveToGroup")}</DropdownMenuLabel>
-                          <DropdownMenuRadioGroup
-                            value="none"
-                            onValueChange={(value) => {
-                              if (value === "none") return;
-                              void handleMoveToGroup(entry, parseInt(value, 10));
-                            }}
-                          >
-                            <DropdownMenuRadioItem value="none" disabled>
-                              {t("noGroup")}
-                            </DropdownMenuRadioItem>
-                            {groups.map((g) => (
-                              <DropdownMenuRadioItem key={g.id} value={String(g.id)}>
-                                <span className="truncate">{g.label}</span>
-                              </DropdownMenuRadioItem>
-                            ))}
-                          </DropdownMenuRadioGroup>
-                        </DropdownMenuGroup>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  ) : undefined}
+                  actions={[
+                    ...(type === "expense" && !entry.isCompleted && !completionPending ? [{
+                      id: "tag" as const,
+                      kind: "selector" as const,
+                      label: t("tagButton"),
+                      icon: <TagIcon className="h-3.5 w-3.5" />,
+                      active: editTagId !== null,
+                      disabled: savingId === entry.id || movingToGroupId === entry.id || movingEntryId === entry.id,
+                      renderPanel: ({ close }: { close: () => void }) => (
+                        <TagPickerContent
+                          tags={tags}
+                          value={editTagId}
+                          onChange={setEditTagId}
+                          onCreateTag={handleCreateTag}
+                          onClose={close}
+                        />
+                      ),
+                    }] : []),
+                    ...(!entry.isCompleted && !completionPending ? [{
+                      id: "recurring" as const,
+                      kind: "command" as const,
+                      label: t(editRecurring ? "recurringActive" : "recurringToggle"),
+                      icon: <Repeat className="h-3.5 w-3.5" />,
+                      active: editRecurring,
+                      disabled: savingId === entry.id || movingToGroupId === entry.id || movingEntryId === entry.id,
+                      onSelect: () => setEditRecurring((value) => !value),
+                    }] : []),
+                    {
+                      id: "completion",
+                      kind: "command",
+                      label: t(entry.isCompleted ? "reopen" : "markCompleted"),
+                      icon: <CompletionLockIcon completed={entry.isCompleted} />,
+                      active: entry.isCompleted,
+                      activeTone: "success",
+                      pending: completionPending,
+                      disabled: savingId === entry.id || movingToGroupId === entry.id || movingEntryId === entry.id || (completionSavingId !== null && !completionPending),
+                      onSelect: () => handleCompletionToggle(entry),
+                    },
+                    ...(!entry.isCompleted && !completionPending && onEntryMoveToMonth && moveTargets.length > 0 ? [{
+                      id: "month" as const,
+                      kind: "selector" as const,
+                      label: t("moveToMonth"),
+                      icon: <CalendarArrowUp className="h-3.5 w-3.5" />,
+                      pending: movingEntryId === entry.id,
+                      disabled: savingId === entry.id || movingToGroupId === entry.id || movingEntryId === entry.id,
+                      renderPanel: ({ close }: { close: () => void }) => (
+                        <EntryFormSelectorList>
+                          {moveTargets.map((target) => (
+                            <EntryFormSelectorItem
+                              key={target.id}
+                              selected={target.id === monthId}
+                              onSelect={() => {
+                                onEntryMoveToMonth(entry, target.id);
+                                close();
+                              }}
+                            >
+                              <span className="capitalize">{formatMonthName(target.month, locale)}</span>
+                            </EntryFormSelectorItem>
+                          ))}
+                        </EntryFormSelectorList>
+                      ),
+                    }] : []),
+                    ...(!entry.isCompleted && !completionPending && type === "expense" && groups.length > 0 ? [{
+                      id: "group" as const,
+                      kind: "selector" as const,
+                      label: t("moveToGroup"),
+                      icon: <FolderInput className="h-3.5 w-3.5" />,
+                      pending: movingToGroupId === entry.id,
+                      disabled: savingId === entry.id || movingToGroupId === entry.id || movingEntryId === entry.id,
+                      renderPanel: ({ close }: { close: () => void }) => (
+                        <EntryFormSelectorList>
+                          <EntryFormSelectorItem selected disabled onSelect={() => {}}>{t("noGroup")}</EntryFormSelectorItem>
+                          {groups.map((targetGroup) => (
+                            <EntryFormSelectorItem
+                              key={targetGroup.id}
+                              onSelect={async () => {
+                                await handleMoveToGroup(entry, targetGroup.id);
+                                close();
+                              }}
+                            >
+                              {targetGroup.label}
+                            </EntryFormSelectorItem>
+                          ))}
+                        </EntryFormSelectorList>
+                      ),
+                    }] : []),
+                  ]}
                 />
               </div>
             ) : (

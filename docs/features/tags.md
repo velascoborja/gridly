@@ -101,12 +101,12 @@ Exports `TAG_COLORS`, `TAG_COLOR_KEYS`, and the `TagColor` interface. The single
 
 ### `src/components/monthly/tag-picker.tsx`
 
-Controlled popover (`@base-ui/react/popover`) with two internal views:
+`TagPickerContent` owns the two reusable selection views, while `TagPicker` supplies the standalone Base UI popover trigger used outside `EntryFormRow`:
 
 - **List view** — existing tags with checkmarks, a "Sin etiqueta" clear option, and a "+ Nueva etiqueta" link.
-- **Create view** — name text input, 9-color swatch grid, and "Crear y asignar" button. "← Volver" returns to the list without creating. On successful creation the new tag is immediately selected and the popover closes.
+- **Create view** — name text input, accessible 9-color swatch group, and "Crear y asignar" button. "← Volver" returns to the list without creating. Creation exposes an immediate busy/disabled state, prevents duplicate submissions, and shows a localized inline error if the request fails. On success the new tag is immediately selected and the host popover closes.
 
-The trigger button highlights with `bg-primary/10` when a tag is currently assigned. The component also accepts an optional `customTrigger?: React.ReactElement` prop to completely override the default tag icon button.
+The same content is rendered inside the `EntryFormRow` tag selector, so existing selection, clearing, and inline creation behave identically in the mobile Actions subview and the desktop icon popover. The standalone trigger highlights with `bg-primary/10` when a tag is currently assigned and accepts an optional `customTrigger?: React.ReactElement` override.
 
 ### `src/components/settings/tag-manager-card.tsx`
 
@@ -121,13 +121,13 @@ Settings card for global tag maintenance:
 
 ### `src/components/monthly/entry-form-row.tsx`
 
-Has an optional `tagAction?: React.ReactNode` slot alongside the existing `recurringAction`. The grid column formula handles 0/1/2/3 extra action columns.
+Accepts typed `EntryFormAction[]` metadata rather than opaque action slots. Tag assignment is a `selector` action: it renders as an icon popover at `sm` and above, and as an icon-and-label item inside the mobile **Actions** popover below 640px. Selecting it on mobile replaces the action list with an inline tag subview and a Back control. An assigned tag marks the action active and gives the full mobile trigger a lavender surface; no separate indicator dot, counter, or badge is shown.
 
 ### `src/components/monthly/additional-entries-card.tsx`
 
 - Fetches tags on mount via `GET /api/tags` (skipped in read-only mode and for income entries).
-- Passes a `TagPicker` as `tagAction` to `EntryFormRow` for both the add form and each open edit form (ungrouped expenses only).
-- `handleCreateTag`: calls `POST /api/tags`, appends the new tag to local `tags` state, and returns the `Tag` to `TagPicker`.
+- Adds a tag `selector` to `EntryFormRow.actions` for both the add form and each open edit form (ungrouped expenses only).
+- `handleCreateTag`: calls `POST /api/tags`, appends the new tag to local `tags` state, and returns the `Tag` to the shared picker content.
 - Includes `tagId` in create and edit payloads; resolves `tag` from local state on the returned entry to avoid a refetch.
 - Renders a tag chip inline in the entry list row, alongside the "anual" recurring badge.
 - **Responsive Optimization**: To prevent aggressive text truncation on narrow mobile screens, if an entry has *both* a tag and is recurring, the "anual" text badge gracefully collapses into a simple primary-colored dot on `< sm` viewports.
@@ -137,7 +137,7 @@ Has an optional `tagAction?: React.ReactNode` slot alongside the existing `recur
 The group header utilizes `TagPicker` to assign a tag to the group itself.
 - When a tag is assigned, it uses the `customTrigger` prop of `TagPicker` to render the colored tag chip as the interactive trigger.
 - This hides the default tag icon button, allowing the user to tap the assigned tag itself to open the menu and change/remove it.
-- Individual grouped entries do not receive a `tagAction`, mirroring the existing behaviour for `recurringAction`.
+- Individual grouped entries do not include tag or recurring actions.
 
 ## i18n Keys
 
@@ -151,6 +151,11 @@ All keys live under `Monthly.additionalEntries` in `messages/es.json` and `messa
 | `newTag` | + Nueva etiqueta | + New tag |
 | `tagName` | Nombre... | Name... |
 | `createAndAssign` | Crear y asignar | Create & assign |
+| `creatingTag` | Creando... | Creating... |
+| `tagColor` | Color de la etiqueta | Tag color |
+| `tagCreateError` | Inline creation failure | Inline creation failure |
+
+The shared responsive entry-action labels (`actions` and `back`) live in the same namespace.
 
 All Settings tag-management keys live under `Settings.tags` in `messages/es.json` and `messages/en.json`:
 

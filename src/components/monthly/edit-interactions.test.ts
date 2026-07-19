@@ -434,7 +434,8 @@ test("additional entry rows keep drag and drop and expose month moves only insid
   assert.match(entriesSource, /draggable=\{canMoveEntry\(entry\)\}/);
   assert.match(entriesSource, /onDragStart=\{\(event\) => handleDragStart\(event, entry\)\}/);
   assert.match(entriesSource, /CalendarArrowUp/);
-  assert.match(entriesSource, /monthAction=\{!entry\.isCompleted && !completionPending && onEntryMoveToMonth && moveTargets\.length > 0/);
+  assert.match(entriesSource, /!entry\.isCompleted && !completionPending && onEntryMoveToMonth && moveTargets\.length > 0/);
+  assert.match(entriesSource, /id: "month" as const,[\s\S]*?kind: "selector" as const/);
   assert.match(entriesSource, /onEntryMoveToMonth\?: \(entry: AdditionalEntry, targetMonthId: number\) => void/);
   assert.match(entriesSource, /t\("moveToMonth"\)/);
   assert.match(overviewSource, /moveTargets=\{sortedMonths/);
@@ -476,19 +477,19 @@ test("additional expense groups can be moved between months with drag and the co
   assert.match(enMessages, /"moveGroupToMonth": "Move group to month"/);
 });
 
-test("additional expense group moves use a compact edit-row menu instead of selects", () => {
+test("additional expense group moves use the shared edit-row selector instead of selects", () => {
   const entriesSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
   const groupRowSource = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");
   const esMessages = readFileSync(new URL("../../../messages/es.json", import.meta.url), "utf8");
   const enMessages = readFileSync(new URL("../../../messages/en.json", import.meta.url), "utf8");
 
   for (const source of [entriesSource, groupRowSource]) {
-    assert.match(source, /DropdownMenu/);
-    assert.match(source, /DropdownMenuRadioGroup/);
+    assert.match(source, /EntryFormSelectorList/);
+    assert.match(source, /EntryFormSelectorItem/);
     assert.match(source, /FolderInput/);
     assert.match(source, /handleMoveToGroup/);
     assert.match(source, /const \[movingToGroupId, setMovingToGroupId\] = useState<number \| null>\(null\)/);
-    assert.match(source, /size="icon-sm"/);
+    assert.match(source, /id: "group" as const/);
     assert.doesNotMatch(source, /<select/);
   }
 
@@ -545,25 +546,97 @@ test("additional expense group delete loading action fits the compact dialog foo
   assert.match(groupRowSource, /isDeletingGroup \? t\("deletingGroup"\) : t\("confirmDeleteGroupAction"\)/);
 });
 
-test("EntryFormRow reserves more horizontal space for the amount and keeps actions on a second row", () => {
+test("EntryFormRow keeps fields wide and uses the typed responsive action collection", () => {
   const source = readFileSync(new URL("./entry-form-row.tsx", import.meta.url), "utf8");
 
-  assert.match(source, /tagAction\?: React\.ReactNode/);
-  assert.match(source, /monthAction\?: React\.ReactNode/);
-  assert.match(source, /completionAction\?: React\.ReactNode/);
+  assert.match(source, /export interface EntryFormCommandAction/);
+  assert.match(source, /export interface EntryFormSelectorAction/);
+  assert.match(source, /export type EntryFormAction = EntryFormCommandAction \| EntryFormSelectorAction/);
+  assert.match(source, /actions\?: EntryFormAction\[\]/);
   assert.match(source, /fieldsDisabled\?: boolean/);
   assert.match(source, /saveDisabled\?: boolean/);
   assert.match(source, /showSaveAction\?: boolean/);
   assert.match(source, /showCancelAction\?: boolean/);
   assert.match(source, /className="grid grid-cols-\[minmax\(0,1fr\)_auto\] gap-x-2"/);
   assert.match(source, /className="relative w-36"/);
-  assert.match(source, /className="col-span-2 mt-2 flex items-center justify-end gap-0"/);
+  assert.match(source, /className="col-span-2 mt-2 flex min-w-0 items-center justify-end gap-0"/);
+  assert.match(source, /sm:hidden/);
+  assert.match(source, /className="hidden items-center sm:flex"/);
 });
 
-test("EntryFormRow keeps the completion lock beside recurring and movement actions", () => {
+test("EntryFormRow keeps Save and Cancel visible beside the responsive action controls", () => {
   const source = readFileSync(new URL("./entry-form-row.tsx", import.meta.url), "utf8");
 
-  assert.match(source, /<div className="col-span-2 mt-2 flex items-center justify-end gap-0">\s*\{tagAction\}\s*\{recurringAction\}\s*\{completionAction\}\s*\{monthAction\}\s*\{folderAction\}/);
+  assert.match(source, /t\("actions"\)/);
+  assert.match(source, /actions\.length > 0/);
+  assert.match(source, /<div className=\{cn\("flex shrink-0 items-center"/);
+  assert.match(source, /\{showSaveAction \? \(/);
+  assert.match(source, /\{showCancelAction \? \(/);
+  assert.match(source, /hasPrimaryActiveAction/);
+  assert.match(source, /hasSuccessActiveAction/);
+  assert.match(source, /aria-busy=\{hasPendingAction \|\| undefined\}/);
+  assert.match(source, /setMobileSelectorId\(action\.id\)/);
+  assert.match(source, /setMobileSelectorId\(null\)/);
+  assert.match(source, /t\("back"\)/);
+  assert.match(source, /finalFocus/);
+  assert.match(source, /100dvh/);
+  assert.match(source, /motion-reduce:transition-none/);
+  assert.match(source, /moreOpen && "rotate-180"/);
+  assert.doesNotMatch(source, /Ellipsis/);
+  assert.doesNotMatch(source, /h-1\.5 w-1\.5 rounded-full/);
+});
+
+test("EntryFormRow mobile Actions trigger communicates neutral, active, open, and pending states", () => {
+  const source = readFileSync(new URL("./entry-form-row.tsx", import.meta.url), "utf8");
+  const triggerStart = source.indexOf('<Popover.Root open={moreOpen}');
+  const triggerEnd = source.indexOf("<Popover.Portal>", triggerStart);
+  const trigger = source.slice(triggerStart, triggerEnd);
+
+  assert.match(trigger, /h-9 min-w-0/);
+  assert.match(trigger, /sm:hidden/);
+  assert.match(trigger, /text-muted-foreground hover:text-foreground/);
+  assert.match(trigger, /bg-primary\/10 text-primary/);
+  assert.match(trigger, /bg-emerald-500\/10 text-emerald-700/);
+  assert.match(trigger, /dark:text-emerald-300/);
+  assert.match(trigger, /<span>\{t\("actions"\)\}<\/span>/);
+  assert.match(trigger, /hasPendingAction \? \([\s\S]*?<Loader2/);
+  assert.match(trigger, /disabled=\{disabled \|\| hasPendingAction\}/);
+  assert.match(trigger, /<ChevronDown/);
+  assert.match(trigger, /moreOpen && "rotate-180"/);
+  assert.match(trigger, /motion-reduce:transition-none/);
+  assert.doesNotMatch(trigger, /rounded-full/);
+});
+
+test("responsive entry actions preserve order, conditional Actions, and localized selector feedback", () => {
+  const rowSource = readFileSync(new URL("./entry-form-row.tsx", import.meta.url), "utf8");
+  const entriesSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
+  const tagSource = readFileSync(new URL("./tag-picker.tsx", import.meta.url), "utf8");
+  const esMessages = readFileSync(new URL("../../../messages/es.json", import.meta.url), "utf8");
+  const enMessages = readFileSync(new URL("../../../messages/en.json", import.meta.url), "utf8");
+  const editActionsStart = entriesSource.indexOf("actions={[", entriesSource.indexOf("sortedEntries.map"));
+  const editActionsEnd = entriesSource.indexOf("]}", editActionsStart);
+  const editActions = entriesSource.slice(editActionsStart, editActionsEnd);
+  const order = ["tag", "recurring", "completion", "month", "group"].map((id) =>
+    editActions.indexOf(`id: "${id}"`)
+  );
+
+  assert.ok(order.every((position) => position >= 0));
+  assert.deepEqual([...order].sort((a, b) => a - b), order);
+  assert.match(rowSource, /\{actions\.length > 0 \? \(/);
+  assert.match(rowSource, /actions = \[\]/);
+  assert.match(rowSource, /setInternalPendingId\(action\.id\)/);
+  assert.match(rowSource, /disabled=\{action\.disabled \|\| pending \|\| internalPendingId !== null\}/);
+  assert.match(tagSource, /export function TagPickerContent/);
+  assert.match(tagSource, /onChange\(tag\.id, tag\);\s*onClose\(\);/);
+  assert.match(tagSource, /const \[isCreating, setIsCreating\] = useState\(false\)/);
+  assert.match(tagSource, /role="alert"/);
+  assert.match(tagSource, /aria-busy=\{isCreating \|\| undefined\}/);
+  assert.match(esMessages, /"actions": "Acciones"/);
+  assert.match(enMessages, /"actions": "Actions"/);
+  assert.match(esMessages, /"back": "Volver"/);
+  assert.match(enMessages, /"back": "Back"/);
+  assert.match(esMessages, /"tagCreateError"/);
+  assert.match(enMessages, /"tagCreateError"/);
 });
 
 test("completion locks replace the icon with centered pending feedback and articulate confirmation", () => {
@@ -626,7 +699,7 @@ test("completion locks remain available in contextual editors before completion"
   const enMessages = readFileSync(new URL("../../../messages/en.json", import.meta.url), "utf8");
   const entriesListStart = entriesSource.indexOf("{sortedEntries.map((entry) => {");
   const entryEditorStart = entriesSource.indexOf("return !readOnly && editingId === entry.id", entriesListStart);
-  const entryLockStart = entriesSource.indexOf("<CompletionLockButton", entryEditorStart);
+  const entryLockStart = entriesSource.indexOf('id: "completion"', entryEditorStart);
   const entryDisplayStart = entriesSource.indexOf("data-highlight-id={`entry-${entry.id}`}", entryEditorStart);
   const expandedGroupStart = groupSource.indexOf("{/* Expanded body */}");
   const groupLockStart = groupSource.indexOf("<CompletionLockButton", expandedGroupStart);
@@ -643,8 +716,8 @@ test("completion locks remain available in contextual editors before completion"
   assert.match(groupSource, /const groupLocked = readOnly \|\| group\.isCompleted/);
   assert.ok(expandedGroupStart < groupLockStart && groupLockStart < groupedEntriesStart);
   assert.ok(desktopGroupActionsStart < desktopAddStart && desktopAddStart < desktopGroupLockStart);
-  assert.match(entriesSource, /completionAction=\{[\s\S]*?<CompletionLockButton[\s\S]*?actionSize/);
-  assert.match(groupSource, /completionAction=\{[\s\S]*?<CompletionLockButton[\s\S]*?actionSize/);
+  assert.match(entriesSource, /id: "completion",[\s\S]*?icon: <CompletionLockIcon/);
+  assert.match(groupSource, /id: "completion",[\s\S]*?icon: <CompletionLockIcon/);
   assert.match(entriesSource, /showSaveAction=\{!entry\.isCompleted && !completionPending\}/);
   assert.match(groupSource, /showSaveAction=\{!entry\.isCompleted && completionSavingId !== entry\.id\}/);
   assert.match(entriesSource, /cancelLabel=\{entry\.isCompleted \? t\("exit"\) : t\("cancel"\)\}/);

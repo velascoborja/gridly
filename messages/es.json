@@ -505,12 +505,17 @@
       "recurringToggle": "Repetir cada año",
       "recurringActive": "Se repetirá cada año",
       "recurringBadge": "anual",
+      "actions": "Acciones",
+      "back": "Volver",
       "tagButton": "Asignar etiqueta",
       "yourTags": "Tus etiquetas",
       "noTag": "Sin etiqueta",
       "newTag": "+ Nueva etiqueta",
       "tagName": "Nombre...",
-      "createAndAssign": "Crear y asignar"
+      "tagColor": "Color de la etiqueta",
+      "createAndAssign": "Crear y asignar",
+      "creatingTag": "Creando...",
+      "tagCreateError": "No se ha podido crear la etiqueta. Inténtalo de nuevo."
     },
     "summary": {
       "title": "Resumen",
