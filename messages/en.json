@@ -490,6 +490,7 @@
       "moveToMonth": "Move to month",
       "moveGroupToMonth": "Move group to month",
       "moveToGroup": "Move to group",
+      "moveToGroupError": "The expense could not be moved to the group. Please try again.",
       "confirmDeleteTitle": "Delete this entry?",
       "confirmDeleteDescription": "\"{label}\" will be removed from the list. This action cannot be undone.",
       "confirmDeleteAction": "Delete",

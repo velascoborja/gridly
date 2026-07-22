@@ -48,6 +48,9 @@ interface Props {
   onGroupDragStart?: (group: AdditionalEntryGroup) => void;
   onGroupDragEnd?: () => void;
   onEntryGroupChanged: (entry: AdditionalEntry, toGroupId: number | null) => void;
+  draggedUngroupedExpense?: AdditionalEntry | null;
+  dropPending?: boolean;
+  onUngroupedExpenseDrop?: (entry: AdditionalEntry) => void;
   readOnly?: boolean;
   highlightId?: string | null;
   collapsed: boolean;
@@ -68,6 +71,9 @@ export function AdditionalEntryGroupRow({
   onGroupDragStart,
   onGroupDragEnd,
   onEntryGroupChanged,
+  draggedUngroupedExpense = null,
+  dropPending = false,
+  onUngroupedExpenseDrop,
   readOnly = false,
   highlightId = null,
   collapsed,
@@ -103,6 +109,7 @@ export function AdditionalEntryGroupRow({
   const [entryCompletionConfirmationId, setEntryCompletionConfirmationId] = useState<number | null>(null);
   const [isGroupCompletionConfirming, setIsGroupCompletionConfirming] = useState(false);
   const [completionError, setCompletionError] = useState<string | null>(null);
+  const [isExpenseDragHovered, setIsExpenseDragHovered] = useState(false);
 
   const getAmountPreview = (value: string) => {
     const parsed = parseMoneyExpression(value);
@@ -132,12 +139,22 @@ export function AdditionalEntryGroupRow({
     || deletingId !== null || movingToGroupId !== null || isSavingTag || isMovingGroup
     || entryCompletionConfirmationId !== null;
   const canMoveGroup = !groupMutationLocked && !isEditingName && !isDeletingGroup && !isSavingName && !isSavingTag && !isMovingGroup;
+  const canAcceptUngroupedExpense = draggedUngroupedExpense !== null
+    && !groupMutationLocked
+    && !hasConflictingMutation
+    && completionSavingId === null
+    && !dropPending
+    && onUngroupedExpenseDrop !== undefined;
 
   useEffect(() => {
     if (highlightId && group.entries.some((e) => `entry-${e.id}` === highlightId)) {
       onCollapsedChange(false);
     }
   }, [highlightId, group.entries, onCollapsedChange]);
+
+  useEffect(() => {
+    if (!canAcceptUngroupedExpense) setIsExpenseDragHovered(false);
+  }, [canAcceptUngroupedExpense]);
 
   const handleToggle = () => {
     if (!isEditingName) onCollapsedChange(!collapsed);
@@ -156,6 +173,28 @@ export function AdditionalEntryGroupRow({
 
   const handleDragEnd = () => {
     onGroupDragEnd?.();
+  };
+
+  const handleExpenseDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    if (!canAcceptUngroupedExpense) return;
+    event.preventDefault();
+    event.stopPropagation();
+    event.dataTransfer.dropEffect = "move";
+    setIsExpenseDragHovered(true);
+  };
+
+  const handleExpenseDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
+    const nextTarget = event.relatedTarget;
+    if (nextTarget instanceof Node && event.currentTarget.contains(nextTarget)) return;
+    setIsExpenseDragHovered(false);
+  };
+
+  const handleExpenseDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    if (!canAcceptUngroupedExpense || !draggedUngroupedExpense) return;
+    event.preventDefault();
+    event.stopPropagation();
+    setIsExpenseDragHovered(false);
+    onUngroupedExpenseDrop?.(draggedUngroupedExpense);
   };
 
   const handleRenameStart = (e: React.MouseEvent) => {
@@ -418,14 +457,21 @@ export function AdditionalEntryGroupRow({
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-xl border border-primary/20 bg-primary/[0.03]",
+        "overflow-hidden rounded-xl border border-primary/20 bg-primary/[0.03] transition-[border-color,background-color,box-shadow,opacity] duration-150",
         group.isCompleted && "border-emerald-500/15 bg-muted/40",
+        canAcceptUngroupedExpense && "border-dashed border-[#362baa]/55 bg-primary/[0.045]",
+        isExpenseDragHovered && "border-solid border-primary bg-primary/[0.09] shadow-[0_18px_34px_-22px_rgba(50,50,93,0.55),0_10px_20px_-16px_rgba(0,0,0,0.25)]",
+        dropPending && "border-primary bg-primary/[0.09] shadow-[0_18px_34px_-22px_rgba(50,50,93,0.55),0_10px_20px_-16px_rgba(0,0,0,0.25)]",
         canMoveGroup && "cursor-grab active:cursor-grabbing",
         isMovingGroup && "pointer-events-none opacity-60"
       )}
+      aria-busy={dropPending}
       draggable={canMoveGroup}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
+      onDragOver={handleExpenseDragOver}
+      onDragLeave={handleExpenseDragLeave}
+      onDrop={handleExpenseDrop}
     >
       {/* Group header */}
       <div

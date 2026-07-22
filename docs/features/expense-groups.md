@@ -59,6 +59,9 @@ Both item `PATCH` routes also accept `{ isCompleted: boolean }`. Completed resou
 - Selecting a target group sends `PATCH /api/months/[monthId]/entries/[entryId]` with `{ groupId: <targetId> }`.
 - Selecting "Sin grupo" sends `{ groupId: null }` to ungroup the entry.
 - Moving uses a per-entry `movingToGroupId` loading flag rather than a generic busy state.
+- On desktop, an incomplete ungrouped expense can also be dragged onto the full surface of an incomplete, editable group, whether that group is collapsed or expanded. Eligible groups receive a dashed purple treatment during the drag, while the hovered or pending destination uses the stronger branded border, background, elevation, and `aria-busy` state.
+- A drop reuses the same `{ groupId }` `PATCH` request. The source row is disabled and dimmed with a spinner while pending. Success removes it from the ungrouped list and inserts the API response into the destination in normal sorted order, preserving the group's collapsed state and reflecting server-applied tag or recurrence changes.
+- Completed expenses cannot start a drag. Completed, read-only, or locally busy groups reject drops and do not render as targets. A failed drop leaves the expense ungrouped, clears all drag/pending styling, and shows a localized actionable error.
 
 ### Moving groups between months
 - Expense groups can be moved as a whole to another month in the same year.

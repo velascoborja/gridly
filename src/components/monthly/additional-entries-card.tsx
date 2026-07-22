@@ -105,6 +105,9 @@ export function AdditionalEntriesCard({
   const [isAddingGroup, setIsAddingGroup] = useState(false);
   const [newGroupLabel, setNewGroupLabel] = useState("");
   const [movingToGroupId, setMovingToGroupId] = useState<number | null>(null);
+  const [draggedUngroupedExpense, setDraggedUngroupedExpense] = useState<AdditionalEntry | null>(null);
+  const [dropPendingGroupId, setDropPendingGroupId] = useState<number | null>(null);
+  const [moveToGroupError, setMoveToGroupError] = useState<string | null>(null);
   const [newRecurring, setNewRecurring] = useState(false);
   const [editRecurring, setEditRecurring] = useState(false);
   const [tags, setTags] = useState<Tag[]>([]);
@@ -192,7 +195,7 @@ export function AdditionalEntriesCard({
   };
 
   const canMoveEntry = (entry: AdditionalEntry) =>
-    !readOnly && !entry.isCompleted && completionSavingId !== entry.id && completionConfirmationId === null && editingId !== entry.id && deletingId !== entry.id && savingId !== entry.id && movingEntryId !== entry.id;
+    !readOnly && !entry.isCompleted && completionSavingId !== entry.id && completionConfirmationId === null && editingId !== entry.id && deletingId !== entry.id && savingId !== entry.id && movingEntryId !== entry.id && movingToGroupId === null;
 
   const handleDragStart = (event: React.DragEvent<HTMLDivElement>, entry: AdditionalEntry) => {
     if (!canMoveEntry(entry)) {
@@ -202,10 +205,13 @@ export function AdditionalEntriesCard({
 
     event.dataTransfer.effectAllowed = "move";
     event.dataTransfer.setData("text/plain", String(entry.id));
+    if (type === "expense") setDraggedUngroupedExpense(entry);
+    setMoveToGroupError(null);
     onEntryDragStart?.(entry);
   };
 
   const handleDragEnd = () => {
+    setDraggedUngroupedExpense(null);
     onEntryDragEnd?.();
   };
 
@@ -344,17 +350,26 @@ export function AdditionalEntriesCard({
     }
   };
 
-  const handleMoveToGroup = async (entry: AdditionalEntry, toGroupId: number | null) => {
+  const handleMoveToGroup = async (
+    entry: AdditionalEntry,
+    toGroupId: number | null,
+    source: "menu" | "drop" = "menu"
+  ) => {
     if (movingToGroupId === entry.id) return;
 
+    setMoveToGroupError(null);
     setMovingToGroupId(entry.id);
+    if (source === "drop") {
+      setDropPendingGroupId(toGroupId);
+      setDraggedUngroupedExpense(null);
+    }
     try {
       const res = await fetch(`/api/months/${monthId}/entries/${entry.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ groupId: toGroupId }),
       });
-      if (!res.ok) return;
+      if (!res.ok) throw new Error("group move failed");
       const updated = await res.json();
       const updatedEntry: AdditionalEntry = {
         ...updated,
@@ -365,8 +380,11 @@ export function AdditionalEntriesCard({
 
       onEntriesChange(sortAdditionalEntriesDesc(entries.filter((e) => e.id !== entry.id)));
       onEntryGroupChanged?.(updatedEntry, toGroupId);
+    } catch {
+      setMoveToGroupError(t("moveToGroupError"));
     } finally {
       setMovingToGroupId(null);
+      setDropPendingGroupId(null);
     }
   };
 
@@ -550,6 +568,15 @@ export function AdditionalEntriesCard({
           </p>
         ) : null}
 
+        {moveToGroupError ? (
+          <p
+            role="alert"
+            className="rounded-md border border-destructive/20 bg-destructive/[0.06] px-2.5 py-2 text-xs text-destructive"
+          >
+            {moveToGroupError}
+          </p>
+        ) : null}
+
         {type === "expense" && groups.length > 0 && (
           <div className="flex flex-col gap-2">
             {sortedGroups.map((group) => (
@@ -570,6 +597,11 @@ export function AdditionalEntriesCard({
                 onGroupDragStart={onGroupDragStart}
                 onGroupDragEnd={onGroupDragEnd}
                 onEntryGroupChanged={onEntryGroupChanged ?? (() => {})}
+                draggedUngroupedExpense={draggedUngroupedExpense}
+                dropPending={dropPendingGroupId === group.id}
+                onUngroupedExpenseDrop={(entry) => {
+                  void handleMoveToGroup(entry, group.id, "drop");
+                }}
                 readOnly={readOnly}
                 highlightId={highlightId}
                 collapsed={groupCollapsedState[group.id] ?? true}
@@ -718,6 +750,7 @@ export function AdditionalEntriesCard({
               <div
                 key={entry.id}
                 data-highlight-id={`entry-${entry.id}`}
+                aria-busy={movingToGroupId === entry.id}
                 draggable={canMoveEntry(entry)}
                 onDragStart={(event) => handleDragStart(event, entry)}
                 onDragEnd={handleDragEnd}
@@ -821,6 +854,9 @@ export function AdditionalEntriesCard({
                     </button>
                   )}
                   <div className="flex shrink-0 items-center gap-1.5">
+                    {movingToGroupId === entry.id ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" aria-hidden="true" />
+                    ) : null}
                     {readOnly || completionPending || completionConfirming ? (
                       <span className={cn(
                         "whitespace-nowrap text-sm font-semibold tabular-nums",

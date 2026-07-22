@@ -490,6 +490,7 @@
       "moveToMonth": "Mover a mes",
       "moveGroupToMonth": "Mover grupo a mes",
       "moveToGroup": "Mover a grupo",
+      "moveToGroupError": "No se ha podido mover el gasto al grupo. Inténtalo de nuevo.",
       "confirmDeleteTitle": "¿Eliminar esta entrada?",
       "confirmDeleteDescription": "Se eliminará \"{label}\" de la lista. Esta acción no se puede deshacer.",
       "confirmDeleteAction": "Eliminar",

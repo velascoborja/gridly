@@ -497,6 +497,30 @@ test("additional expense group moves use the shared edit-row selector instead of
   assert.match(enMessages, /"moveToGroup": "Move to group"/);
 });
 
+test("ungrouped expenses can be dropped onto eligible expense groups with pending and error feedback", () => {
+  const entriesSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
+  const groupRowSource = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");
+  const esMessages = readFileSync(new URL("../../../messages/es.json", import.meta.url), "utf8");
+  const enMessages = readFileSync(new URL("../../../messages/en.json", import.meta.url), "utf8");
+
+  assert.match(entriesSource, /const \[draggedUngroupedExpense, setDraggedUngroupedExpense\] = useState<AdditionalEntry \| null>\(null\)/);
+  assert.match(entriesSource, /handleMoveToGroup\(entry, group\.id, "drop"\)/);
+  assert.match(entriesSource, /body: JSON\.stringify\(\{ groupId: toGroupId \}\)/);
+  assert.match(entriesSource, /aria-busy=\{movingToGroupId === entry\.id\}/);
+  assert.match(entriesSource, /setMoveToGroupError\(t\("moveToGroupError"\)\)/);
+
+  assert.match(groupRowSource, /const canAcceptUngroupedExpense = draggedUngroupedExpense !== null/);
+  assert.match(groupRowSource, /onDragOver=\{handleExpenseDragOver\}/);
+  assert.match(groupRowSource, /onDragLeave=\{handleExpenseDragLeave\}/);
+  assert.match(groupRowSource, /onDrop=\{handleExpenseDrop\}/);
+  assert.match(groupRowSource, /aria-busy=\{dropPending\}/);
+  assert.match(groupRowSource, /border-dashed border-\[#362baa\]/);
+  assert.match(groupRowSource, /!groupMutationLocked[\s\S]*?!hasConflictingMutation[\s\S]*?completionSavingId === null/);
+
+  assert.match(esMessages, /"moveToGroupError": "No se ha podido mover el gasto al grupo\. Inténtalo de nuevo\."/);
+  assert.match(enMessages, /"moveToGroupError": "The expense could not be moved to the group\. Please try again\."/);
+});
+
 test("additional expense group keeps compact mobile actions above expenses without a duplicate add trigger", () => {
   const groupRowSource = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");
   const entriesStart = groupRowSource.indexOf("{group.entries.map((entry) =>");
