@@ -39,6 +39,7 @@ export function ShortcutsCard() {
     {
       label: t("groupMonthNav"),
       shortcuts: [
+        { keys: [mod, "⇧", "K"], action: t("openMonthNavigation") },
         { keys: [mod, "⇧", "←"], action: t("prevMonth") },
         { keys: [mod, "⇧", "→"], action: t("nextMonth") },
         { keys: [mod, "B"], action: t("goToCurrentMonth") },

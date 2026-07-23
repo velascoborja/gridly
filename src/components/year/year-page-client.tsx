@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { AnnualView } from "@/components/annual/annual-view";
 import { AppShell } from "@/components/layout/app-shell";
 import { MonthOverview } from "@/components/monthly/month-overview";
+import { MonthNavigationPalette } from "@/components/search/month-navigation-palette";
 import { SearchPalette } from "@/components/search/search-palette";
 import { SettingsForm } from "@/components/settings/settings-form";
 import { usePathname } from "@/i18n/routing";
@@ -78,6 +79,7 @@ export function YearPageClient({
   const [selectedView, setSelectedView] = useState<YearRouteView>(() => initialState.view);
   const routePrefix = getYearRoutePrefix(pathname, currentYearData.config.year);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [monthNavigationOpen, setMonthNavigationOpen] = useState(false);
   const [highlightId, setHighlightId] = useState<string | null>(null);
   const highlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const toggleFixedRef = useRef<(() => void) | null>(null);
@@ -157,9 +159,15 @@ export function YearPageClient({
       const meta = e.metaKey || e.ctrlKey;
       if (!meta) return;
 
-      if (e.key === "k") {
+      if (e.key.toLowerCase() === "k") {
         e.preventDefault();
-        setSearchOpen((prev) => !prev);
+        if (e.shiftKey) {
+          setSearchOpen(false);
+          setMonthNavigationOpen((prev) => !prev);
+        } else {
+          setMonthNavigationOpen(false);
+          setSearchOpen((prev) => !prev);
+        }
         return;
       }
 
@@ -255,7 +263,10 @@ export function YearPageClient({
       onMonthViewSelect={() => handleMonthSelect(selectedMonth)}
       onSummaryViewSelect={handleSummarySelect}
       onSettingsSelect={handleSettingsSelect}
-      onSearchOpen={() => setSearchOpen(true)}
+      onSearchOpen={() => {
+        setMonthNavigationOpen(false);
+        setSearchOpen(true);
+      }}
     >
       {selectedView === "settings" ? (
         <div className="mx-auto max-w-4xl py-6">
@@ -288,6 +299,12 @@ export function YearPageClient({
         open={searchOpen}
         onClose={() => setSearchOpen(false)}
         onSelect={handleSearchSelect}
+      />
+      <MonthNavigationPalette
+        open={monthNavigationOpen}
+        currentMonth={selectedMonth}
+        onClose={() => setMonthNavigationOpen(false)}
+        onSelect={handleMonthSelect}
       />
     </AppShell>
   );

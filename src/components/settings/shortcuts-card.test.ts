@@ -31,8 +31,9 @@ test("ShortcutsCard has client directive, OS detection, and all shortcut groups"
   assert.match(source, /groupMonthNav/);
   assert.match(source, /groupEntries/);
 
-  // all 12 shortcut action keys present
+  // all 13 shortcut action keys present
   assert.match(source, /openSearch/);
+  assert.match(source, /openMonthNavigation/);
   assert.match(source, /viewMonths/);
   assert.match(source, /viewYears/);
   assert.match(source, /viewEvolution/);

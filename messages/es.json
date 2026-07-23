@@ -65,6 +65,7 @@
     "groupMonthNav": "Navegación mensual",
     "groupEntries": "Entradas y grupos",
     "openSearch": "Abrir búsqueda",
+    "openMonthNavigation": "Ir a un mes",
     "viewMonths": "Ver Meses",
     "viewYears": "Ver Años",
     "viewEvolution": "Ver Evolución",
@@ -715,6 +716,15 @@
     "kindRecurring": "Gasto fijo",
     "openButton": "Buscar entradas"
   },
+  "MonthNavigation": {
+    "title": "Ir a un mes",
+    "placeholder": "Escribe un mes...",
+    "resultsLabel": "Meses",
+    "noResults": "No se ha encontrado ningún mes",
+    "selected": "Seleccionado",
+    "navigateHint": "Navegar",
+    "selectHint": "Abrir"
+  },
   "Privacy": {
     "title": "Política de Privacidad",
     "lastUpdated": "Última actualización: 9 de mayo de 2026",
@@ -822,8 +832,8 @@
     "tagsSummary": "Etiquetas de color para categorizar gastos; asignables a entradas individuales, grupos y gastos recurrentes.",
     "tagsDetail": "Las etiquetas tienen nombre y un color de una paleta de 9 opciones. Son globales a tu cuenta y reutilizables en todos los años. Cada entrada o grupo puede tener una sola etiqueta. Eliminar una etiqueta borra la asignación en todas las entradas.",
     "navTitle": "Navegación entre meses",
-    "navSummary": "Usa la tira de meses, desliza horizontalmente en móvil o usa Cmd+Shift+←/→. Cmd+B salta al mes actual.",
-    "navDetail": "En escritorio usa Cmd+Shift+← y Cmd+Shift+→ para moverte entre meses. En móvil puedes deslizar horizontalmente en el área principal. Cmd+B salta al mes del calendario actual (solo disponible en el año activo).",
+    "navSummary": "Usa la tira de meses, desliza en móvil o abre un mes directamente con Cmd+Shift+K.",
+    "navDetail": "En escritorio usa Cmd+Shift+← y Cmd+Shift+→ para moverte de forma secuencial, o Cmd+Shift+K para buscar y abrir cualquier mes del año. En móvil puedes deslizar horizontalmente en el área principal. Cmd+B salta al mes del calendario actual (solo disponible en el año activo).",
     "chainTitle": "Cadena de saldo",
     "chainSummary": "El saldo inicial de cada mes es automáticamente el saldo final del mes anterior.",
     "chainDetail": "Gridly encadena los meses: el saldo final de enero es el saldo inicial de febrero, y así sucesivamente. Editar el saldo de un mes propaga el cambio a todos los meses posteriores del año.",
@@ -871,7 +881,7 @@
     "languageDetail": "Gridly está disponible en español e inglés. El cambio de idioma se aplica inmediatamente a toda la interfaz. Tu preferencia se guarda en tu cuenta.",
     "shortcutsTitle": "Atajos de teclado",
     "shortcutsSummary": "Referencia completa de todos los atajos disponibles, adaptada a macOS o Windows/Linux.",
-    "shortcutsDetail": "Los atajos globales funcionan en cualquier página: Cmd+K para buscar, Cmd+1/2/3 para cambiar de vista. En la vista de meses hay atajos adicionales para navegar entre meses y abrir formularios de entradas.",
+    "shortcutsDetail": "Dentro de un año, Cmd+K busca entradas y Cmd+Shift+K abre cualquier mes directamente. Cmd+1/2/3 cambia de vista y la vista mensual añade atajos para moverse entre meses y abrir formularios de entradas.",
     "deleteTitle": "Eliminar cuenta",
     "deleteSummary": "Elimina permanentemente tu cuenta y todos tus datos (requiere escribir una frase de confirmación).",
     "deleteDetail": "La eliminación de cuenta borra de forma permanente todos tus años, meses, entradas y etiquetas. La acción requiere que escribas una frase de confirmación y no se puede deshacer."

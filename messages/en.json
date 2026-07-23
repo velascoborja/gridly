@@ -65,6 +65,7 @@
     "groupMonthNav": "Month navigation",
     "groupEntries": "Entries & groups",
     "openSearch": "Open search",
+    "openMonthNavigation": "Go to a month",
     "viewMonths": "View Months",
     "viewYears": "View Years",
     "viewEvolution": "View Evolution",
@@ -715,6 +716,15 @@
     "kindRecurring": "Recurring",
     "openButton": "Search entries"
   },
+  "MonthNavigation": {
+    "title": "Go to a month",
+    "placeholder": "Type a month...",
+    "resultsLabel": "Months",
+    "noResults": "No matching month",
+    "selected": "Selected",
+    "navigateHint": "Navigate",
+    "selectHint": "Open"
+  },
   "Privacy": {
     "title": "Privacy Policy",
     "lastUpdated": "Last updated: May 9, 2026",
@@ -822,8 +832,8 @@
     "tagsSummary": "Color-coded tags to categorize expenses; assignable to individual entries, groups, and recurring expenses.",
     "tagsDetail": "Tags have a name and a color from a palette of 9 options. They are global to your account and reusable across all years. Each entry or group can have one tag. Deleting a tag removes the assignment from all entries, but the entries are not deleted.",
     "navTitle": "Month navigation",
-    "navSummary": "Use the month strip, swipe horizontally on mobile, or use Cmd+Shift+←/→. Cmd+B jumps to the current month.",
-    "navDetail": "On desktop use Cmd+Shift+← and Cmd+Shift+→ to move between months. On mobile you can swipe horizontally in the main area. Cmd+B jumps to the current calendar month (only available in the active year).",
+    "navSummary": "Use the month strip, swipe on mobile, or open any month directly with Cmd+Shift+K.",
+    "navDetail": "On desktop use Cmd+Shift+← and Cmd+Shift+→ to move sequentially, or Cmd+Shift+K to search for and open any month in the year. On mobile you can swipe horizontally in the main area. Cmd+B jumps to the current calendar month (only available in the active year).",
     "chainTitle": "Balance chain",
     "chainSummary": "The starting balance of each month is automatically the ending balance of the previous month.",
     "chainDetail": "Gridly chains months together: January's ending balance is February's starting balance, and so on. Editing a month's balance propagates the change to all subsequent months in the year.",
@@ -871,7 +881,7 @@
     "languageDetail": "Gridly is available in Spanish and English. The language change applies immediately to the entire interface. Your preference is saved to your account.",
     "shortcutsTitle": "Keyboard shortcuts",
     "shortcutsSummary": "Full reference of all available shortcuts, adapted for macOS or Windows/Linux.",
-    "shortcutsDetail": "Global shortcuts work on any page: Cmd+K to search, Cmd+1/2/3 to switch views. In the months view there are additional shortcuts to navigate between months and open entry forms.",
+    "shortcutsDetail": "Within a year, Cmd+K searches entries and Cmd+Shift+K opens any month directly. Cmd+1/2/3 switches views, and the month view adds shortcuts for moving between months and opening entry forms.",
     "deleteTitle": "Delete account",
     "deleteSummary": "Permanently delete your account and all your data (requires typing a confirmation phrase).",
     "deleteDetail": "Account deletion permanently removes all your years, months, entries, and tags. The action requires typing a confirmation phrase and cannot be undone."
