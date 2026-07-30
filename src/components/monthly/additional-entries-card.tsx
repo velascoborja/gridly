@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { AdditionalEntryGroupRow } from "./additional-entry-group-row";
 import { EntryFormRow, EntryFormSelectorItem, EntryFormSelectorList } from "./entry-form-row";
+import { EntryHeightTransition } from "./entry-height-transition";
 import { TagPickerContent } from "./tag-picker";
 import { CompletionLockButton, CompletionLockIcon } from "./completion-lock-button";
 import { sortAdditionalEntriesDesc, sumAdditionalEntries } from "@/lib/additional-entries";
@@ -623,8 +624,14 @@ export function AdditionalEntriesCard({
             const displayTag = resolveTag(entry.tagId) ?? entry.tag;
             const completionPending = completionSavingId === entry.id;
             const completionConfirming = completionConfirmationId === entry.id;
-            return !readOnly && editingId === entry.id ? (
-              <div key={entry.id} className="rounded-xl border border-border/70 bg-muted/20 p-1.5">
+            const isEditing = !readOnly && editingId === entry.id;
+            return (
+              <EntryHeightTransition
+                key={entry.id}
+                stateKey={isEditing ? "editing" : "resting"}
+              >
+                {isEditing ? (
+                  <div className="rounded-xl border border-border/70 bg-muted/20 p-1.5">
                 <EntryFormRow
                   labelValue={editLabel}
                   onLabelChange={setEditLabel}
@@ -748,14 +755,13 @@ export function AdditionalEntriesCard({
               </div>
             ) : (
               <div
-                key={entry.id}
                 data-highlight-id={`entry-${entry.id}`}
                 aria-busy={movingToGroupId === entry.id}
                 draggable={canMoveEntry(entry)}
                 onDragStart={(event) => handleDragStart(event, entry)}
                 onDragEnd={handleDragEnd}
                 className={cn(
-                  "rounded-xl border border-transparent px-2 py-1.5 transition-all hover:border-border/70 hover:bg-muted/40",
+                  "min-h-10 rounded-xl border border-transparent px-2 py-1.5 transition-[border-color,background-color,box-shadow,opacity] duration-150 hover:border-border/70 hover:bg-muted/40",
                   entry.isCompleted && "border-emerald-500/10 bg-muted/45 hover:border-emerald-500/15 hover:bg-muted/55",
                   canMoveEntry(entry) && "cursor-grab active:cursor-grabbing",
                   (deletingId === entry.id || movingEntryId === entry.id) && "pointer-events-none opacity-60",
@@ -859,7 +865,7 @@ export function AdditionalEntriesCard({
                     ) : null}
                     {readOnly || completionPending || completionConfirming ? (
                       <span className={cn(
-                        "whitespace-nowrap text-sm font-semibold tabular-nums",
+                        "inline-flex h-7 items-center whitespace-nowrap rounded-md px-2 text-sm font-semibold tabular-nums",
                         entry.isCompleted && "text-muted-foreground/65"
                       )}>
                         {formatCurrency(entry.amount, locale)}
@@ -930,6 +936,8 @@ export function AdditionalEntriesCard({
                   </div>
                 </div>
               </div>
+                )}
+              </EntryHeightTransition>
             );
           })}
         </div>

@@ -26,6 +26,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { EntryFormRow, EntryFormSelectorItem, EntryFormSelectorList } from "./entry-form-row";
+import { EntryHeightTransition } from "./entry-height-transition";
 import { sortAdditionalEntriesDesc } from "@/lib/additional-entries";
 import { parseMoneyExpression } from "@/lib/currency-input";
 import { cn, formatCurrency, formatMonthName } from "@/lib/utils";
@@ -825,9 +826,15 @@ export function AdditionalEntryGroupRow({
             </div>
           ) : null}
 
-          {group.entries.map((entry) =>
-            !groupMutationLocked && editingId === entry.id ? (
-              <div key={entry.id} className="rounded-xl border border-border/70 bg-muted/20 p-1.5">
+          {group.entries.map((entry) => {
+            const isEditingEntry = !groupMutationLocked && editingId === entry.id;
+            return (
+              <EntryHeightTransition
+                key={entry.id}
+                stateKey={isEditingEntry ? "editing" : "resting"}
+              >
+                {isEditingEntry ? (
+                  <div className="rounded-xl border border-border/70 bg-muted/20 p-1.5">
                 <EntryFormRow
                   labelValue={editLabel}
                   onLabelChange={setEditLabel}
@@ -910,10 +917,9 @@ export function AdditionalEntryGroupRow({
               </div>
             ) : (
               <div
-                key={entry.id}
                 data-highlight-id={`entry-${entry.id}`}
                 className={cn(
-                  "rounded-lg border border-transparent px-2 py-1.5 transition-all hover:border-border/70 hover:bg-muted/40",
+                  "min-h-10 rounded-lg border border-transparent px-2 py-1.5 transition-[border-color,background-color,box-shadow,opacity] duration-150 hover:border-border/70 hover:bg-muted/40",
                   (group.isCompleted || entry.isCompleted) && "border-emerald-500/10 bg-muted/45 hover:border-emerald-500/15 hover:bg-muted/55",
                   deletingId === entry.id && "pointer-events-none opacity-60",
                   highlightId === `entry-${entry.id}` && "animate-entry-highlight"
@@ -944,7 +950,7 @@ export function AdditionalEntryGroupRow({
                   <div className="flex shrink-0 items-center gap-1.5">
                     {groupMutationLocked || completionSavingId === entry.id || entryCompletionConfirmationId === entry.id ? (
                       <span className={cn(
-                        "whitespace-nowrap text-sm font-semibold tabular-nums",
+                        "inline-flex h-7 items-center whitespace-nowrap rounded-md px-2 text-sm font-semibold tabular-nums",
                         (group.isCompleted || entry.isCompleted) && "text-muted-foreground/65"
                       )}>
                         {formatCurrency(entry.amount, locale)}
@@ -1028,8 +1034,10 @@ export function AdditionalEntryGroupRow({
                   </div>
                 </div>
               </div>
-            )
-          )}
+                )}
+              </EntryHeightTransition>
+            );
+          })}
 
           {/* Add entry to group form */}
           {!groupMutationLocked && addingFormOpen ? (

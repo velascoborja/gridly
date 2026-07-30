@@ -720,7 +720,7 @@ test("completion locks remain available in contextual editors before completion"
   const esMessages = readFileSync(new URL("../../../messages/es.json", import.meta.url), "utf8");
   const enMessages = readFileSync(new URL("../../../messages/en.json", import.meta.url), "utf8");
   const entriesListStart = entriesSource.indexOf("{sortedEntries.map((entry) => {");
-  const entryEditorStart = entriesSource.indexOf("return !readOnly && editingId === entry.id", entriesListStart);
+  const entryEditorStart = entriesSource.indexOf("const isEditing = !readOnly && editingId === entry.id", entriesListStart);
   const entryLockStart = entriesSource.indexOf('id: "completion"', entryEditorStart);
   const entryDisplayStart = entriesSource.indexOf("data-highlight-id={`entry-${entry.id}`}", entryEditorStart);
   const expandedGroupStart = groupSource.indexOf("{/* Expanded body */}");
@@ -732,7 +732,7 @@ test("completion locks remain available in contextual editors before completion"
 
   assert.notEqual(entryEditorStart, -1);
   assert.ok(entryEditorStart < entryLockStart && entryLockStart < entryDisplayStart);
-  assert.match(entriesSource, /return !readOnly && editingId === entry\.id/);
+  assert.match(entriesSource, /const isEditing = !readOnly && editingId === entry\.id/);
   assert.match(entriesSource, /!readOnly && !entry\.isCompleted/);
   assert.doesNotMatch(entriesSource, /LockKeyhole/);
   assert.match(groupSource, /const groupLocked = readOnly \|\| group\.isCompleted/);
@@ -749,6 +749,29 @@ test("completion locks remain available in contextual editors before completion"
   assert.doesNotMatch(groupSource, /LockKeyhole/);
   assert.match(groupSource, /className="shrink-0 text-muted-foreground hover:text-destructive"/);
   assert.doesNotMatch(groupSource, /className="hidden shrink-0 text-muted-foreground hover:text-destructive sm:inline-flex"/);
+});
+
+test("entry editor swaps share a measured height transition with stable resting footprints", () => {
+  const transitionSource = readFileSync(new URL("./entry-height-transition.tsx", import.meta.url), "utf8");
+  const entriesSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
+  const groupSource = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");
+
+  assert.match(transitionSource, /export function EntryHeightTransition/);
+  assert.match(transitionSource, /useLayoutEffect/);
+  assert.match(transitionSource, /getBoundingClientRect\(\)\.height/);
+  assert.match(transitionSource, /prefers-reduced-motion: reduce/);
+  assert.match(transitionSource, /event\.propertyName !== "height"/);
+  assert.match(transitionSource, /HEIGHT_TRANSITION_FALLBACK_MS/);
+  assert.match(transitionSource, /transition-\[height\] duration-200/);
+  assert.match(transitionSource, /container\.style\.height = "auto"/);
+
+  for (const source of [entriesSource, groupSource]) {
+    assert.match(source, /<EntryHeightTransition/);
+    assert.match(source, /stateKey=\{[\s\S]*?\? "editing" : "resting"\}/);
+    assert.match(source, /min-h-10 rounded-(?:xl|lg)/);
+    assert.match(source, /inline-flex h-7 items-center whitespace-nowrap rounded-md px-2/);
+    assert.match(source, /transition-\[border-color,background-color,box-shadow,opacity\]/);
+  }
 });
 
 test("completed ungrouped entries replace Delete with a direct compact reopen action", () => {
