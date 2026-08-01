@@ -45,6 +45,11 @@ Both item `PATCH` routes also accept `{ isCompleted: boolean }`. Completed resou
 
 ## UI Behaviour
 
+### Visual separation from ungrouped expenses
+- When a month contains both expense groups and ungrouped expenses, `AdditionalEntriesCard` renders a subtle 1px inset divider between the two lists.
+- The divider fades to transparent at both ends and blends the neutral border color into a low-opacity primary-purple center accent.
+- It is omitted when either list is empty so it never appears without two sections to separate.
+
 ### Creating a group
 - Click "Añadir grupo" in the expenses card footer.
 - Enter a name and confirm. The card's state updates immediately via optimistic update. No `router.refresh()` is needed — Next.js 16 sets `staleTimes.dynamic = 0`, so dynamic pages are never cached client-side; fresh data is always fetched from the server on navigation.

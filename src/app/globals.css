@@ -303,6 +303,20 @@
     backdrop-filter: blur(20px);
   }
 
+  .expense-group-divider {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      color-mix(in oklch, var(--border) 72%, transparent) 18%,
+      color-mix(in oklch, var(--border) 72%, transparent) 36%,
+      color-mix(in oklch, var(--primary) 18%, transparent) 43%,
+      color-mix(in oklch, var(--primary) 18%, transparent) 57%,
+      color-mix(in oklch, var(--border) 72%, transparent) 64%,
+      color-mix(in oklch, var(--border) 72%, transparent) 82%,
+      transparent 100%
+    );
+  }
+
   .surface-depth {
     background: var(--surface-1);
     box-shadow: var(--elevation-1);

@@ -79,6 +79,19 @@ test("additional expense group creation refreshes the app router cache after loc
   assert.match(source, /onGroupsChange\?\.\(\[\.\.\.groups, newGroup\]\);\s*router\.refresh\(\);/);
 });
 
+test("grouped and ungrouped expenses render a subtle mixed divider between their lists", () => {
+  const entriesSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
+  const stylesSource = readFileSync(new URL("../../app/globals.css", import.meta.url), "utf8");
+
+  assert.match(
+    entriesSource,
+    /type === "expense" && groups\.length > 0 && sortedEntries\.length > 0/
+  );
+  assert.match(entriesSource, /className="expense-group-divider mx-3 h-px shrink-0"/);
+  assert.match(stylesSource, /\.expense-group-divider\s*\{[\s\S]*?linear-gradient/);
+  assert.match(stylesSource, /color-mix\(in oklch, var\(--primary\) 18%, transparent\)/);
+});
+
 test("grouped additional expense amount inputs use expression parsing and preview props", () => {
   const groupRowSource = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");
 

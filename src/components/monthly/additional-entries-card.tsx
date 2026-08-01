@@ -614,6 +614,13 @@ export function AdditionalEntriesCard({
           </div>
         )}
 
+        {type === "expense" && groups.length > 0 && sortedEntries.length > 0 ? (
+          <div
+            aria-hidden="true"
+            className="expense-group-divider mx-3 h-px shrink-0"
+          />
+        ) : null}
+
         <div className="flex flex-col gap-2">
           {sortedEntries.length === 0 && groups.length === 0 && (readOnly || !addingFormOpen) && (
             <div className="rounded-xl border border-dashed border-border/70 bg-muted/20 px-3 py-3 text-sm text-muted-foreground">
