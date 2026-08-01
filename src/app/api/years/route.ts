@@ -6,6 +6,12 @@ import { deriveStartingBalance, shouldAllowYearCreation } from "@/lib/server/yea
 import { getSessionUser } from "@/lib/server/session";
 import { getYearData } from "@/lib/server/year-data";
 
+function toPublicYearRow(row: typeof years.$inferSelect) {
+  return Object.fromEntries(
+    Object.entries(row).filter(([key]) => key !== "carryOverVersion")
+  );
+}
+
 export async function GET() {
   const user = await getSessionUser();
   if (!user?.id) {
@@ -99,7 +105,12 @@ export async function POST(request: Request) {
     await db.insert(yearRecurringExpenses).values(recurringValues);
   }
 
-  await propagateYearCarryOver(user.id, year);
+  await propagateYearCarryOver(user.id, latestYear ?? year);
 
-  return Response.json(row, { status: 201 });
+  const finalRow = await db.query.years.findFirst({
+    where: and(eq(years.userId, user.id), eq(years.year, year)),
+  });
+  if (!finalRow) return Response.json({ error: "Year not found" }, { status: 404 });
+
+  return Response.json(toPublicYearRow(finalRow), { status: 201 });
 }

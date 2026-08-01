@@ -3,6 +3,7 @@ import { monthlyRecurringExpenses, months, yearRecurringExpenses } from "@/db/sc
 import { asc, eq } from "drizzle-orm";
 import { computeMonthChain, estimatedMonthData } from "@/lib/calculations";
 import type { YearConfig } from "@/lib/types";
+import { propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getSessionUser } from "@/lib/server/session";
 import { getOwnedYear } from "@/lib/server/ownership";
 
@@ -81,6 +82,8 @@ export async function POST(
       )
     );
   }
+
+  await propagateYearCarryOver(user.id, yearNum);
 
   return Response.json(inserted, { status: 201 });
 }

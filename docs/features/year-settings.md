@@ -17,7 +17,7 @@ The setup screen is a single-page guided workspace. Desktop layouts use a left s
 
 The creation screen groups setup fields by financial purpose:
 
-- **Starting point:** `startingBalance`, including a locked derived state when the balance comes from the previous year.
+- **Starting point:** `startingBalance`, including a locked derived state when the balance comes from the previous year. For every later year, the server derives this value from the predecessor regardless of the value submitted by the client.
 - **Income:** `estimatedSalary`, `hasExtraPayments`, and `estimatedExtraPayment`.
 - **Monthly plan:** `monthlyHomeExpense`, `monthlyPersonalBudget`, and `monthlyInvestment`.
 - **Growth:** `interestRate`, exposed through a collapsed disclosure that users expand only if they want to set it.
@@ -33,6 +33,8 @@ Currency labels on the setup page omit unit suffixes, while placeholder hints sh
 The section stepper derives completed state from local form readiness and only includes the setup sections that users need to navigate: Starting point, Income, Monthly plan, and Recurring expenses. Readiness uses `hasSetupFieldValue`, so any non-empty input, including `0`, counts as entered data. Starting point is complete once the editable starting balance is filled or when the balance is derived from the previous year. Income requires salary and, when extra pays are enabled, the extra-pay amount. Monthly plan requires only the three monthly currency values. Recurring expenses are optional, so the stepper marks that item with a neutral dashed treatment while empty, then switches to the green completed state once at least one recurring expense exists.
 
 When the starting balance is derived from the previous year, the setup input is read-only and displays a locale-formatted Euro amount via `formatCurrency` (for example, `1.234,56 €` in `es`). Submission still sends the numeric carry-over value, not the formatted string.
+
+The server remains authoritative for later-year creation: `createAndPrefillYear` and `POST /api/years` derive the starting balance from the latest existing year. After insertion they propagate from that predecessor so a concurrent predecessor update cannot be missed.
 
 ## Navigation & Workspace Model
 
@@ -114,6 +116,7 @@ The setup prefill logic in `createAndPrefillYear` follows these rules:
 - `investment` = `monthlyInvestment`.
 - If `hasExtraPayments` is `true`: Months 6 and 12 get `additionalPayslip` = `estimatedExtraPayment`.
 - Every `year_recurring_expenses` row is copied into every month as a `monthly_recurring_expenses` row.
+- `POST /api/years/[year]/prefill` propagates the recreated month chain into all downstream year starting balances before returning.
 
 ### Interest Calculation
 Interests are typically calculated based on the `interestRate` and the monthly balance, unless manually overridden.

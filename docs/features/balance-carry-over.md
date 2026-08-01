@@ -9,11 +9,14 @@ When a user manages multiple years (e.g., 2024 and 2025), changes in an earlier 
 ## Implementation Details
 
 - **Logic:** `src/lib/server/year-carry-over.ts` handles the propagation.
-- **Trigger:** Whenever a month's data is updated or an additional entry is modified, the system identifies if there are "downstream" years.
+- **Trigger:** Whenever monthly data, additional entries, recurring expenses, or a full-year prefill changes a year's totals, the system identifies if there are "downstream" years.
 - **Calculation:** The `startingBalance` for a year is derived from the `endingBalance` of December of the previous year.
-- **Persistence:** The system performs an asynchronous propagation to update the `startingBalance` field in the `years` table for all subsequent years belonging to the user.
+- **Persistence:** The system propagates the `startingBalance` field in the `years` table for all subsequent years belonging to the user.
+- **Concurrency:** Each full year has an internal `carryOverVersion`. A downstream update is applied only when the predecessor still has the version used for the calculation. Conflicting propagations retry from fresh data, preventing an older browser request from overwriting a newer balance.
+- **Creation repair:** When a later year is created, propagation starts from its latest predecessor after insertion. This also repairs a race where the predecessor changed while the new year was being created.
 
 ## Constraints
 
 - Propagation only flows forward (past to future).
 - The very first year created by a user serves as the anchor for the `startingBalance` unless manually adjusted in the settings of that specific year.
+- Later-year starting balances are always derived server-side from the predecessor; the client-submitted value is not authoritative.

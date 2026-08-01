@@ -37,14 +37,13 @@ export async function createAndPrefillYear(data: {
     throw new Error("Only the next year can be created");
   }
 
-  // Handle derived starting balance if it's 0 and there's a previous year
+  // Later years always derive their starting balance from the server-side predecessor.
   let finalStartingBalance = data.startingBalance;
   const latestYear = existingYears.at(-1)?.year;
-  if (finalStartingBalance === 0 && latestYear !== undefined) {
+  if (latestYear !== undefined) {
     const previousYearData = await getYearData(user.id, latestYear);
-    if (previousYearData) {
-      finalStartingBalance = deriveStartingBalance(previousYearData);
-    }
+    if (!previousYearData) throw new Error("Previous year data is required");
+    finalStartingBalance = deriveStartingBalance(previousYearData);
   }
 
   // 1. Insert Year Config
@@ -191,8 +190,8 @@ export async function createAndPrefillYear(data: {
     }
   }
 
-  // 5. Propagate Carry Over
-  await propagateYearCarryOver(user.id, data.year);
+  // 5. Propagate from the predecessor so a concurrent predecessor update cannot be missed.
+  await propagateYearCarryOver(user.id, latestYear ?? data.year);
 
   // 6. Invalidate Cache
   revalidatePath("/", "layout");

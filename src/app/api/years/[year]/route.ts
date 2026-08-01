@@ -7,6 +7,11 @@ import { getYearData, getYearsForUser } from "@/lib/server/year-data";
 import { getSessionUser } from "@/lib/server/session";
 import { getOwnedYear } from "@/lib/server/ownership";
 
+function toPublicYearRow(row: typeof years.$inferSelect) {
+  return Object.fromEntries(
+    Object.entries(row).filter(([key]) => key !== "carryOverVersion")
+  );
+}
 
 function yearConfigFromRow(row: typeof years.$inferSelect): YearConfig {
   return {
@@ -114,7 +119,7 @@ export async function PATCH(
   await applyYearConfigToStoredMonths(yearRow.id, yearConfigFromRow(updated), applyFromMonth);
 
   await propagateYearCarryOver(user.id, yearNum);
-  return Response.json(updated);
+  return Response.json(toPublicYearRow(updated));
 }
 
 export async function DELETE(

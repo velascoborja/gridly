@@ -21,3 +21,9 @@ test("additional entries and groups persist completion with a false default", ()
   assert.match(entriesBlock, /isCompleted: boolean\("is_completed"\)\.notNull\(\)\.default\(false\)/);
   assert.match(groupsBlock, /isCompleted: boolean\("is_completed"\)\.notNull\(\)\.default\(false\)/);
 });
+
+test("years persist a non-null carry-over version with a zero default", () => {
+  const yearsBlock = source.slice(source.indexOf("export const years ="), source.indexOf("export const historicalYears ="));
+
+  assert.match(yearsBlock, /carryOverVersion: integer\("carry_over_version"\)\.notNull\(\)\.default\(0\)/);
+});

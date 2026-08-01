@@ -11,7 +11,12 @@ import {
 import type { AdditionalEntryGroup, Tag, YearData } from "@/lib/types";
 import { pickDefaultYear } from "./year-navigation";
 
-export async function getYearData(userId: string, year: number): Promise<YearData | null> {
+export interface YearDataSnapshot {
+  data: YearData;
+  carryOverVersion: number;
+}
+
+async function loadYearData(userId: string, year: number): Promise<YearDataSnapshot | null> {
   const yearRow = await db.query.years.findFirst({
     where: and(eq(years.userId, userId), eq(years.year, year)),
   });
@@ -179,25 +184,37 @@ export async function getYearData(userId: string, year: number): Promise<YearDat
   });
 
   return {
-    config: {
-      id: yearRow.id,
-      year: yearRow.year,
-      startingBalance: parseFloat(yearRow.startingBalance),
-      estimatedSalary: parseFloat(yearRow.estimatedSalary),
-      hasExtraPayments: yearRow.hasExtraPayments,
-      estimatedExtraPayment: parseFloat(yearRow.estimatedExtraPayment),
-      monthlyInvestment: parseFloat(yearRow.monthlyInvestment),
-      monthlyHomeExpense: parseFloat(yearRow.monthlyHomeExpense),
-      monthlyPersonalBudget: parseFloat(yearRow.monthlyPersonalBudget),
-      interestRate: parseFloat(yearRow.interestRate),
+    data: {
+      config: {
+        id: yearRow.id,
+        year: yearRow.year,
+        startingBalance: parseFloat(yearRow.startingBalance),
+        estimatedSalary: parseFloat(yearRow.estimatedSalary),
+        hasExtraPayments: yearRow.hasExtraPayments,
+        estimatedExtraPayment: parseFloat(yearRow.estimatedExtraPayment),
+        monthlyInvestment: parseFloat(yearRow.monthlyInvestment),
+        monthlyHomeExpense: parseFloat(yearRow.monthlyHomeExpense),
+        monthlyPersonalBudget: parseFloat(yearRow.monthlyPersonalBudget),
+        interestRate: parseFloat(yearRow.interestRate),
+      },
+      recurringExpenses: sortRecurringExpensesAsc(recurringTemplates.map(parseYearRecurringExpense)),
+      months: computeMonthChain(
+        rawMonths,
+        parseFloat(yearRow.startingBalance),
+        parseFloat(yearRow.interestRate)
+      ),
     },
-    recurringExpenses: sortRecurringExpensesAsc(recurringTemplates.map(parseYearRecurringExpense)),
-    months: computeMonthChain(
-      rawMonths,
-      parseFloat(yearRow.startingBalance),
-      parseFloat(yearRow.interestRate)
-    ),
+    carryOverVersion: yearRow.carryOverVersion,
   };
+}
+
+export async function getYearData(userId: string, year: number): Promise<YearData | null> {
+  const snapshot = await loadYearData(userId, year);
+  return snapshot?.data ?? null;
+}
+
+export async function getYearDataSnapshot(userId: string, year: number): Promise<YearDataSnapshot | null> {
+  return loadYearData(userId, year);
 }
 
 export async function getYears(): Promise<number[]> {

@@ -12,7 +12,9 @@ test("year creation source enforces sequential creation and derived carry-over",
   assert.match(source, /latestYear/, "create year action should look up the latest existing year");
   assert.match(source, /Only the next year can be created/, "create year action should reject non-sequential requests");
   assert.match(source, /deriveStartingBalance/, "create year action should derive the next starting balance from prior data");
-  assert.match(source, /propagateYearCarryOver/, "create year action should propagate carry-over after creation");
+  assert.match(source, /propagateYearCarryOver\(user\.id, latestYear \?\? data\.year\)/, "create year action should repair from the predecessor after creation");
+  assert.doesNotMatch(source, /finalStartingBalance === 0/, "later-year creation must not trust a client zero check");
+  assert.match(source, /Previous year data is required/, "later-year creation must not fall back to a client balance when predecessor data is unavailable");
 });
 
 test("year update source accepts starting balance edits only for the earliest year and propagates changes", async () => {
@@ -27,10 +29,27 @@ test("month and additional entry mutations propagate future year balances", asyn
   const monthSource = await readSource("src/app/api/months/[monthId]/route.ts");
   const createEntrySource = await readSource("src/app/api/months/[monthId]/entries/route.ts");
   const entrySource = await readSource("src/app/api/months/[monthId]/entries/[entryId]/route.ts");
+  const prefillSource = await readSource("src/app/api/years/[year]/prefill/route.ts");
 
   assert.match(monthSource, /propagateYearCarryOver/, "month updates should propagate downstream years");
   assert.match(createEntrySource, /propagateYearCarryOver/, "entry creation should propagate downstream years");
   assert.match(entrySource, /propagateYearCarryOver/, "entry edits and deletes should propagate downstream years");
+  assert.match(prefillSource, /propagateYearCarryOver\(user\.id, yearNum\)/, "year prefill should propagate its recreated months downstream");
+});
+
+test("API year creation derives and repairs from the latest predecessor", async () => {
+  const source = await readSource("src/app/api/years/route.ts");
+
+  assert.match(source, /derivedStartingBalance = deriveStartingBalance\(previousYearData\)/);
+  assert.match(source, /propagateYearCarryOver\(user\.id, latestYear \?\? year\)/);
+});
+
+test("carry-over propagation uses versioned compare-and-set updates and retries", async () => {
+  const source = await readSource("src/lib/server/year-carry-over.ts");
+
+  assert.match(source, /carryOverVersion/);
+  assert.match(source, /predecessorVersionMatches/);
+  assert.match(source, /propagateVersionedCarryOver/);
 });
 
 test("setup and monthly entrypoints expose only guided next-year creation", async () => {
