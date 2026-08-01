@@ -47,8 +47,16 @@ test("API year creation derives and repairs from the latest predecessor", async 
 test("carry-over propagation uses versioned compare-and-set updates and retries", async () => {
   const source = await readSource("src/lib/server/year-carry-over.ts");
 
-  assert.match(source, /carryOverVersion/);
-  assert.match(source, /predecessorVersionMatches/);
+  assert.equal(
+    source.match(/eq\(years\.carryOverVersion, expectedVersion\)/g)?.length,
+    2,
+    "source and destination CAS operations should compare the version of the row being updated",
+  );
+  assert.doesNotMatch(
+    source,
+    /predecessorVersionMatches|EXISTS\s*\(/,
+    "destination updates should not validate through a predecessor EXISTS clause",
+  );
   assert.match(source, /propagateVersionedCarryOver/);
 });
 

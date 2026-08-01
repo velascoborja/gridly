@@ -4,16 +4,20 @@ export interface CarryOverSnapshot {
   nextStartingBalance: number;
 }
 
+export interface CarryOverYearVersion {
+  year: number;
+  version: number;
+}
+
 export interface CarryOverStore {
-  listYears(): Promise<number[]>;
-  bumpVersion(year: number): Promise<boolean>;
+  listYears(): Promise<CarryOverYearVersion[]>;
+  compareAndIncrementVersion(input: CarryOverYearVersion): Promise<number | null>;
   getSnapshot(year: number): Promise<CarryOverSnapshot | null>;
   updateStartingBalance(input: {
     year: number;
     startingBalance: number;
-    predecessorYear: number;
-    predecessorVersion: number;
-  }): Promise<boolean>;
+    expectedVersion: number;
+  }): Promise<number | null>;
 }
 
 export const DEFAULT_MAX_PROPAGATION_ATTEMPTS = 5;
@@ -24,36 +28,52 @@ export async function propagateVersionedCarryOver(
   maxAttempts = DEFAULT_MAX_PROPAGATION_ATTEMPTS,
 ) {
   for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
-    const sortedYears = [...(await store.listYears())].sort((a, b) => a - b);
-    const downstreamYears = sortedYears.filter((year) => year > startYear);
+    const sortedYears = [...(await store.listYears())].sort(
+      (a, b) => a.year - b.year,
+    );
+    const downstreamYears = sortedYears.filter(({ year }) => year > startYear);
 
-    if (!(await store.bumpVersion(startYear))) {
+    if (downstreamYears.length === 0) {
       return;
     }
+
+    const startYearVersion = sortedYears.find(({ year }) => year === startYear);
+    if (!startYearVersion) return;
+
+    const incrementedStartVersion = await store.compareAndIncrementVersion(
+      startYearVersion,
+    );
+    if (incrementedStartVersion === null) continue;
 
     let previousSnapshot = await store.getSnapshot(startYear);
     if (!previousSnapshot) {
       return;
     }
+    if (previousSnapshot.version !== incrementedStartVersion) continue;
 
     let conflictDetected = false;
 
-    for (const year of downstreamYears) {
-      const updated = await store.updateStartingBalance({
-        year,
+    for (const [index, target] of downstreamYears.entries()) {
+      const updatedVersion = await store.updateStartingBalance({
+        year: target.year,
         startingBalance: previousSnapshot.nextStartingBalance,
-        predecessorYear: previousSnapshot.year,
-        predecessorVersion: previousSnapshot.version,
+        expectedVersion: target.version,
       });
 
-      if (!updated) {
+      if (updatedVersion === null) {
         conflictDetected = true;
         break;
       }
 
-      previousSnapshot = await store.getSnapshot(year);
+      if (index === downstreamYears.length - 1) return;
+
+      previousSnapshot = await store.getSnapshot(target.year);
       if (!previousSnapshot) {
         return;
+      }
+      if (previousSnapshot.version !== updatedVersion) {
+        conflictDetected = true;
+        break;
       }
     }
 

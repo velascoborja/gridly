@@ -1,33 +1,37 @@
-import { and, eq, sql } from "drizzle-orm";
+import { and, asc, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { years } from "@/db/schema";
 import { deriveStartingBalance } from "@/lib/server/year-planning";
-import { getYearDataSnapshot, getYearsForUser } from "@/lib/server/year-data";
+import { getYearDataSnapshot } from "@/lib/server/year-data";
 import {
   propagateVersionedCarryOver,
   type CarryOverStore,
 } from "@/lib/server/year-carry-over-engine";
 
-function predecessorVersionMatches(userId: string, year: number, version: number) {
-  return sql`EXISTS (
-    SELECT 1
-    FROM "years" AS "carry_predecessor"
-    WHERE "carry_predecessor"."user_id" = ${userId}
-      AND "carry_predecessor"."year" = ${year}
-      AND "carry_predecessor"."carry_over_version" = ${version}
-  )`;
-}
-
 function createCarryOverStore(userId: string): CarryOverStore {
   return {
-    listYears: () => getYearsForUser(userId),
-    bumpVersion: async (year) => {
+    listYears: () =>
+      db
+        .select({
+          year: years.year,
+          version: years.carryOverVersion,
+        })
+        .from(years)
+        .where(eq(years.userId, userId))
+        .orderBy(asc(years.year)),
+    compareAndIncrementVersion: async ({ year, version: expectedVersion }) => {
       const [versionedYear] = await db
         .update(years)
         .set({ carryOverVersion: sql`${years.carryOverVersion} + 1` })
-        .where(and(eq(years.userId, userId), eq(years.year, year)))
+        .where(
+          and(
+            eq(years.userId, userId),
+            eq(years.year, year),
+            eq(years.carryOverVersion, expectedVersion),
+          ),
+        )
         .returning({ carryOverVersion: years.carryOverVersion });
-      return Boolean(versionedYear);
+      return versionedYear?.carryOverVersion ?? null;
     },
     getSnapshot: async (year) => {
       const snapshot = await getYearDataSnapshot(userId, year);
@@ -41,8 +45,7 @@ function createCarryOverStore(userId: string): CarryOverStore {
     updateStartingBalance: async ({
       year,
       startingBalance,
-      predecessorYear,
-      predecessorVersion,
+      expectedVersion,
     }) => {
       const [updatedYear] = await db
         .update(years)
@@ -54,11 +57,11 @@ function createCarryOverStore(userId: string): CarryOverStore {
           and(
             eq(years.userId, userId),
             eq(years.year, year),
-            predecessorVersionMatches(userId, predecessorYear, predecessorVersion)
-          )
+            eq(years.carryOverVersion, expectedVersion),
+          ),
         )
         .returning({ carryOverVersion: years.carryOverVersion });
-      return Boolean(updatedYear);
+      return updatedYear?.carryOverVersion ?? null;
     },
   };
 }

@@ -36,6 +36,13 @@ When the starting balance is derived from the previous year, the setup input is 
 
 The server remains authoritative for later-year creation: `createAndPrefillYear` and `POST /api/years` derive the starting balance from the latest existing year. After insertion they propagate from that predecessor so a concurrent predecessor update cannot be missed.
 
+The HTTP API keeps a two-step creation contract:
+
+1. `POST /api/years` creates the year configuration and recurring expense templates. It does not create month rows. Carry-over can still update this new year because propagation does not request a snapshot from the final destination.
+2. `POST /api/years/[year]/prefill` creates all 12 months and their recurring expense copies, then propagates the completed month chain into any later years.
+
+The guided setup Server Action performs the equivalent configuration, template, and month initialization work in one invocation for the UI; this does not change the two-step contract exposed by the Route Handlers.
+
 ## Navigation & Workspace Model
 
 Gridly employs an "In-Year Workspace" model to manage the complex financial state of a year:
