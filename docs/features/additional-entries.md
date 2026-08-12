@@ -62,6 +62,7 @@ Users can group related additional expenses within a month (e.g., "Viaje a Roma"
 
 ### UI
 - **`AdditionalEntryGroupRow`** (`src/components/monthly/additional-entry-group-row.tsx`): self-contained collapsed/expanded group row. Owns its own UI state (collapsed, rename, add-entry form, per-entry edit/delete).
+- Additional-entry cards stay expanded and interactive in every month. Their temporal context controls presentation only: past months use a slate historical surface, the current month uses the standard card surface, and future months use an indigo forecast surface; non-current cards also show their localized status beside the title.
 - Groups render above ungrouped entries in `AdditionalEntriesCard`.
 - Groups can be moved to another month from the group header. Desktop drag-and-drop and the compact month menu both persist through `PATCH /api/months/[monthId]/entry-groups/[groupId]` with a target `monthId`.
 - Creating a group updates the mounted month state immediately, then calls `router.refresh()` to invalidate the App Router client cache for route restores after leaving and returning to the year workspace.

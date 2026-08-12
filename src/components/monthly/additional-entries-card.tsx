@@ -31,6 +31,7 @@ import type { AdditionalEntry, AdditionalEntryGroup, Tag } from "@/lib/types";
 
 const NO_GROUPS: AdditionalEntryGroup[] = [];
 type EntryEditFocusTarget = "label" | "amount";
+type TemporalContext = "past" | "current" | "future";
 
 type MonthMoveTarget = {
   id: number;
@@ -46,6 +47,7 @@ interface Props {
   onGroupsChange?: (groups: AdditionalEntryGroup[]) => void;
   onEntryGroupChanged?: (entry: AdditionalEntry, toGroupId: number | null) => void;
   readOnly?: boolean;
+  temporalContext?: TemporalContext;
   title: string;
   movingEntryId?: number | null;
   movingGroupId?: number | null;
@@ -71,6 +73,7 @@ export function AdditionalEntriesCard({
   onGroupsChange,
   onEntryGroupChanged,
   readOnly = false,
+  temporalContext = "current",
   title,
   movingEntryId = null,
   movingGroupId = null,
@@ -87,6 +90,7 @@ export function AdditionalEntriesCard({
   toggleAllGroupsRef,
 }: Props) {
   const t = useTranslations("Monthly.additionalEntries");
+  const tOverview = useTranslations("Monthly.overview");
   const common = useTranslations("Common");
   const locale = useLocale();
   const router = useRouter();
@@ -428,11 +432,44 @@ export function AdditionalEntriesCard({
   };
 
   return (
-    <Card size="sm" className="border-border/70 bg-card/95 shadow-sm shadow-black/5">
+    <Card
+      size="sm"
+      className={cn(
+        "transition-[border-color,background-color,box-shadow] duration-300",
+        temporalContext === "past"
+          ? "border-slate-300 border-l-[3px] border-l-slate-500/70 bg-gradient-to-br from-slate-200/75 via-slate-100/65 to-card shadow-[0_8px_18px_-16px_rgba(15,23,42,0.45)] dark:border-slate-700 dark:border-l-slate-500/80 dark:from-slate-800/80 dark:via-slate-900/55 dark:to-card"
+          : temporalContext === "future"
+            ? "border-indigo-200/70 border-l-[3px] border-l-indigo-400/55 bg-gradient-to-br from-indigo-50/70 via-indigo-50/30 to-card shadow-[0_8px_18px_-16px_rgba(79,70,229,0.08)] dark:border-indigo-800/60 dark:border-l-indigo-500/60 dark:from-indigo-950/45 dark:via-indigo-950/25 dark:to-card"
+            : "border-border/70 bg-card/95 shadow-sm shadow-black/5"
+      )}
+    >
       <CardHeader className="pb-3">
         <div className="flex min-w-0 items-start justify-between gap-3">
           <div className="min-w-0">
-            <CardTitle className="text-sm font-medium">{title}</CardTitle>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <CardTitle className="text-sm font-medium">{title}</CardTitle>
+              {temporalContext !== "current" ? (
+                <span
+                  className={cn(
+                    "inline-flex items-center gap-1.5 text-[9px] font-medium uppercase tracking-[0.14em]",
+                    temporalContext === "past"
+                      ? "text-slate-500 dark:text-slate-400"
+                      : "text-indigo-500 dark:text-indigo-300"
+                  )}
+                >
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      "size-1.5 rounded-full",
+                      temporalContext === "past"
+                        ? "bg-slate-400 dark:bg-slate-500"
+                        : "bg-sky-400 dark:bg-sky-400"
+                    )}
+                  />
+                  {tOverview(temporalContext === "past" ? "pastMonth" : "futureMonth")}
+                </span>
+              ) : null}
+            </div>
             <CardDescription>
               {t(type === "income" ? "descriptionIncome" : "descriptionExpense")}
             </CardDescription>

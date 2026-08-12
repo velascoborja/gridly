@@ -787,6 +787,37 @@ test("entry editor swaps share a measured height transition with stable resting 
   }
 });
 
+test("additional entry cards expose distinct past, current, and forecast treatments without collapsing content", () => {
+  const cardSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
+  const overviewSource = readFileSync(new URL("./month-overview.tsx", import.meta.url), "utf8");
+  const esMessages = readFileSync(new URL("../../../messages/es.json", import.meta.url), "utf8");
+  const enMessages = readFileSync(new URL("../../../messages/en.json", import.meta.url), "utf8");
+
+  assert.match(overviewSource, /const temporalContext = isPastMonth \? "past" : isFutureMonth \? "future" : "current"/);
+  assert.equal((overviewSource.match(/temporalContext=\{temporalContext\}/g) ?? []).length, 2);
+  assert.match(cardSource, /type TemporalContext = "past" \| "current" \| "future"/);
+  assert.match(cardSource, /temporalContext\?: TemporalContext/);
+  assert.match(cardSource, /temporalContext = "current"/);
+  assert.match(cardSource, /border-slate-300 border-l-\[3px\] border-l-slate-500\/70/);
+  assert.match(cardSource, /bg-gradient-to-br from-slate-200\/75 via-slate-100\/65 to-card/);
+  assert.match(cardSource, /dark:from-slate-800\/80 dark:via-slate-900\/55 dark:to-card/);
+  assert.match(cardSource, /shadow-\[0_8px_18px_-16px_rgba\(15,23,42,0\.45\)\]/);
+  assert.match(cardSource, /border-indigo-200\/70 border-l-\[3px\] border-l-indigo-400\/55/);
+  assert.match(cardSource, /bg-gradient-to-br from-indigo-50\/70 via-indigo-50\/30 to-card/);
+  assert.match(cardSource, /dark:from-indigo-950\/45 dark:via-indigo-950\/25 dark:to-card/);
+  assert.match(cardSource, /shadow-\[0_8px_18px_-16px_rgba\(79,70,229,0\.08\)\]/);
+  assert.match(cardSource, /bg-slate-400 dark:bg-slate-500/);
+  assert.match(cardSource, /bg-sky-400 dark:bg-sky-400/);
+  assert.match(cardSource, /tOverview\(temporalContext === "past" \? "pastMonth" : "futureMonth"\)/);
+  assert.doesNotMatch(cardSource, /collapsible|setCollapsed/);
+  assert.match(esMessages, /"pastMonth": "Mes pasado"/);
+  assert.match(esMessages, /"futureMonth": "Previsión"/);
+  assert.match(enMessages, /"pastMonth": "Past month"/);
+  assert.match(enMessages, /"futureMonth": "Forecast"/);
+  assert.doesNotMatch(esMessages, /pastMonthContext/);
+  assert.doesNotMatch(enMessages, /pastMonthContext/);
+});
+
 test("completed ungrouped entries replace Delete with a direct compact reopen action", () => {
   const source = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
   const restingRowStart = source.indexOf('data-highlight-id={`entry-${entry.id}`}');

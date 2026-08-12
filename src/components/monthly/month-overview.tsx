@@ -526,6 +526,7 @@ export function MonthOverview({
     config.year < today.getFullYear() || (config.year === today.getFullYear() && month.month < today.getMonth() + 1);
   const isFutureMonth =
     config.year > today.getFullYear() || (config.year === today.getFullYear() && month.month > today.getMonth() + 1);
+  const temporalContext = isPastMonth ? "past" : isFutureMonth ? "future" : "current";
   const CurrentMonthArrowIcon = isPastMonth ? ArrowRight : ArrowLeft;
   return (
     <div
@@ -848,6 +849,7 @@ export function MonthOverview({
           onGroupsChange={handleGroupsChange}
           onEntryGroupChanged={handleEntryGroupChanged}
           readOnly={readOnly}
+          temporalContext={temporalContext}
           title={tOverview("additionalExpensesTitle")}
           movingEntryId={movingEntry?.entryId ?? null}
           movingGroupId={movingGroup?.groupId ?? null}
@@ -897,6 +899,7 @@ export function MonthOverview({
           entries={month.additionalIncomes}
           onEntriesChange={(entries) => handleEntriesChange("income", entries)}
           readOnly={readOnly}
+          temporalContext={temporalContext}
           title={tOverview("additionalIncomeTitle")}
           movingEntryId={movingEntry?.entryId ?? null}
           moveTargets={sortedMonths
