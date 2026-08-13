@@ -6,6 +6,7 @@ import { propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getYearData, getYearsForUser } from "@/lib/server/year-data";
 import { getSessionUser } from "@/lib/server/session";
 import { getOwnedYear } from "@/lib/server/ownership";
+import { APPLY_FROM_MONTH_ERROR, parseApplyFromMonth } from "@/lib/apply-from-month";
 
 function toPublicYearRow(row: typeof years.$inferSelect) {
   return Object.fromEntries(
@@ -26,11 +27,6 @@ function yearConfigFromRow(row: typeof years.$inferSelect): YearConfig {
     monthlyPersonalBudget: parseFloat(row.monthlyPersonalBudget),
     interestRate: parseFloat(row.interestRate),
   };
-}
-
-function parseApplyFromMonth(value: unknown): number {
-  const month = Number(value ?? 1);
-  return Number.isInteger(month) && month >= 1 && month <= 12 ? month : 1;
 }
 
 async function applyYearConfigToStoredMonths(yearId: number, config: YearConfig, applyFromMonth: number) {
@@ -89,6 +85,9 @@ export async function PATCH(
   const yearNum = parseInt(year, 10);
   const body = await request.json();
   const applyFromMonth = parseApplyFromMonth(body.applyFromMonth);
+  if (applyFromMonth === null) {
+    return Response.json({ error: APPLY_FROM_MONTH_ERROR }, { status: 400 });
+  }
 
   const yearRow = await getOwnedYear(user.id, yearNum);
   if (!yearRow) return Response.json({ error: "Year not found" }, { status: 404 });

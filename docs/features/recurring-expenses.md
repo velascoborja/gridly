@@ -17,6 +17,7 @@ Recurring expenses let users define named monthly expenses that repeat across a 
 During setup, `createAndPrefillYear` in `src/lib/server/actions/years.ts` saves the template list and copies every template into all 12 months, including each template's `tagId`. The prefill endpoint (`POST /api/years/[year]/prefill`) likewise copies the `tagId` from the template into each monthly copy it creates.
 
 Annual template updates use `PUT /api/years/[year]/recurring-expenses`. This endpoint replaces the template list, deletes all monthly recurring expense rows for that year, recreates them from the new template, and propagates downstream year carry-over. Tags are preserved best-effort by label match: if a recurring expense in the new list has the same label as one in the previous template, it inherits the previous template's `tagId`. Renaming a recurring expense in the annual editor resets its tag to `null`.
+The optional `applyFromMonth` request field defaults to January when omitted. When supplied, it must be an integer from 1 through 12; invalid values return HTTP `400` before templates or monthly copies are changed.
 After the annual editor receives the updated `yearData`, it refreshes the current App Router route cache so returning from setup or another route keeps the recalculated recurring expense totals.
 
 Monthly changes use:

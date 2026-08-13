@@ -38,6 +38,17 @@ test("annual setup dialog exposes one apply-from month selector for setup and re
   assert.match(formSource, /onConfigApplied\?: \(config: YearConfig, applyFromMonth: number\) => void/);
   assert.match(yearRouteSource, /const applyFromMonth = parseApplyFromMonth\(body\.applyFromMonth\)/);
   assert.match(recurringRouteSource, /const applyFromMonth = parseApplyFromMonth\(body\.applyFromMonth\)/);
+  assert.match(yearRouteSource, /if \(applyFromMonth === null\)[\s\S]*status: 400/);
+  assert.match(recurringRouteSource, /if \(applyFromMonth === null\)[\s\S]*status: 400/);
+  assert.ok(
+    yearRouteSource.indexOf("if (applyFromMonth === null)") < yearRouteSource.indexOf("db.update(years)"),
+    "invalid year config scopes should return before updating the year",
+  );
+  assert.ok(
+    recurringRouteSource.indexOf("if (applyFromMonth === null)") <
+      recurringRouteSource.indexOf("db.delete(yearRecurringExpenses)"),
+    "invalid recurring expense scopes should return before replacing templates",
+  );
   assert.match(recurringRouteSource, /month\.month >= applyFromMonth/);
 });
 

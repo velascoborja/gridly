@@ -88,6 +88,7 @@ Once a year is created, its configuration can be modified within the **Annual Su
 - **Layout:** The annual setup dialog groups setup fields into Starting point, Income, Monthly allocation, and Growth assumptions. The form is single-column on mobile and pairs Income with Monthly allocation on larger screens.
 - **Scroll Chrome:** The annual setup dialog header is sticky with a translucent blurred card background so metadata and actions remain visible while the form body scrolls underneath.
 - **Apply Scope:** The dialog includes an "Apply changes from" selector, defaulting to January. Monthly setup value saves and recurring expense reapplications only overwrite months from the selected month through December. `startingBalance` remains a year-level chain anchor.
+- **Apply Scope Validation:** The update APIs accept `applyFromMonth` as an integer from 1 through 12. Omitting it preserves the legacy January default; explicitly invalid values return HTTP `400` before any monthly data is changed.
 - **Persistence:** Changes are sent via `PATCH /api/years/[year]`.
 - **Confirmation:** Before saving any setup value, the form shows a warning that the change will overwrite monthly fixed values from the selected month onward.
 - **Cache Refresh:** After a successful save, the client calls `router.refresh()` so route cache restores after visiting setup or another route include the updated annual balance.

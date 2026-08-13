@@ -7,11 +7,7 @@ import { getOwnedYear } from "@/lib/server/ownership";
 import { getYearNumberForYearId, propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getSessionUser } from "@/lib/server/session";
 import { getYearData } from "@/lib/server/year-data";
-
-function parseApplyFromMonth(value: unknown): number {
-  const month = Number(value ?? 1);
-  return Number.isInteger(month) && month >= 1 && month <= 12 ? month : 1;
-}
+import { APPLY_FROM_MONTH_ERROR, parseApplyFromMonth } from "@/lib/apply-from-month";
 
 export async function GET(
   _req: Request,
@@ -52,6 +48,9 @@ export async function PUT(
 
   const body = await request.json();
   const applyFromMonth = parseApplyFromMonth(body.applyFromMonth);
+  if (applyFromMonth === null) {
+    return Response.json({ error: APPLY_FROM_MONTH_ERROR }, { status: 400 });
+  }
   const normalized = normalizeRecurringExpenseInputs(
     Array.isArray(body.recurringExpenses) ? body.recurringExpenses : []
   );
