@@ -22,41 +22,36 @@ async function loadYearData(userId: string, year: number): Promise<YearDataSnaps
   });
   if (!yearRow) return null;
 
-  const monthRows = await db
-    .select()
-    .from(months)
-    .where(eq(months.yearId, yearRow.id))
-    .orderBy(asc(months.month));
+  const [monthRows, recurringTemplates] = await Promise.all([
+    db
+      .select()
+      .from(months)
+      .where(eq(months.yearId, yearRow.id))
+      .orderBy(asc(months.month)),
+    db
+      .select()
+      .from(yearRecurringExpenses)
+      .where(eq(yearRecurringExpenses.yearId, yearRow.id))
+      .orderBy(asc(yearRecurringExpenses.sortOrder), asc(yearRecurringExpenses.id)),
+  ]);
 
-  const recurringTemplates = await db
-    .select()
-    .from(yearRecurringExpenses)
-    .where(eq(yearRecurringExpenses.yearId, yearRow.id))
-    .orderBy(asc(yearRecurringExpenses.sortOrder), asc(yearRecurringExpenses.id));
-
-  const allEntries =
+  const [allEntries, allGroups, allRecurringExpenses] =
     monthRows.length > 0
-      ? await db
-          .select()
-          .from(additionalEntries)
-          .where(inArray(additionalEntries.monthId, monthRows.map((month) => month.id)))
-      : [];
-
-  const allGroups =
-    monthRows.length > 0
-      ? await db
-          .select()
-          .from(additionalEntryGroups)
-          .where(inArray(additionalEntryGroups.monthId, monthRows.map((month) => month.id)))
-      : [];
-
-  const allRecurringExpenses =
-    monthRows.length > 0
-      ? await db
-          .select()
-          .from(monthlyRecurringExpenses)
-          .where(inArray(monthlyRecurringExpenses.monthId, monthRows.map((month) => month.id)))
-      : [];
+      ? await Promise.all([
+          db
+            .select()
+            .from(additionalEntries)
+            .where(inArray(additionalEntries.monthId, monthRows.map((month) => month.id))),
+          db
+            .select()
+            .from(additionalEntryGroups)
+            .where(inArray(additionalEntryGroups.monthId, monthRows.map((month) => month.id))),
+          db
+            .select()
+            .from(monthlyRecurringExpenses)
+            .where(inArray(monthlyRecurringExpenses.monthId, monthRows.map((month) => month.id))),
+        ])
+      : [[], [], []];
 
   const usedTagIds = [...new Set([
     ...allEntries.map((e) => e.tagId).filter((id): id is number => id !== null),
