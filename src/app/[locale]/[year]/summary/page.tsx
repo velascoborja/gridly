@@ -1,9 +1,7 @@
 import { notFound } from "next/navigation";
 import { YearPageClient } from "@/components/year/year-page-client";
-import { deriveAnnualKpiComparison } from "@/lib/annual-comparisons";
-import { deriveEvolutionMetrics } from "@/lib/evolution";
-import { getEvolutionSourcesForUser } from "@/lib/server/historical-years";
-import { getYearData, getYearsForUser } from "@/lib/server/year-data";
+import { getAnnualKpiComparisonContextForUser } from "@/lib/server/annual-comparisons";
+import { getYearData } from "@/lib/server/year-data";
 import { requireSessionUser } from "@/lib/server/session";
 
 export default async function SummaryPage({
@@ -16,13 +14,12 @@ export default async function SummaryPage({
   if (isNaN(year)) notFound();
 
   const user = await requireSessionUser();
-  const [yearData, years, evolutionSources] = await Promise.all([
+  const [yearData, comparisonContext] = await Promise.all([
     getYearData(user.id, year),
-    getYearsForUser(user.id),
-    getEvolutionSourcesForUser(user.id),
+    getAnnualKpiComparisonContextForUser(user.id, year),
   ]);
   if (!yearData) notFound();
-  const annualComparison = deriveAnnualKpiComparison(deriveEvolutionMetrics(evolutionSources), year);
+  const { years, comparison: annualComparison } = comparisonContext;
   const startingBalanceEditable = years[0] === year;
   const now = new Date();
   const defaultMonth = now.getFullYear() === year ? now.getMonth() + 1 : 1;

@@ -23,6 +23,22 @@ interface RawMonthData {
   additionalIncomes: AdditionalEntry[];
 }
 
+export interface AggregatedMonthFinancialInput {
+  startingBalance: number;
+  interestRate: number;
+  interests: number;
+  interestsManualOverride: boolean;
+  payslip: number;
+  additionalPayslip: number;
+  personalRemaining: number;
+  homeExpense: number;
+  personalExpense: number;
+  investment: number;
+  additionalIncome: number;
+  additionalExpense: number;
+  recurringExpense: number;
+}
+
 export function calculateMonthlyInterest(startingBalance: number, interestRate: number): number {
   return round2((startingBalance * interestRate) / 12);
 }
@@ -46,6 +62,23 @@ export function savings(m: RawMonthData): number {
   return totalIncome(m) - totalExpenses(m);
 }
 
+export function calculateMonthFinancials(input: AggregatedMonthFinancialInput) {
+  const interests = input.interestsManualOverride
+    ? input.interests
+    : calculateMonthlyInterest(input.startingBalance, input.interestRate);
+  const income = input.payslip + input.additionalPayslip + interests + input.personalRemaining + input.additionalIncome;
+  const expenses = input.homeExpense + input.personalExpense + input.investment + input.recurringExpense + input.additionalExpense;
+  const monthSavings = income - expenses;
+
+  return {
+    interests,
+    totalIncome: income,
+    totalExpenses: expenses,
+    savings: monthSavings,
+    endingBalance: input.startingBalance + monthSavings,
+  };
+}
+
 export function computeMonthChain(
   rawMonths: RawMonthData[],
   yearStartingBalance: number,
@@ -57,32 +90,45 @@ export function computeMonthChain(
   let runningBalance = yearStartingBalance;
   return sorted.map((m) => {
     const startingBalance = runningBalance;
-    const interests = m.interestsManualOverride
-      ? m.interests
-      : calculateMonthlyInterest(startingBalance, interestRate);
-    const monthWithInterest = {
-      ...m,
-      interests,
-      recurringExpenses: m.recurringExpenses ?? [],
-    };
-    const income = totalIncome(monthWithInterest);
-    const expenses = totalExpenses(monthWithInterest);
-    const monthSavings = income - expenses;
-    const endingBalance = startingBalance + monthSavings;
-    runningBalance = endingBalance;
+    const additionalIncome = m.additionalIncomes.reduce((sum, entry) => sum + entry.amount, 0);
+    const additionalExpense =
+      m.additionalExpenses.reduce((sum, entry) => sum + entry.amount, 0) +
+      m.additionalExpenseGroups.reduce(
+        (sum, group) => sum + group.entries.reduce((groupSum, entry) => groupSum + entry.amount, 0),
+        0
+      );
+    const recurringExpense = (m.recurringExpenses ?? []).reduce((sum, entry) => sum + entry.amount, 0);
+    const financials = calculateMonthFinancials({
+      startingBalance,
+      interestRate,
+      interests: m.interests,
+      interestsManualOverride: m.interestsManualOverride,
+      payslip: m.payslip,
+      additionalPayslip: m.additionalPayslip,
+      personalRemaining: m.personalRemaining,
+      homeExpense: m.homeExpense,
+      personalExpense: m.personalExpense,
+      investment: m.investment,
+      additionalIncome,
+      additionalExpense,
+      recurringExpense,
+    });
+    runningBalance = financials.endingBalance;
 
     return {
-      ...monthWithInterest,
+      ...m,
+      interests: financials.interests,
+      recurringExpenses: m.recurringExpenses ?? [],
       homeExpenseManualOverride: Boolean(m.homeExpenseManualOverride),
       personalExpenseManualOverride: Boolean(m.personalExpenseManualOverride),
       investmentManualOverride: Boolean(m.investmentManualOverride),
       payslipManualOverride: Boolean(m.payslipManualOverride),
       additionalPayslipManualOverride: Boolean(m.additionalPayslipManualOverride),
-      totalIncome: income,
-      totalExpenses: expenses,
-      savings: monthSavings,
+      totalIncome: financials.totalIncome,
+      totalExpenses: financials.totalExpenses,
+      savings: financials.savings,
       startingBalance,
-      endingBalance,
+      endingBalance: financials.endingBalance,
     };
   });
 }

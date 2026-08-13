@@ -47,17 +47,17 @@ test("year page lets annual summary update shared year data", () => {
   assert.match(source, /<AnnualView[\s\S]*onYearDataChange=\{setCurrentYearData\}/);
 });
 
-test("year pages pass annual KPI comparison context from evolution metrics", () => {
+test("year pages load annual KPI comparison context without loading full evolution data", () => {
   const summarySource = readFileSync(new URL("../../app/[locale]/[year]/summary/page.tsx", import.meta.url), "utf8");
   const monthSource = readFileSync(new URL("../../app/[locale]/[year]/[month]/page.tsx", import.meta.url), "utf8");
   const yearClientSource = readFileSync(new URL("../year/year-page-client.tsx", import.meta.url), "utf8");
   const annualSource = readFileSync(new URL("./annual-view.tsx", import.meta.url), "utf8");
 
-  assert.match(summarySource, /getEvolutionSourcesForUser/);
-  assert.match(summarySource, /deriveAnnualKpiComparison\(deriveEvolutionMetrics\(evolutionSources\), year\)/);
+  assert.match(summarySource, /getAnnualKpiComparisonContextForUser/);
+  assert.doesNotMatch(summarySource, /getEvolutionSourcesForUser/);
   assert.match(summarySource, /annualComparison=\{annualComparison\}/);
-  assert.match(monthSource, /getEvolutionSourcesForUser/);
-  assert.match(monthSource, /deriveAnnualKpiComparison\(deriveEvolutionMetrics\(evolutionSources\), year\)/);
+  assert.match(monthSource, /getAnnualKpiComparisonContextForUser/);
+  assert.doesNotMatch(monthSource, /getEvolutionSourcesForUser/);
   assert.match(monthSource, /annualComparison=\{annualComparison\}/);
   assert.match(yearClientSource, /annualComparison\?: AnnualKpiComparisonData/);
   assert.match(yearClientSource, /<AnnualView[\s\S]*annualComparison=\{annualComparison\}/);

@@ -24,6 +24,8 @@ The hero KPI card adds extra context from Evolution metrics:
 
 Annual savings follows the Evolution definition: cash balance growth, with investment tracked separately because Gridly counts monthly investment inside expenses.
 
+The month and summary server routes load this comparison context through `getAnnualKpiComparisonContextForUser`. The helper uses four grouped queries for configured years/months, additional-entry totals, recurring-expense totals, and historical summaries. It excludes the viewed year's month-level rows because that year is not part of either comparison baseline, and it does not hydrate full `YearData`, tags, groups, or recurring templates for the other years. The compact calculation shares the same month-chain financial primitive as the full year loader, including automatic and manually overridden interest behavior.
+
 ## Fixed Expenses Drilldown
 
 The Fixed expenses dialog groups annual fixed spend into home expense, personal budget, and recurring expenses. Expanding a row shows the chronological monthly drilldown. Month headers show a subtotal when that month contains more than one visible expense row, so recurring-expense months with multiple items can be read without manual addition.
