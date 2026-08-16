@@ -1,12 +1,11 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { AnnualView } from "@/components/annual/annual-view";
 import { AppShell } from "@/components/layout/app-shell";
-import { MonthOverview } from "@/components/monthly/month-overview";
 import { MonthNavigationPalette } from "@/components/search/month-navigation-palette";
 import { SearchPalette } from "@/components/search/search-palette";
-import { SettingsForm } from "@/components/settings/settings-form";
+import { YearViewLoading } from "@/components/year/year-view-loading";
 import { usePathname } from "@/i18n/routing";
 import type { YearData } from "@/lib/types";
 import type { AnnualKpiComparisonData } from "@/lib/annual-comparisons";
@@ -20,6 +19,21 @@ import {
   buildSettingsHref,
 } from "@/lib/year-routes";
 import { getUserExpectedEntriesNamespace } from "@/lib/expected-entries-storage";
+
+const AnnualView = dynamic(
+  () => import("@/components/annual/annual-view").then((module) => module.AnnualView),
+  { loading: () => <YearViewLoading view="summary" /> }
+);
+
+const MonthOverview = dynamic(
+  () => import("@/components/monthly/month-overview").then((module) => module.MonthOverview),
+  { loading: () => <YearViewLoading view="overview" /> }
+);
+
+const SettingsForm = dynamic(
+  () => import("@/components/settings/settings-form").then((module) => module.SettingsForm),
+  { loading: () => <YearViewLoading view="settings" /> }
+);
 
 interface Props {
   yearData: YearData;

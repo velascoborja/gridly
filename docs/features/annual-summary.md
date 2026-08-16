@@ -2,6 +2,8 @@
 
 The annual summary is the in-year overview shown at `/{locale}/{year}/summary`. It reuses the same `YearPageClient` state as monthly management, so local month edits and annual setup changes stay reflected in the KPI cards and charts without a full client-side refetch.
 
+`AnnualView` is a separate `next/dynamic` client chunk within `YearPageClient`. Month routes therefore do not include the annual UI or Recharts in their initial JavaScript; opening the summary for the first time renders an in-shell skeleton until the chunk is available. Direct summary visits retain server rendering and load the annual chunk immediately, while later in-year switches reuse the cached chunk and shared `YearData`.
+
 ## Hero KPI Card
 
 The main card shows the final balance and total savings for the selected year.
