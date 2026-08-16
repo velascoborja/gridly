@@ -52,6 +52,18 @@ test("annual setup dialog exposes one apply-from month selector for setup and re
   assert.match(recurringRouteSource, /month\.month >= applyFromMonth/);
 });
 
+test("annual config saves serialize the year and month updates in one transaction", () => {
+  const source = readFileSync(new URL("../../app/api/years/[year]/route.ts", import.meta.url), "utf8");
+
+  assert.match(source, /await db\.batch\(\[/, "the year and month writes should share one database transaction");
+  assert.match(source, /db\.update\(years\)[\s\S]*applyYearConfigToStoredMonths\(yearRow\.id, applyFromMonth\)/);
+  assert.match(source, /\.from\(years\)/, "month baselines should be read from the locked year row");
+  assert.match(source, /homeExpense: years\.monthlyHomeExpense/);
+  assert.match(source, /payslip: years\.estimatedSalary/);
+  assert.match(source, /then \$\{years\.estimatedExtraPayment\}/);
+  assert.doesNotMatch(source, /yearConfigFromRow/, "month writes must not use a JavaScript year snapshot");
+});
+
 test("year page lets annual summary update shared year data", () => {
   const source = readFileSync(new URL("../year/year-page-client.tsx", import.meta.url), "utf8");
 

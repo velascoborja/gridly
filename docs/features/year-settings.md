@@ -102,6 +102,8 @@ Once a year is created, its configuration can be modified within the **Annual Su
   - `interestsManualOverride` is reset to `false` so interest follows the current annual rate again.
   - Manual monthly fixed-value edits are overwritten only in the selected range; earlier months keep their existing fixed values. Additional entries and personal remaining values are preserved.
 
+The year-row update and month baseline rewrite run in one database transaction. The month update reads the current values directly from the locked year row, so concurrent field saves serialize and cannot overwrite monthly baselines with an older configuration snapshot.
+
 Annual Summary also includes the recurring expense template editor.
 
 - **Endpoint:** `PUT /api/years/[year]/recurring-expenses`.

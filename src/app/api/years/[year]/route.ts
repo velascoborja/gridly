@@ -1,7 +1,6 @@
 import { db } from "@/db";
 import { months, years } from "@/db/schema";
-import { and, eq, gte, inArray } from "drizzle-orm";
-import type { YearConfig } from "@/lib/types";
+import { and, eq, gte, sql } from "drizzle-orm";
 import { propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getYearData, getYearsForUser } from "@/lib/server/year-data";
 import { getSessionUser } from "@/lib/server/session";
@@ -14,46 +13,35 @@ function toPublicYearRow(row: typeof years.$inferSelect) {
   );
 }
 
-function yearConfigFromRow(row: typeof years.$inferSelect): YearConfig {
-  return {
-    id: row.id,
-    year: row.year,
-    startingBalance: parseFloat(row.startingBalance),
-    estimatedSalary: parseFloat(row.estimatedSalary),
-    hasExtraPayments: row.hasExtraPayments,
-    estimatedExtraPayment: parseFloat(row.estimatedExtraPayment),
-    monthlyInvestment: parseFloat(row.monthlyInvestment),
-    monthlyHomeExpense: parseFloat(row.monthlyHomeExpense),
-    monthlyPersonalBudget: parseFloat(row.monthlyPersonalBudget),
-    interestRate: parseFloat(row.interestRate),
-  };
-}
-
-async function applyYearConfigToStoredMonths(yearId: number, config: YearConfig, applyFromMonth: number) {
-  await db
+function applyYearConfigToStoredMonths(yearId: number, applyFromMonth: number) {
+  return db
     .update(months)
     .set({
-      homeExpense: String(config.monthlyHomeExpense),
+      homeExpense: years.monthlyHomeExpense,
       homeExpenseManualOverride: false,
-      personalExpense: String(config.monthlyPersonalBudget),
+      personalExpense: years.monthlyPersonalBudget,
       personalExpenseManualOverride: false,
-      investment: String(config.monthlyInvestment),
+      investment: years.monthlyInvestment,
       investmentManualOverride: false,
-      payslip: String(config.estimatedSalary),
+      payslip: years.estimatedSalary,
       payslipManualOverride: false,
-      additionalPayslip: "0",
+      additionalPayslip: sql`case
+        when ${years.hasExtraPayments} and ${months.month} in (6, 12)
+          then ${years.estimatedExtraPayment}
+        else 0
+      end`,
       additionalPayslipManualOverride: false,
       interests: "0",
       interestsManualOverride: false,
     })
-    .where(and(eq(months.yearId, yearId), gte(months.month, applyFromMonth)));
-
-  if (config.hasExtraPayments) {
-    await db
-      .update(months)
-      .set({ additionalPayslip: String(config.estimatedExtraPayment) })
-      .where(and(eq(months.yearId, yearId), gte(months.month, applyFromMonth), inArray(months.month, [6, 12])));
-  }
+    .from(years)
+    .where(
+      and(
+        eq(years.id, yearId),
+        eq(months.yearId, years.id),
+        gte(months.month, applyFromMonth),
+      ),
+    );
 }
 
 export async function GET(
@@ -114,8 +102,11 @@ export async function PATCH(
   if (body.monthlyPersonalBudget !== undefined) updates.monthlyPersonalBudget = String(body.monthlyPersonalBudget);
   if (body.interestRate !== undefined) updates.interestRate = String(body.interestRate);
 
-  const [updated] = await db.update(years).set(updates).where(eq(years.id, yearRow.id)).returning();
-  await applyYearConfigToStoredMonths(yearRow.id, yearConfigFromRow(updated), applyFromMonth);
+  const [updatedRows] = await db.batch([
+    db.update(years).set(updates).where(eq(years.id, yearRow.id)).returning(),
+    applyYearConfigToStoredMonths(yearRow.id, applyFromMonth),
+  ]);
+  const [updated] = updatedRows;
 
   await propagateYearCarryOver(user.id, yearNum);
   return Response.json(toPublicYearRow(updated));
