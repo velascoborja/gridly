@@ -85,6 +85,8 @@ Every non-null `tagId` supplied to these endpoints is resolved against both `tag
 
 The UI always shows a confirmation dialog before applying a tag change on a recurring expense, informing the user that the change will affect the entire year's series.
 
+Tag-only mutations do not trigger yearly balance carry-over because tags are metadata and do not participate in financial calculations.
+
 ### Annual recurring expense endpoint
 
 `PUT /api/years/[year]/recurring-expenses` replaces the recurring expense template list and rewrites monthly copies from the selected `applyFromMonth` through December. Before deleting existing templates, the route records a `label -> tagId` map and reapplies matching tags to recreated templates. Newly inserted monthly copies inherit the recreated template's `tagId`.

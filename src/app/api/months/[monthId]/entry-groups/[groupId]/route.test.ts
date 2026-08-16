@@ -3,6 +3,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 const source = readFileSync(new URL("./route.ts", import.meta.url), "utf8");
+const deleteStart = source.indexOf("export async function DELETE");
+const patchSource = source.slice(0, deleteStart);
+const deleteSource = source.slice(deleteStart);
 
 test("entry-groups PATCH route reads tagId from the request body", () => {
   assert.match(source, /body\.tagId/);
@@ -32,4 +35,21 @@ test("entry-groups route only lets completed groups reopen", () => {
   assert.match(source, /groupUpdate\.isCompleted = body\.isCompleted/);
   assert.match(source, /if \(group\.isCompleted\)/);
   assert.match(source, /status: 409/);
+});
+
+test("entry-groups PATCH only propagates carry-over for an actual month move", () => {
+  assert.equal((patchSource.match(/affectsCarryOver =/g) ?? []).length, 2);
+  assert.match(patchSource, /let affectsCarryOver = false/);
+  assert.match(
+    patchSource,
+    /affectsCarryOver = ownedTargetMonth\.id !== month\.id/,
+  );
+  assert.match(
+    patchSource,
+    /if \(affectsCarryOver\) \{[\s\S]*propagateYearCarryOver/,
+  );
+});
+
+test("entry-groups DELETE keeps carry-over propagation", () => {
+  assert.match(deleteSource, /propagateYearCarryOver/);
 });

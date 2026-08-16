@@ -3,6 +3,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 const source = readFileSync(new URL("./route.ts", import.meta.url), "utf8");
+const deleteStart = source.indexOf("export async function DELETE");
+const patchSource = source.slice(0, deleteStart);
+const deleteSource = source.slice(deleteStart);
 
 test("entry PATCH supports moving an entry to another owned month in the same year", () => {
   assert.match(source, /body\.monthId !== undefined/);
@@ -45,4 +48,24 @@ test("entries PATCH route only accepts a tag owned by the authenticated user", (
   assert.match(source, /eq\(tags\.id, newTagId\)/);
   assert.match(source, /eq\(tags\.userId, user\.id\)/);
   assert.match(source, /ownedTag\.length === 0/);
+});
+
+test("entry PATCH only propagates for a changed amount or actual month move", () => {
+  assert.equal((patchSource.match(/affectsCarryOver =/g) ?? []).length, 2);
+  assert.match(
+    patchSource,
+    /body\.amount !== undefined && Number\(body\.amount\) !== Number\(entry\.amount\)/,
+  );
+  assert.match(
+    patchSource,
+    /if \(targetMonth\.id !== entry\.monthId\) \{\s*affectsCarryOver = true/,
+  );
+  assert.match(
+    patchSource,
+    /if \(affectsCarryOver\) \{[\s\S]*propagateYearCarryOver/,
+  );
+});
+
+test("entry DELETE keeps carry-over propagation", () => {
+  assert.match(deleteSource, /propagateYearCarryOver/);
 });

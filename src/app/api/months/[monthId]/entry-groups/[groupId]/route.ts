@@ -37,6 +37,7 @@ export async function PATCH(
   }
 
   const groupUpdate: { label: string; tagId?: number | null; monthId?: number; isCompleted?: boolean } = { label };
+  let affectsCarryOver = false;
   if (body.isCompleted !== undefined) {
     if (typeof body.isCompleted !== "boolean") {
       return Response.json({ error: "isCompleted must be a boolean" }, { status: 400 });
@@ -58,6 +59,7 @@ export async function PATCH(
     }
     targetMonth = ownedTargetMonth;
     groupUpdate.monthId = ownedTargetMonth.id;
+    affectsCarryOver = ownedTargetMonth.id !== month.id;
   }
 
   let newTagId: number | null | undefined;
@@ -99,9 +101,11 @@ export async function PATCH(
       .where(eq(additionalEntries.groupId, group.id));
   }
 
-  const yearNumber = await getYearNumberForYearId(month.yearId);
-  if (yearNumber !== null) {
-    await propagateYearCarryOver(user.id, yearNumber);
+  if (affectsCarryOver) {
+    const yearNumber = await getYearNumberForYearId(month.yearId);
+    if (yearNumber !== null) {
+      await propagateYearCarryOver(user.id, yearNumber);
+    }
   }
 
   return Response.json(updated);

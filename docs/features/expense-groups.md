@@ -129,6 +129,8 @@ totalExpenses = homeExpense + personalExpense + investment
   + groupedExpensesTotal;     // grouped
 ```
 
+Creating an empty group, renaming it, assigning a tag, or changing its completion state does not trigger yearly carry-over. Moving a group to a different month does trigger propagation because the timing can affect monthly interest, and deleting a group retains propagation because its entries are cascade-deleted.
+
 ## Tests
 
 `src/app/api/months/[monthId]/entries/route.test.ts` contains three source-inspection tests covering the bug-prone data path:

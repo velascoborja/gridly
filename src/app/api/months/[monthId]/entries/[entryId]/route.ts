@@ -33,6 +33,9 @@ export async function PATCH(
   if (!month || !entry || entry.monthId !== month.id)
     return Response.json({ error: "Entry not found" }, { status: 404 });
 
+  let affectsCarryOver =
+    body.amount !== undefined && Number(body.amount) !== Number(entry.amount);
+
   const sourceGroup = entry.groupId == null
     ? null
     : await db.query.additionalEntryGroups.findFirst({
@@ -63,6 +66,9 @@ export async function PATCH(
       return Response.json({ error: "Target month must be in the same year" }, { status: 400 });
     }
     updates.monthId = targetMonth.id;
+    if (targetMonth.id !== entry.monthId) {
+      affectsCarryOver = true;
+    }
   }
 
   if (body.groupId !== undefined) {
@@ -118,9 +124,11 @@ export async function PATCH(
     .where(eq(additionalEntries.id, entry.id))
     .returning();
 
-  const yearNumber = await getYearNumberForYearId(month.yearId);
-  if (yearNumber !== null) {
-    await propagateYearCarryOver(user.id, yearNumber);
+  if (affectsCarryOver) {
+    const yearNumber = await getYearNumberForYearId(month.yearId);
+    if (yearNumber !== null) {
+      await propagateYearCarryOver(user.id, yearNumber);
+    }
   }
 
   return Response.json(updated);

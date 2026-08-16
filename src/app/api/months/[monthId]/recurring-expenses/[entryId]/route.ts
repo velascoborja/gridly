@@ -25,8 +25,11 @@ export async function PATCH(
   const body = await request.json();
   const updates: Partial<typeof monthlyRecurringExpenses.$inferInsert> = {};
   if (body.label !== undefined) updates.label = String(body.label).trim();
-  if (body.amount !== undefined) updates.amount = String(Number(body.amount) || 0);
+  const nextAmount = body.amount !== undefined ? Number(body.amount) || 0 : undefined;
+  if (nextAmount !== undefined) updates.amount = String(nextAmount);
   if (body.sortOrder !== undefined) updates.sortOrder = Number(body.sortOrder) || 0;
+  const affectsCarryOver =
+    nextAmount !== undefined && nextAmount !== Number(entry.amount);
 
   const tagChange = body.tagId !== undefined;
   const newTagId: number | null = body.tagId === null ? null : Number(body.tagId);
@@ -74,9 +77,11 @@ export async function PATCH(
       .where(eq(monthlyRecurringExpenses.id, entry.id));
   }
 
-  const yearNumber = await getYearNumberForYearId(month.yearId);
-  if (yearNumber !== null) {
-    await propagateYearCarryOver(user.id, yearNumber);
+  if (affectsCarryOver) {
+    const yearNumber = await getYearNumberForYearId(month.yearId);
+    if (yearNumber !== null) {
+      await propagateYearCarryOver(user.id, yearNumber);
+    }
   }
 
   return Response.json(parseMonthlyRecurringExpense(updated));
