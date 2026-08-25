@@ -71,20 +71,6 @@ test("entry edit focus follows whether the user clicked label or amount", () => 
   assert.match(recurringSource, /autoFocus=\{editFocusTarget\}/);
 });
 
-test("additional entry editors keep the focused editor inside the visible viewport", () => {
-  const additionalEntriesSource = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
-  const groupRowSource = readFileSync(new URL("./additional-entry-group-row.tsx", import.meta.url), "utf8");
-  const recurringSource = readFileSync(new URL("./recurring-expenses-list.tsx", import.meta.url), "utf8");
-
-  for (const source of [additionalEntriesSource, groupRowSource]) {
-    assert.match(source, /import \{ useEntryEditorVisibility \} from "\.\/use-entry-editor-visibility"/);
-    assert.match(source, /const editorContainerRef = useEntryEditorVisibility\(editingId\)/);
-    assert.match(source, /ref=\{editorContainerRef\} className="rounded-xl border border-border\/70 bg-muted\/20 p-1\.5"/);
-  }
-
-  assert.doesNotMatch(recurringSource, /useEntryEditorVisibility/);
-});
-
 test("additional expense group creation refreshes the app router cache after local state updates", () => {
   const source = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
 

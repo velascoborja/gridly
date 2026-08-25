@@ -21,7 +21,6 @@ import {
 import { AdditionalEntryGroupRow } from "./additional-entry-group-row";
 import { EntryFormRow, EntryFormSelectorItem, EntryFormSelectorList } from "./entry-form-row";
 import { EntryHeightTransition } from "./entry-height-transition";
-import { useEntryEditorVisibility } from "./use-entry-editor-visibility";
 import { TagPickerContent } from "./tag-picker";
 import { CompletionLockButton, CompletionLockIcon } from "./completion-lock-button";
 import { sortAdditionalEntriesDesc, sumAdditionalEntries } from "@/lib/additional-entries";
@@ -103,7 +102,6 @@ export function AdditionalEntriesCard({
   const [newAmount, setNewAmount] = useState("");
   const [newAmountError, setNewAmountError] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const editorContainerRef = useEntryEditorVisibility(editingId);
   const [editFocusTarget, setEditFocusTarget] = useState<EntryEditFocusTarget>("label");
   const [editLabel, setEditLabel] = useState("");
   const [editAmount, setEditAmount] = useState("");
@@ -677,7 +675,7 @@ export function AdditionalEntriesCard({
                 stateKey={isEditing ? "editing" : "resting"}
               >
                 {isEditing ? (
-                  <div ref={editorContainerRef} className="rounded-xl border border-border/70 bg-muted/20 p-1.5">
+                  <div className="rounded-xl border border-border/70 bg-muted/20 p-1.5">
                 <EntryFormRow
                   labelValue={editLabel}
                   onLabelChange={setEditLabel}

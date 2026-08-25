@@ -27,7 +27,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { EntryFormRow, EntryFormSelectorItem, EntryFormSelectorList } from "./entry-form-row";
 import { EntryHeightTransition } from "./entry-height-transition";
-import { useEntryEditorVisibility } from "./use-entry-editor-visibility";
 import { sortAdditionalEntriesDesc } from "@/lib/additional-entries";
 import { parseMoneyExpression } from "@/lib/currency-input";
 import { cn, formatCurrency, formatMonthName } from "@/lib/utils";
@@ -98,7 +97,6 @@ export function AdditionalEntryGroupRow({
   const [newAmountError, setNewAmountError] = useState(false);
 
   const [editingId, setEditingId] = useState<number | null>(null);
-  const editorContainerRef = useEntryEditorVisibility(editingId);
   const [editFocusTarget, setEditFocusTarget] = useState<EntryEditFocusTarget>("label");
   const [editLabel, setEditLabel] = useState("");
   const [editAmount, setEditAmount] = useState("");
@@ -836,7 +834,7 @@ export function AdditionalEntryGroupRow({
                 stateKey={isEditingEntry ? "editing" : "resting"}
               >
                 {isEditingEntry ? (
-                  <div ref={editorContainerRef} className="rounded-xl border border-border/70 bg-muted/20 p-1.5">
+                  <div className="rounded-xl border border-border/70 bg-muted/20 p-1.5">
                 <EntryFormRow
                   labelValue={editLabel}
                   onLabelChange={setEditLabel}
