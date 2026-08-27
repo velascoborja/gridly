@@ -30,6 +30,7 @@ interface CurrentMonthAxisTickProps {
     value?: string;
   };
   currentMonthName?: string;
+  negativeMonthNames: ReadonlySet<string>;
 }
 
 function SavingsBarShape({ x, y, width, height, fill, payload }: SavingsBarShapeProps) {
@@ -75,10 +76,11 @@ function SavingsBarShape({ x, y, width, height, fill, payload }: SavingsBarShape
   );
 }
 
-function CurrentMonthAxisTick({ x, y, payload, currentMonthName }: CurrentMonthAxisTickProps) {
+function CurrentMonthAxisTick({ x, y, payload, currentMonthName, negativeMonthNames }: CurrentMonthAxisTickProps) {
   if (x === undefined || y === undefined || !payload?.value) return null;
 
   const isCurrentMonth = payload.value === currentMonthName;
+  const isNegativeMonth = negativeMonthNames.has(payload.value);
 
   return (
     <g transform={`translate(${x},${y})`}>
@@ -87,7 +89,7 @@ function CurrentMonthAxisTick({ x, y, payload, currentMonthName }: CurrentMonthA
         y={0}
         dy={12}
         textAnchor="middle"
-        fill={isCurrentMonth ? "var(--color-primary)" : "currentColor"}
+        fill={isNegativeMonth ? "var(--color-destructive)" : isCurrentMonth ? "var(--color-primary)" : "currentColor"}
         fontSize={11}
         fontWeight={isCurrentMonth ? 600 : 400}
       >
@@ -113,6 +115,7 @@ export function SavingsChart({ months, year }: Props) {
     isCurrentMonth: isCurrentSavingsChartMonth(year, m.month, now),
   }));
   const currentMonthName = data.find((m) => m.isCurrentMonth)?.name;
+  const negativeMonthNames = new Set(data.filter((m) => m.ahorro < 0).map((m) => m.name));
 
   return (
     <Card className="border-border/70 bg-card/90 shadow-sm">
@@ -128,7 +131,13 @@ export function SavingsChart({ months, year }: Props) {
               <XAxis
                 dataKey="name"
                 height={34}
-                tick={(props) => <CurrentMonthAxisTick {...props} currentMonthName={currentMonthName} />}
+                tick={(props) => (
+                  <CurrentMonthAxisTick
+                    {...props}
+                    currentMonthName={currentMonthName}
+                    negativeMonthNames={negativeMonthNames}
+                  />
+                )}
               />
               <YAxis tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} width={40} />
               <Tooltip

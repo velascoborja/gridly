@@ -273,8 +273,11 @@ test("savings chart colors negative months red and highlights the current month 
   assert.match(source, /shape=\{<SavingsBarShape \/>}/);
   assert.match(source, /payload\.ahorro < 0/);
   assert.match(source, /"var\(--color-destructive\)"/);
+  assert.match(source, /const negativeMonthNames = new Set\(data\.filter\(\(m\) => m\.ahorro < 0\)\.map\(\(m\) => m\.name\)\)/);
+  assert.match(source, /const isNegativeMonth = negativeMonthNames\.has\(payload\.value\)/);
+  assert.match(source, /fill=\{isNegativeMonth \? "var\(--color-destructive\)" : isCurrentMonth/);
   assert.match(source, /const currentMonthName = data\.find\(\(m\) => m\.isCurrentMonth\)\?\.name/);
-  assert.match(source, /tick=\{\(props\) => <CurrentMonthAxisTick \{\.\.\.props\} currentMonthName=\{currentMonthName\} \/>}/);
+  assert.match(source, /negativeMonthNames=\{negativeMonthNames\}/);
   assert.match(source, /stroke="var\(--color-primary\)"/);
   assert.match(source, /t\("currentMonthLabel"\)/);
   assert.match(esMessages, /"currentMonthLabel": "Mes actual"/);

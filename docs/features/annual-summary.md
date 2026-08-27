@@ -44,4 +44,4 @@ When the viewed year is the current calendar year, the X-axis tick for the curre
 
 The monthly savings chart plots each month's net savings as bars. Positive months stay green and negative months stay red so the savings direction remains the primary signal. `AnnualView` also passes the selected calendar year into `SavingsChart`; when the viewed year matches the browser's current year, the current month bar receives a subtle primary-colored outline and glow, and the tooltip labels it as the current month.
 
-The savings chart uses the same X-axis current-month tick treatment as the balance chart: the current month abbreviation turns primary-colored and gets a small dot beneath it.
+Negative-month abbreviations on the X axis use the same red status color as their bars. This negative-state color takes priority over the primary-colored current-month label, while the small primary dot beneath the label continues to identify the current month.
