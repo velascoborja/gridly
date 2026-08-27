@@ -258,7 +258,7 @@ test("balance chart highlights only the current month dot by viewed year", () =>
   assert.doesNotMatch(source, /futureSaldo/);
 });
 
-test("savings chart highlights the current month bar by viewed year", () => {
+test("savings chart colors negative months red and highlights the current month bar by viewed year", () => {
   const source = readFileSync(new URL("./savings-chart.tsx", import.meta.url), "utf8");
   const annualSource = readFileSync(new URL("./annual-view.tsx", import.meta.url), "utf8");
   const esMessages = readFileSync(new URL("../../../messages/es.json", import.meta.url), "utf8");
@@ -271,6 +271,8 @@ test("savings chart highlights the current month bar by viewed year", () => {
   assert.match(source, /function SavingsBarShape/);
   assert.match(source, /function CurrentMonthAxisTick/);
   assert.match(source, /shape=\{<SavingsBarShape \/>}/);
+  assert.match(source, /payload\.ahorro < 0/);
+  assert.match(source, /"var\(--color-destructive\)"/);
   assert.match(source, /const currentMonthName = data\.find\(\(m\) => m\.isCurrentMonth\)\?\.name/);
   assert.match(source, /tick=\{\(props\) => <CurrentMonthAxisTick \{\.\.\.props\} currentMonthName=\{currentMonthName\} \/>}/);
   assert.match(source, /stroke="var\(--color-primary\)"/);

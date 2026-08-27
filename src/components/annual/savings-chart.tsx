@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations, useLocale } from "next-intl";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency, formatMonthName } from "@/lib/utils";
 import type { MonthData } from "@/lib/types";
@@ -18,6 +18,7 @@ interface SavingsBarShapeProps {
   height?: number;
   fill?: string;
   payload?: {
+    ahorro?: number;
     isCurrentMonth?: boolean;
   };
 }
@@ -35,7 +36,11 @@ function SavingsBarShape({ x, y, width, height, fill, payload }: SavingsBarShape
   if (x === undefined || y === undefined || width === undefined || height === undefined) return null;
 
   const radius = 3;
-  const barFill = fill ?? "var(--color-primary)";
+  const barFill = payload?.ahorro !== undefined
+    ? payload.ahorro < 0
+      ? "var(--color-destructive)"
+      : "hsl(142 76% 36%)"
+    : fill ?? "var(--color-primary)";
   const normalizedY = height < 0 ? y + height : y;
   const normalizedHeight = Math.abs(height);
 
@@ -133,14 +138,7 @@ export function SavingsChart({ months, year }: Props) {
                   return entry?.isCurrentMonth ? `${label} · ${t("currentMonthLabel")}` : label;
                 }}
               />
-              <Bar name={t("savingsLabel")} dataKey="ahorro" radius={[3, 3, 0, 0]} shape={<SavingsBarShape />}>
-                {data.map((entry, i) => (
-                  <Cell
-                    key={i}
-                    fill={entry.ahorro >= 0 ? "hsl(142 76% 36%)" : "hsl(0 84% 60%)"}
-                  />
-                ))}
-              </Bar>
+              <Bar name={t("savingsLabel")} dataKey="ahorro" radius={[3, 3, 0, 0]} shape={<SavingsBarShape />} />
             </BarChart>
           </ResponsiveContainer>
         </div>
