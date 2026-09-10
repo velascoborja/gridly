@@ -13,8 +13,6 @@ import {
 } from "@/components/ui/dialog";
 import { calcEstimatedPortfolioValues, summarizeEvolutionMetrics, type EvolutionYearMetric } from "@/lib/evolution";
 import type { HistoricalYear } from "@/lib/types";
-import { mergeTagStatsByYear, type TagStats } from "@/lib/tag-stats";
-import { mergeFixedStatsByYear, type FixedExpenseStats } from "@/lib/fixed-stats";
 import { formatCurrency } from "@/lib/utils";
 import { TagStatRow } from "@/components/annual/tag-stat-row";
 import { FixedStatRow } from "@/components/annual/fixed-stat-row";
@@ -22,6 +20,7 @@ import { EvolutionCharts } from "./evolution-charts";
 import { EvolutionDetailTable } from "./evolution-detail-table";
 import { HistoricalYearDialog } from "./historical-year-dialog";
 import { EvolutionKpiCards } from "./evolution-kpi-cards";
+import { useEvolutionDrilldown } from "./use-evolution-drilldown";
 
 const STORAGE_KEY = "evolution_return_rate";
 const STORAGE_EVENT = "gridly:evolution-return-rate";
@@ -54,11 +53,21 @@ interface Props {
   metrics: EvolutionYearMetric[];
   historicalYears: HistoricalYear[];
   calendarYear: number;
-  tagStatsByYear: { year: number; stats: TagStats }[];
-  fixedStatsByYear: { year: number; stats: FixedExpenseStats }[];
+  tagYears: number[];
+  fixedYears: number[];
 }
 
-export function EvolutionDashboard({ metrics, historicalYears, calendarYear, tagStatsByYear, fixedStatsByYear }: Props) {
+function DrilldownLoading({ label }: { label: string }) {
+  return (
+    <div className="space-y-2" role="status" aria-busy="true" aria-label={label}>
+      {[0, 1, 2].map((item) => (
+        <div key={item} className="h-20 animate-pulse rounded-xl border border-border bg-muted/50" />
+      ))}
+    </div>
+  );
+}
+
+export function EvolutionDashboard({ metrics, historicalYears, calendarYear, tagYears, fixedYears }: Props) {
   const t = useTranslations("Evolution");
   const tCat = useTranslations("Annual.categories");
   const tFixed = useTranslations("Annual.fixedExpenses");
@@ -86,43 +95,37 @@ export function EvolutionDashboard({ metrics, historicalYears, calendarYear, tag
   const showEmptyState = visibleMetrics.length < 2;
 
   const visibleTagYears = useMemo(
-    () => (includeFuture ? tagStatsByYear : tagStatsByYear.filter((y) => y.year <= calendarYear)),
-    [tagStatsByYear, includeFuture, calendarYear],
+    () => (includeFuture ? tagYears : tagYears.filter((year) => year <= calendarYear)),
+    [tagYears, includeFuture, calendarYear],
   );
   const hasTagData = visibleTagYears.length > 0;
-  type TagPage = { year: number | null; stats: TagStats };
-  const tagPages = useMemo<TagPage[]>(
-    () => [
-      { year: null, stats: mergeTagStatsByYear(visibleTagYears) },
-      ...visibleTagYears.map((y) => ({ year: y.year, stats: y.stats })),
-    ],
+  const tagPages = useMemo<(number | null)[]>(
+    () => [null, ...visibleTagYears],
     [visibleTagYears],
   );
   const safeTagPageIndex = Math.min(tagPageIndex, tagPages.length - 1);
-  const currentTagPage = tagPages[safeTagPageIndex];
-  const currentTagStats = currentTagPage?.stats.stats ?? [];
+  const currentTagYear = tagPages[safeTagPageIndex] ?? null;
+  const tagDrilldown = useEvolutionDrilldown("tags", currentTagYear, includeFuture, tagsDialogOpen);
+  const currentTagStats = tagDrilldown.data?.stats ?? [];
   const currentMaxTagAmount = currentTagStats[0]?.totalAmount ?? 0;
   const currentTagTaggedCount = currentTagStats.filter((s) => s.tag !== null).length;
-  const currentTagTotal = currentTagPage?.stats.totalAdditional ?? 0;
+  const currentTagTotal = tagDrilldown.data?.totalAdditional ?? 0;
 
   const visibleFixedYears = useMemo(
-    () => (includeFuture ? fixedStatsByYear : fixedStatsByYear.filter((y) => y.year <= calendarYear)),
-    [fixedStatsByYear, includeFuture, calendarYear],
+    () => (includeFuture ? fixedYears : fixedYears.filter((year) => year <= calendarYear)),
+    [fixedYears, includeFuture, calendarYear],
   );
   const hasFixedData = visibleFixedYears.length > 0;
-  type FixedPage = { year: number | null; stats: FixedExpenseStats };
-  const fixedPages = useMemo<FixedPage[]>(
-    () => [
-      { year: null, stats: mergeFixedStatsByYear(visibleFixedYears) },
-      ...visibleFixedYears.map((y) => ({ year: y.year, stats: y.stats })),
-    ],
+  const fixedPages = useMemo<(number | null)[]>(
+    () => [null, ...visibleFixedYears],
     [visibleFixedYears],
   );
   const safeFixedPageIndex = Math.min(fixedPageIndex, fixedPages.length - 1);
-  const currentFixedPage = fixedPages[safeFixedPageIndex];
-  const currentFixedStats = currentFixedPage?.stats.stats ?? [];
+  const currentFixedYear = fixedPages[safeFixedPageIndex] ?? null;
+  const fixedDrilldown = useEvolutionDrilldown("fixed", currentFixedYear, includeFuture, fixedDialogOpen);
+  const currentFixedStats = fixedDrilldown.data?.stats ?? [];
   const currentMaxFixedAmount = currentFixedStats[0]?.totalAmount ?? 0;
-  const currentFixedTotal = currentFixedPage?.stats.grandTotal ?? 0;
+  const currentFixedTotal = fixedDrilldown.data?.grandTotal ?? 0;
 
   function handleRateChange(e: React.ChangeEvent<HTMLInputElement>) {
     const raw = e.target.value;
@@ -204,7 +207,7 @@ export function EvolutionDashboard({ metrics, historicalYears, calendarYear, tag
                             aria-live="polite"
                             className="finance-number text-sm font-semibold tabular-nums text-foreground"
                           >
-                            {currentFixedPage?.year === null ? t("fixedPager.allYears") : currentFixedPage?.year}
+                            {currentFixedYear === null ? t("fixedPager.allYears") : currentFixedYear}
                           </span>
                           <Button
                             type="button"
@@ -220,19 +223,34 @@ export function EvolutionDashboard({ metrics, historicalYears, calendarYear, tag
                         </div>
                       </DialogHeader>
                       <div className="mx-auto max-w-2xl px-4 py-6">
-                        <p className="mb-4 text-xs text-muted-foreground">
-                          {tFixed("grandTotalLabel")}{" "}
-                          <strong className="text-foreground">{formatCurrency(currentFixedTotal, locale)}</strong>
-                        </p>
-                        <div className="flex flex-col gap-2">
-                          {currentFixedStats.map((stat) => (
-                            <FixedStatRow
-                              key={`${currentFixedPage?.year ?? "all"}-${stat.key}`}
-                              stat={stat}
-                              maxAmount={currentMaxFixedAmount}
-                            />
-                          ))}
-                        </div>
+                        {fixedDrilldown.loading ? (
+                          <DrilldownLoading label={t("drilldown.loading")} />
+                        ) : fixedDrilldown.error ? (
+                          <div className="rounded-lg border border-destructive/25 bg-destructive/5 p-4 text-sm text-muted-foreground">
+                            <p>{t("drilldown.loadError")}</p>
+                            <Button type="button" variant="outline" size="sm" className="mt-3" onClick={fixedDrilldown.retry}>
+                              {t("drilldown.retry")}
+                            </Button>
+                          </div>
+                        ) : currentFixedStats.length === 0 ? (
+                          <p className="text-sm text-muted-foreground">{t("drilldown.empty")}</p>
+                        ) : (
+                          <>
+                            <p className="mb-4 text-xs text-muted-foreground">
+                              {tFixed("grandTotalLabel")}{" "}
+                              <strong className="text-foreground">{formatCurrency(currentFixedTotal, locale)}</strong>
+                            </p>
+                            <div className="flex flex-col gap-2">
+                              {currentFixedStats.map((stat) => (
+                                <FixedStatRow
+                                  key={`${currentFixedYear ?? "all"}-${stat.key}`}
+                                  stat={stat}
+                                  maxAmount={currentMaxFixedAmount}
+                                />
+                              ))}
+                            </div>
+                          </>
+                        )}
                       </div>
                     </div>
                   </DialogContent>
@@ -275,7 +293,7 @@ export function EvolutionDashboard({ metrics, historicalYears, calendarYear, tag
                             aria-live="polite"
                             className="finance-number text-sm font-semibold tabular-nums text-foreground"
                           >
-                            {currentTagPage?.year === null ? t("tagsPager.allYears") : currentTagPage?.year}
+                            {currentTagYear === null ? t("tagsPager.allYears") : currentTagYear}
                           </span>
                           <Button
                             type="button"
@@ -291,20 +309,35 @@ export function EvolutionDashboard({ metrics, historicalYears, calendarYear, tag
                         </div>
                       </DialogHeader>
                       <div className="mx-auto max-w-2xl px-4 py-6">
-                        <p className="mb-4 text-xs text-muted-foreground">
-                          {tCat("totalLabel")}{" "}
-                          <strong className="text-foreground">{formatCurrency(currentTagTotal, locale)}</strong>
-                          {currentTagTaggedCount > 0 && <> · {tCat("tagCount", { count: currentTagTaggedCount })}</>}
-                        </p>
-                        <div className="flex flex-col gap-2">
-                          {currentTagStats.map((stat) => (
-                            <TagStatRow
-                              key={`${currentTagPage?.year ?? "all"}-${stat.tag?.id ?? "untagged"}`}
-                              stat={stat}
-                              maxAmount={currentMaxTagAmount}
-                            />
-                          ))}
-                        </div>
+                        {tagDrilldown.loading ? (
+                          <DrilldownLoading label={t("drilldown.loading")} />
+                        ) : tagDrilldown.error ? (
+                          <div className="rounded-lg border border-destructive/25 bg-destructive/5 p-4 text-sm text-muted-foreground">
+                            <p>{t("drilldown.loadError")}</p>
+                            <Button type="button" variant="outline" size="sm" className="mt-3" onClick={tagDrilldown.retry}>
+                              {t("drilldown.retry")}
+                            </Button>
+                          </div>
+                        ) : currentTagStats.length === 0 ? (
+                          <p className="text-sm text-muted-foreground">{t("drilldown.empty")}</p>
+                        ) : (
+                          <>
+                            <p className="mb-4 text-xs text-muted-foreground">
+                              {tCat("totalLabel")}{" "}
+                              <strong className="text-foreground">{formatCurrency(currentTagTotal, locale)}</strong>
+                              {currentTagTaggedCount > 0 && <> · {tCat("tagCount", { count: currentTagTaggedCount })}</>}
+                            </p>
+                            <div className="flex flex-col gap-2">
+                              {currentTagStats.map((stat) => (
+                                <TagStatRow
+                                  key={`${currentTagYear ?? "all"}-${stat.tag?.id ?? "untagged"}`}
+                                  stat={stat}
+                                  maxAmount={currentMaxTagAmount}
+                                />
+                              ))}
+                            </div>
+                          </>
+                        )}
                       </div>
                     </div>
                   </DialogContent>

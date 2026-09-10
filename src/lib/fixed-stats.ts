@@ -81,6 +81,14 @@ export function computeFixedStats(yearData: YearData): FixedExpenseStats {
   return buildStats(homeTotal, homeEntries, personalTotal, personalEntries, recurringTotal, recurringEntries);
 }
 
+export function hasFixedStats(yearData: YearData): boolean {
+  return yearData.months.some((month) =>
+    month.homeExpense > 0
+    || month.personalExpense > 0
+    || month.recurringExpenses.some((expense) => expense.amount > 0)
+  );
+}
+
 export function mergeFixedStatsByYear(perYear: { year: number; stats: FixedExpenseStats }[]): FixedExpenseStats {
   let homeTotal = 0;
   let personalTotal = 0;

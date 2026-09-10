@@ -79,7 +79,7 @@ The set of years available in the pager respects the dashboard's **"incluir futu
 
 Each page shows a per-page summary line with total spend and tag count. On the "Todos" page, `DrilldownList` groups expanded entries by year; on per-year pages, it groups by month — identical to the annual Categorías view, including month subtotals when a month contains multiple entries.
 
-**Data flow**: the route passes `tagStatsByYear` — a `{ year: number; stats: TagStats }[]` array sorted ascending, one entry per Gridly year with spending — to `EvolutionDashboard`. The client merges the visible years for the combined page by calling `mergeTagStatsByYear(visibleYears)` (which attaches a `year` field to each `DrilldownEntry`). The dashboard hides the Tags button when `tagStatsByYear` is empty or absent.
+**Data flow**: the route passes only `tagYears`, a sorted list of Gridly years with spending, to `EvolutionDashboard`. When the dialog opens or its pager changes, the client requests the selected page from `GET /api/evolution/drilldown?kind=tags&year=all|YYYY&includeFuture=true|false`. The authenticated endpoint computes a single-year page with `computeTagStats`, or merges eligible years with `mergeTagStatsByYear` for the combined page. The client caches fetched pages for the dashboard visit and shows loading and retry states without placing drilldown entries in the initial React Server Component payload.
 
 Grouped expenses are attributed to the group's tag, ungrouped additional expenses use their own tag, and recurring expenses are bucketed by their recurring expense tag.
 
@@ -91,7 +91,7 @@ Three rows appear — home expense, personal budget, and aggregated recurring ex
 
 The set of years in the pager respects the `includeFuture` toggle. Historical summary-only imports are excluded. The dialog resets to the combined "Todos los años" page each time it is opened.
 
-**Data flow**: `computeFixedStats` (from `src/lib/fixed-stats.ts`) runs per Gridly year on the server (`evolution/page.tsx`) and results are passed as `fixedStatsByYear: { year: number; stats: FixedExpenseStats }[]` to `EvolutionDashboard`. The client uses `mergeFixedStatsByYear` to produce the combined all-years page.
+**Data flow**: the route passes only `fixedYears`, a sorted list of Gridly years with positive fixed expense data. The client loads the selected page from the same authenticated drilldown endpoint with `kind=fixed`. The endpoint uses `computeFixedStats` for one year and `mergeFixedStatsByYear` for the combined page. Pages are cached for the dashboard visit; future years are filtered on the server unless `includeFuture=true`.
 
 ### KPI Cards
 

@@ -569,6 +569,12 @@
       "prevYear": "Previous year",
       "nextYear": "Next year"
     },
+    "drilldown": {
+      "loading": "Loading details...",
+      "loadError": "Could not load the details. Check the connection and try again.",
+      "retry": "Retry",
+      "empty": "No details are available for this selection."
+    },
     "source": {
       "gridly": "Gridly",
       "historical": "Historical"

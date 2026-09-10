@@ -79,7 +79,8 @@ test("computeMultiYearTagStats sorts entries by year ascending then month", () =
   assert.match(source, /a\.year.*b\.year/);
 });
 
-import { mergeTagStatsByYear, type TagStats } from "./tag-stats.ts";
+import { hasTagStats, mergeTagStatsByYear, type TagStats } from "./tag-stats.ts";
+import type { YearData } from "./types.ts";
 
 function singleYearStats(): TagStats {
   return {
@@ -102,6 +103,20 @@ function singleYearStats(): TagStats {
     ],
   };
 }
+
+test("hasTagStats matches the positive-total visibility rule without building drilldown rows", () => {
+  const yearData = {
+    months: [{
+      additionalExpenses: [{ amount: 25 }, { amount: -10 }],
+      additionalExpenseGroups: [{ entries: [{ amount: 5 }] }],
+      recurringExpenses: [{ amount: 10 }],
+    }],
+  } as YearData;
+
+  assert.equal(hasTagStats(yearData), true);
+  yearData.months[0].additionalExpenses[0].amount = -5;
+  assert.equal(hasTagStats(yearData), false);
+});
 
 test("mergeTagStatsByYear stamps each entry with its year", () => {
   const merged = mergeTagStatsByYear([{ year: 2024, stats: singleYearStats() }]);

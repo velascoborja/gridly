@@ -90,6 +90,20 @@ export function computeTagStats(yearData: YearData): TagStats {
   return finalizeBuckets(buckets, false);
 }
 
+export function hasTagStats(yearData: YearData): boolean {
+  const total = yearData.months.reduce((yearTotal, monthData) => {
+    const ungrouped = monthData.additionalExpenses.reduce((sum, entry) => sum + entry.amount, 0);
+    const grouped = monthData.additionalExpenseGroups.reduce(
+      (sum, group) => sum + group.entries.reduce((groupSum, entry) => groupSum + entry.amount, 0),
+      0,
+    );
+    const recurring = monthData.recurringExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+    return yearTotal + ungrouped + grouped + recurring;
+  }, 0);
+
+  return total > 0;
+}
+
 // Contract: entries from computeTagStats carry no `year`. mergeTagStatsByYear stamps each
 // entry with its source year so the combined drilldown can group entries by year.
 export function mergeTagStatsByYear(perYear: { year: number; stats: TagStats }[]): TagStats {

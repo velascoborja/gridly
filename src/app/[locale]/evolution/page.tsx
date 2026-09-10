@@ -5,8 +5,8 @@ import { getEvolutionSourcesForUser, getHistoricalYearsForUser } from "@/lib/ser
 import { requireSessionUser } from "@/lib/server/session";
 import { getYearsForUser } from "@/lib/server/year-data";
 import { pickDefaultYear } from "@/lib/server/year-navigation";
-import { computeTagStats } from "@/lib/tag-stats";
-import { computeFixedStats } from "@/lib/fixed-stats";
+import { hasTagStats } from "@/lib/tag-stats";
+import { hasFixedStats } from "@/lib/fixed-stats";
 
 export default async function EvolutionPage() {
   const user = await requireSessionUser();
@@ -22,15 +22,14 @@ export default async function EvolutionPage() {
   const gridlyYearDataList = evolutionSources
     .filter((s): s is Extract<typeof s, { source: "gridly" }> => s.source === "gridly")
     .map((s) => s.yearData);
-  const tagStatsByYear = gridlyYearDataList
-    .map((yd) => ({ year: yd.config.year, stats: computeTagStats(yd) }))
-    .filter((y) => y.stats.totalAdditional > 0)
-    .sort((a, b) => a.year - b.year);
-
-  const fixedStatsByYear = gridlyYearDataList
-    .map((yd) => ({ year: yd.config.year, stats: computeFixedStats(yd) }))
-    .filter((y) => y.stats.grandTotal > 0)
-    .sort((a, b) => a.year - b.year);
+  const tagYears = gridlyYearDataList
+    .filter(hasTagStats)
+    .map((yearData) => yearData.config.year)
+    .sort((a, b) => a - b);
+  const fixedYears = gridlyYearDataList
+    .filter(hasFixedStats)
+    .map((yearData) => yearData.config.year)
+    .sort((a, b) => a - b);
 
   const currentYear = pickDefaultYear(years, calendarYear);
   const yearOptions = [
@@ -50,8 +49,8 @@ export default async function EvolutionPage() {
         metrics={metrics}
         historicalYears={historicalRows}
         calendarYear={calendarYear}
-        tagStatsByYear={tagStatsByYear}
-        fixedStatsByYear={fixedStatsByYear}
+        tagYears={tagYears}
+        fixedYears={fixedYears}
       />
     </AppShell>
   );

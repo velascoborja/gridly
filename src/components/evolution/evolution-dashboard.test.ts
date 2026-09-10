@@ -139,25 +139,48 @@ test("evolution tags pager keys exist in both locales", () => {
   assert.equal(english.Evolution.tagsPager.nextYear, "Next year");
 });
 
-test("evolution dashboard accepts tagStatsByYear prop and renders Tags button with dialog", () => {
+test("evolution dashboard accepts tag year metadata and renders Tags button with dialog", () => {
   const source = readFileSync(new URL("./evolution-dashboard.tsx", import.meta.url), "utf8");
 
-  assert.match(source, /tagStatsByYear/);
+  assert.match(source, /tagYears/);
   assert.match(source, /TagStatRow/);
   assert.match(source, /Tags/);
   assert.match(source, /t\("categoriesButton"\)/);
   assert.match(source, /t\("categoriesTitle"\)/);
 });
 
-test("evolution dashboard renders a year pager over merged tag stats", () => {
+test("evolution dashboard loads the selected tag pager page on demand", () => {
   const source = readFileSync(new URL("./evolution-dashboard.tsx", import.meta.url), "utf8");
 
-  assert.match(source, /mergeTagStatsByYear/);
+  assert.match(source, /useEvolutionDrilldown\("tags"/);
   assert.match(source, /tagsPager\.allYears/);
   assert.match(source, /tagsPager\.prevYear/);
   assert.match(source, /tagsPager\.nextYear/);
   assert.match(source, /ChevronLeft/);
   assert.match(source, /ChevronRight/);
+});
+
+test("evolution drilldowns provide immediate loading feedback and retry errors", () => {
+  const dashboard = readFileSync(new URL("./evolution-dashboard.tsx", import.meta.url), "utf8");
+  const loader = readFileSync(new URL("./use-evolution-drilldown.ts", import.meta.url), "utf8");
+
+  assert.match(dashboard, /aria-busy="true"/);
+  assert.match(dashboard, /drilldown\.loadError/);
+  assert.match(dashboard, /drilldown\.retry/);
+  assert.match(loader, /AbortController/);
+  assert.match(loader, /cache\.current/);
+  assert.match(loader, /cache: "no-store"/);
+});
+
+test("evolution page serializes drilldown year metadata without entry details", () => {
+  const page = readFileSync(new URL("../../app/[locale]/evolution/page.tsx", import.meta.url), "utf8");
+
+  assert.match(page, /tagYears=\{tagYears\}/);
+  assert.match(page, /fixedYears=\{fixedYears\}/);
+  assert.doesNotMatch(page, /tagStatsByYear/);
+  assert.doesNotMatch(page, /fixedStatsByYear/);
+  assert.doesNotMatch(page, /computeTagStats/);
+  assert.doesNotMatch(page, /computeFixedStats/);
 });
 
 test("evolution dashboard only shows tags button when there are visible tag years", () => {

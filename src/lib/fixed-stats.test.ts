@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { computeFixedStats, mergeFixedStatsByYear } from "./fixed-stats.ts";
+import { computeFixedStats, hasFixedStats, mergeFixedStatsByYear } from "./fixed-stats.ts";
 import type { MonthData, RecurringExpense, YearData } from "./types.ts";
 
 function recurringExpense(overrides: Partial<Pick<RecurringExpense, "label" | "amount">>): RecurringExpense {
@@ -75,6 +75,11 @@ test("months with zero values produce no stats", () => {
   const result = computeFixedStats(yearData([month({ month: 1, homeExpense: 0, personalExpense: 0 })]));
   assert.equal(result.grandTotal, 0);
   assert.deepEqual(result.stats, []);
+});
+
+test("hasFixedStats detects positive fixed rows without building drilldown entries", () => {
+  assert.equal(hasFixedStats(yearData([month({ month: 1, homeExpense: 800 })])), true);
+  assert.equal(hasFixedStats(yearData([month({ month: 1 })])), false);
 });
 
 test("home expense accumulates entries per month", () => {

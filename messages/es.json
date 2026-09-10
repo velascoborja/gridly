@@ -569,6 +569,12 @@
       "prevYear": "Año anterior",
       "nextYear": "Año siguiente"
     },
+    "drilldown": {
+      "loading": "Cargando detalle...",
+      "loadError": "No se ha podido cargar el detalle. Revisa la conexión e inténtalo de nuevo.",
+      "retry": "Reintentar",
+      "empty": "No hay detalle disponible para esta selección."
+    },
     "source": {
       "gridly": "Gridly",
       "historical": "Histórico"
