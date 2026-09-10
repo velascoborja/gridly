@@ -9,7 +9,12 @@ import { getSessionUser } from "@/lib/server/session";
 import { getYearData } from "@/lib/server/year-data";
 import { computeMonthChain, estimatedMonthData } from "@/lib/calculations";
 import type { YearConfig } from "@/lib/types";
-import type { RecurringExpenseInput } from "@/lib/recurring-expenses";
+import {
+  hasInvalidRecurringExpenseAmounts,
+  normalizeRecurringExpenseInputs,
+  RECURRING_EXPENSE_AMOUNT_ERROR,
+  type RecurringExpenseInput,
+} from "@/lib/recurring-expenses";
 import { revalidatePath } from "next/cache";
 
 export async function createAndPrefillYear(data: {
@@ -26,6 +31,10 @@ export async function createAndPrefillYear(data: {
 }) {
   const user = await getSessionUser();
   if (!user?.id) throw new Error("Unauthorized");
+  if (hasInvalidRecurringExpenseAmounts(data.recurringExpenses)) {
+    throw new RangeError(RECURRING_EXPENSE_AMOUNT_ERROR);
+  }
+  const normalizedRecurringExpenses = normalizeRecurringExpenseInputs(data.recurringExpenses);
 
   const result = await withFinancialTransaction(user.id, async (db) => {
     const existingYears = await db
@@ -65,15 +74,14 @@ export async function createAndPrefillYear(data: {
       .returning();
 
     // 2. Insert Recurring Expense Templates
-    if (data.recurringExpenses.length > 0) {
-      const recurringValues = data.recurringExpenses
-        .map((entry, index) => ({
+    if (normalizedRecurringExpenses.length > 0) {
+      const recurringValues = normalizedRecurringExpenses
+        .map((entry) => ({
           yearId: yearRow.id,
-          label: String(entry.label ?? "").trim(),
-          amount: String(Number(entry.amount) || 0),
-          sortOrder: index,
+          label: entry.label,
+          amount: String(entry.amount),
+          sortOrder: entry.sortOrder,
         }))
-        .filter((entry) => entry.label.length > 0);
 
       if (recurringValues.length > 0) {
         await db.insert(yearRecurringExpenses).values(recurringValues);

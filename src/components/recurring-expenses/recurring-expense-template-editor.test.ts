@@ -13,3 +13,11 @@ test("recurring expense amount inputs can show an opt-in Euro suffix as soon as 
   assert.doesNotMatch(suffixBlock, /entry\.amount !== 0/);
   assert.doesNotMatch(suffixBlock, /opacity-0/);
 });
+
+test("recurring expense amounts expose an accessible validation error", () => {
+  const source = readFileSync(new URL("./recurring-expense-template-editor.tsx", import.meta.url), "utf8");
+  assert.match(source, /isValidRecurringExpenseAmount/);
+  assert.match(source, /aria-invalid/);
+  assert.match(source, /role="alert"/);
+  assert.match(source, /amountInvalid/);
+});

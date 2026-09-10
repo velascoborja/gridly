@@ -5,6 +5,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { RecurringExpenseInput } from "@/lib/recurring-expenses";
+import { isValidRecurringExpenseAmount } from "@/lib/recurring-expenses";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -46,7 +47,7 @@ export function RecurringExpenseTemplateEditor({
           variant="outline"
           size="sm"
           disabled={disabled}
-          onClick={() => onChange([...entries, { label: "", amount: 0 }])}
+          onClick={() => onChange([...entries, { id: null, label: "", amount: 0 }])}
           className="shrink-0 border-primary/20 bg-background/80 text-primary hover:bg-primary/[0.06]"
         >
           <Plus className="h-3.5 w-3.5" />
@@ -62,7 +63,7 @@ export function RecurringExpenseTemplateEditor({
         ) : null}
 
         {entries.map((entry, index) => (
-          <div key={index} className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_8rem_auto]">
+          <div key={entry.id ?? `new-${index}`} className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_8rem_auto]">
             <Input
               value={entry.label}
               placeholder={t("labelPlaceholder")}
@@ -75,11 +76,14 @@ export function RecurringExpenseTemplateEditor({
                 value={entry.amount === 0 ? "" : String(entry.amount)}
                 placeholder="0.00"
                 inputMode="decimal"
+                min={0}
                 disabled={disabled}
                 onChange={(event) => {
                   const amount = parseFloat(event.target.value.replace(/€/g, "").replace(",", "."));
                   updateEntry(index, { amount: Number.isNaN(amount) ? 0 : amount });
                 }}
+                aria-invalid={!isValidRecurringExpenseAmount(entry.amount) || undefined}
+                aria-describedby={!isValidRecurringExpenseAmount(entry.amount) ? `recurring-amount-error-${index}` : undefined}
                 className={cn("h-10 text-right text-sm", showCurrencySuffix && "pr-8")}
               />
               {showCurrencySuffix ? (
@@ -89,6 +93,11 @@ export function RecurringExpenseTemplateEditor({
                 >
                   €
                 </span>
+              ) : null}
+              {!isValidRecurringExpenseAmount(entry.amount) ? (
+                <p id={`recurring-amount-error-${index}`} role="alert" className="mt-1 text-xs text-destructive">
+                  {t("amountInvalid")}
+                </p>
               ) : null}
             </div>
             <Button

@@ -5,6 +5,7 @@ import { getYearNumberForYearId, propagateYearCarryOver } from "@/lib/server/yea
 import { getSessionUser } from "@/lib/server/session";
 import { getOwnedEntry, getOwnedMonth } from "@/lib/server/ownership";
 import { COMPLETED_LOCK_ERROR, isCompletionOnlyRequest } from "@/lib/additional-entry-completion";
+import { GROUPED_ENTRY_MONTH_ERROR, validateGroupedEntryState } from "@/lib/additional-entry-grouping";
 
 export async function PATCH(
   request: Request,
@@ -55,27 +56,31 @@ export async function PATCH(
       updates.isCompleted = body.isCompleted;
     }
 
+    let targetMonth = month;
     if (body.monthId !== undefined) {
       const targetMonthId = parseInt(String(body.monthId), 10);
       if (Number.isNaN(targetMonthId)) {
         return Response.json({ error: "Invalid target month" }, { status: 400 });
       }
-      const targetMonth = await getOwnedMonth(user.id, targetMonthId, db);
-      if (!targetMonth) {
+      const ownedTargetMonth = await getOwnedMonth(user.id, targetMonthId, db);
+      if (!ownedTargetMonth) {
         return Response.json({ error: "Target month not found" }, { status: 404 });
       }
-      if (targetMonth.yearId !== month.yearId) {
+      if (ownedTargetMonth.yearId !== month.yearId) {
         return Response.json({ error: "Target month must be in the same year" }, { status: 400 });
       }
+      targetMonth = ownedTargetMonth;
       updates.monthId = targetMonth.id;
       if (targetMonth.id !== entry.monthId) {
         affectsCarryOver = true;
       }
     }
 
+    let targetGroup = sourceGroup;
     if (body.groupId !== undefined) {
       if (body.groupId === null) {
         updates.groupId = null;
+        targetGroup = null;
       } else {
         const groupId = parseInt(String(body.groupId), 10);
         if (Number.isNaN(groupId)) {
@@ -84,7 +89,7 @@ export async function PATCH(
         const group = await db.query.additionalEntryGroups.findFirst({
           where: and(
             eq(additionalEntryGroups.id, groupId),
-            eq(additionalEntryGroups.monthId, month.id)
+            eq(additionalEntryGroups.monthId, targetMonth.id)
           ),
         });
         if (!group) {
@@ -93,14 +98,34 @@ export async function PATCH(
         if (group.isCompleted) {
           return Response.json({ error: COMPLETED_LOCK_ERROR }, { status: 409 });
         }
+        targetGroup = group;
         updates.groupId = groupId;
         updates.isRecurring = false;
         updates.tagId = group.tagId ?? null;
       }
+    } else if (sourceGroup && targetMonth.id !== month.id) {
+      return Response.json({ error: GROUPED_ENTRY_MONTH_ERROR }, { status: 400 });
     }
 
     if (body.isRecurring !== undefined) {
+      if (typeof body.isRecurring !== "boolean") {
+        return Response.json({ error: "isRecurring must be a boolean" }, { status: 400 });
+      }
       updates.isRecurring = body.isRecurring === true;
+    }
+
+    if (targetGroup) {
+      const groupingError = validateGroupedEntryState({
+        type: entry.type,
+        isRecurring: body.isRecurring === undefined
+          ? (body.groupId !== undefined ? false : entry.isRecurring)
+          : body.isRecurring,
+        entryMonthId: targetMonth.id,
+        groupMonthId: targetGroup.monthId,
+      });
+      if (groupingError) {
+        return Response.json({ error: groupingError }, { status: 400 });
+      }
     }
 
     if (body.tagId !== undefined && body.groupId === undefined) {

@@ -10,7 +10,7 @@ const deleteSource = source.slice(deleteStart);
 test("entry PATCH supports moving an entry to another owned month in the same year", () => {
   assert.match(source, /body\.monthId !== undefined/);
   assert.match(source, /const targetMonthId = parseInt\(String\(body\.monthId\), 10\)/);
-  assert.match(source, /targetMonth\.yearId !== month\.yearId/);
+  assert.match(source, /ownedTargetMonth\.yearId !== month\.yearId/);
   assert.match(source, /updates\.monthId = targetMonth\.id/);
 });
 
@@ -19,6 +19,13 @@ test("entry PATCH keeps existing label and amount edits while validating the sou
   assert.match(source, /updates\.label = body\.label/);
   assert.match(source, /if \(body\.amount !== undefined\) updates\.amount = String\(body\.amount\)/);
   assert.match(source, /entry\.monthId !== month\.id/);
+});
+
+test("entry PATCH validates the final group, month, type, and recurrence state", () => {
+  assert.match(patchSource, /eq\(additionalEntryGroups\.monthId, targetMonth\.id\)/);
+  assert.match(patchSource, /GROUPED_ENTRY_MONTH_ERROR/);
+  assert.match(patchSource, /validateGroupedEntryState/);
+  assert.match(patchSource, /type: entry\.type/);
 });
 
 test("entry mutations enforce completion locks from the entry and its group", () => {

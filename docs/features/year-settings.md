@@ -75,7 +75,7 @@ Year setup also supports any number of recurring expense templates. These are st
 | Field | Description |
 |---|---|
 | `label` | Expense name shown to the user. |
-| `amount` | Monthly amount copied into each month. |
+| `amount` | Non-negative monthly amount copied into each month. Client and server reject negative or non-finite values. |
 | `sortOrder` | Stable ordering for setup, annual settings, and monthly views. |
 
 During setup, the client sends `recurringExpenses` to `createAndPrefillYear`. The Server Action stores valid templates and then copies them into `monthly_recurring_expenses` for all 12 months.
@@ -107,7 +107,8 @@ The year-row update, month baseline rewrite, and downstream carry-over run in on
 Annual Summary also includes the recurring expense template editor.
 
 - **Endpoint:** `PUT /api/years/[year]/recurring-expenses`.
-- **Side Effect:** The template list is authoritative. Saving it deletes monthly recurring expense rows from the selected apply-from month through December and recreates them from the template, overriding manual monthly recurring expense edits only in that range.
+- **Identity:** Existing drafts include their template `id`; new drafts use `id: null`. Updates preserve the identity and tag of retained templates even when their label changes. Invalid or stale identities are rejected before any write.
+- **Side Effect:** The template list is authoritative. Saving it updates retained templates, adds or removes the remaining templates, then deletes monthly recurring expense rows from the selected apply-from month through December and recreates them from the resulting list. Manual monthly recurring expense edits are overridden only in that range; earlier copies remain linked to retained series.
 - **Confirmation:** The UI shows a localized confirmation dialog before applying this overwrite.
 
 ## Implementation Details

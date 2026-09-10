@@ -1,7 +1,15 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { computeMonthChain, totalExpenses } from "./calculations.ts";
-import { sortRecurringExpensesAsc, sumRecurringExpenses, parseYearRecurringExpense, parseMonthlyRecurringExpense } from "./recurring-expenses.ts";
+import {
+  hasInvalidRecurringExpenseAmounts,
+  normalizeRecurringExpenseInputs,
+  RECURRING_EXPENSE_AMOUNT_ERROR,
+  sortRecurringExpensesAsc,
+  sumRecurringExpenses,
+  parseYearRecurringExpense,
+  parseMonthlyRecurringExpense,
+} from "./recurring-expenses.ts";
 import type { RecurringExpense } from "./types.ts";
 
 const recurringExpenses: RecurringExpense[] = [
@@ -16,6 +24,24 @@ test("recurring expenses sort by sort order and then id", () => {
 
 test("recurring expense totals sum all monthly rows", () => {
   assert.equal(sumRecurringExpenses(recurringExpenses), 1025);
+});
+
+test("recurring expense inputs reject negative and non-finite labeled amounts", () => {
+  for (const amount of [-1, Number.NaN, Number.POSITIVE_INFINITY, "12", null]) {
+    const entries = [{ label: "Rent", amount }];
+    assert.equal(hasInvalidRecurringExpenseAmounts(entries), true);
+    assert.throws(
+      () => normalizeRecurringExpenseInputs(entries as never),
+      (error: unknown) => error instanceof RangeError && error.message === RECURRING_EXPENSE_AMOUNT_ERROR,
+    );
+  }
+});
+
+test("recurring expense inputs accept zero and preserve template identity", () => {
+  assert.deepEqual(
+    normalizeRecurringExpenseInputs([{ id: 17, label: "  Rent  ", amount: 0 }]),
+    [{ id: 17, label: "Rent", amount: 0, sortOrder: 0 }],
+  );
 });
 
 test("total expenses include recurring expenses", () => {

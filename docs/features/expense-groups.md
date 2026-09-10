@@ -16,6 +16,7 @@ Two tables are involved:
 - `group_id` is nullable; a `null` value means the entry is ungrouped.
 - Deleting a group cascades to all its entries (DB `ON DELETE CASCADE`).
 - An entry can belong to at most one group.
+- Every grouped entry must be an `expense`, must have the same `month_id` as its group, and must have `is_recurring = false`. The entry APIs validate these cross-table rules before writing.
 - `tag_id` on a group is nullable. When set, all entries in the group carry the same `tagId` value as the group.
 
 ### How `MonthData` represents groups
@@ -35,6 +36,8 @@ Two tables are involved:
 | `PATCH` | `/api/months/[monthId]/entries/[entryId]` | Accepts `groupId: number \| null` to move an entry into or out of a group |
 
 Both item `PATCH` routes also accept `{ isCompleted: boolean }`. Completed resources only accept the exact reopen mutation `{ isCompleted: false }`; other changes and deletion return `409 { error: "completed_locked" }`. Creating or moving an entry into a completed group is rejected with the same response.
+
+`POST /entries` rejects income or recurring entries when `groupId` is present. `PATCH /entries/[entryId]` validates the final combined state: a grouped entry cannot move to another month alone, and a request that moves an entry and assigns a group must choose a group in the destination month. Moving a recurring ungrouped expense into a group clears its recurrence unless the same request explicitly asks for recurrence, which is rejected.
 
 **Important:** The entries `POST` route must receive `groupId` in the request body and forward it to the DB insert. Omitting it results in the entry being saved as ungrouped (`group_id = NULL`) even though the client shows it inside the group (optimistic UI). This was a bug that was fixed — the test `entries POST route persists groupId to the database insert` guards against regression.
 

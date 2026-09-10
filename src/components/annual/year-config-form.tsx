@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import type { RecurringExpenseInput } from "@/lib/recurring-expenses";
+import { hasInvalidRecurringExpenseAmounts, type RecurringExpenseInput } from "@/lib/recurring-expenses";
 import type { YearConfig, YearData, YearRecurringExpense } from "@/lib/types";
 
 interface Props {
@@ -63,7 +63,7 @@ export function YearConfigForm({
   const [savingFields, setSavingFields] = useState<Set<keyof YearConfig>>(() => new Set());
   const [optimisticExtraPayments, setOptimisticExtraPayments] = useState<boolean | null>(null);
   const [recurringDraft, setRecurringDraft] = useState<RecurringExpenseInput[]>(
-    recurringExpenses.map((entry) => ({ label: entry.label, amount: entry.amount }))
+    recurringExpenses.map((entry) => ({ id: entry.id, label: entry.label, amount: entry.amount }))
   );
   const [savingRecurring, setSavingRecurring] = useState(false);
   const [recurringError, setRecurringError] = useState("");
@@ -77,7 +77,7 @@ export function YearConfigForm({
   const [deleteError, setDeleteError] = useState("");
 
   useEffect(() => {
-    setRecurringDraft(recurringExpenses.map((entry) => ({ label: entry.label, amount: entry.amount })));
+    setRecurringDraft(recurringExpenses.map((entry) => ({ id: entry.id, label: entry.label, amount: entry.amount })));
   }, [recurringExpenses]);
   const isFutureYear = config.year > new Date().getFullYear();
   const requiredDeletePhrase = String(config.year);
@@ -194,6 +194,7 @@ export function YearConfigForm({
   };
 
   const handleSaveRecurringExpenses = async () => {
+    if (hasInvalidRecurringExpenseAmounts(recurringDraft)) return;
     setSavingRecurring(true);
     setRecurringError("");
     const savePromise = (async () => {
@@ -429,7 +430,7 @@ export function YearConfigForm({
                   <Button
                     type="button"
                     variant="outline"
-                    disabled={savingRecurring}
+                    disabled={savingRecurring || hasInvalidRecurringExpenseAmounts(recurringDraft)}
                     className="mt-3 w-full border-primary/20 bg-primary/[0.06] text-primary hover:bg-primary/[0.1]"
                   >
                     {savingRecurring ? t("recurringExpensesSaving") : t("recurringExpensesSave")}
@@ -445,7 +446,10 @@ export function YearConfigForm({
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel disabled={savingRecurring}>{t("recurringExpensesCancel")}</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => void handleSaveRecurringExpenses()} disabled={savingRecurring}>
+                  <AlertDialogAction
+                    onClick={() => void handleSaveRecurringExpenses()}
+                    disabled={savingRecurring || hasInvalidRecurringExpenseAmounts(recurringDraft)}
+                  >
                     {savingRecurring ? t("recurringExpensesSaving") : t("recurringExpensesConfirmAction")}
                   </AlertDialogAction>
                 </AlertDialogFooter>

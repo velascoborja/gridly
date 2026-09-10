@@ -16,7 +16,9 @@ Recurring expenses let users define named monthly expenses that repeat across a 
 
 During setup, `createAndPrefillYear` in `src/lib/server/actions/years.ts` saves the template list and copies every template into all 12 months, including each template's `tagId`. The prefill endpoint (`POST /api/years/[year]/prefill`) likewise copies the `tagId` from the template into each monthly copy it creates.
 
-Annual template updates use `PUT /api/years/[year]/recurring-expenses`. This endpoint replaces the template list, deletes monthly recurring expense rows from the selected apply-from month through December, recreates them from the new template, and propagates downstream year carry-over. Tags are preserved best-effort by label match: if a recurring expense in the new list has the same label as one in the previous template, it inherits the previous template's `tagId`. Renaming a recurring expense in the annual editor resets its tag to `null`.
+Annual template updates use `PUT /api/years/[year]/recurring-expenses`. Existing templates are identified and updated by `id`, so renaming or reordering a template preserves its series identity and tag. New drafts send `id: null`. Missing, duplicate, unknown, or cross-year IDs are rejected with HTTP `409` so a stale client cannot accidentally replace every series. The endpoint deletes monthly recurring expense rows from the selected apply-from month through December, recreates them from the resulting template list, and propagates downstream year carry-over. Earlier monthly copies stay linked to every retained template. Deleting a template leaves only its earlier copies as independent rows through the existing `ON DELETE SET NULL` foreign key.
+
+Recurring expense amounts must be finite numbers greater than or equal to zero. The setup editor, annual editor, guided setup action, year creation API, annual template API, and monthly recurring-expense API enforce the same rule. Invalid amounts show an inline localized error in editable forms and return HTTP `400` from APIs before any database transaction starts.
 
 Monthly recurring-expense edits propagate yearly carry-over only when the normalized numeric amount differs from the stored amount. Label, tag, and sort-order-only edits skip propagation; deleting an expense still propagates because it changes the month's total.
 
@@ -47,4 +49,4 @@ This means recurring expenses affect monthly savings, ending balance, downstream
 
 ## Atomic Persistence
 
-Template replacement, selected monthly copies, and downstream balances commit in one transaction. Rollback also restores earlier-month template links nullified by template deletion. Monthly series-tag updates, the edited monthly row, and any amount-triggered carry-over share a transaction. See [Atomic Financial Writes](financial-transactions.md).
+Template updates, additions and removals, selected monthly copies, and downstream balances commit in one transaction. Rollback restores both template identities and monthly links. Monthly series-tag updates, the edited monthly row, and any amount-triggered carry-over share a transaction. See [Atomic Financial Writes](financial-transactions.md).

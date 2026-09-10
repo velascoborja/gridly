@@ -1,7 +1,11 @@
 import { withFinancialTransaction } from "@/db/financial-transaction";
 import { and, eq } from "drizzle-orm";
 import { monthlyRecurringExpenses, tags, yearRecurringExpenses } from "@/db/schema";
-import { parseMonthlyRecurringExpense } from "@/lib/recurring-expenses";
+import {
+  isValidRecurringExpenseAmount,
+  parseMonthlyRecurringExpense,
+  RECURRING_EXPENSE_AMOUNT_ERROR,
+} from "@/lib/recurring-expenses";
 import { getOwnedMonth, getOwnedRecurringExpense } from "@/lib/server/ownership";
 import { getYearNumberForYearId, propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getSessionUser } from "@/lib/server/session";
@@ -16,6 +20,9 @@ export async function PATCH(
   }
 
   const body = await request.json();
+  if (body.amount !== undefined && !isValidRecurringExpenseAmount(body.amount)) {
+    return Response.json({ error: RECURRING_EXPENSE_AMOUNT_ERROR }, { status: 400 });
+  }
 
   const result = await withFinancialTransaction(user.id, async (db) => {
     const { monthId, entryId } = await params;
@@ -27,7 +34,7 @@ export async function PATCH(
 
     const updates: Partial<typeof monthlyRecurringExpenses.$inferInsert> = {};
     if (body.label !== undefined) updates.label = String(body.label).trim();
-    const nextAmount = body.amount !== undefined ? Number(body.amount) || 0 : undefined;
+    const nextAmount = body.amount !== undefined ? body.amount : undefined;
     if (nextAmount !== undefined) updates.amount = String(nextAmount);
     if (body.sortOrder !== undefined) updates.sortOrder = Number(body.sortOrder) || 0;
     const affectsCarryOver =

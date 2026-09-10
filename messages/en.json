@@ -324,6 +324,7 @@
       "add": "Add",
       "empty": "No recurring expenses.",
       "labelPlaceholder": "Concept",
+      "amountInvalid": "The amount must be zero or greater.",
       "remove": "Remove recurring expense"
     },
     "monthly": {
@@ -331,6 +332,7 @@
       "description": "Planned expenses that repeat every month. Changes here only affect this month.",
       "total": "Total",
       "empty": "No recurring expenses this month.",
+      "amountInvalid": "The amount must be zero or greater.",
       "deleteEntry": "Remove recurring expense {label}",
       "confirmDeleteTitle": "Remove recurring expense?",
       "confirmDeleteDescription": "\"{label}\" will be removed from this month. This action cannot be undone.",

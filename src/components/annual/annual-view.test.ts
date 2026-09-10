@@ -46,8 +46,8 @@ test("annual setup dialog exposes one apply-from month selector for setup and re
   );
   assert.ok(
     recurringRouteSource.indexOf("if (applyFromMonth === null)") <
-      recurringRouteSource.indexOf("db.delete(yearRecurringExpenses)"),
-    "invalid recurring expense scopes should return before replacing templates",
+      recurringRouteSource.indexOf(".update(yearRecurringExpenses)"),
+    "invalid recurring expense scopes should return before changing templates",
   );
   assert.match(recurringRouteSource, /month\.month >= applyFromMonth/);
 });
@@ -102,7 +102,7 @@ test("year route has a dedicated loading skeleton inside the app shell", () => {
 test("year page uses native history for in-year view changes without server navigation", () => {
   const source = readFileSync(new URL("../year/year-page-client.tsx", import.meta.url), "utf8");
 
-  assert.match(source, /import \{ usePathname \} from "@\/i18n\/routing"/);
+  assert.match(source, /import \{ getPathname, usePathname \} from "@\/i18n\/routing"/);
   assert.doesNotMatch(source, /useRouter/);
   assert.match(source, /window\.history\.pushState\(null, "", buildYearMonthHref\(routePrefix, currentYearData\.config\.year, nextMonth\)\)/);
   assert.match(source, /window\.history\.pushState\(null, "", buildYearSummaryHref\(routePrefix, currentYearData\.config\.year\)\)/);

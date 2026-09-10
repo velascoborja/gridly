@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { RecurringExpenseTemplateEditor } from "@/components/recurring-expenses/recurring-expense-template-editor";
 import { createAndPrefillYear } from "@/lib/server/actions/years";
-import type { RecurringExpenseInput } from "@/lib/recurring-expenses";
+import { hasInvalidRecurringExpenseAmounts, type RecurringExpenseInput } from "@/lib/recurring-expenses";
 import type { YearConfig } from "@/lib/types";
 import { parseLocalizedNumber, sanitizeNumericInput } from "@/lib/currency-input";
 import { hasSetupFieldValue } from "@/lib/setup-readiness";
@@ -187,7 +187,8 @@ export function SetupPageClient({
   const canSubmit =
     completedSteps["starting-point"] &&
     completedSteps.income &&
-    completedSteps["monthly-plan"];
+    completedSteps["monthly-plan"] &&
+    !hasInvalidRecurringExpenseAmounts(recurringExpenses);
 
   const summary = {
     startingBalance: parseNumber(values.startingBalance),

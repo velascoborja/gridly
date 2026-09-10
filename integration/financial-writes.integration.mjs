@@ -83,6 +83,7 @@ test('financial operations are atomic on isolated Neon', { timeout: 180000 }, as
     await fixture.query('insert into additional_entries (month_id, type, label, amount, is_recurring, is_completed, tag_id) values ($1, $2, $3, $4, true, true, $5)', [monthRows[24].id, 'income', 'Recurring gift', 8, tag.id]);
     await fixture.query('update year_recurring_expenses set tag_id = $1', [tag.id]);
     await fixture.query('update monthly_recurring_expenses set tag_id = $1', [tag.id]);
+    const templateId = (await fixture.query('select id from year_recurring_expenses where year_id = (select id from years where year = 2030)')).rows[0].id;
     await m.transaction.withFinancialTransaction(userId, (tx) => m.carry.propagateYearCarryOver(userId, 2030, tx));
     state.invalidations.length = 0;
 
@@ -121,8 +122,8 @@ test('financial operations are atomic on isolated Neon', { timeout: 180000 }, as
     });
     await rollbackCase('year insert rolls back and leaves its number retryable', /^insert into "years"/, () => m.action.createAndPrefillYear(config(2033)));
     await rollbackCase('prefill restores cascaded groups, entries and monthly copies', /^delete from "months"/, () => call('prefill', 'POST', { year: 2030 }));
-    await rollbackCase('template deletion restores earlier monthly links and tags', /^delete from "year_recurring_expenses"/, () => call('templates', 'PUT', { year: 2030 }, { recurringExpenses: [{ label: 'Subscription', amount: 20 }], applyFromMonth: 6 }));
-    await rollbackCase('template rebuild rolls back all selected copies', /^insert into "monthly_recurring_expenses"/, () => call('templates', 'PUT', { year: 2030 }, { recurringExpenses: [{ label: 'Subscription', amount: 20 }], applyFromMonth: 6 }));
+    await rollbackCase('template update restores earlier monthly links and tags', /^update "year_recurring_expenses"/, () => call('templates', 'PUT', { year: 2030 }, { recurringExpenses: [{ id: templateId, label: 'Subscription', amount: 20 }], applyFromMonth: 6 }));
+    await rollbackCase('template rebuild rolls back all selected copies', /^insert into "monthly_recurring_expenses"/, () => call('templates', 'PUT', { year: 2030 }, { recurringExpenses: [{ id: templateId, label: 'Subscription', amount: 20 }], applyFromMonth: 6 }));
     await rollbackCase('group move restores parent and child month IDs', /^update "additional_entry_groups"/, () => call('group', 'PATCH', { monthId: january.id, groupId: group.id }, { monthId: february.id }));
     await rollbackCase('failure midway through carry-over restores mutation, balances and versions', /^update "years" set "starting_balance"/, () => call('month', 'PATCH', { monthId: january.id }, { payslip: 200 }));
     await rollbackCase('annual configuration and baseline updates roll back together', /^update "months"/, () => call('year', 'PATCH', { year: 2030 }, { estimatedSalary: 150, applyFromMonth: 6 }));
@@ -202,13 +203,48 @@ test('financial operations are atomic on isolated Neon', { timeout: 180000 }, as
       }
       assert.deepEqual(await snapshot(), before);
     });
-    await t.test('applyFromMonth preserves earlier values and matching template tags', async () => {
-      const before = (await fixture.query('select id, label, amount, tag_id from monthly_recurring_expenses where month_id = $1', [january.id])).rows;
-      const response = await call('templates', 'PUT', { year: 2030 }, { recurringExpenses: [{ label: 'Subscription', amount: 20 }], applyFromMonth: 6 });
+    await t.test('invalid recurring amounts and missing template identities reject without writes', async () => {
+      const before = await snapshot();
+      const negativeTemplate = await call('templates', 'PUT', { year: 2030 }, {
+        recurringExpenses: [{ id: templateId, label: 'Subscription', amount: -1 }], applyFromMonth: 6,
+      });
+      assert.equal(negativeTemplate.status, 400);
+      const missingIdentity = await call('templates', 'PUT', { year: 2030 }, {
+        recurringExpenses: [{ label: 'Subscription', amount: 20 }], applyFromMonth: 6,
+      });
+      assert.equal(missingIdentity.status, 409);
+      const recurring = (await fixture.query('select id from monthly_recurring_expenses where month_id = $1 order by id', [january.id])).rows[0];
+      const negativeMonthly = await call('recurring', 'PATCH', { monthId: january.id, entryId: recurring.id }, { amount: -1 });
+      assert.equal(negativeMonthly.status, 400);
+      assert.deepEqual(await snapshot(), before);
+    });
+    await t.test('grouped entry APIs reject income, recurrence, and independent month moves', async () => {
+      const before = await snapshot();
+      const groupMonthId = (await fixture.query('select month_id from additional_entry_groups where id = $1', [group.id])).rows[0].month_id;
+      const destinationMonthId = groupMonthId === january.id ? february.id : january.id;
+      assert.equal((await call('entries', 'POST', { monthId: groupMonthId }, {
+        type: 'income', label: 'Invalid', amount: 5, groupId: group.id,
+      })).status, 400);
+      assert.equal((await call('entries', 'POST', { monthId: groupMonthId }, {
+        type: 'expense', label: 'Invalid', amount: 5, groupId: group.id, isRecurring: true,
+      })).status, 400);
+      assert.equal((await call('entry', 'PATCH', { monthId: groupMonthId, entryId: entry.id }, {
+        monthId: destinationMonthId,
+      })).status, 400);
+      assert.equal((await call('entry', 'PATCH', { monthId: groupMonthId, entryId: entry.id }, {
+        isRecurring: true,
+      })).status, 400);
+      assert.deepEqual(await snapshot(), before);
+    });
+    await t.test('applyFromMonth preserves earlier template links and tags through a rename', async () => {
+      const before = (await fixture.query('select id, year_recurring_expense_id, label, amount, tag_id from monthly_recurring_expenses where month_id = $1', [january.id])).rows;
+      const response = await call('templates', 'PUT', { year: 2030 }, { recurringExpenses: [{ id: templateId, label: 'Renamed subscription', amount: 20 }], applyFromMonth: 6 });
       assert.equal(response.status, 200);
-      assert.deepEqual((await fixture.query('select id, label, amount, tag_id from monthly_recurring_expenses where month_id = $1', [january.id])).rows, before);
+      assert.deepEqual((await fixture.query('select id, year_recurring_expense_id, label, amount, tag_id from monthly_recurring_expenses where month_id = $1', [january.id])).rows, before);
       const body = await response.json();
       assert.equal(body.recurringExpenses[0].tagId, tag.id);
+      assert.equal(body.recurringExpenses[0].id, templateId);
+      assert.equal(body.recurringExpenses[0].label, 'Renamed subscription');
       assert.equal(body.yearData.months[5].recurringExpenses[0].amount, 20);
     });
     await t.test('metadata-only edits do not increment carry-over versions', async () => {

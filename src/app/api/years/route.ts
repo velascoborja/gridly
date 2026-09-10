@@ -6,6 +6,11 @@ import { propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { deriveStartingBalance, shouldAllowYearCreation } from "@/lib/server/year-planning";
 import { getSessionUser } from "@/lib/server/session";
 import { getYearData } from "@/lib/server/year-data";
+import {
+  hasInvalidRecurringExpenseAmounts,
+  normalizeRecurringExpenseInputs,
+  RECURRING_EXPENSE_AMOUNT_ERROR,
+} from "@/lib/recurring-expenses";
 
 function toPublicYearRow(row: typeof years.$inferSelect) {
   return Object.fromEntries(
@@ -51,6 +56,11 @@ export async function POST(request: Request) {
     } = body;
 
     if (!year) return Response.json({ error: "year is required" }, { status: 400 });
+    if (!Array.isArray(recurringExpenses) || hasInvalidRecurringExpenseAmounts(recurringExpenses)) {
+      return Response.json({ error: RECURRING_EXPENSE_AMOUNT_ERROR }, { status: 400 });
+    }
+    const recurringInputs = recurringExpenses;
+    const normalizedRecurringExpenses = normalizeRecurringExpenseInputs(recurringInputs);
 
     const existingYears = await db
       .select({ year: years.year })
@@ -94,16 +104,12 @@ export async function POST(request: Request) {
       interestRate: String(interestRate),
     }).returning();
 
-    const recurringValues = Array.isArray(recurringExpenses)
-      ? recurringExpenses
-          .map((entry, index) => ({
-            yearId: row.id,
-            label: String(entry.label ?? "").trim(),
-            amount: String(Number(entry.amount) || 0),
-            sortOrder: index,
-          }))
-          .filter((entry) => entry.label.length > 0)
-      : [];
+    const recurringValues = normalizedRecurringExpenses.map((entry) => ({
+      yearId: row.id,
+      label: entry.label,
+      amount: String(entry.amount),
+      sortOrder: entry.sortOrder,
+    }));
 
     if (recurringValues.length > 0) {
       await db.insert(yearRecurringExpenses).values(recurringValues);

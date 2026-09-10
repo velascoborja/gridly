@@ -28,7 +28,13 @@ test("entries POST route reads isRecurring from the request body", () => {
 });
 
 test("entries POST route persists isRecurring in the database insert", () => {
-  assert.match(routeSource, /isRecurring: isRecurring/);
+  assert.match(routeSource, /isRecurring: groupId == null && isRecurring === true/);
+});
+
+test("entries POST route rejects income and recurring group combinations", () => {
+  assert.match(routeSource, /validateGroupedEntryState/);
+  assert.match(routeSource, /type,/);
+  assert.match(routeSource, /isRecurring: isRecurring === true/);
 });
 
 test("entries POST route uses group tagId when groupId is provided", () => {

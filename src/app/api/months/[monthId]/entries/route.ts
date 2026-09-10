@@ -4,6 +4,7 @@ import { additionalEntries, additionalEntryGroups, tags } from "@/db/schema";
 import { getYearNumberForYearId, propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getSessionUser } from "@/lib/server/session";
 import { getOwnedMonth } from "@/lib/server/ownership";
+import { validateGroupedEntryState } from "@/lib/additional-entry-grouping";
 
 export async function POST(
   request: Request,
@@ -37,6 +38,9 @@ export async function POST(
     let entryTagId: number | null = null;
 
     if (groupId != null) {
+      if (!(Number.isInteger(groupId) && groupId > 0)) {
+        return Response.json({ error: "Invalid groupId" }, { status: 400 });
+      }
       const group = await db.query.additionalEntryGroups.findFirst({
         where: and(
           eq(additionalEntryGroups.id, groupId),
@@ -48,6 +52,15 @@ export async function POST(
       }
       if (group.isCompleted) {
         return Response.json({ error: "completed_locked" }, { status: 409 });
+      }
+      const groupingError = validateGroupedEntryState({
+        type,
+        isRecurring: isRecurring === true,
+        entryMonthId: ownedMonth.id,
+        groupMonthId: group.monthId,
+      });
+      if (groupingError) {
+        return Response.json({ error: groupingError }, { status: 400 });
       }
       entryTagId = group.tagId ?? null;
     } else if (tagId !== undefined && tagId !== null) {
@@ -70,7 +83,7 @@ export async function POST(
       label,
       amount: String(amount),
       groupId: groupId ?? null,
-      isRecurring: isRecurring === true,
+      isRecurring: groupId == null && isRecurring === true,
       isCompleted: false,
       tagId: entryTagId,
     }).returning();

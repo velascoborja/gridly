@@ -55,14 +55,17 @@ To provide a fast, app-like experience and preserve locally updated `YearData` a
 
 - **State Persistence:** Navigation between months, the annual summary, and settings uses `window.history.pushState()` instead of standard router transitions. This prevents Next.js from refetching data and allows the `YearPageClient` to keep its local state (e.g., pending edits or recalculated balances) visible as the user switches tabs.
 - **Shared Utilities:** All path parsing and URL generation must use the utilities in `src/lib/year-routes.ts` (e.g., `parseYearRoutePathname`, `buildYearMonthHref`). This ensures consistency between the URL and the client-side UI state.
+- **Locale Preservation:** `usePathname` from the next-intl navigation wrapper returns a locale-stripped pathname. Before deriving the prefix for a native history update, `YearPageClient` reconstructs the localized pathname with `getPathname({locale, href: pathname})`. Every month, summary, settings, search, and keyboard navigation URL therefore keeps `/es` or `/en`.
 - **Loading Stability:** The `BaseAppShell` and standardized `loading.tsx` files ensure that the header and background remain stable during navigation, avoiding layout shifts while the server is reached for initial page loads or hard refreshes.
 
 ```tsx
+import { getPathname } from "@/i18n/routing";
 import { buildYearMonthHref } from "@/lib/year-routes";
 import { getYearRoutePrefix } from "@/lib/year-routes";
 
 // Example: local navigation to month 4
-const prefix = getYearRoutePrefix(pathname, year);
+const localizedPathname = getPathname({ locale, href: pathname });
+const prefix = getYearRoutePrefix(localizedPathname, year);
 window.history.pushState(null, "", buildYearMonthHref(prefix, year, 4));
 ```
 

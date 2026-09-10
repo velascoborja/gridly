@@ -23,3 +23,11 @@ test("createAndPrefillYear carries tagId when copying recurring entries", () => 
 test("createAndPrefillYear reopens copied recurring entries", () => {
   assert.match(source, /isCompleted: false/);
 });
+
+test("createAndPrefillYear validates recurring expense amounts before starting a transaction", () => {
+  assert.match(source, /hasInvalidRecurringExpenseAmounts\(data\.recurringExpenses\)/);
+  assert.ok(
+    source.indexOf("hasInvalidRecurringExpenseAmounts(data.recurringExpenses)") <
+      source.indexOf("const result = await withFinancialTransaction"),
+  );
+});

@@ -19,6 +19,10 @@ test("year creation and prefill persist recurring templates into every month", (
   assert.match(yearsRoute, /yearRecurringExpenses/);
   assert.match(prefillRoute, /monthlyRecurringExpenses/);
   assert.match(prefillRoute, /yearRecurringExpenseId: template\.id/);
+  assert.ok(
+    prefillRoute.indexOf("await propagateYearCarryOver") > prefillRoute.indexOf("db.insert(monthlyRecurringExpenses)"),
+    "prefill must propagate only after recurring copies have been recreated",
+  );
 });
 
 test("year data hydrates recurring templates and monthly recurring rows", () => {

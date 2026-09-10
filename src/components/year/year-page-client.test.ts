@@ -24,3 +24,9 @@ test("every deferred year view has immediate accessible loading feedback", () =>
   assert.match(loadingSource, /aria-live="polite"/);
   assert.match(loadingSource, /motion-reduce:/);
 });
+
+test("local year navigation restores the locale prefix before native pushState", () => {
+  assert.match(source, /getPathname\(\{ locale, href: pathname \}\)/);
+  assert.match(source, /getYearRoutePrefix\(localizedPathname, currentYearData\.config\.year\)/);
+  assert.match(source, /window\.history\.pushState/);
+});

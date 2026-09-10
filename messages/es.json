@@ -324,6 +324,7 @@
       "add": "Añadir",
       "empty": "Sin gastos recurrentes.",
       "labelPlaceholder": "Concepto",
+      "amountInvalid": "El importe debe ser cero o mayor.",
       "remove": "Eliminar gasto recurrente"
     },
     "monthly": {
@@ -331,6 +332,7 @@
       "description": "Gastos planificados que se repiten cada mes. Los cambios aquí solo afectan a este mes.",
       "total": "Total",
       "empty": "Sin gastos recurrentes este mes.",
+      "amountInvalid": "El importe debe ser cero o mayor.",
       "deleteEntry": "Eliminar gasto recurrente {label}",
       "confirmDeleteTitle": "¿Eliminar gasto recurrente?",
       "confirmDeleteDescription": "Se eliminará \"{label}\" de este mes. Esta acción no se puede deshacer.",

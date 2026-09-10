@@ -1,12 +1,13 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useLocale } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AppShell } from "@/components/layout/app-shell";
 import { MonthNavigationPalette } from "@/components/search/month-navigation-palette";
 import { SearchPalette } from "@/components/search/search-palette";
 import { YearViewLoading } from "@/components/year/year-view-loading";
-import { usePathname } from "@/i18n/routing";
+import { getPathname, usePathname } from "@/i18n/routing";
 import type { YearData } from "@/lib/types";
 import type { AnnualKpiComparisonData } from "@/lib/annual-comparisons";
 import type { SearchEntry } from "@/lib/search-index";
@@ -87,11 +88,13 @@ export function YearPageClient({
   user,
 }: Props) {
   const pathname = usePathname();
+  const locale = useLocale();
   const initialState = getInitialStateFromPathname(pathname, yearData.config.year, initialMonth, initialView);
   const [currentYearData, setCurrentYearData] = useState<YearData>(yearData);
   const [selectedMonth, setSelectedMonth] = useState(() => initialState.month);
   const [selectedView, setSelectedView] = useState<YearRouteView>(() => initialState.view);
-  const routePrefix = getYearRoutePrefix(pathname, currentYearData.config.year);
+  const localizedPathname = getPathname({ locale, href: pathname });
+  const routePrefix = getYearRoutePrefix(localizedPathname, currentYearData.config.year);
   const [searchOpen, setSearchOpen] = useState(false);
   const [monthNavigationOpen, setMonthNavigationOpen] = useState(false);
   const [highlightId, setHighlightId] = useState<string | null>(null);

@@ -7,6 +7,15 @@ const deleteStart = source.indexOf("export async function DELETE");
 const patchSource = source.slice(0, deleteStart);
 const deleteSource = source.slice(deleteStart);
 
+test("recurring expense PATCH rejects invalid amounts before opening a transaction", () => {
+  assert.match(patchSource, /isValidRecurringExpenseAmount\(body\.amount\)/);
+  assert.match(patchSource, /RECURRING_EXPENSE_AMOUNT_ERROR/);
+  assert.ok(
+    patchSource.indexOf("isValidRecurringExpenseAmount(body.amount)") <
+      patchSource.indexOf("const result = await withFinancialTransaction"),
+  );
+});
+
 test("PATCH reads tagId from the body", () => {
   assert.match(source, /body\.tagId !== undefined/);
 });
@@ -27,7 +36,7 @@ test("PATCH only propagates carry-over when the normalized amount changes", () =
   assert.equal((patchSource.match(/affectsCarryOver =/g) ?? []).length, 1);
   assert.match(
     patchSource,
-    /const nextAmount = body\.amount !== undefined \? Number\(body\.amount\) \|\| 0 : undefined/,
+    /const nextAmount = body\.amount !== undefined \? body\.amount : undefined/,
   );
   assert.match(
     patchSource,

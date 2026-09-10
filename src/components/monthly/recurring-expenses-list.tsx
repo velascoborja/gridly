@@ -48,6 +48,10 @@ export function RecurringExpensesList({ monthId, entries, onEntriesChange, readO
   const [pendingTag, setPendingTag] = useState<{ entry: RecurringExpense; tagId: number | null; tag: Tag | null } | null>(null);
   const [savingTagId, setSavingTagId] = useState<number | null>(null);
   const sortedEntries = sortRecurringExpensesAsc(entries);
+  const parsedEditAmount = Number.parseFloat(editAmount.replace(",", "."));
+  const editAmountError = Number.isFinite(parsedEditAmount) && parsedEditAmount >= 0
+    ? null
+    : t("amountInvalid");
 
   useEffect(() => {
     if (readOnly) return;
@@ -66,8 +70,8 @@ export function RecurringExpensesList({ monthId, entries, onEntriesChange, readO
 
   const handleEdit = async (id: number) => {
     if (savingId === id) return;
-    const amount = parseFloat(editAmount.replace(",", "."));
-    if (!editLabel.trim() || Number.isNaN(amount)) return;
+    const amount = Number.parseFloat(editAmount.replace(",", "."));
+    if (!editLabel.trim() || !Number.isFinite(amount) || amount < 0) return;
 
     setSavingId(id);
     try {
@@ -156,9 +160,11 @@ export function RecurringExpensesList({ monthId, entries, onEntriesChange, readO
                 onLabelChange={setEditLabel}
                 amountValue={editAmount}
                 onAmountChange={setEditAmount}
+                amountError={editAmountError}
                 onSave={() => handleEdit(entry.id)}
                 onCancel={() => setEditingId(null)}
                 disabled={savingId === entry.id}
+                saveDisabled={editAmountError !== null || !editLabel.trim()}
                 isSaving={savingId === entry.id}
                 saveLabel={common("save")}
                 savingLabel={common("saving")}
