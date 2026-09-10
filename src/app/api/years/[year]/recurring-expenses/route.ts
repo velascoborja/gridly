@@ -1,3 +1,4 @@
+import { withFinancialTransaction } from "@/db/financial-transaction";
 import { asc, eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db } from "@/db";
@@ -41,85 +42,91 @@ export async function PUT(
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { year } = await params;
-  const yearNum = parseInt(year, 10);
-  const yearRow = await getOwnedYear(user.id, yearNum);
-  if (!yearRow) return Response.json({ error: "Year not found" }, { status: 404 });
-
   const body = await request.json();
-  const applyFromMonth = parseApplyFromMonth(body.applyFromMonth);
-  if (applyFromMonth === null) {
-    return Response.json({ error: APPLY_FROM_MONTH_ERROR }, { status: 400 });
-  }
-  const normalized = normalizeRecurringExpenseInputs(
-    Array.isArray(body.recurringExpenses) ? body.recurringExpenses : []
-  );
 
-  const existingTemplates = await db
-    .select()
-    .from(yearRecurringExpenses)
-    .where(eq(yearRecurringExpenses.yearId, yearRow.id));
-  const tagByLabel = new Map(existingTemplates.map((t) => [t.label, t.tagId]));
+  const result = await withFinancialTransaction(user.id, async (db) => {
+    const { year } = await params;
+    const yearNum = parseInt(year, 10);
+    const yearRow = await getOwnedYear(user.id, yearNum, db);
+    if (!yearRow) return Response.json({ error: "Year not found" }, { status: 404 });
 
-  await db.delete(yearRecurringExpenses).where(eq(yearRecurringExpenses.yearId, yearRow.id));
-  const templates =
-    normalized.length > 0
-      ? await db
-          .insert(yearRecurringExpenses)
-          .values(
-            normalized.map((entry) => ({
-              yearId: yearRow.id,
-              label: entry.label,
-              amount: String(entry.amount),
-              sortOrder: entry.sortOrder,
-              tagId: tagByLabel.get(entry.label) ?? null,
+    const applyFromMonth = parseApplyFromMonth(body.applyFromMonth);
+    if (applyFromMonth === null) {
+      return Response.json({ error: APPLY_FROM_MONTH_ERROR }, { status: 400 });
+    }
+    const normalized = normalizeRecurringExpenseInputs(
+      Array.isArray(body.recurringExpenses) ? body.recurringExpenses : []
+    );
+
+    const existingTemplates = await db
+      .select()
+      .from(yearRecurringExpenses)
+      .where(eq(yearRecurringExpenses.yearId, yearRow.id));
+    const tagByLabel = new Map(existingTemplates.map((t) => [t.label, t.tagId]));
+
+    await db.delete(yearRecurringExpenses).where(eq(yearRecurringExpenses.yearId, yearRow.id));
+    const templates =
+      normalized.length > 0
+        ? await db
+            .insert(yearRecurringExpenses)
+            .values(
+              normalized.map((entry) => ({
+                yearId: yearRow.id,
+                label: entry.label,
+                amount: String(entry.amount),
+                sortOrder: entry.sortOrder,
+                tagId: tagByLabel.get(entry.label) ?? null,
+              }))
+            )
+            .returning()
+        : [];
+
+    const monthRows = await db
+      .select()
+      .from(months)
+      .where(eq(months.yearId, yearRow.id))
+      .orderBy(asc(months.month));
+
+    const targetMonthRows = monthRows.filter((month) => month.month >= applyFromMonth);
+
+    if (targetMonthRows.length > 0) {
+      await db
+        .delete(monthlyRecurringExpenses)
+        .where(inArray(monthlyRecurringExpenses.monthId, targetMonthRows.map((month) => month.id)));
+
+      if (templates.length > 0) {
+        await db.insert(monthlyRecurringExpenses).values(
+          targetMonthRows.flatMap((month) =>
+            templates.map((template) => ({
+              monthId: month.id,
+              yearRecurringExpenseId: template.id,
+              label: template.label,
+              amount: template.amount,
+              sortOrder: template.sortOrder,
+              tagId: template.tagId,
             }))
           )
-          .returning()
-      : [];
-
-  const monthRows = await db
-    .select()
-    .from(months)
-    .where(eq(months.yearId, yearRow.id))
-    .orderBy(asc(months.month));
-
-  const targetMonthRows = monthRows.filter((month) => month.month >= applyFromMonth);
-
-  if (targetMonthRows.length > 0) {
-    await db
-      .delete(monthlyRecurringExpenses)
-      .where(inArray(monthlyRecurringExpenses.monthId, targetMonthRows.map((month) => month.id)));
-
-    if (templates.length > 0) {
-      await db.insert(monthlyRecurringExpenses).values(
-        targetMonthRows.flatMap((month) =>
-          templates.map((template) => ({
-            monthId: month.id,
-            yearRecurringExpenseId: template.id,
-            label: template.label,
-            amount: template.amount,
-            sortOrder: template.sortOrder,
-            tagId: template.tagId,
-          }))
-        )
-      );
+        );
+      }
     }
-  }
 
-  const yearNumber = await getYearNumberForYearId(yearRow.id);
-  if (yearNumber !== null) {
-    await propagateYearCarryOver(user.id, yearNumber);
-  }
+    const yearNumber = await getYearNumberForYearId(yearRow.id, db);
+    if (yearNumber !== null) {
+      await propagateYearCarryOver(user.id, yearNumber, db);
+    }
 
+    const yearData = await getYearData(user.id, yearNum, db);
+    return Response.json({
+      recurringExpenses: sortRecurringExpensesAsc(templates.map(parseYearRecurringExpense)),
+      yearData,
+    });
+  });
+  if (!result.ok) return result;
+  const { year } = await params;
+  const yearNum = parseInt(year, 10);
   revalidatePath(`/${yearNum}/summary`);
   for (const locale of ["es", "en"]) {
     revalidatePath(`/${locale}/${yearNum}/summary`);
   }
-
-  const yearData = await getYearData(user.id, yearNum);
-  return Response.json({
-    recurringExpenses: sortRecurringExpensesAsc(templates.map(parseYearRecurringExpense)),
-    yearData,
-  });
+  return result;
 }

@@ -102,7 +102,7 @@ Once a year is created, its configuration can be modified within the **Annual Su
   - `interestsManualOverride` is reset to `false` so interest follows the current annual rate again.
   - Manual monthly fixed-value edits are overwritten only in the selected range; earlier months keep their existing fixed values. Additional entries and personal remaining values are preserved.
 
-The year-row update and month baseline rewrite run in one database transaction. The month update reads the current values directly from the locked year row, so concurrent field saves serialize and cannot overwrite monthly baselines with an older configuration snapshot.
+The year-row update, month baseline rewrite, and downstream carry-over run in one database transaction after locking the user row. The month update reads the current values directly from the updated year row, so concurrent field saves serialize and cannot overwrite monthly baselines with an older configuration snapshot.
 
 Annual Summary also includes the recurring expense template editor.
 
@@ -144,3 +144,7 @@ A year and all its data can be permanently deleted from the Year Configuration p
   1. **Impact step** — describes what will be deleted irreversibly.
   2. **Typed confirmation step** — user must type the year number (e.g., `2026`) to unlock the final delete button.
 - **Post-deletion navigation:** The client navigates to the locale root (`/`), which redirects to the next available year or the landing page.
+
+## Atomic Persistence
+
+Guided setup, REST creation, annual configuration updates, prefill, and year deletion each run their complete database operation and downstream carry-over in one user-serialized transaction. The two-step REST creation contract remains unchanged. Cache invalidation occurs after commit. See [Atomic Financial Writes](financial-transactions.md) for transaction boundaries and verification.

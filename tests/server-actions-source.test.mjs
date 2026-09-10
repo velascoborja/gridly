@@ -14,8 +14,9 @@ test("createAndPrefillYear server action exists and handles logic", () => {
   assert.match(source, /revalidatePath/);
 });
 
-test("createAndPrefillYear does not use unsupported neon-http interactive transactions", () => {
+test("createAndPrefillYear uses the supported financial transaction client", () => {
   const source = readFileSync(new URL("../src/lib/server/actions/years.ts", import.meta.url), "utf8");
 
-  assert.doesNotMatch(source, /\.transaction\(/);
+  assert.match(source, /withFinancialTransaction\(user\.id, async \(db\) =>/);
+  assert.doesNotMatch(source, /import \{ db \} from "@\/db"/);
 });

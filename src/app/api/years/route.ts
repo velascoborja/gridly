@@ -1,3 +1,4 @@
+import { withFinancialTransaction } from "@/db/financial-transaction";
 import { db } from "@/db";
 import { yearRecurringExpenses, years } from "@/db/schema";
 import { and, asc, eq } from "drizzle-orm";
@@ -33,84 +34,89 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const {
-    year,
-    startingBalance = 0,
-    estimatedSalary = 0,
-    hasExtraPayments = false,
-    estimatedExtraPayment = 0,
-    monthlyInvestment = 0,
-    monthlyHomeExpense = 0,
-    monthlyPersonalBudget = 0,
-    interestRate = 0,
-    recurringExpenses = [],
-  } = body;
 
-  if (!year) return Response.json({ error: "year is required" }, { status: 400 });
+  const result = await withFinancialTransaction(user.id, async (db) => {
 
-  const existingYears = await db
-    .select({ year: years.year })
-    .from(years)
-    .where(eq(years.userId, user.id))
-    .orderBy(asc(years.year));
+    const {
+      year,
+      startingBalance = 0,
+      estimatedSalary = 0,
+      hasExtraPayments = false,
+      estimatedExtraPayment = 0,
+      monthlyInvestment = 0,
+      monthlyHomeExpense = 0,
+      monthlyPersonalBudget = 0,
+      interestRate = 0,
+      recurringExpenses = [],
+    } = body;
 
-  const latestYear = existingYears.at(-1)?.year;
-  if (!shouldAllowYearCreation(existingYears.map((row) => row.year), year, year)) {
-    return Response.json({ error: "Only the next year can be created" }, { status: 400 });
-  }
+    if (!year) return Response.json({ error: "year is required" }, { status: 400 });
 
-  const existingYear = await db.query.years.findFirst({
-    where: and(eq(years.userId, user.id), eq(years.year, year)),
-  });
+    const existingYears = await db
+      .select({ year: years.year })
+      .from(years)
+      .where(eq(years.userId, user.id))
+      .orderBy(asc(years.year));
 
-  if (existingYear) {
-    return Response.json({ error: "Year already exists" }, { status: 409 });
-  }
-
-  let derivedStartingBalance = startingBalance;
-  if (latestYear !== undefined) {
-    const previousYearData = await getYearData(user.id, latestYear);
-    if (!previousYearData) {
-      return Response.json({ error: "Previous year data is required" }, { status: 400 });
+    const latestYear = existingYears.at(-1)?.year;
+    if (!shouldAllowYearCreation(existingYears.map((row) => row.year), year, year)) {
+      return Response.json({ error: "Only the next year can be created" }, { status: 400 });
     }
 
-    derivedStartingBalance = deriveStartingBalance(previousYearData);
-  }
+    const existingYear = await db.query.years.findFirst({
+      where: and(eq(years.userId, user.id), eq(years.year, year)),
+    });
 
-  const [row] = await db.insert(years).values({
-    userId: user.id,
-    year,
-    startingBalance: String(derivedStartingBalance),
-    estimatedSalary: String(estimatedSalary),
-    hasExtraPayments: Boolean(hasExtraPayments),
-    estimatedExtraPayment: String(estimatedExtraPayment),
-    monthlyInvestment: String(monthlyInvestment),
-    monthlyHomeExpense: String(monthlyHomeExpense),
-    monthlyPersonalBudget: String(monthlyPersonalBudget),
-    interestRate: String(interestRate),
-  }).returning();
+    if (existingYear) {
+      return Response.json({ error: "Year already exists" }, { status: 409 });
+    }
 
-  const recurringValues = Array.isArray(recurringExpenses)
-    ? recurringExpenses
-        .map((entry, index) => ({
-          yearId: row.id,
-          label: String(entry.label ?? "").trim(),
-          amount: String(Number(entry.amount) || 0),
-          sortOrder: index,
-        }))
-        .filter((entry) => entry.label.length > 0)
-    : [];
+    let derivedStartingBalance = startingBalance;
+    if (latestYear !== undefined) {
+      const previousYearData = await getYearData(user.id, latestYear, db);
+      if (!previousYearData) {
+        return Response.json({ error: "Previous year data is required" }, { status: 400 });
+      }
 
-  if (recurringValues.length > 0) {
-    await db.insert(yearRecurringExpenses).values(recurringValues);
-  }
+      derivedStartingBalance = deriveStartingBalance(previousYearData);
+    }
 
-  await propagateYearCarryOver(user.id, latestYear ?? year);
+    const [row] = await db.insert(years).values({
+      userId: user.id,
+      year,
+      startingBalance: String(derivedStartingBalance),
+      estimatedSalary: String(estimatedSalary),
+      hasExtraPayments: Boolean(hasExtraPayments),
+      estimatedExtraPayment: String(estimatedExtraPayment),
+      monthlyInvestment: String(monthlyInvestment),
+      monthlyHomeExpense: String(monthlyHomeExpense),
+      monthlyPersonalBudget: String(monthlyPersonalBudget),
+      interestRate: String(interestRate),
+    }).returning();
 
-  const finalRow = await db.query.years.findFirst({
-    where: and(eq(years.userId, user.id), eq(years.year, year)),
+    const recurringValues = Array.isArray(recurringExpenses)
+      ? recurringExpenses
+          .map((entry, index) => ({
+            yearId: row.id,
+            label: String(entry.label ?? "").trim(),
+            amount: String(Number(entry.amount) || 0),
+            sortOrder: index,
+          }))
+          .filter((entry) => entry.label.length > 0)
+      : [];
+
+    if (recurringValues.length > 0) {
+      await db.insert(yearRecurringExpenses).values(recurringValues);
+    }
+
+    await propagateYearCarryOver(user.id, latestYear ?? year, db);
+
+    const finalRow = await db.query.years.findFirst({
+      where: and(eq(years.userId, user.id), eq(years.year, year)),
+    });
+    if (!finalRow) throw new Error("Created year is missing");
+
+    return Response.json(toPublicYearRow(finalRow), { status: 201 });
   });
-  if (!finalRow) return Response.json({ error: "Year not found" }, { status: 404 });
-
-  return Response.json(toPublicYearRow(finalRow), { status: 201 });
+  return result;
 }

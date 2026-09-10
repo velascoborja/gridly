@@ -1,5 +1,6 @@
+import type { DatabaseExecutor, FinancialTransaction } from "@/db/financial-transaction";
 import { and, asc, eq, sql } from "drizzle-orm";
-import { db } from "@/db";
+import { db as defaultDb } from "@/db";
 import { years } from "@/db/schema";
 import { deriveStartingBalance } from "@/lib/server/year-planning";
 import { getYearDataSnapshot } from "@/lib/server/year-data";
@@ -8,7 +9,7 @@ import {
   type CarryOverStore,
 } from "@/lib/server/year-carry-over-engine";
 
-function createCarryOverStore(userId: string): CarryOverStore {
+function createCarryOverStore(userId: string, db: FinancialTransaction): CarryOverStore {
   return {
     listYears: () =>
       db
@@ -34,7 +35,7 @@ function createCarryOverStore(userId: string): CarryOverStore {
       return versionedYear?.carryOverVersion ?? null;
     },
     getSnapshot: async (year) => {
-      const snapshot = await getYearDataSnapshot(userId, year);
+      const snapshot = await getYearDataSnapshot(userId, year, db);
       if (!snapshot) return null;
       return {
         year: snapshot.data.config.year,
@@ -66,11 +67,11 @@ function createCarryOverStore(userId: string): CarryOverStore {
   };
 }
 
-export async function propagateYearCarryOver(userId: string, startYear: number) {
-  await propagateVersionedCarryOver(createCarryOverStore(userId), startYear);
+export async function propagateYearCarryOver(userId: string, startYear: number, tx: FinancialTransaction) {
+  await propagateVersionedCarryOver(createCarryOverStore(userId, tx), startYear);
 }
 
-export async function getYearNumberForYearId(yearId: number) {
+export async function getYearNumberForYearId(yearId: number, db: DatabaseExecutor = defaultDb) {
   const row = await db.query.years.findFirst({
     columns: { year: true },
     where: eq(years.id, yearId),

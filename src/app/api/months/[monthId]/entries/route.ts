@@ -1,5 +1,5 @@
+import { withFinancialTransaction } from "@/db/financial-transaction";
 import { and, eq } from "drizzle-orm";
-import { db } from "@/db";
 import { additionalEntries, additionalEntryGroups, tags } from "@/db/schema";
 import { getYearNumberForYearId, propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { getSessionUser } from "@/lib/server/session";
@@ -14,68 +14,73 @@ export async function POST(
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { monthId } = await params;
-  const id = parseInt(monthId, 10);
   const body = await request.json();
-  const { type, label, amount, groupId, isRecurring, tagId } = body;
 
-  if (!type || !label || amount === undefined) {
-    return Response.json({ error: "type, label, and amount are required" }, { status: 400 });
-  }
-  if (type !== "income" && type !== "expense") {
-    return Response.json({ error: "type must be 'income' or 'expense'" }, { status: 400 });
-  }
+  const result = await withFinancialTransaction(user.id, async (db) => {
+    const { monthId } = await params;
+    const id = parseInt(monthId, 10);
 
-  const ownedMonth = await getOwnedMonth(user.id, id);
-  if (!ownedMonth) {
-    return Response.json({ error: "Month not found" }, { status: 404 });
-  }
+    const { type, label, amount, groupId, isRecurring, tagId } = body;
 
-  let entryTagId: number | null = null;
-
-  if (groupId != null) {
-    const group = await db.query.additionalEntryGroups.findFirst({
-      where: and(
-        eq(additionalEntryGroups.id, groupId),
-        eq(additionalEntryGroups.monthId, ownedMonth.id)
-      ),
-    });
-    if (!group) {
-      return Response.json({ error: "Group not found" }, { status: 404 });
+    if (!type || !label || amount === undefined) {
+      return Response.json({ error: "type, label, and amount are required" }, { status: 400 });
     }
-    if (group.isCompleted) {
-      return Response.json({ error: "completed_locked" }, { status: 409 });
+    if (type !== "income" && type !== "expense") {
+      return Response.json({ error: "type must be 'income' or 'expense'" }, { status: 400 });
     }
-    entryTagId = group.tagId ?? null;
-  } else if (tagId !== undefined && tagId !== null) {
-    if (!(Number.isInteger(tagId) && tagId > 0)) {
-      return Response.json({ error: "Tag not found" }, { status: 404 });
+
+    const ownedMonth = await getOwnedMonth(user.id, id, db);
+    if (!ownedMonth) {
+      return Response.json({ error: "Month not found" }, { status: 404 });
     }
-    const ownedTag = await db
-      .select({ id: tags.id })
-      .from(tags)
-      .where(and(eq(tags.id, tagId), eq(tags.userId, user.id)));
-    if (ownedTag.length === 0) {
-      return Response.json({ error: "Tag not found" }, { status: 404 });
+
+    let entryTagId: number | null = null;
+
+    if (groupId != null) {
+      const group = await db.query.additionalEntryGroups.findFirst({
+        where: and(
+          eq(additionalEntryGroups.id, groupId),
+          eq(additionalEntryGroups.monthId, ownedMonth.id)
+        ),
+      });
+      if (!group) {
+        return Response.json({ error: "Group not found" }, { status: 404 });
+      }
+      if (group.isCompleted) {
+        return Response.json({ error: "completed_locked" }, { status: 409 });
+      }
+      entryTagId = group.tagId ?? null;
+    } else if (tagId !== undefined && tagId !== null) {
+      if (!(Number.isInteger(tagId) && tagId > 0)) {
+        return Response.json({ error: "Tag not found" }, { status: 404 });
+      }
+      const ownedTag = await db
+        .select({ id: tags.id })
+        .from(tags)
+        .where(and(eq(tags.id, tagId), eq(tags.userId, user.id)));
+      if (ownedTag.length === 0) {
+        return Response.json({ error: "Tag not found" }, { status: 404 });
+      }
+      entryTagId = tagId;
     }
-    entryTagId = tagId;
-  }
 
-  const [entry] = await db.insert(additionalEntries).values({
-    monthId: ownedMonth.id,
-    type,
-    label,
-    amount: String(amount),
-    groupId: groupId ?? null,
-    isRecurring: isRecurring === true,
-    isCompleted: false,
-    tagId: entryTagId,
-  }).returning();
+    const [entry] = await db.insert(additionalEntries).values({
+      monthId: ownedMonth.id,
+      type,
+      label,
+      amount: String(amount),
+      groupId: groupId ?? null,
+      isRecurring: isRecurring === true,
+      isCompleted: false,
+      tagId: entryTagId,
+    }).returning();
 
-  const yearNumber = await getYearNumberForYearId(ownedMonth.yearId);
-  if (yearNumber !== null) {
-    await propagateYearCarryOver(user.id, yearNumber);
-  }
+    const yearNumber = await getYearNumberForYearId(ownedMonth.yearId, db);
+    if (yearNumber !== null) {
+      await propagateYearCarryOver(user.id, yearNumber, db);
+    }
 
-  return Response.json(entry, { status: 201 });
+    return Response.json(entry, { status: 201 });
+  });
+  return result;
 }

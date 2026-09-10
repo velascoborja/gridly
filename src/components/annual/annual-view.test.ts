@@ -55,8 +55,8 @@ test("annual setup dialog exposes one apply-from month selector for setup and re
 test("annual config saves serialize the year and month updates in one transaction", () => {
   const source = readFileSync(new URL("../../app/api/years/[year]/route.ts", import.meta.url), "utf8");
 
-  assert.match(source, /await db\.batch\(\[/, "the year and month writes should share one database transaction");
-  assert.match(source, /db\.update\(years\)[\s\S]*applyYearConfigToStoredMonths\(yearRow\.id, applyFromMonth\)/);
+  assert.match(source, /await withFinancialTransaction\(user\.id, async \(db\) =>/, "the year and month writes should share one database transaction");
+  assert.match(source, /db\.update\(years\)[\s\S]*applyYearConfigToStoredMonths\(yearRow\.id, applyFromMonth, db\)/);
   assert.match(source, /\.from\(years\)/, "month baselines should be read from the locked year row");
   assert.match(source, /homeExpense: years\.monthlyHomeExpense/);
   assert.match(source, /payslip: years\.estimatedSalary/);

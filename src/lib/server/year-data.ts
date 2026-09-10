@@ -1,5 +1,6 @@
+import type { DatabaseExecutor } from "@/db/financial-transaction";
 import { and, asc, eq, inArray } from "drizzle-orm";
-import { db } from "@/db";
+import { db as defaultDb } from "@/db";
 import { additionalEntries, additionalEntryGroups, monthlyRecurringExpenses, months, tags, yearRecurringExpenses, years } from "@/db/schema";
 import { sortAdditionalEntriesDesc } from "@/lib/additional-entries";
 import { computeMonthChain } from "@/lib/calculations";
@@ -16,7 +17,7 @@ export interface YearDataSnapshot {
   carryOverVersion: number;
 }
 
-async function loadYearData(userId: string, year: number): Promise<YearDataSnapshot | null> {
+async function loadYearData(userId: string, year: number, db: DatabaseExecutor = defaultDb): Promise<YearDataSnapshot | null> {
   const yearRow = await db.query.years.findFirst({
     where: and(eq(years.userId, userId), eq(years.year, year)),
   });
@@ -203,20 +204,20 @@ async function loadYearData(userId: string, year: number): Promise<YearDataSnaps
   };
 }
 
-export async function getYearData(userId: string, year: number): Promise<YearData | null> {
-  const snapshot = await loadYearData(userId, year);
+export async function getYearData(userId: string, year: number, db: DatabaseExecutor = defaultDb): Promise<YearData | null> {
+  const snapshot = await loadYearData(userId, year, db);
   return snapshot?.data ?? null;
 }
 
-export async function getYearDataSnapshot(userId: string, year: number): Promise<YearDataSnapshot | null> {
-  return loadYearData(userId, year);
+export async function getYearDataSnapshot(userId: string, year: number, db: DatabaseExecutor = defaultDb): Promise<YearDataSnapshot | null> {
+  return loadYearData(userId, year, db);
 }
 
 export async function getYears(): Promise<number[]> {
   throw new Error("getYears(userId) must be used with an authenticated user");
 }
 
-export async function getYearsForUser(userId: string): Promise<number[]> {
+export async function getYearsForUser(userId: string, db: DatabaseExecutor = defaultDb): Promise<number[]> {
   const rows = await db
     .select({ year: years.year })
     .from(years)

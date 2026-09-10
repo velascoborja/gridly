@@ -38,7 +38,7 @@ export async function propagateVersionedCarryOver(
     }
 
     const startYearVersion = sortedYears.find(({ year }) => year === startYear);
-    if (!startYearVersion) return;
+    if (!startYearVersion) throw new Error("Carry-over source year is missing");
 
     const incrementedStartVersion = await store.compareAndIncrementVersion(
       startYearVersion,
@@ -47,7 +47,7 @@ export async function propagateVersionedCarryOver(
 
     let previousSnapshot = await store.getSnapshot(startYear);
     if (!previousSnapshot) {
-      return;
+      throw new Error("Carry-over snapshot is missing");
     }
     if (previousSnapshot.version !== incrementedStartVersion) continue;
 
@@ -69,7 +69,7 @@ export async function propagateVersionedCarryOver(
 
       previousSnapshot = await store.getSnapshot(target.year);
       if (!previousSnapshot) {
-        return;
+        throw new Error("Carry-over snapshot is missing");
       }
       if (previousSnapshot.version !== updatedVersion) {
         conflictDetected = true;

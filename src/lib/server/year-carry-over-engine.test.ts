@@ -230,3 +230,16 @@ test("persistent contention fails instead of reporting a stale propagation as su
   assert.equal(store.listAttempts, 3);
   assert.equal(store.updateAttempts, 3);
 });
+
+test("a missing source cannot silently complete a downstream propagation", async () => {
+  const store = new FakeCarryOverStore([2025, 2026]);
+  await assert.rejects(propagateVersionedCarryOver(store, 2024), /source year is missing/);
+});
+
+test("missing source or intermediate snapshots reject the whole operation", async () => {
+  for (const missingYear of [2024, 2025]) {
+    const store = new FakeCarryOverStore([2024, 2025, 2026]);
+    store.snapshotUnavailableYears.add(missingYear);
+    await assert.rejects(propagateVersionedCarryOver(store, 2024), /snapshot is missing/);
+  }
+});

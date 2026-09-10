@@ -86,3 +86,7 @@ Any **ungrouped** additional entry (income or expense) can be marked as recurrin
 - **Schema:** `additionalEntries.isRecurring` (`boolean NOT NULL DEFAULT false` in `src/db/schema.ts`).
 - **Year creation hook:** Implemented as step 4b in `createAndPrefillYear` in `src/lib/server/actions/years.ts`. Runs after monthly recurring expenses are linked and before carry-over propagation.
 - **Completion reset:** Recurring entries copied into a newly created year always start with `isCompleted = false`, even when the source entry was completed.
+
+## Atomic Persistence
+
+Entry creation, edits, moves, and deletion run in the same transaction as any required carry-over. State/ownership checks run after acquiring the account lock, preventing an edit from using a stale month or group during a concurrent move. Metadata-only edits retain propagation suppression. See [Atomic Financial Writes](financial-transactions.md).

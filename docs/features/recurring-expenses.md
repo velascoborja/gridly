@@ -16,7 +16,7 @@ Recurring expenses let users define named monthly expenses that repeat across a 
 
 During setup, `createAndPrefillYear` in `src/lib/server/actions/years.ts` saves the template list and copies every template into all 12 months, including each template's `tagId`. The prefill endpoint (`POST /api/years/[year]/prefill`) likewise copies the `tagId` from the template into each monthly copy it creates.
 
-Annual template updates use `PUT /api/years/[year]/recurring-expenses`. This endpoint replaces the template list, deletes all monthly recurring expense rows for that year, recreates them from the new template, and propagates downstream year carry-over. Tags are preserved best-effort by label match: if a recurring expense in the new list has the same label as one in the previous template, it inherits the previous template's `tagId`. Renaming a recurring expense in the annual editor resets its tag to `null`.
+Annual template updates use `PUT /api/years/[year]/recurring-expenses`. This endpoint replaces the template list, deletes monthly recurring expense rows from the selected apply-from month through December, recreates them from the new template, and propagates downstream year carry-over. Tags are preserved best-effort by label match: if a recurring expense in the new list has the same label as one in the previous template, it inherits the previous template's `tagId`. Renaming a recurring expense in the annual editor resets its tag to `null`.
 
 Monthly recurring-expense edits propagate yearly carry-over only when the normalized numeric amount differs from the stored amount. Label, tag, and sort-order-only edits skip propagation; deleting an expense still propagates because it changes the month's total.
 
@@ -44,3 +44,7 @@ homeExpense + personalExpense + investment + recurringExpensesTotal + additional
 ```
 
 This means recurring expenses affect monthly savings, ending balance, downstream starting balances, annual summaries, and exports.
+
+## Atomic Persistence
+
+Template replacement, selected monthly copies, and downstream balances commit in one transaction. Rollback also restores earlier-month template links nullified by template deletion. Monthly series-tag updates, the edited monthly row, and any amount-triggered carry-over share a transaction. See [Atomic Financial Writes](financial-transactions.md).

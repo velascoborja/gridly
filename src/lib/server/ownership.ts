@@ -1,18 +1,19 @@
+import type { DatabaseExecutor } from "@/db/financial-transaction";
 import { and, eq } from "drizzle-orm";
-import { db } from "@/db";
+import { db as defaultDb } from "@/db";
 import { additionalEntries, additionalEntryGroups, monthlyRecurringExpenses, months, years } from "@/db/schema";
 
 export function statusForAuth(isAuthenticated: boolean) {
   return isAuthenticated ? 200 : 401;
 }
 
-export async function getOwnedYear(userId: string, year: number) {
+export async function getOwnedYear(userId: string, year: number, db: DatabaseExecutor = defaultDb) {
   return db.query.years.findFirst({
     where: and(eq(years.userId, userId), eq(years.year, year)),
   });
 }
 
-export async function getOwnedMonth(userId: string, monthId: number) {
+export async function getOwnedMonth(userId: string, monthId: number, db: DatabaseExecutor = defaultDb) {
   const row = await db
     .select({ month: months })
     .from(months)
@@ -22,7 +23,7 @@ export async function getOwnedMonth(userId: string, monthId: number) {
   return row[0]?.month ?? null;
 }
 
-export async function getOwnedEntry(userId: string, entryId: number) {
+export async function getOwnedEntry(userId: string, entryId: number, db: DatabaseExecutor = defaultDb) {
   const row = await db
     .select({ entry: additionalEntries })
     .from(additionalEntries)
@@ -33,7 +34,7 @@ export async function getOwnedEntry(userId: string, entryId: number) {
   return row[0]?.entry ?? null;
 }
 
-export async function getOwnedRecurringExpense(userId: string, entryId: number) {
+export async function getOwnedRecurringExpense(userId: string, entryId: number, db: DatabaseExecutor = defaultDb) {
   const row = await db
     .select({ entry: monthlyRecurringExpenses })
     .from(monthlyRecurringExpenses)
@@ -44,8 +45,8 @@ export async function getOwnedRecurringExpense(userId: string, entryId: number) 
   return row[0]?.entry ?? null;
 }
 
-export async function getOwnedGroup(userId: string, monthId: number, groupId: number) {
-  const month = await getOwnedMonth(userId, monthId);
+export async function getOwnedGroup(userId: string, monthId: number, groupId: number, db: DatabaseExecutor = defaultDb) {
+  const month = await getOwnedMonth(userId, monthId, db);
   if (!month) return null;
   const group = await db.query.additionalEntryGroups.findFirst({
     where: and(

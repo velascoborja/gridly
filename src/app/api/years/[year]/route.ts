@@ -1,4 +1,5 @@
-import { db } from "@/db";
+import { withFinancialTransaction } from "@/db/financial-transaction";
+import type { FinancialTransaction } from "@/db/financial-transaction";
 import { months, years } from "@/db/schema";
 import { and, eq, gte, sql } from "drizzle-orm";
 import { propagateYearCarryOver } from "@/lib/server/year-carry-over";
@@ -13,7 +14,7 @@ function toPublicYearRow(row: typeof years.$inferSelect) {
   );
 }
 
-function applyYearConfigToStoredMonths(yearId: number, applyFromMonth: number) {
+function applyYearConfigToStoredMonths(yearId: number, applyFromMonth: number, db: FinancialTransaction) {
   return db
     .update(months)
     .set({
@@ -69,47 +70,50 @@ export async function PATCH(
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { year } = await params;
-  const yearNum = parseInt(year, 10);
   const body = await request.json();
-  const applyFromMonth = parseApplyFromMonth(body.applyFromMonth);
-  if (applyFromMonth === null) {
-    return Response.json({ error: APPLY_FROM_MONTH_ERROR }, { status: 400 });
-  }
 
-  const yearRow = await getOwnedYear(user.id, yearNum);
-  if (!yearRow) return Response.json({ error: "Year not found" }, { status: 404 });
+  const result = await withFinancialTransaction(user.id, async (db) => {
+    const { year } = await params;
+    const yearNum = parseInt(year, 10);
 
-  if (body.startingBalance !== undefined) {
-    const userYears = await getYearsForUser(user.id);
-    const earliestYear = userYears[0];
-
-    if (earliestYear !== yearNum) {
-      return Response.json(
-        { error: "Starting balance can only be edited on the earliest year" },
-        { status: 400 }
-      );
+    const applyFromMonth = parseApplyFromMonth(body.applyFromMonth);
+    if (applyFromMonth === null) {
+      return Response.json({ error: APPLY_FROM_MONTH_ERROR }, { status: 400 });
     }
-  }
 
-  const updates: Partial<typeof years.$inferInsert> = {};
-  if (body.startingBalance !== undefined) updates.startingBalance = String(body.startingBalance);
-  if (body.estimatedSalary !== undefined) updates.estimatedSalary = String(body.estimatedSalary);
-  if (body.hasExtraPayments !== undefined) updates.hasExtraPayments = Boolean(body.hasExtraPayments);
-  if (body.estimatedExtraPayment !== undefined) updates.estimatedExtraPayment = String(body.estimatedExtraPayment);
-  if (body.monthlyInvestment !== undefined) updates.monthlyInvestment = String(body.monthlyInvestment);
-  if (body.monthlyHomeExpense !== undefined) updates.monthlyHomeExpense = String(body.monthlyHomeExpense);
-  if (body.monthlyPersonalBudget !== undefined) updates.monthlyPersonalBudget = String(body.monthlyPersonalBudget);
-  if (body.interestRate !== undefined) updates.interestRate = String(body.interestRate);
+    const yearRow = await getOwnedYear(user.id, yearNum, db);
+    if (!yearRow) return Response.json({ error: "Year not found" }, { status: 404 });
 
-  const [updatedRows] = await db.batch([
-    db.update(years).set(updates).where(eq(years.id, yearRow.id)).returning(),
-    applyYearConfigToStoredMonths(yearRow.id, applyFromMonth),
-  ]);
-  const [updated] = updatedRows;
+    if (body.startingBalance !== undefined) {
+      const userYears = await getYearsForUser(user.id, db);
+      const earliestYear = userYears[0];
 
-  await propagateYearCarryOver(user.id, yearNum);
-  return Response.json(toPublicYearRow(updated));
+      if (earliestYear !== yearNum) {
+        return Response.json(
+          { error: "Starting balance can only be edited on the earliest year" },
+          { status: 400 }
+        );
+      }
+    }
+
+    const updates: Partial<typeof years.$inferInsert> = {};
+    if (body.startingBalance !== undefined) updates.startingBalance = String(body.startingBalance);
+    if (body.estimatedSalary !== undefined) updates.estimatedSalary = String(body.estimatedSalary);
+    if (body.hasExtraPayments !== undefined) updates.hasExtraPayments = Boolean(body.hasExtraPayments);
+    if (body.estimatedExtraPayment !== undefined) updates.estimatedExtraPayment = String(body.estimatedExtraPayment);
+    if (body.monthlyInvestment !== undefined) updates.monthlyInvestment = String(body.monthlyInvestment);
+    if (body.monthlyHomeExpense !== undefined) updates.monthlyHomeExpense = String(body.monthlyHomeExpense);
+    if (body.monthlyPersonalBudget !== undefined) updates.monthlyPersonalBudget = String(body.monthlyPersonalBudget);
+    if (body.interestRate !== undefined) updates.interestRate = String(body.interestRate);
+
+    const updatedRows = await db.update(years).set(updates).where(eq(years.id, yearRow.id)).returning();
+    await applyYearConfigToStoredMonths(yearRow.id, applyFromMonth, db);
+    const [updated] = updatedRows;
+
+    await propagateYearCarryOver(user.id, yearNum, db);
+    return Response.json(toPublicYearRow(updated));
+  });
+  return result;
 }
 
 export async function DELETE(
@@ -121,23 +125,26 @@ export async function DELETE(
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { year } = await params;
-  const yearNum = parseInt(year, 10);
+  const result = await withFinancialTransaction(user.id, async (db) => {
+    const { year } = await params;
+    const yearNum = parseInt(year, 10);
 
-  if (yearNum <= new Date().getFullYear()) {
-    return Response.json({ error: "Only future years can be deleted" }, { status: 403 });
-  }
+    if (yearNum <= new Date().getFullYear()) {
+      return Response.json({ error: "Only future years can be deleted" }, { status: 403 });
+    }
 
-  const yearRow = await getOwnedYear(user.id, yearNum);
-  if (!yearRow) return Response.json({ error: "Year not found" }, { status: 404 });
+    const yearRow = await getOwnedYear(user.id, yearNum, db);
+    if (!yearRow) return Response.json({ error: "Year not found" }, { status: 404 });
 
-  await db.delete(years).where(eq(years.id, yearRow.id));
+    await db.delete(years).where(eq(years.id, yearRow.id));
 
-  const remainingYears = (await getYearsForUser(user.id)).sort((a, b) => a - b);
-  const precedingYear = remainingYears.filter((y) => y < yearNum).at(-1);
-  if (precedingYear !== undefined) {
-    await propagateYearCarryOver(user.id, precedingYear);
-  }
+    const remainingYears = (await getYearsForUser(user.id, db)).sort((a, b) => a - b);
+    const precedingYear = remainingYears.filter((y) => y < yearNum).at(-1);
+    if (precedingYear !== undefined) {
+      await propagateYearCarryOver(user.id, precedingYear, db);
+    }
 
-  return Response.json({ ok: true });
+    return Response.json({ ok: true });
+  });
+  return result;
 }

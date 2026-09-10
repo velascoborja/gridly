@@ -138,3 +138,7 @@ Creating an empty group, renaming it, assigning a tag, or changing its completio
 1. `entries POST route reads groupId from the request body` — ensures `groupId` is destructured from the body.
 2. `entries POST route persists groupId to the database insert` — ensures `groupId ?? null` reaches the DB insert.
 3. `group row add-entry handler sends groupId in the POST body` — ensures the `AdditionalEntryGroupRow` component includes `groupId` in its `POST` payload.
+
+## Atomic Persistence
+
+Group edits, child month/tag updates, and any required carry-over share one transaction. A failed move cannot leave the parent and children in different months. Group deletion, cascaded entry deletion, and carry-over likewise commit or roll back together. See [Atomic Financial Writes](financial-transactions.md).

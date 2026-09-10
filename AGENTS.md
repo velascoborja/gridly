@@ -118,6 +118,7 @@ When changing any of the features listed below, update the related documentation
 - [Additional Entries](docs/features/additional-entries.md): Management of granular variable expenses and income transactions.
 - [Expense Groups](docs/features/expense-groups.md): Grouping additional expenses under named headings within a month.
 - [Balance & Interest Logic](docs/features/calculations-engine.md): The mathematical engine behind the month-over-month financial chain.
+- [Atomic Financial Writes](docs/features/financial-transactions.md): Transaction boundaries, per-user serialization, rollback guarantees, and isolated Neon integration tests.
 - [Yearly Carry-over](docs/features/balance-carry-over.md): Automatic synchronization of balances across consecutive years.
 - [Data Export](docs/features/data-export.md): Excel workbook generation for offline analysis and data portability.
 - [Internationalization](docs/features/internationalization.md): Implementation details for multi-language support and routing.

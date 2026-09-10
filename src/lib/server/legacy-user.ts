@@ -1,3 +1,4 @@
+import { withFinancialTransaction } from "@/db/financial-transaction";
 import { eq, isNull } from "drizzle-orm";
 import { db } from "@/db";
 import { users, years } from "@/db/schema";
@@ -32,8 +33,7 @@ export async function ensureLegacyOwner(email = LEGACY_OWNER_EMAIL) {
 export async function claimLegacyYearsForUser(userId: string, email?: string | null) {
   if (email !== LEGACY_OWNER_EMAIL) return;
 
-  await db
-    .update(years)
-    .set({ userId })
-    .where(isNull(years.userId));
+  await withFinancialTransaction(userId, async (tx) => {
+    await tx.update(years).set({ userId }).where(isNull(years.userId));
+  });
 }

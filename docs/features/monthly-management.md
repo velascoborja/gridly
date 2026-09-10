@@ -49,7 +49,7 @@ Monthly recurring expense rows live in `monthly_recurring_expenses`.
 
 - Rows copied from the annual template keep `yearRecurringExpenseId`.
 - Monthly changes affect only the selected month.
-- If the annual template list is later saved from Annual Summary, all monthly recurring expense rows for the year are replaced from the updated template.
+- If the annual template list is later saved from Annual Summary, monthly recurring expense rows from the selected apply-from month through December are replaced from the updated template.
 
 ### Interest Calculation
 - Monthly interest is calculated based on the `Starting Balance` and the `YearConfig.interestRate`.
@@ -59,3 +59,7 @@ Monthly recurring expense rows live in `monthly_recurring_expenses`.
 
 ### Spanish Employment Conventions
 - **Extra Pays:** In Spain, net salary is often paid in 14 payments. Gridly automatically handles this by prefilling `additionalPayslip` in June (Month 6) and December (Month 12) if the year is configured with extra payments.
+
+## Atomic Persistence
+
+Monthly fixed-field saves and financial mutations commit together with downstream year balances. A failed propagation rolls back the originating change. Mixed metadata/financial handlers also serialize their ownership and state checks within the same account transaction. See [Atomic Financial Writes](financial-transactions.md).
