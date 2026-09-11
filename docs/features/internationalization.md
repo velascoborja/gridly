@@ -50,6 +50,22 @@ Always use the custom navigation components and hooks exported from `@/i18n/rout
 - `useRouter`, `usePathname`, `redirect`: Locale-aware versions of Next.js utilities.
 - Use `useRouter().refresh()` from `@/i18n/routing` after client-side mutations that need fresh App Router server payloads.
 
+#### Language Changes and Route Refreshes
+
+`SettingsForm.onLanguageChange` saves the language preference with `PATCH /api/user/settings`, then calls `router.replace(pathname, { locale: nextLocale })`. It does not refresh the old locale's route before navigating. The existing transition keeps the language selector disabled while pending. If preference persistence fails, the error is logged and the locale navigation still proceeds, preserving the existing behavior.
+
+A local state update alone does not prove that a route refresh is redundant: all affected data and route restoration must be covered. In particular, `staleTimes.dynamic = 0` does not disable back/forward caching or force shared layouts to reload. See the [Next.js staleTimes reference](https://nextjs.org/docs/app/api-reference/config/next-config-js/staleTimes).
+
+The following seven refresh calls remain:
+
+| Operation | Calls | Reason retained |
+| --- | --- | --- |
+| Create an expense group | 1 | Local year state includes the group, but restoring the updated data after leaving and returning to the workspace has not been established without refreshing. |
+| Save annual configuration or recurring templates | 2 | Local year updates do not cover route restoration or server-loaded comparisons involving downstream years affected by carry-over. |
+| Change a recurring expense tag | 1 | The server updates the entire series, while the local callback updates only the visible month. |
+| Delete a tag | 1 | Removing the tag from the local catalog does not update its references throughout the year data. |
+| Save or delete a historical year | 2 | Evolution needs updated server data for its rows and metrics. |
+
 #### In-Year Routing & Workspace State
 To provide a fast, app-like experience and preserve locally updated `YearData` across views, Gridly uses a "Workspace" model for in-year navigation:
 

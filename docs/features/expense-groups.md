@@ -55,7 +55,7 @@ Both item `PATCH` routes also accept `{ isCompleted: boolean }`. Completed resou
 
 ### Creating a group
 - Click "Añadir grupo" in the expenses card footer.
-- Enter a name and confirm. The card's state updates immediately via optimistic update. No `router.refresh()` is needed — Next.js 16 sets `staleTimes.dynamic = 0`, so dynamic pages are never cached client-side; fresh data is always fetched from the server on navigation.
+- Enter a name and confirm. After the API succeeds, the card publishes the created group to the mounted year state, then calls `router.refresh()` to refresh the server payload used for route restoration. The local update covers navigation within the mounted workspace, but does not establish freshness after leaving and returning to it. `staleTimes.dynamic = 0` does not disable back/forward caching; see [Language Changes and Route Refreshes](internationalization.md#language-changes-and-route-refreshes).
 
 ### Adding an entry to a group
 - Expand the group row and click "Añadir al grupo".
