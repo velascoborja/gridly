@@ -39,6 +39,8 @@ type MonthMoveTarget = {
 };
 
 interface Props {
+  tags: Tag[];
+  onCreateTag: (name: string, color: string) => Promise<Tag>;
   monthId: number;
   type: "income" | "expense";
   entries: AdditionalEntry[];
@@ -65,6 +67,8 @@ interface Props {
 }
 
 export function AdditionalEntriesCard({
+  tags,
+  onCreateTag: handleCreateTag,
   monthId,
   type,
   entries,
@@ -115,7 +119,6 @@ export function AdditionalEntriesCard({
   const [moveToGroupError, setMoveToGroupError] = useState<string | null>(null);
   const [newRecurring, setNewRecurring] = useState(false);
   const [editRecurring, setEditRecurring] = useState(false);
-  const [tags, setTags] = useState<Tag[]>([]);
   const [newTagId, setNewTagId] = useState<number | null>(null);
   const [editTagId, setEditTagId] = useState<number | null>(null);
   const [completionSavingId, setCompletionSavingId] = useState<number | null>(null);
@@ -160,14 +163,6 @@ export function AdditionalEntriesCard({
     openAddGroupFormRef.current = readOnly ? null : () => setAddingGroupOpen(true);
     return () => { openAddGroupFormRef.current = null; };
   }, [openAddGroupFormRef, readOnly]);
-
-  useEffect(() => {
-    if (readOnly || type !== "expense") return;
-    fetch("/api/tags")
-      .then((res) => (res.ok ? res.json() : []))
-      .then((data: Tag[]) => setTags(data))
-      .catch(() => {});
-  }, [readOnly, type]);
 
   const sortedEntries = [
     ...sortAdditionalEntriesDesc(entries.filter((e) => e.isRecurring)),
@@ -391,18 +386,6 @@ export function AdditionalEntriesCard({
       setMovingToGroupId(null);
       setDropPendingGroupId(null);
     }
-  };
-
-  const handleCreateTag = async (name: string, color: string): Promise<Tag> => {
-    const res = await fetch("/api/tags", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, color }),
-    });
-    if (!res.ok) throw new Error("Failed to create tag");
-    const tag: Tag = await res.json();
-    setTags((prev) => [...prev, tag]);
-    return tag;
   };
 
   const resolveTag = (tagId: number | null): Tag | null =>

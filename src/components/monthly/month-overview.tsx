@@ -14,7 +14,7 @@ import { sortRecurringExpensesAsc } from "@/lib/recurring-expenses";
 import { cn, formatCurrency, formatMonthName } from "@/lib/utils";
 import { computeMonthChain } from "@/lib/calculations";
 import { getHorizontalSwipeDirection } from "@/lib/mobile-swipe";
-import type { MonthData, YearData, AdditionalEntry, AdditionalEntryGroup, RecurringExpense } from "@/lib/types";
+import type { MonthData, YearData, AdditionalEntry, AdditionalEntryGroup, RecurringExpense, Tag } from "@/lib/types";
 
 interface Props {
   yearData: YearData;
@@ -99,6 +99,34 @@ export function MonthOverview({
   const t = useTranslations("Monthly");
   const tOverview = useTranslations("Monthly.overview");
   const locale = useLocale();
+  const [tags, setTags] = useState<Tag[]>([]);
+
+  useEffect(() => {
+    if (readOnly) return;
+    let active = true;
+    fetch("/api/tags")
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data: Tag[]) => {
+        if (!active) return;
+        // A tag may have been created while the initial request was in flight.
+        setTags((current) => [...data, ...current.filter((tag) => !data.some((item) => item.id === tag.id))]);
+      })
+      .catch(() => {});
+    return () => { active = false; };
+  }, [readOnly]);
+
+  const handleCreateTag = async (name: string, color: string): Promise<Tag> => {
+    const res = await fetch("/api/tags", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, color }),
+    });
+    if (!res.ok) throw new Error("Failed to create tag");
+    const tag: Tag = await res.json();
+    setTags((current) => [...current.filter((item) => item.id !== tag.id), tag]);
+    return tag;
+  };
+
   const [months, setMonths] = useState<MonthData[]>(initialYearData.months);
   const [showFixedEditors, setShowFixedEditors] = useState(readOnly);
   const [renderFixedEditors, setRenderFixedEditors] = useState(false);
@@ -820,6 +848,8 @@ export function MonthOverview({
               )}
             >
               <FixedExpensesCard
+                tags={tags}
+                onCreateTag={handleCreateTag}
                 month={month}
                 onUpdate={handleFixedUpdate}
                 onRecurringEntriesChange={handleRecurringExpensesChange}
@@ -841,6 +871,8 @@ export function MonthOverview({
 
       <div className="grid gap-4 lg:grid-cols-2">
         <AdditionalEntriesCard
+          tags={tags}
+          onCreateTag={handleCreateTag}
           monthId={month.id}
           type="expense"
           entries={month.additionalExpenses}
@@ -894,6 +926,8 @@ export function MonthOverview({
         />
 
         <AdditionalEntriesCard
+          tags={tags}
+          onCreateTag={handleCreateTag}
           monthId={month.id}
           type="income"
           entries={month.additionalIncomes}

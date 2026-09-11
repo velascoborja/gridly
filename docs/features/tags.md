@@ -101,6 +101,12 @@ Tag-only mutations do not trigger yearly balance carry-over because tags are met
 
 Exports `TAG_COLORS`, `TAG_COLOR_KEYS`, and the `TagColor` interface. The single source of truth for palette data.
 
+### Shared monthly tag catalog
+
+`MonthOverview` owns the tag catalog and loads `GET /api/tags` once per editable mount. It passes the same `tags` array and `onCreateTag` callback to `AdditionalEntriesCard` and, through `FixedExpensesCard`, to `RecurringExpensesList`. The child components do not fetch or keep independent tag catalogs. Opening and closing fixed editors or switching months within the mounted overview reuses this state. Read-only/demo views do not fetch the catalog.
+
+Inline creation adds the returned tag to the shared list immediately, so both selectors see it without reloading. The existing picker owns pending, disabled, and localized creation-error feedback. A late initial GET merges with locally created tags by ID rather than discarding them; responses arriving after effect cleanup are ignored. Initial load failures remain non-blocking. This state is scoped to the mounted monthly overview, not a global cache shared with Settings or other tabs.
+
 ### `src/components/monthly/tag-picker.tsx`
 
 `TagPickerContent` owns the two reusable selection views, while `TagPicker` supplies the standalone Base UI popover trigger used outside `EntryFormRow`:
@@ -127,10 +133,10 @@ Accepts typed `EntryFormAction[]` metadata rather than opaque action slots. Tag 
 
 ### `src/components/monthly/additional-entries-card.tsx`
 
-- Fetches tags on mount via `GET /api/tags` (skipped in read-only mode and for income entries).
+- Receives the shared monthly tag catalog and creation callback from `MonthOverview`; income entries do not expose tag controls.
 - Adds a tag `selector` to `EntryFormRow.actions` for both the add form and each open edit form (ungrouped expenses only).
 - `handleCreateTag`: calls `POST /api/tags`, appends the new tag to local `tags` state, and returns the `Tag` to the shared picker content.
-- Includes `tagId` in create and edit payloads; resolves `tag` from local state on the returned entry to avoid a refetch.
+- Includes `tagId` in create and edit payloads; resolves `tag` from the shared catalog on the returned entry to avoid a refetch.
 - Renders a tag chip inline in the entry list row, alongside the "anual" recurring badge.
 - **Responsive Optimization**: To prevent aggressive text truncation on narrow mobile screens, if an entry has *both* a tag and is recurring, the "anual" text badge gracefully collapses into a simple primary-colored dot on `< sm` viewports.
 
@@ -183,7 +189,7 @@ All Settings tag-management keys live under `Settings.tags` in `messages/es.json
 
 - `POST /api/tags` returns 400 if `name` is empty or `color` is not a valid palette key.
 - Entry, group, and recurring-expense assignment endpoints return 404 when a non-null `tagId` is malformed or is not owned by the authenticated user.
-- If the tags fetch fails on mount, the tag action button is hidden for that session (no hard error shown).
+- If the shared tags fetch fails on mount, existing catalog options remain unavailable (no hard error shown); locally created tags remain available.
 - Tag assignment is always optional — saving an entry without a tag is valid.
 - Settings tag management shows explicit localized errors for failed loading, saving, and deletion. Save is disabled for unchanged rows and blank names; API validation remains authoritative.
 

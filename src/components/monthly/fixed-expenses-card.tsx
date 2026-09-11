@@ -7,7 +7,7 @@ import { InlineEditField } from "./inline-edit-field";
 import { RecurringExpensesList } from "./recurring-expenses-list";
 import { sumRecurringExpenses } from "@/lib/recurring-expenses";
 import { formatCurrency } from "@/lib/utils";
-import type { MonthData, RecurringExpense, YearConfig } from "@/lib/types";
+import type { MonthData, RecurringExpense, Tag, YearConfig } from "@/lib/types";
 
 type FixedUpdateOptions = Partial<Pick<
   MonthData,
@@ -15,6 +15,8 @@ type FixedUpdateOptions = Partial<Pick<
 >>;
 
 interface Props {
+  tags: Tag[];
+  onCreateTag: (name: string, color: string) => Promise<Tag>;
   month: MonthData;
   onUpdate: (field: string, value: number, options?: FixedUpdateOptions) => Promise<void>;
   onRecurringEntriesChange: (entries: RecurringExpense[]) => void;
@@ -23,7 +25,7 @@ interface Props {
   highlightId?: string | null;
 }
 
-export function FixedExpensesCard({ month, onUpdate, onRecurringEntriesChange, annualDefaults, readOnly = false, highlightId = null }: Props) {
+export function FixedExpensesCard({ tags, onCreateTag, month, onUpdate, onRecurringEntriesChange, annualDefaults, readOnly = false, highlightId = null }: Props) {
   const t = useTranslations("Monthly.fixedExpenses");
   const tFixed = useTranslations("Monthly.fixed");
   const locale = useLocale();
@@ -83,6 +85,8 @@ export function FixedExpensesCard({ month, onUpdate, onRecurringEntriesChange, a
             </span>
           </div>
           <RecurringExpensesList
+            tags={tags}
+            onCreateTag={onCreateTag}
             monthId={month.id}
             entries={month.recurringExpenses}
             onEntriesChange={onRecurringEntriesChange}

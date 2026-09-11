@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,8 @@ import type { RecurringExpense, Tag } from "@/lib/types";
 type EntryEditFocusTarget = "label" | "amount";
 
 interface Props {
+  tags: Tag[];
+  onCreateTag: (name: string, color: string) => Promise<Tag>;
   monthId: number;
   entries: RecurringExpense[];
   onEntriesChange: (entries: RecurringExpense[]) => void;
@@ -33,7 +35,7 @@ interface Props {
   highlightId?: string | null;
 }
 
-export function RecurringExpensesList({ monthId, entries, onEntriesChange, readOnly = false, highlightId = null }: Props) {
+export function RecurringExpensesList({ tags, onCreateTag: handleCreateTag, monthId, entries, onEntriesChange, readOnly = false, highlightId = null }: Props) {
   const t = useTranslations("RecurringExpenses.monthly");
   const common = useTranslations("Common");
   const locale = useLocale();
@@ -44,7 +46,6 @@ export function RecurringExpensesList({ monthId, entries, onEntriesChange, readO
   const [editFocusTarget, setEditFocusTarget] = useState<EntryEditFocusTarget>("label");
   const [editLabel, setEditLabel] = useState("");
   const [editAmount, setEditAmount] = useState("");
-  const [tags, setTags] = useState<Tag[]>([]);
   const [pendingTag, setPendingTag] = useState<{ entry: RecurringExpense; tagId: number | null; tag: Tag | null } | null>(null);
   const [savingTagId, setSavingTagId] = useState<number | null>(null);
   const sortedEntries = sortRecurringExpensesAsc(entries);
@@ -52,14 +53,6 @@ export function RecurringExpensesList({ monthId, entries, onEntriesChange, readO
   const editAmountError = Number.isFinite(parsedEditAmount) && parsedEditAmount >= 0
     ? null
     : t("amountInvalid");
-
-  useEffect(() => {
-    if (readOnly) return;
-    fetch("/api/tags")
-      .then((res) => (res.ok ? res.json() : []))
-      .then((data: Tag[]) => setTags(data))
-      .catch(() => {});
-  }, [readOnly]);
 
   const openEditForm = (entry: RecurringExpense, focusTarget: EntryEditFocusTarget = "label") => {
     setEditingId(entry.id);
@@ -99,18 +92,6 @@ export function RecurringExpensesList({ monthId, entries, onEntriesChange, readO
     } finally {
       setDeletingId(null);
     }
-  };
-
-  const handleCreateTag = async (name: string, color: string): Promise<Tag> => {
-    const res = await fetch("/api/tags", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, color }),
-    });
-    if (!res.ok) throw new Error("Failed to create tag");
-    const tag: Tag = await res.json();
-    setTags((prev) => [...prev, tag]);
-    return tag;
   };
 
   const requestTagChange = (entry: RecurringExpense, tagId: number | null, tag: Tag | null) => {

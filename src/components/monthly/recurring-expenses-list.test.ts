@@ -4,8 +4,10 @@ import { readFileSync } from "node:fs";
 
 const source = readFileSync(new URL("./recurring-expenses-list.tsx", import.meta.url), "utf8");
 
-test("list fetches tags from /api/tags when not read-only", () => {
-  assert.match(source, /fetch\("\/api\/tags"\)/);
+test("list consumes shared tags and creation without fetching its own catalog", () => {
+  assert.doesNotMatch(source, /fetch\("\/api\/tags"/);
+  assert.match(source, /tags: Tag\[\]/);
+  assert.match(source, /onCreateTag: handleCreateTag/);
 });
 
 test("list renders a TagPicker", () => {
