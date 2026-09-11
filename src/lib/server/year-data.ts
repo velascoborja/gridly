@@ -73,9 +73,15 @@ async function loadYearData(userId: string, year: number, db: DatabaseExecutor =
     tagId != null ? (tagsById.get(tagId) ?? null) : null;
 
   const entriesByMonthId = new Map<number, typeof allEntries>();
+  const entriesByGroupId = new Map<number, typeof allEntries>();
   for (const entry of allEntries) {
     if (!entriesByMonthId.has(entry.monthId)) entriesByMonthId.set(entry.monthId, []);
     entriesByMonthId.get(entry.monthId)!.push(entry);
+
+    if (entry.type === "expense" && entry.groupId !== null) {
+      if (!entriesByGroupId.has(entry.groupId)) entriesByGroupId.set(entry.groupId, []);
+      entriesByGroupId.get(entry.groupId)!.push(entry);
+    }
   }
 
   const groupsByMonthId = new Map<number, typeof allGroups>();
@@ -105,8 +111,7 @@ async function loadYearData(userId: string, year: number, db: DatabaseExecutor =
       tagId: group.tagId ?? null,
       tag: resolveTag(group.tagId),
       entries: sortAdditionalEntriesDesc(
-        expenseEntries
-          .filter((e) => e.groupId === group.id)
+        (entriesByGroupId.get(group.id) ?? [])
           .map((e) => ({
             id: e.id,
             monthId: e.monthId,

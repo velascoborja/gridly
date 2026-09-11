@@ -24,6 +24,7 @@ Two tables are involved:
 - `MonthData.additionalExpenses` — ungrouped expenses only.
 - `MonthData.additionalExpenseGroups` — array of groups, each with a nested `entries` array.
 - Both sets are summed together when computing `totalExpenses` in `src/lib/calculations.ts`.
+- Server hydration in `src/lib/server/year-data.ts` indexes expense entries by `groupId` once before assembling months, so each group reads its entries directly instead of rescanning every monthly expense.
 
 ## API
 

@@ -40,3 +40,13 @@ test("year-data hydrates completion for entries and groups", () => {
   assert.match(source, /isCompleted: group\.isCompleted/);
   assert.match(source, /isCompleted: e\.isCompleted/);
 });
+
+test("year-data indexes expense entries by group instead of filtering per group", () => {
+  const groupIndex = source.indexOf("const entriesByGroupId = new Map");
+  const monthAssembly = source.indexOf("const rawMonths = monthRows.map");
+
+  assert.ok(groupIndex >= 0, "grouped entries should be indexed");
+  assert.ok(groupIndex < monthAssembly, "the group index should be built once before assembling months");
+  assert.match(source, /entriesByGroupId\.get\(group\.id\) \?\? \[\]/);
+  assert.doesNotMatch(source, /expenseEntries\s*\.filter\(\(e\) => e\.groupId === group\.id\)/);
+});
