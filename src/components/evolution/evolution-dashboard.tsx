@@ -61,7 +61,23 @@ function DrilldownLoading({ label }: { label: string }) {
   return (
     <div className="space-y-2" role="status" aria-busy="true" aria-label={label}>
       {[0, 1, 2].map((item) => (
-        <div key={item} className="h-20 animate-pulse rounded-xl border border-border bg-muted/50" />
+        <div
+          key={item}
+          aria-hidden="true"
+          className="relative overflow-hidden rounded-xl border border-border bg-card px-4 py-3"
+        >
+          <div className="mb-2.5 flex items-center gap-3">
+            <div className="size-2.5 shrink-0 rounded-full bg-primary/20" />
+            <div className="h-4 w-1/3 rounded bg-muted-foreground/20" />
+            <div className="ml-auto h-4 w-20 rounded bg-muted-foreground/20" />
+          </div>
+          <div className="mb-1.5 h-1.5 w-full rounded-full bg-primary/15" />
+          <div className="flex justify-between">
+            <div className="h-3 w-24 rounded bg-muted-foreground/15" />
+            <div className="h-3 w-16 rounded bg-muted-foreground/15" />
+          </div>
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-1/2 animate-shimmer-slide bg-gradient-to-r from-transparent via-primary/10 to-transparent motion-reduce:hidden" />
+        </div>
       ))}
     </div>
   );
