@@ -850,6 +850,7 @@ export function MonthOverview({
               <FixedExpensesCard
                 tags={tags}
                 onCreateTag={handleCreateTag}
+                key={`fixed-expenses-${month.id}`}
                 month={month}
                 onUpdate={handleFixedUpdate}
                 onRecurringEntriesChange={handleRecurringExpensesChange}
@@ -858,6 +859,7 @@ export function MonthOverview({
                 highlightId={highlightId}
               />
               <IncomeCard
+                key={`fixed-income-${month.id}`}
                 month={month}
                 onUpdate={handleFixedUpdate}
                 showAdditionalPayslip={config.hasExtraPayments && (month.month === 6 || month.month === 12)}
@@ -873,6 +875,7 @@ export function MonthOverview({
         <AdditionalEntriesCard
           tags={tags}
           onCreateTag={handleCreateTag}
+          key={`additional-expenses-${month.id}`}
           monthId={month.id}
           type="expense"
           entries={month.additionalExpenses}
@@ -928,6 +931,7 @@ export function MonthOverview({
         <AdditionalEntriesCard
           tags={tags}
           onCreateTag={handleCreateTag}
+          key={`additional-income-${month.id}`}
           monthId={month.id}
           type="income"
           entries={month.additionalIncomes}
