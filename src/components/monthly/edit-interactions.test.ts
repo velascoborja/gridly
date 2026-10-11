@@ -234,7 +234,7 @@ test("additional entry add and edit handlers block invalid expressions before fe
   assertInOrder(editHandlerSource, editInvalidGuard, editFetch);
 });
 
-test("EntryFormRow supports numeric and expression amount modes", () => {
+test("EntryFormRow supports numeric and expression amounts with a decimal mobile keyboard", () => {
   const source = readFileSync(new URL("./entry-form-row.tsx", import.meta.url), "utf8");
 
   assert.match(source, /amountMode\?: "numeric" \| "expression"/);
@@ -242,7 +242,7 @@ test("EntryFormRow supports numeric and expression amount modes", () => {
   assert.match(source, /amountError\?: string \| null/);
   assert.match(source, /sanitizeMoneyExpressionInput/);
   assert.match(source, /amountMode === "expression"[\s\S]*\? sanitizeMoneyExpressionInput\(e\.target\.value\)[\s\S]*: sanitizeNumericInput\(e\.target\.value\)/);
-  assert.match(source, /inputMode=\{amountMode === "expression" \? "text" : "decimal"\}/);
+  assert.match(source, /inputMode="decimal"/);
 });
 
 test("EntryFormRow reveals expression feedback only while a calculation or message is present", () => {
