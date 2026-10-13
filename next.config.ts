@@ -32,6 +32,9 @@ export const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  experimental: {
+    globalNotFound: true,
+  },
   async headers() {
     return [{ source: '/(.*)', headers: securityHeaders }];
   },

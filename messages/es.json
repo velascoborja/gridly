@@ -1,4 +1,10 @@
 {
+  "NotFound": {
+    "title": "Página no encontrada",
+    "description": "La página que buscas no existe o ha cambiado de dirección. Vuelve al inicio para continuar con Gridly.",
+    "backHome": "Volver al inicio",
+    "returningHome": "Volviendo al inicio…"
+  },
   "Common": {
     "settings": "Ajustes",
     "logout": "Cerrar sesión",

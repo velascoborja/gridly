@@ -1,4 +1,10 @@
 {
+  "NotFound": {
+    "title": "Page not found",
+    "description": "The page you’re looking for doesn’t exist or has moved. Return home to continue with Gridly.",
+    "backHome": "Back to home",
+    "returningHome": "Returning home…"
+  },
   "Common": {
     "settings": "Settings",
     "logout": "Log out",

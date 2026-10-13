@@ -85,6 +85,10 @@ const prefix = getYearRoutePrefix(localizedPathname, year);
 window.history.pushState(null, "", buildYearMonthHref(prefix, year, 4));
 ```
 
+### Not-found Pages and Public Metadata
+
+`[locale]/not-found.tsx` handles localized resource errors, and `[locale]/[...rest]/page.tsx` calls `notFound()` for unknown paths. Both languages use the `NotFound` message namespace and a home link that preserves the active locale. The global not-found document provides a Spanish fallback with its own translation provider for requests outside localized routing. Root `/robots.txt` and `/sitemap.xml` bypass locale redirection and advertise only public home and legal pages. See [Public Routing & Search Crawling](public-routing-seo.md) for configuration and verification details.
+
 ### Adding New Strings
 1.  Identify the appropriate namespace in `messages/es.json`.
 2.  Add the key and the Spanish translation (Primary language).

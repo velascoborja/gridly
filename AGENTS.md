@@ -122,6 +122,7 @@ When changing any of the features listed below, update the related documentation
 - [Yearly Carry-over](docs/features/balance-carry-over.md): Automatic synchronization of balances across consecutive years.
 - [Data Export](docs/features/data-export.md): Excel workbook generation for offline analysis and data portability.
 - [Internationalization](docs/features/internationalization.md): Implementation details for multi-language support and routing.
+- [Public Routing & Search Crawling](docs/features/public-routing-seo.md): Localized 404 pages, robots rules, and the public multilingual sitemap.
 - [App Icons & Web App Metadata](docs/features/app-icons.md): Browser, manifest, and iOS Safari icon asset conventions.
 - [Evolution Dashboard](docs/features/evolution-dashboard.md): Multi-year balance, savings, and investment analytics.
 - [Historical Year Imports](docs/features/historical-year-imports.md): Summary-only pre-Gridly annual imports used by Evolution.
