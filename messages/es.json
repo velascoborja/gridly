@@ -263,7 +263,17 @@
       "emptyExpenseMonth": "Sin gastos adicionales este mes.",
       "emptyIncomeMonth": "Sin ingresos adicionales este mes.",
       "loss": "Pérdida",
-      "group": "Grupo"
+      "group": "Grupo",
+      "sortLabel": "Ordenar por",
+      "chronological": "Cronológico",
+      "descending": "Importe: mayor a menor",
+      "ascending": "Importe: menor a mayor",
+      "yearLabel": "Año",
+      "yearWithoutMovements": "{year} — sin movimientos",
+      "loadingYears": "Cargando años…",
+      "yearsError": "No se han podido cargar los años.",
+      "retryYears": "Reintentar",
+      "loadingYear": "Cargando año…"
     }
   },
   "Setup": {

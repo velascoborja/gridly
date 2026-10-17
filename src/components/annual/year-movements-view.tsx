@@ -5,24 +5,30 @@ import { ArrowLeft, ArrowDownRight, ArrowUpRight, ChevronDown, ChevronsDownUp, C
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MovementsYearSelector } from "@/components/annual/movements-year-selector";
 import { formatCurrency, formatMonthName, cn } from "@/lib/utils";
-import { summarizeYearMovements, type MovementType } from "@/lib/year-movements";
+import { getMovementColorIntensity, sortMovementMonths, summarizeYearMovements, type MovementSort, type MovementType } from "@/lib/year-movements";
 import { buildYearSummaryHref } from "@/lib/year-routes";
 import type { AdditionalEntry, YearData } from "@/lib/types";
 
 interface Props {
   yearData: YearData;
+  years?: number[];
   onSummarySelect?: () => void;
   pathPrefix?: string;
 }
 
-export function YearMovementsView({ yearData, onSummarySelect, pathPrefix }: Props) {
+export function YearMovementsView({ yearData, years, onSummarySelect, pathPrefix }: Props) {
   const t = useTranslations("Annual.movements");
   const locale = useLocale();
   const regionId = useId();
+  const sortLabelId = useId();
   const [type, setType] = useState<MovementType>("expense");
+  const [order, setOrder] = useState<MovementSort>("chronological");
   const [collapsedMonths, setCollapsedMonths] = useState<Set<number>>(() => new Set());
   const summary = summarizeYearMovements(yearData.months, type);
+  const rows = sortMovementMonths(summary.rows, order);
   const peakNames = summary.rows.filter((row) => row.isPeak)
     .map((row) => formatMonthName(row.month.month, locale));
   const now = new Date();
@@ -100,17 +106,35 @@ export function YearMovementsView({ yearData, onSummarySelect, pathPrefix }: Pro
         </div>
       </section>
 
-      <div className="flex flex-wrap justify-end gap-2">
-        <Button variant="outline" className="min-h-9 rounded-md" disabled={collapsedMonths.size === 0} onClick={() => setCollapsedMonths(new Set())}>
-          <ChevronsUpDown className="size-4" aria-hidden="true" />{t("expandAll")}
-        </Button>
-        <Button variant="outline" className="min-h-9 rounded-md" disabled={collapsedMonths.size === summary.rows.length} onClick={() => setCollapsedMonths(new Set(summary.rows.map((row) => row.month.month)))}>
-          <ChevronsDownUp className="size-4" aria-hidden="true" />{t("collapseAll")}
-        </Button>
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+          {years && years.length > 1 && <MovementsYearSelector year={year} pathPrefix={pathPrefix} />}
+          <div className="flex flex-wrap items-center gap-2">
+            <span id={sortLabelId} className="text-sm text-muted-foreground">{t("sortLabel")}</span>
+            <Select value={order} onValueChange={(value) => {
+              if (value === "chronological" || value === "descending" || value === "ascending") setOrder(value);
+            }}>
+              <SelectTrigger aria-labelledby={sortLabelId} className="min-h-9 rounded-md bg-card"><SelectValue>{t(order)}</SelectValue></SelectTrigger>
+              <SelectContent>
+                {(["chronological", "descending", "ascending"] as const).map((option) => <SelectItem key={option} value={option}>{t(option)}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" className="min-h-9 rounded-md" disabled={collapsedMonths.size === 0} onClick={() => setCollapsedMonths(new Set())}>
+            <ChevronsUpDown className="size-4" aria-hidden="true" />{t("expandAll")}
+          </Button>
+          <Button variant="outline" className="min-h-9 rounded-md" disabled={collapsedMonths.size === summary.rows.length} onClick={() => setCollapsedMonths(new Set(summary.rows.map((row) => row.month.month)))}>
+            <ChevronsDownUp className="size-4" aria-hidden="true" />{t("collapseAll")}
+          </Button>
+        </div>
       </div>
 
       <div className="space-y-5">
-        {summary.rows.map(({ month, entries, groups, total, entryCount, isPeak, barPercent }) => {
+        {rows.map((row) => {
+          const { month, entries, groups, total, entryCount, isPeak, barPercent } = row;
+          const intensity = getMovementColorIntensity(row, summary.rows);
           const name = formatMonthName(month.month, locale);
           const expanded = !collapsedMonths.has(month.month);
           const monthId = `${regionId}-month-${month.month}`;
@@ -134,7 +158,10 @@ export function YearMovementsView({ yearData, onSummarySelect, pathPrefix }: Pro
                         {isPeak && <span className="rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[11px] font-normal text-primary">{t("peakBadge")}</span>}
                       </span>
                       <span className="flex shrink-0 items-center gap-3">
-                        <span className="finance-number text-xl font-light tracking-[-0.03em] sm:text-2xl">{formatCurrency(total, locale)}</span>
+                        <span
+                          className="finance-number text-xl font-light tracking-[-0.03em] [--movement-neutral:#000] [--movement-red:var(--color-rose-600)] dark:[--movement-neutral:var(--foreground)] dark:[--movement-red:var(--color-rose-400)] sm:text-2xl"
+                          style={{ color: `color-mix(in srgb, var(--movement-neutral) ${100 - intensity * 100}%, var(--movement-red))` }}
+                        >{formatCurrency(total, locale)}</span>
                         <ChevronDown aria-hidden="true" className={cn("size-4 text-muted-foreground transition-transform motion-reduce:transition-none", !expanded && "-rotate-90")} />
                       </span>
                     </span>

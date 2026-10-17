@@ -307,6 +307,7 @@ export function YearPageClient({
         <YearMovementsView
           key={currentYearData.config.year}
           yearData={currentYearData}
+          years={years}
           onSummarySelect={handleSummarySelect}
         />
       ) : selectedView === "summary" ? (

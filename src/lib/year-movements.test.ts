@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { summarizeYearMovements } from "./year-movements.ts";
+import { getMovementColorIntensity, sortMovementMonths, summarizeYearMovements } from "./year-movements.ts";
 import { getDemoYearData } from "./demo/demo-year.ts";
 import type { AdditionalEntry, MonthData } from "./types.ts";
 
@@ -95,4 +95,53 @@ test("fresh shared monthly data immediately changes the annual total and peak", 
   const result = summarizeYearMovements(updated, "expense");
   assert.equal(result.total, 150);
   assert.equal(result.rows[1].isPeak, true);
+});
+
+test("month sorting uses signed totals, chronological ties and never changes shared rows", () => {
+  const data = months();
+  data[0].additionalExpenses = [entry(1, 50)];
+  data[1].additionalExpenses = [entry(2, -10)];
+  data[2].additionalExpenses = [entry(3, 50)];
+  const rows = summarizeYearMovements(data, "expense").rows;
+  const before = JSON.stringify(rows);
+  assert.deepEqual(sortMovementMonths(rows, "descending").map((row) => row.month.month), [1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 2]);
+  assert.deepEqual(sortMovementMonths(rows, "ascending").map((row) => row.month.month), [2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 3]);
+  assert.deepEqual(sortMovementMonths([...rows].reverse(), "chronological").map((row) => row.month.month), data.map((month) => month.month));
+  assert.equal(JSON.stringify(rows), before);
+});
+
+test("color uses populated signed totals with proportional intermediate values", () => {
+  const data = months();
+  data[0].additionalExpenses = [entry(1, -20)];
+  data[1].additionalExpenseGroups = [{ id: 1, monthId: 2, label: "Group", isCompleted: false, tagId: null, tag: null, entries: [entry(2, 10)] }];
+  data[2].additionalExpenses = [entry(3, 40)];
+  const { rows } = summarizeYearMovements(data, "expense");
+  assert.deepEqual(rows.slice(0, 4).map((row) => getMovementColorIntensity(row, rows)), [0, 0.5, 1, 0]);
+  const sorted = sortMovementMonths(rows, "descending");
+  assert.equal(getMovementColorIntensity(sorted[0], sorted), 1);
+});
+
+test("color ignores empty months and recalculates independently for income", () => {
+  const data = months();
+  data[0].additionalExpenses = [entry(1, 10)];
+  data[1].additionalExpenses = [entry(2, 20)];
+  data[0].additionalIncomes = [entry(3, 100, "income")];
+  data[1].additionalIncomes = [entry(4, 50, "income")];
+  for (const [type, expected] of [["expense", [0, 1]], ["income", [1, 0]]] as const) {
+    const { rows } = summarizeYearMovements(data, type);
+    assert.deepEqual(rows.slice(0, 2).map((row) => getMovementColorIntensity(row, rows)), expected);
+  }
+});
+
+test("empty, single-month and equal-total color scales stay neutral and finite", () => {
+  const data = months();
+  for (const count of [0, 1, 2]) {
+    if (count > 0) data[count - 1].additionalExpenses = [entry(count, 0.3)];
+    const { rows } = summarizeYearMovements(data, "expense");
+    assert.ok(rows.every((row) => getMovementColorIntensity(row, rows) === 0));
+  }
+  data[0].additionalExpenses = [entry(3, 0.1), entry(4, 0.2)];
+  const { rows } = summarizeYearMovements(data, "expense");
+  assert.ok(rows.every((row) => getMovementColorIntensity(row, rows) === 0));
+  assert.equal(getMovementColorIntensity(rows[0], []), 0);
 });

@@ -2,6 +2,24 @@ import type { AdditionalEntry, MonthData } from "./types.ts";
 import { sortAdditionalEntriesDesc, sumAdditionalEntries } from "./additional-entries.ts";
 
 export type MovementType = AdditionalEntry["type"];
+export type MovementSort = "chronological" | "descending" | "ascending";
+
+type MonthlyTotal = { month: { month: number }; total: number; entryCount: number };
+
+export function sortMovementMonths<T extends MonthlyTotal>(rows: T[], order: MovementSort): T[] {
+  return [...rows].sort((a, b) => {
+    const difference = order === "chronological" ? 0 : order === "ascending" ? a.total - b.total : b.total - a.total;
+    return difference || a.month.month - b.month.month;
+  });
+}
+
+export function getMovementColorIntensity(row: MonthlyTotal, rows: MonthlyTotal[]): number {
+  const totals = rows.filter((item) => item.entryCount > 0).map((item) => item.total);
+  if (row.entryCount === 0 || totals.length === 0) return 0;
+  const minimum = Math.min(...totals);
+  const range = Math.max(...totals) - minimum;
+  return range < 1e-8 ? 0 : Math.max(0, Math.min(1, (row.total - minimum) / range));
+}
 
 /** Additional entries only; savings and balances keep the financial engine's values. */
 export function summarizeYearMovements(months: MonthData[], type: MovementType) {

@@ -1,7 +1,7 @@
 import { withFinancialTransaction } from "@/db/financial-transaction";
 import { db } from "@/db";
-import { yearRecurringExpenses, years } from "@/db/schema";
-import { and, asc, eq } from "drizzle-orm";
+import { additionalEntries, months, yearRecurringExpenses, years } from "@/db/schema";
+import { and, asc, eq, exists, inArray } from "drizzle-orm";
 import { propagateYearCarryOver } from "@/lib/server/year-carry-over";
 import { deriveStartingBalance, shouldAllowYearCreation } from "@/lib/server/year-planning";
 import { getSessionUser } from "@/lib/server/session";
@@ -18,16 +18,23 @@ function toPublicYearRow(row: typeof years.$inferSelect) {
   );
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   const user = await getSessionUser();
   if (!user?.id) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const withMovements = new URL(request.url).searchParams.get("withMovements") === "true";
+  const movementFilter = withMovements ? exists(
+    db.select({ id: additionalEntries.id })
+      .from(additionalEntries)
+      .innerJoin(months, eq(additionalEntries.monthId, months.id))
+      .where(and(eq(months.yearId, years.id), inArray(additionalEntries.type, ["expense", "income"])))
+  ) : undefined;
   const rows = await db
     .select({ year: years.year, id: years.id })
     .from(years)
-    .where(eq(years.userId, user.id))
+    .where(and(eq(years.userId, user.id), movementFilter))
     .orderBy(asc(years.year));
   return Response.json(rows);
 }

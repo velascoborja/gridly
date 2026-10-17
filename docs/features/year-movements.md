@@ -2,7 +2,7 @@
 
 ## Overview
 
-The read-only **Yearly movements** screen is opened from the Annual summary's **Yearly movements** button at `/{locale}/{year}/movements`. The Year tab stays active. Users can switch between additional expenses (default) and additional income and compare the twelve months in chronological order.
+The read-only **Yearly movements** screen is opened from the Annual summary's **Yearly movements** button at `/{locale}/{year}/movements`. The Year tab stays active. Users can switch between additional expenses (default) and additional income and compare the twelve months in chronological order (default), highest-total-first or lowest-total-first order.
 
 The public demo exposes the same screen at `/{locale}/demo/{year}/movements`, using the canonical demo year and fictional data. Its return link stays within the demo.
 
@@ -22,6 +22,14 @@ Opening the screen and returning to the summary use real localized links with op
 
 All months start expanded. Each monthly header toggles its breakdown with `aria-expanded` and `aria-controls`; Expand all and Collapse all operate synchronously. Expansion is independent of movement type and persists while switching the selector. Leaving and re-entering the screen or changing the year resets expansion and selects expenses.
 
+The toolbar exposes an accessible Sort by selector. Sorting rearranges complete month sections by the signed total of the active movement type, preserving chronological order for ties and counting empty months as zero. It works on copied rows without mutating shared data. Changing movement type preserves the selected order and collapsed months. Entering the screen or changing year restores chronological order.
+
+Monthly header amounts use a proportional black-to-rose-red scale for both expenses and income. Only months with entries establish the minimum and maximum; empty months stay neutral. Equal totals (within the existing decimal tolerance), a single populated month, and empty years remain neutral. In dark mode the neutral endpoint uses the foreground token and the red endpoint uses rose-400; light mode uses black and rose-600. Annual KPIs and comparison bars retain their existing visual roles.
+
+When the account has multiple created Gridly years, `MovementsYearSelector` fetches `GET /api/years?withMovements=true` on mount with cancellation and no browser caching. This optional filter preserves the collection response shape (`{ year, id }[]`) and its default unfiltered behavior. An authenticated, user-scoped `EXISTS` query joins months and additional entries; grouped, completed, future, zero-value and negative entries all count, independently of the selected movement type. Fixed financial fields, empty groups and historical summary-only imports do not qualify.
+
+The in-screen year selector appears only when at least two eligible years exist, ordered newest first. A currently open empty year is represented by a disabled localized option. Loading and retryable errors appear alongside the controls without blocking the movements; year navigation disables the selector and announces its pending state before using the localized router and shared movements route builder. The existing route loading boundary handles destination loading. The shell's general year menus remain available. The public demo does not request account years and offers sorting and color comparison for its single fictional year.
+
 Monthly headers stick within their own month section. `BaseAppShell` measures its header using `ResizeObserver` and exposes `--app-sticky-header-height` on its root. This is the header height when it is sticky and zero otherwise, including mobile. The demo falls back to zero. Month sections do not clip overflow, so sticky positioning works with normal document scrolling.
 
 Peak selection considers months containing entries and marks all tied maxima, allowing floating-point tolerance for decimal amounts. Empty years have no peak; zero-value recorded entries remain distinct from empty months. Comparison bars use absolute magnitude for width, remain within 0–100%, and retain signed displayed totals. Each expense group appears as one row with its name, a localized Group badge and its full subtotal; its children are not rendered. Empty groups are omitted. Entries are sorted by amount descending without changing shared arrays.
@@ -30,7 +38,7 @@ All copy lives under `Annual.movements`, `Annual.movementsButton` and `Demo.move
 
 ## Verification
 
-`src/lib/year-movements.test.ts` covers grouped totals, type separation, future/completed entries, chronological output, financial context preservation, ties, negative and zero values, empty years and updated shared data. Route tests cover locale/demo prefixes and setup return destinations. `tests/year-movements-source.test.mjs` checks shared-state navigation, loading boundaries, accessible interaction contracts, year selectors, translated copy and documentation registration.
+`src/lib/year-movements.test.ts` covers grouped totals, type separation, future/completed entries, sorting and chronological ties, financial context preservation, negative and zero values, populated-only color scales, equal totals, empty years and updated shared data. Route tests cover locale/demo prefixes and setup return destinations. `tests/year-movements-source.test.mjs` checks shared-state navigation, loading boundaries, accessible interaction contracts, year eligibility and loading/retry feedback, translated copy and documentation registration.
 
 
 ## Responsive Summary Action

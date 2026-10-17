@@ -61,4 +61,49 @@ test("all new labels are translated and feature documentation is linked", () => 
   assert.ok(spanish.Annual.movementsButton && english.Annual.movementsButton);
   assert.ok(spanish.Demo.movements.title && english.Demo.movements.title);
   assert.match(read("AGENTS.md"), /docs\/features\/year-movements.md/);
+  for (const key of ["sortLabel", "chronological", "ascending", "descending", "yearLabel", "yearWithoutMovements", "loadingYears", "yearsError", "retryYears", "loadingYear"]) {
+    assert.ok(spanish.Annual.movements[key] && english.Annual.movements[key]);
+  }
+});
+
+test("sorting and colors stay local while account years are omitted from the demo", () => {
+  const source = read("src/components/annual/year-movements-view.tsx");
+  assert.match(source, /useState<MovementSort>\("chronological"\)/);
+  assert.match(source, /sortMovementMonths\(summary.rows, order\)/);
+  assert.match(source, /<SelectValue>\{t\(order\)\}<\/SelectValue>/);
+  assert.match(source, /getMovementColorIntensity\(row, summary.rows\)/);
+  assert.match(source, /color-mix\(in srgb/);
+  assert.match(source, /dark:\[--movement-neutral:var\(--foreground\)\]/);
+  assert.match(source, /years && years.length > 1 && <MovementsYearSelector/);
+  assert.match(read("src/components/year/year-page-client.tsx"), /yearData=\{currentYearData\}\s+years=\{years\}/);
+});
+
+test("year selection has cancellable fetching, retry and pending navigation feedback", () => {
+  const source = read("src/components/annual/movements-year-selector.tsx");
+  assert.match(source, /fetch\("\/api\/years\?withMovements=true"/);
+  assert.match(source, /cache: "no-store"/);
+  assert.match(source, /if \(!response.ok\) throw/);
+  assert.match(source, /return \(\) => controller.abort\(\)/);
+  assert.match(source, /if \(!controller.signal.aborted\) setState/);
+  assert.match(source, /role="alert"/);
+  assert.match(source, /setState\(\{ status: "loading" \}\); setAttempt/);
+  assert.match(source, /if \(state.years.length < 2\) return null/);
+  assert.match(source, /sort\(\(a, b\) => b - a\)/);
+  assert.match(source, /aria-busy=\{pending\}/);
+  assert.match(source, /disabled=\{pending\}/);
+  assert.match(source, /startTransition\(\(\) => router.push\(buildYearMovementsHref/);
+  assert.match(source, /<SelectItem value=\{String\(year\)\} disabled>/);
+});
+
+test("year eligibility uses entry existence and always scopes to the authenticated user", () => {
+  const collection = read("src/app/api/years/route.ts");
+  const get = collection.slice(collection.indexOf("export async function GET"), collection.indexOf("export async function POST"));
+  assert.match(get, /if \(!user\?\.id\)[\s\S]*status: 401/);
+  assert.match(get, /searchParams.get\("withMovements"\) === "true"/);
+  assert.match(get, /withMovements \? exists\(/);
+  assert.match(get, /eq\(additionalEntries.monthId, months.id\)/);
+  assert.match(get, /eq\(months.yearId, years.id\)/);
+  assert.match(get, /\.where\(and\(eq\(years.userId, user.id\), movementFilter\)\)/);
+  assert.match(get, /select\(\{ year: years.year, id: years.id \}\)/);
+  assert.doesNotMatch(get, /additionalEntries\.(?:amount|isCompleted|groupId)|historicalYears|sum\(/);
 });

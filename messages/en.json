@@ -263,7 +263,17 @@
       "emptyExpenseMonth": "No additional expenses this month.",
       "emptyIncomeMonth": "No additional income this month.",
       "loss": "Loss",
-      "group": "Group"
+      "group": "Group",
+      "sortLabel": "Sort by",
+      "chronological": "Chronological",
+      "descending": "Amount: highest first",
+      "ascending": "Amount: lowest first",
+      "yearLabel": "Year",
+      "yearWithoutMovements": "{year} — no movements",
+      "loadingYears": "Loading years…",
+      "yearsError": "Could not load years.",
+      "retryYears": "Retry",
+      "loadingYear": "Loading year…"
     }
   },
   "Setup": {
