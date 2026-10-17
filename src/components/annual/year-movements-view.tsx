@@ -165,8 +165,13 @@ export function YearMovementsView({ yearData, years, onSummarySelect, pathPrefix
                       </span>
                       <span className="flex shrink-0 items-center gap-3">
                         <span
-                          className="finance-number text-xl font-light tracking-[-0.03em] [--movement-neutral:#000] [--movement-red:var(--color-rose-600)] dark:[--movement-neutral:var(--foreground)] dark:[--movement-red:var(--color-rose-400)] sm:text-2xl"
-                          style={{ color: `color-mix(in srgb, var(--movement-neutral) ${100 - intensity * 100}%, var(--movement-red))` }}
+                          className={cn(
+                            "finance-number text-xl font-light tracking-[-0.03em] [--movement-neutral:#000] dark:[--movement-neutral:var(--foreground)] sm:text-2xl",
+                            isExpense
+                              ? "[--movement-accent:var(--color-rose-600)] dark:[--movement-accent:var(--color-rose-400)]"
+                              : "[--movement-accent:var(--color-emerald-600)] dark:[--movement-accent:var(--color-emerald-400)]"
+                          )}
+                          style={{ color: `color-mix(in srgb, var(--movement-neutral) ${100 - intensity * 100}%, var(--movement-accent))` }}
                         >{formatCurrency(total, locale)}</span>
                         <ChevronDown aria-hidden="true" className={cn("size-4 text-muted-foreground transition-transform motion-reduce:transition-none", !expanded && "-rotate-90")} />
                       </span>
