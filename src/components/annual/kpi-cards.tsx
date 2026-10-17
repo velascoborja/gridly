@@ -346,12 +346,12 @@ export function KpiCards({
                   event.preventDefault();
                   onMovementsSelect();
                 }}
-                className={cn(buttonVariants({ variant: "outline", className: "h-9 rounded-md border-primary/20 bg-background/80 text-primary" }), "hidden sm:inline-flex")}
+                className={cn(buttonVariants({ variant: "link", className: "h-9 border-0 bg-transparent px-0 text-primary shadow-none" }), "hidden sm:inline-flex")}
               >
                 <LayoutList className="size-4" aria-hidden="true" />
                 {tAnnual("movementsButton")}
               </Link>
-              <div className={cn("flex flex-wrap items-center gap-2 sm:flex-nowrap", readOnly && "sm:hidden")}>
+              <div className={cn("flex w-full min-w-0 flex-nowrap items-center gap-1 min-[480px]:gap-2 sm:w-auto", readOnly && "sm:hidden")}>
                 <Link
                   href={movementsHref}
                   onNavigate={(event) => {
@@ -479,10 +479,14 @@ export function KpiCards({
                       size="sm"
                       onClick={onExport}
                       disabled={savingConfig}
-                      className="max-sm:w-full border-primary/20 bg-primary/[0.06] text-primary shadow-sm hover:border-primary/35 hover:bg-primary/[0.1] hover:text-primary"
+                      aria-label={savingConfig ? tAnnual("saving") : tAnnual("exportExcel")}
+                      title={savingConfig ? tAnnual("saving") : tAnnual("exportExcel")}
+                      className="h-9 min-w-9 gap-2 border-primary/20 bg-primary/[0.06] text-primary shadow-sm hover:border-primary/35 hover:bg-primary/[0.1] hover:text-primary max-sm:flex-1 max-sm:shrink sm:h-7"
                     >
-                      <Download className="mr-2 h-4 w-4" />
-                      {savingConfig ? tAnnual("saving") : tAnnual("exportExcel")}
+                      <Download className="h-4 w-4" aria-hidden="true" />
+                      <span className="hidden min-[480px]:inline">
+                        {savingConfig ? tAnnual("saving") : tAnnual("exportExcel")}
+                      </span>
                     </Button>
                   </>
                 ) : null}
