@@ -21,13 +21,19 @@ export async function POST(
     const { monthId } = await params;
     const id = parseInt(monthId, 10);
 
-    const { type, label, amount, groupId, isRecurring, tagId } = body;
+    const { type, label, amount, groupId, isRecurring, tagId, isInvestment = false } = body;
 
     if (!type || !label || amount === undefined) {
       return Response.json({ error: "type, label, and amount are required" }, { status: 400 });
     }
     if (type !== "income" && type !== "expense") {
       return Response.json({ error: "type must be 'income' or 'expense'" }, { status: 400 });
+    }
+    if (typeof isInvestment !== "boolean") {
+      return Response.json({ error: "isInvestment must be a boolean" }, { status: 400 });
+    }
+    if (isInvestment && (type !== "expense" || groupId != null)) {
+      return Response.json({ error: "investment_requires_ungrouped_expense" }, { status: 400 });
     }
 
     const ownedMonth = await getOwnedMonth(user.id, id, db);
@@ -84,6 +90,7 @@ export async function POST(
       amount: String(amount),
       groupId: groupId ?? null,
       isRecurring: groupId == null && isRecurring === true,
+      isInvestment,
       isCompleted: false,
       tagId: entryTagId,
     }).returning();

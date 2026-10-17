@@ -16,9 +16,13 @@ export async function loadFinancialModules(paths) {
   async function compile(path) {
     path = resolve(path);
     if (seen.has(path)) return seen.get(path);
-    const outputPath = join(directory, relative(process.cwd(), path)).replace(/\.ts$/, '.mjs');
+    const outputPath = join(directory, relative(process.cwd(), path)).replace(/\.(ts|json)$/, '.mjs');
     seen.set(path, outputPath);
     await mkdir(dirname(outputPath), { recursive: true });
+    if (path.endsWith('.json')) {
+      await writeFile(outputPath, `export default ${await readFile(path, 'utf8')};`);
+      return outputPath;
+    }
     if (path.endsWith('/server/session.ts')) {
       await writeFile(outputPath, `export const getSessionUser = async () => globalThis[${JSON.stringify(key)}].user;`);
       return outputPath;
@@ -36,7 +40,7 @@ export async function loadFinancialModules(paths) {
       else if (specifier.startsWith('@/') || specifier.startsWith('.')) {
         let dependency = specifier.startsWith('@/')
           ? resolve('src', specifier.slice(2)) : resolve(dirname(path), specifier);
-        if (!dependency.endsWith('.ts')) {
+        if (!dependency.endsWith('.ts') && !dependency.endsWith('.json')) {
           try { await access(`${dependency}.ts`); dependency += '.ts'; }
           catch { dependency = join(dependency, 'index.ts'); }
         }

@@ -3,7 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "@/i18n/routing";
-import { CalendarArrowUp, FolderInput, FolderPlus, Loader2, Plus, Repeat, Tag as TagIcon, Trash2 } from "lucide-react";
+import { CalendarArrowUp, FolderInput, FolderPlus, Loader2, Plus, Repeat, Tag as TagIcon, Trash2, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -119,6 +119,10 @@ export function AdditionalEntriesCard({
   const [moveToGroupError, setMoveToGroupError] = useState<string | null>(null);
   const [newRecurring, setNewRecurring] = useState(false);
   const [editRecurring, setEditRecurring] = useState(false);
+  const [newInvestment, setNewInvestment] = useState(false);
+  const [editInvestment, setEditInvestment] = useState(false);
+  const [newSaveError, setNewSaveError] = useState(false);
+  const [editSaveError, setEditSaveError] = useState(false);
   const [newTagId, setNewTagId] = useState<number | null>(null);
   const [editTagId, setEditTagId] = useState<number | null>(null);
   const [completionSavingId, setCompletionSavingId] = useState<number | null>(null);
@@ -180,6 +184,8 @@ export function AdditionalEntriesCard({
     setNewAmount("");
     setNewAmountError(false);
     setNewRecurring(false);
+    setNewInvestment(false);
+    setNewSaveError(false);
     setNewTagId(null);
   };
 
@@ -191,6 +197,8 @@ export function AdditionalEntriesCard({
     setEditAmount(String(entry.amount));
     setEditAmountError(false);
     setEditRecurring(entry.isRecurring);
+    setEditInvestment(entry.isInvestment);
+    setEditSaveError(false);
     setEditTagId(entry.tagId);
   };
 
@@ -239,14 +247,15 @@ export function AdditionalEntriesCard({
     if (!newLabel.trim() || amount === null) return;
 
     setNewAmountError(false);
+    setNewSaveError(false);
     setIsAdding(true);
     try {
       const res = await fetch(`/api/months/${monthId}/entries`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, label: newLabel.trim(), amount, isRecurring: newRecurring, tagId: newTagId }),
+        body: JSON.stringify({ type, label: newLabel.trim(), amount, isRecurring: newRecurring, tagId: newTagId, isInvestment: type === "expense" && newInvestment }),
       });
-      if (!res.ok) return;
+      if (!res.ok) throw new Error("entry save failed");
       const raw = await res.json();
       const entry: AdditionalEntry = {
         ...raw,
@@ -255,8 +264,11 @@ export function AdditionalEntriesCard({
         tagId: raw.tagId ?? null,
         tag: resolveTag(raw.tagId ?? null),
       };
-      onEntriesChange(sortAdditionalEntriesDesc([...entries, entry]));
+      onEntriesChange(sortAdditionalEntriesDesc([...entriesRef.current, entry]));
       closeAddForm();
+      router.refresh();
+    } catch {
+      setNewSaveError(true);
     } finally {
       setIsAdding(false);
     }
@@ -281,16 +293,17 @@ export function AdditionalEntriesCard({
     if (!editLabel.trim() || amount === null) return;
 
     setEditAmountError(false);
+    setEditSaveError(false);
     setSavingId(id);
     try {
-      const body: Record<string, unknown> = { label: editLabel.trim(), amount, isRecurring: editRecurring, tagId: editTagId };
+      const body: Record<string, unknown> = { label: editLabel.trim(), amount, isRecurring: editRecurring, tagId: editTagId, isInvestment: type === "expense" && editInvestment };
 
       const res = await fetch(`/api/months/${monthId}/entries/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      if (!res.ok) return;
+      if (!res.ok) throw new Error("entry save failed");
       const updated = await res.json();
       const updatedEntry: AdditionalEntry = {
         ...updated,
@@ -301,10 +314,13 @@ export function AdditionalEntriesCard({
 
       onEntriesChange(
         sortAdditionalEntriesDesc(
-          entries.map((e) => e.id === id ? updatedEntry : e)
+          entriesRef.current.map((e) => e.id === id ? updatedEntry : e)
         )
       );
       setEditingId(null);
+      router.refresh();
+    } catch {
+      setEditSaveError(true);
     } finally {
       setSavingId(null);
     }
@@ -356,6 +372,10 @@ export function AdditionalEntriesCard({
     source: "menu" | "drop" = "menu"
   ) => {
     if (movingToGroupId === entry.id) return;
+    if (toGroupId !== null && entry.isInvestment) {
+      setMoveToGroupError(t("investmentGroupBlocked"));
+      return;
+    }
 
     setMoveToGroupError(null);
     setMovingToGroupId(entry.id);
@@ -548,8 +568,18 @@ export function AdditionalEntriesCard({
                     disabled: isAdding,
                     onSelect: () => setNewRecurring((value) => !value),
                   },
+                  ...(type === "expense" ? [{
+                    id: "investment" as const,
+                    kind: "command" as const,
+                    label: t(newInvestment ? "investmentActive" : "investmentToggle"),
+                    icon: <TrendingUp className="h-3.5 w-3.5" />,
+                    active: newInvestment,
+                    disabled: isAdding,
+                    onSelect: () => setNewInvestment((value) => !value),
+                  }] : []),
                 ]}
               />
+              {newSaveError ? <p role="alert" className="px-2 pb-1 text-xs text-destructive">{t("entrySaveError")}</p> : null}
             </div>
           ) : null}
 
@@ -618,7 +648,7 @@ export function AdditionalEntriesCard({
                 onGroupDragStart={onGroupDragStart}
                 onGroupDragEnd={onGroupDragEnd}
                 onEntryGroupChanged={onEntryGroupChanged ?? (() => {})}
-                draggedUngroupedExpense={draggedUngroupedExpense}
+                draggedUngroupedExpense={draggedUngroupedExpense?.isInvestment ? null : draggedUngroupedExpense}
                 dropPending={dropPendingGroupId === group.id}
                 onUngroupedExpenseDrop={(entry) => {
                   void handleMoveToGroup(entry, group.id, "drop");
@@ -652,6 +682,15 @@ export function AdditionalEntriesCard({
             const completionPending = completionSavingId === entry.id;
             const completionConfirming = completionConfirmationId === entry.id;
             const isEditing = !readOnly && editingId === entry.id;
+            const investmentBadge = entry.isInvestment ? (
+              <span
+                className="inline-flex max-w-full shrink-0 items-center gap-1 rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium leading-none text-primary"
+                title={t("investmentBadge")}
+              >
+                <TrendingUp className="size-3 shrink-0" aria-hidden="true" />
+                <span className="truncate">{t("investmentBadge")}</span>
+              </span>
+            ) : null;
             return (
               <EntryHeightTransition
                 key={entry.id}
@@ -718,6 +757,15 @@ export function AdditionalEntriesCard({
                       disabled: savingId === entry.id || movingToGroupId === entry.id || movingEntryId === entry.id,
                       onSelect: () => setEditRecurring((value) => !value),
                     }] : []),
+                    ...(type === "expense" && !entry.isCompleted && !completionPending ? [{
+                      id: "investment" as const,
+                      kind: "command" as const,
+                      label: t(editInvestment ? "investmentActive" : "investmentToggle"),
+                      icon: <TrendingUp className="h-3.5 w-3.5" />,
+                      active: editInvestment,
+                      disabled: savingId === entry.id || movingToGroupId === entry.id || movingEntryId === entry.id,
+                      onSelect: () => setEditInvestment((value) => !value),
+                    }] : []),
                     {
                       id: "completion",
                       kind: "command",
@@ -756,10 +804,10 @@ export function AdditionalEntriesCard({
                     ...(!entry.isCompleted && !completionPending && type === "expense" && groups.length > 0 ? [{
                       id: "group" as const,
                       kind: "selector" as const,
-                      label: t("moveToGroup"),
+                      label: t(entry.isInvestment || editInvestment ? "investmentGroupBlocked" : "moveToGroup"),
                       icon: <FolderInput className="h-3.5 w-3.5" />,
                       pending: movingToGroupId === entry.id,
-                      disabled: savingId === entry.id || movingToGroupId === entry.id || movingEntryId === entry.id,
+                      disabled: entry.isInvestment || editInvestment || savingId === entry.id || movingToGroupId === entry.id || movingEntryId === entry.id,
                       renderPanel: ({ close }: { close: () => void }) => (
                         <EntryFormSelectorList>
                           <EntryFormSelectorItem selected disabled onSelect={() => {}}>{t("noGroup")}</EntryFormSelectorItem>
@@ -779,6 +827,10 @@ export function AdditionalEntriesCard({
                     }] : []),
                   ]}
                 />
+                {editSaveError ? <p role="alert" className="px-2 pb-1 text-xs text-destructive">{t("entrySaveError")}</p> : null}
+                {groups.length > 0 && (entry.isInvestment || editInvestment) ? (
+                  <p className="px-2 pb-1 text-xs text-muted-foreground">{t("investmentGroupBlocked")}</p>
+                ) : null}
               </div>
             ) : (
               <div
@@ -801,8 +853,9 @@ export function AdditionalEntriesCard({
                       "min-w-0 flex-1 truncate text-left text-sm font-medium text-foreground",
                       entry.isCompleted && "text-muted-foreground/65"
                     )} title={entry.label}>
-                      <span className="flex min-w-0 items-center gap-1.5">
+                      <span className={cn("flex min-w-0 items-center gap-1.5", entry.isInvestment && "flex-wrap")}>
                         <span className="truncate">{entry.label}</span>
+                        {investmentBadge}
                         {displayTag && TAG_COLORS[displayTag.color] && (
                           <span
                             className="shrink-0 inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-medium leading-none"
@@ -849,8 +902,9 @@ export function AdditionalEntriesCard({
                       title={entry.label}
                       disabled={deletingId === entry.id}
                     >
-                      <span className="flex min-w-0 items-center gap-1.5">
+                      <span className={cn("flex min-w-0 items-center gap-1.5", entry.isInvestment && "flex-wrap")}>
                         <span className="truncate">{entry.label}</span>
+                        {investmentBadge}
                         {displayTag && TAG_COLORS[displayTag.color] && (
                           <span
                             className="shrink-0 inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-medium leading-none"

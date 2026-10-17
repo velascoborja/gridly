@@ -1,4 +1,5 @@
 import type { YearData } from "./types";
+import { totalMonthlyInvestment } from "./calculations.ts";
 
 export type EvolutionMetricSource =
   | { source: "gridly"; yearData: YearData }
@@ -72,7 +73,7 @@ export function deriveEvolutionMetrics(sources: EvolutionMetricSource[]): Evolut
     const december = yearData.months.find((month) => month.month === 12);
     if (!december) continue;
 
-    const investedAmount = yearData.months.reduce((sum, month) => sum + month.investment, 0);
+    const investedAmount = yearData.months.reduce((sum, month) => sum + totalMonthlyInvestment(month), 0);
     const interestsEarned = yearData.months.reduce((sum, month) => sum + month.interests, 0);
     const totalIncome = yearData.months.reduce((sum, month) => sum + month.totalIncome, 0);
     const totalExpenses = yearData.months.reduce((sum, month) => sum + month.totalExpenses, 0);

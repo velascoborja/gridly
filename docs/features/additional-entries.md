@@ -13,6 +13,15 @@ Each entry consists of:
 - `amount`: The financial value (stored as numeric in DB).
 - `type`: Either `income` or `expense`.
 - `isCompleted`: Whether the expected transaction has occurred and is locked from further mutation.
+- `isInvestment`: Whether an ungrouped expense is an additional investment. Defaults to `false` for existing entries and clients that omit it.
+
+## Additional Investments
+
+Ungrouped expenses expose an investment action in their create/edit form, including the mobile Actions menu. Saved rows show an `Additional investment` badge beside their description, including on mobile and in read-only views. Tags and annual recurrence remain independent. Completed entries must be reopened before changing the flag.
+
+`POST` and `PATCH` accept a boolean `isInvestment`. Non-boolean values, marked incomes, and marked grouped entries return HTTP `400`; invalid combinations use `investment_requires_ungrouped_expense`. Moving a marked expense into a group is blocked in the menu, drag-and-drop, and API until the investment flag is removed. Month moves preserve it. Guided year creation copies it for annually recurring entries.
+
+Marked amounts remain additional expenses in categories, monthly averages and cash-flow totals, while also contributing to investment metrics. Classification-only changes do not propagate cash balances. Saving updates shared year state immediately, refreshes the route cache, and preserves the draft with a localized error on failure. Apply `drizzle/0006_additional_investments.sql` before deploying code that reads the new column.
 
 ## UI & Implementation
 

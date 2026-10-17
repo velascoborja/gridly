@@ -43,6 +43,13 @@ export function calculateMonthlyInterest(startingBalance: number, interestRate: 
   return round2((startingBalance * interestRate) / 12);
 }
 
+export function totalMonthlyInvestment(month: Pick<MonthData, "investment" | "additionalExpenses">): number {
+  return month.investment + month.additionalExpenses.reduce(
+    (sum, entry) => sum + (entry.type === "expense" && entry.isInvestment ? entry.amount : 0),
+    0
+  );
+}
+
 export function totalIncome(m: RawMonthData): number {
   const additionalSum = m.additionalIncomes.reduce((sum, e) => sum + e.amount, 0);
   return m.payslip + m.additionalPayslip + m.interests + additionalSum;

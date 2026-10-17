@@ -45,3 +45,7 @@ For real PostgreSQL rollback and concurrency checks:
 The runner rejects a missing test connection or one identifying the application database. It creates a uniquely named schema, generates its tables from the current Drizzle schema, scopes every test connection to that schema, and drops only that schema during cleanup. The test role needs schema creation/deletion privileges. A process killed before cleanup can leave an `atomic_<uuid>` schema in the disposable database.
 
 The integration suite executes production handlers and calculations with stubbed session/cache boundaries. It injects failures after SQL writes and checks complete row snapshots, including cascaded rows, relationships, tags, balances, and versions. It also coordinates concurrent requests with query barriers, checks successful creation retries, `applyFromMonth`, metadata-only saves, recurring-entry copying, and the two-step REST creation contract. Integration success is required to validate the database guarantees; local source or mocked-driver tests alone are not sufficient.
+
+## Investment Classification
+
+Changing only an additional entry’s `isInvestment` flag is a metadata-only write: it uses the same user-serialized transaction but does not propagate cash balances. Amount edits, creation, deletion and month moves retain their existing carry-over behavior. Validation rejects marked incomes and grouped entries before writes.

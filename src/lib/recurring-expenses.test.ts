@@ -59,7 +59,7 @@ test("total expenses include recurring expenses", () => {
       interestsManualOverride: false,
       personalRemaining: 0,
       recurringExpenses,
-      additionalExpenses: [{ id: 10, monthId: 1, type: "expense", label: "Cena", amount: 60, isRecurring: false, isCompleted: false, tagId: null, tag: null }],
+      additionalExpenses: [{ id: 10, monthId: 1, type: "expense", label: "Cena", amount: 60, isRecurring: false, isInvestment: false, isCompleted: false, tagId: null, tag: null }],
       additionalExpenseGroups: [],
       additionalIncomes: [],
     }),

@@ -81,6 +81,7 @@ test('financial operations are atomic on isolated Neon', { timeout: 180000 }, as
     const group = (await fixture.query('insert into additional_entry_groups (month_id, label, tag_id) values ($1, $2, $3) returning id', [january.id, 'Trip', tag.id])).rows[0];
     const entry = (await fixture.query('insert into additional_entries (month_id, group_id, type, label, amount, tag_id) values ($1, $2, $3, $4, $5, $6) returning id', [january.id, group.id, 'expense', 'Ticket', 5, tag.id])).rows[0];
     await fixture.query('insert into additional_entries (month_id, type, label, amount, is_recurring, is_completed, tag_id) values ($1, $2, $3, $4, true, true, $5)', [monthRows[24].id, 'income', 'Recurring gift', 8, tag.id]);
+    await fixture.query('insert into additional_entries (month_id, type, label, amount, is_recurring, is_investment, is_completed, tag_id) values ($1, $2, $3, $4, true, true, true, $5)', [monthRows[24].id, 'expense', 'Annual investment', 7, tag.id]);
     await fixture.query('update year_recurring_expenses set tag_id = $1', [tag.id]);
     await fixture.query('update monthly_recurring_expenses set tag_id = $1', [tag.id]);
     const templateId = (await fixture.query('select id from year_recurring_expenses where year_id = (select id from years where year = 2030)')).rows[0].id;
@@ -181,9 +182,13 @@ test('financial operations are atomic on isolated Neon', { timeout: 180000 }, as
     await concurrent('predecessor edit and retrying year creation serialize', /^update "months"/, () => call('month', 'PATCH', { monthId: monthRows[24].id }, { payslip: 250 }), () => m.action.createAndPrefillYear(config(2033)));
     await t.test('successful retry creates twelve months and reopens tagged recurring entries', async () => {
       const rows = (await fixture.query('select m.month, e.* from additional_entries e join months m on m.id = e.month_id join years y on y.id = m.year_id where y.year = 2033')).rows;
-      assert.equal(rows.length, 1);
-      assert.equal(rows[0].is_completed, false);
-      assert.equal(rows[0].tag_id, tag.id);
+      assert.equal(rows.length, 2);
+      for (const row of rows) {
+        assert.equal(row.is_completed, false);
+        assert.equal(row.tag_id, tag.id);
+      }
+      assert.equal(rows.find((row) => row.label === 'Annual investment').is_investment, true);
+      assert.equal(rows.find((row) => row.label === 'Recurring gift').is_investment, false);
       assert.equal((await fixture.query('select count(*)::int as n from months m join years y on y.id = m.year_id where y.year = 2033')).rows[0].n, 12);
     });
     await concurrent('edits in different years keep the full chain consistent', /^update "months"/, () => call('month', 'PATCH', { monthId: january.id }, { payslip: 210 }), () => call('month', 'PATCH', { monthId: monthRows[12].id }, { payslip: 220 }));

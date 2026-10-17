@@ -114,6 +114,16 @@ export async function PATCH(
       updates.isRecurring = body.isRecurring === true;
     }
 
+    if (body.isInvestment !== undefined) {
+      if (typeof body.isInvestment !== "boolean") {
+        return Response.json({ error: "isInvestment must be a boolean" }, { status: 400 });
+      }
+      updates.isInvestment = body.isInvestment;
+    }
+    if ((updates.isInvestment ?? entry.isInvestment) && (entry.type !== "expense" || targetGroup)) {
+      return Response.json({ error: "investment_requires_ungrouped_expense" }, { status: 400 });
+    }
+
     if (targetGroup) {
       const groupingError = validateGroupedEntryState({
         type: entry.type,

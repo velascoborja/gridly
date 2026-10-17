@@ -27,3 +27,9 @@ test("years persist a non-null carry-over version with a zero default", () => {
 
   assert.match(yearsBlock, /carryOverVersion: integer\("carry_over_version"\)\.notNull\(\)\.default\(0\)/);
 });
+
+test("additional investments default to false in the schema and additive migration", () => {
+  const migration = readFileSync(new URL("../../drizzle/0006_additional_investments.sql", import.meta.url), "utf8");
+  assert.match(source, /isInvestment: boolean\("is_investment"\)\.notNull\(\)\.default\(false\)/);
+  assert.match(migration, /ALTER TABLE "additional_entries" ADD COLUMN "is_investment" boolean DEFAULT false NOT NULL/);
+});

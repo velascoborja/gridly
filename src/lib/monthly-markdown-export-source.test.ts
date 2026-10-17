@@ -21,7 +21,7 @@ test("monthly Markdown export includes recurring, grouped, and additional rows",
   assert.match(source, /month\.recurringExpenses\.map/);
   assert.match(source, /month\.additionalIncomes\.map/);
   assert.match(source, /\[t\.additionalPayslip, month\.additionalPayslip\],\n      \.\.\.additionalIncomeRows/);
-  assert.match(source, /currentExpenseRows\(month\)/);
+  assert.match(source, /currentExpenseRows\(month, locale\)/);
   assert.match(source, /\`\$\{group\.label\} - \$\{entry\.label\}\`/);
   assert.match(source, /formatMoney\(amount, locale\)/);
   assert.match(source, /sortMoneyRowsDesc\(rows\)/);

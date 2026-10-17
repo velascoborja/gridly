@@ -71,3 +71,7 @@ Monthly fixed-field saves and financial mutations commit together with downstrea
 Editing either `personalExpense` or `personalRemaining` validates the resulting pair inside the financial transaction, before writing. Both values must be finite numbers and satisfy `0 <= personalRemaining <= personalExpense`, including a zero budget. Resetting the budget follows the same validation. Invalid requests return HTTP 400 with `code: PERSONAL_REMAINING_OUT_OF_RANGE` and `months: number[]`; values and override flags remain unchanged. The client shows a localized error and clears pending state while retaining the editor.
 
 Legacy out-of-range values produce a warning above the fixed editors, even when the panel is collapsed. Unrelated monthly fields remain editable; users can correct the pair by changing the budget or surplus. No automatic data repair occurs.
+
+## Additional Investments
+
+Ungrouped additional expenses can be marked as investments when creating or editing them. Desktop forms expose a toggle icon; mobile forms expose the action in the Actions menu. Saved rows display a localized investment badge at both sizes. The flag changes investment analytics without adding a second cash expense. Completed rows must be reopened to change it. Saving shows pending/disabled controls and keeps the draft with a localized error on failure.

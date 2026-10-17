@@ -28,6 +28,30 @@ function rowFor(sheet, column, label) {
   return null;
 }
 for (const locale of ['es', 'en']) {
+  test(`${locale} exports count and identify additional investments without duplicate expense rows`, async () => {
+    const year = data(0);
+    year.months[0].additionalExpenses = [{ id: 1, monthId: 1, type: 'expense', label: 'ETF', amount: 200,
+      isRecurring: false, isInvestment: true, isCompleted: false, tagId: null, tag: null }];
+    year.months = calculations.computeMonthChain(year.months, config.startingBalance);
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(await excel.buildWorkbook(year, locale));
+    const annual = workbook.getWorksheet('2026');
+    const investedRow = rowFor(annual, 'A', locale === 'es' ? 'Total invertido' : 'Total invested');
+    assert.equal(annual.getCell(`B${investedRow}`).value, 1400);
+    const sheet = workbook.getWorksheet(locale === 'es' ? 'Enero' : 'January');
+    const badge = locale === 'es' ? 'Inversión adicional' : 'Additional investment';
+    const contributionRow = rowFor(sheet, 'A', `ETF [${badge}]`);
+    assert.ok(contributionRow);
+    assert.equal(sheet.getCell(`B${contributionRow}`).value, 200);
+    assert.equal(rowFor(sheet, 'A', 'ETF'), null);
+    const expenseRow = rowFor(sheet, 'A', locale === 'es' ? 'Total gastos' : 'Total expenses');
+    assert.equal(sheet.getCell(`B${expenseRow}`).value, 1000);
+    const md = markdown.buildMonthlyMarkdown(year, 1, locale);
+    assert.equal(md.split(`ETF [${badge}]`).length - 1, 1);
+    const [metric] = evolution.deriveEvolutionMetrics([{ source: 'gridly', yearData: year }]);
+    assert.equal(metric.investedAmount, annual.getCell(`B${investedRow}`).value);
+  });
+
   for (const remaining of [0, 50, 200, 250, -20]) {
     test(`${locale} Excel, Markdown and Evolution agree for surplus ${remaining}`, async () => {
       const year = data(remaining);

@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { sanitizeMoneyExpressionInput, sanitizeNumericInput } from "@/lib/currency-input";
 
 interface EntryFormActionBase {
-  id: "tag" | "recurring" | "completion" | "month" | "group";
+  id: "tag" | "recurring" | "investment" | "completion" | "month" | "group";
   label: string;
   icon: ReactNode;
   active?: boolean;

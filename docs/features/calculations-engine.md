@@ -41,3 +41,9 @@ Additional income and expense forms accept arithmetic expressions in their amoun
 Income is salary + extra pay + interest + additional income. Personal surplus is subtracted in full from personal expenses in both individual totals and the shared `calculateMonthFinancials` primitive. This reclassification preserves cash savings, ending balances, subsequent interest and carry-over, while correcting the income denominator used by savings and investment rates.
 
 Legacy surplus outside `0 <= personalRemaining <= personalExpense` remains stored without migration or automatic correction. Calculations keep the full subtraction, even when net personal spending becomes negative, until the user corrects it manually. `src/lib/personal-remaining.ts` centralizes finite-number and range validation.
+
+## Investment Totals
+
+`totalMonthlyInvestment` adds the month's programmed `investment` to the amounts of ungrouped additional expenses marked `isInvestment`. Annual KPIs, invested-month counts, Evolution and the Excel summary use this shared total. Completed entries still count. Investment totals preserve signed amounts, matching existing rate behavior.
+
+The additional amount is already included in `totalExpenses`; it must not be added to expenses a second time or written into the programmed `investment` field. Changing the flag alone leaves savings, interest, balances and cross-year carry-over unchanged.

@@ -1,8 +1,11 @@
 import type { MonthData, YearData } from "./types";
 import { formatMonthName } from "./utils";
+import esMessages from "../../messages/es.json";
+import enMessages from "../../messages/en.json";
 
 const MONTHLY_MARKDOWN_MESSAGES = {
   en: {
+    additionalInvestment: enMessages.Monthly.additionalEntries.investmentBadge,
     nextMonthExpenses: "Next month expenses",
     fixedExpenses: "Fixed expenses",
     currentMonthExpenses: "Current month expenses",
@@ -25,6 +28,7 @@ const MONTHLY_MARKDOWN_MESSAGES = {
     amountHeader: "Amount",
   },
   es: {
+    additionalInvestment: esMessages.Monthly.additionalEntries.investmentBadge,
     nextMonthExpenses: "Gastos mes siguiente",
     fixedExpenses: "Gastos fijos",
     currentMonthExpenses: "Gastos mes actual",
@@ -75,8 +79,12 @@ function sortMoneyRowsDesc(rows: Array<[string, number]>) {
   return [...rows].sort((a, b) => b[1] - a[1]);
 }
 
-function currentExpenseRows(month: MonthData): Array<[string, number]> {
-  const rows: Array<[string, number]> = month.additionalExpenses.map((entry) => [entry.label, entry.amount]);
+function currentExpenseRows(month: MonthData, locale: Locale): Array<[string, number]> {
+  const t = MONTHLY_MARKDOWN_MESSAGES[locale];
+  const rows: Array<[string, number]> = month.additionalExpenses.map((entry) => [
+    entry.isInvestment ? `${entry.label} [${t.additionalInvestment}]` : entry.label,
+    entry.amount,
+  ]);
 
   for (const group of month.additionalExpenseGroups) {
     for (const entry of group.entries) {
@@ -117,7 +125,7 @@ export function buildMonthlyMarkdown(yearData: YearData, monthNumber: number, lo
     "",
     `## ${t.currentMonthExpenses}`,
     "",
-    moneyTable(currentExpenseRows(month), locale),
+    moneyTable(currentExpenseRows(month, locale), locale),
     "",
     `## ${t.income}`,
     "",

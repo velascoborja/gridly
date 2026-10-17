@@ -3,9 +3,13 @@ import type { YearData } from "./types";
 import { formatMonthName } from "./utils";
 import { avgAdditionalEntriesPerMonth } from "./additional-entries";
 import { computeTagStats } from "./tag-stats";
+import { totalMonthlyInvestment } from "./calculations";
+import esMessages from "../../messages/es.json";
+import enMessages from "../../messages/en.json";
 
 const EXPORT_MESSAGES = {
   en: {
+    additionalInvestment: enMessages.Monthly.additionalEntries.investmentBadge,
     expenses: "EXPENSES",
     income: "INCOME",
     totalExpenses: "Total expenses",
@@ -46,6 +50,7 @@ const EXPORT_MESSAGES = {
     untagged: "Untagged",
   },
   es: {
+    additionalInvestment: esMessages.Monthly.additionalEntries.investmentBadge,
     expenses: "GASTOS",
     income: "INGRESOS",
     totalExpenses: "Total gastos",
@@ -180,7 +185,7 @@ function buildMonthSheet(
   subsectionLabel(ws, `A${expRow}`, t.additionalExpensesLabel);
   expRow++;
   for (const entry of month.additionalExpenses) {
-    ws.getCell(`A${expRow}`).value = entry.label;
+    ws.getCell(`A${expRow}`).value = entry.isInvestment ? `${entry.label} [${t.additionalInvestment}]` : entry.label;
     money(ws, `B${expRow}`, entry.amount);
     expRow++;
   }
@@ -260,7 +265,7 @@ function buildSummarySheet(
   const totalSaved = months.reduce((s, m) => s + m.savings, 0);
   const avgSavings = totalSaved / 12;
   const maxSavings = Math.max(...months.map((m) => m.savings));
-  const totalInvested = months.reduce((s, m) => s + m.investment, 0);
+  const totalInvested = months.reduce((s, m) => s + totalMonthlyInvestment(m), 0);
   const avgAdditionalExpenses = avgAdditionalEntriesPerMonth(months, "expense");
   const avgAdditionalIncomes = avgAdditionalEntriesPerMonth(months, "income");
 

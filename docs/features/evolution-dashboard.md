@@ -46,7 +46,7 @@ Returns a per-year array of `{ year, estimatedPortfolioValue }`. For each year Y
 - `startingBalance`: the year's configured starting balance.
 - `finalBalance`: December ending balance.
 - `savedAmount`: `finalBalance - startingBalance`.
-- `investedAmount`: sum of monthly `investment` for that year.
+- `investedAmount`: sum of monthly programmed investments plus ungrouped additional expenses marked `isInvestment`, using `totalMonthlyInvestment`. This also feeds accumulated investment, total wealth, investment rates and portfolio projections.
 - `accumulatedInvested`: running sum of `investedAmount` up to and including that year.
 - `totalIncome`: sum of monthly total income for Gridly years, or `null` for historical imports.
 - `totalExpenses`: sum of monthly total expenses for Gridly years, or `null` for historical imports.

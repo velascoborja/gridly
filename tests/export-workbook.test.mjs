@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 
 import ExcelJS from "exceljs";
 import ts from "typescript";
@@ -17,7 +17,9 @@ async function transpileModuleToTemp(relativePath, outDir) {
     },
     fileName: sourcePath,
   });
-  const rewritten = output.outputText.replace(/require\("(\.[^"]+)"\)/g, 'require("$1.cjs")');
+  const rewritten = output.outputText.replace(/require\("(\.[^"]+)"\)/g, (_, specifier) =>
+    `require(${JSON.stringify(specifier.endsWith(".json") ? resolve(dirname(sourcePath), specifier) : `${specifier}.cjs`)})`
+  );
   const outPath = join(outDir, relativePath.replace(/^src\//, "").replace(/\.ts$/, ".cjs"));
   await mkdir(dirname(outPath), { recursive: true });
   await writeFile(outPath, rewritten, "utf8");
@@ -28,6 +30,7 @@ async function loadBuildWorkbook() {
   await transpileModuleToTemp("src/lib/utils.ts", outDir);
   await transpileModuleToTemp("src/lib/additional-entries.ts", outDir);
   await transpileModuleToTemp("src/lib/tag-stats.ts", outDir);
+  await transpileModuleToTemp("src/lib/calculations.ts", outDir);
   await transpileModuleToTemp("src/lib/export.ts", outDir);
   const modulePath = join(outDir, "lib", "export.cjs");
   const mod = await import(`file://${modulePath}`);

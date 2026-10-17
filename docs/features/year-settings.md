@@ -155,3 +155,7 @@ Guided setup, REST creation, annual configuration updates, prefill, and year del
 Before any annual configuration or month write, `PATCH /api/years/[year]` checks the resulting personal budget against the surplus of every stored month from `applyFromMonth` through December. This also applies when another setting triggers reapplication of the existing annual budget. Negative or non-finite budgets, negative surplus, or surplus exceeding the new budget reject the entire operation with HTTP 400, `code: PERSONAL_REMAINING_OUT_OF_RANGE`, and the affected `months` array. Earlier months do not block a later range. This validation runs under the same per-user transaction lock as the writes.
 
 The configuration dialog translates conflicts into month names and preserves the previous configuration, monthly values and save state. Legacy invalid values are preserved until corrected manually; no migration is performed.
+
+## Annually Recurring Additional Investments
+
+When guided year creation copies ungrouped additional entries marked `isRecurring` from the previous year, it also preserves `isInvestment`. Copies reopen with `isCompleted: false`, retaining their investment classification and tags. The investment flag alone never schedules or copies an entry.

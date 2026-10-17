@@ -14,6 +14,7 @@ import {
 import { formatCurrency } from "@/lib/utils";
 import { calculateSavingsRate, formatSavingsRate } from "@/lib/annual-savings-rate";
 import { calculateInvestmentRate } from "@/lib/annual-investment-rate";
+import { totalMonthlyInvestment } from "@/lib/calculations";
 import { CategoriesView } from "./categories-view";
 import { FixedExpensesView } from "./fixed-expenses-view";
 import { YearConfigForm } from "./year-config-form";
@@ -161,8 +162,8 @@ export function KpiCards({
   const locale = useLocale();
   const populated = months.filter((m) => m.totalIncome !== 0 || m.totalExpenses !== 0 || m.savings !== 0);
   const totalSavings = populated.reduce((s, m) => s + m.savings, 0);
-  const totalInvestment = months.reduce((sum, month) => sum + month.investment, 0);
-  const investmentMonths = months.filter((month) => month.investment > 0).length;
+  const totalInvestment = months.reduce((sum, month) => sum + totalMonthlyInvestment(month), 0);
+  const investmentMonths = months.filter((month) => totalMonthlyInvestment(month) > 0).length;
   const totalInterests = months.reduce((sum, m) => sum + m.interests, 0);
   const interestMonths = months.filter((m) => m.interests > 0).length;
   const avgSavings = populated.length > 0 ? totalSavings / populated.length : 0;

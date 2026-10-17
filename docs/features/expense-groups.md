@@ -146,3 +146,7 @@ Creating an empty group, renaming it, assigning a tag, or changing its completio
 ## Atomic Persistence
 
 Group edits, child month/tag updates, and any required carry-over share one transaction. A failed move cannot leave the parent and children in different months. Group deletion, cascaded entry deletion, and carry-over likewise commit or roll back together. See [Atomic Financial Writes](financial-transactions.md).
+
+## Investment Restriction
+
+Additional investment classification is available only for ungrouped expenses. A marked investment cannot be moved into a group through the menu, drag-and-drop, or API. Users must remove its investment mark and save before grouping it; the UI explains this restriction. Moving an ungrouped investment to another month preserves the flag.

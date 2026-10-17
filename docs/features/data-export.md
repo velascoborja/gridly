@@ -43,3 +43,7 @@ The Markdown is generated from server-side year data via `buildMonthlyMarkdown` 
 ## Personal Surplus Totals
 
 Both exports retain the editable gross personal budget and show surplus separately as a negative fixed-expense row. Income excludes surplus, and total expenses include its full subtraction, including legacy adjustments outside the valid range. Savings and balances remain unchanged.
+
+## Additional Investments
+
+The annual Total invested KPI includes programmed investments and ungrouped additional expenses marked `isInvestment`. Monthly Excel and Markdown expense descriptions append `[Additional investment]` (localized from the shared messages) to marked entries. Their amounts remain in the original additional-expense rows and appear only once in cash-flow totals. Categories and additional-expense averages continue to include them.

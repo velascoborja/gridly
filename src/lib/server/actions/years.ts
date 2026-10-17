@@ -187,6 +187,7 @@ export async function createAndPrefillYear(data: {
               label: e.label,
               amount: e.amount,
               isRecurring: true,
+              isInvestment: e.isInvestment,
               isCompleted: false,
               groupId: null,
               tagId: e.tagId,

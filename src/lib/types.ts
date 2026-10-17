@@ -24,6 +24,7 @@ export interface AdditionalEntry {
   label: string;
   amount: number;
   isRecurring: boolean;
+  isInvestment: boolean;
   isCompleted: boolean;
   tagId: number | null;
   tag: Tag | null;

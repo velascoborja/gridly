@@ -59,16 +59,17 @@ test("annual rate labels and unavailable values are localized", async () => {
   assert.equal(en.Annual.kpis.investmentRateUnavailable, "—");
 });
 
-test("annual KPI cards expose total investment from monthly investment values", async () => {
+test("annual KPI cards include programmed and additional investments in totals and month counts", async () => {
   const source = await readSource("src/components/annual/kpi-cards.tsx");
   const primaryMetrics = source.match(/const primaryMetrics[^\n]*: KpiMetric\[\] = \[[\s\S]*?\n  \];/)?.[0] ?? "";
   const supportingMetrics = source.match(/const supportingMetrics[^\n]*: KpiMetric\[\] = \[[\s\S]*?\n  \];/)?.[0] ?? "";
 
   assert.match(
     source,
-    /totalInvestment\s*=\s*months\.reduce\(\(sum,\s*month\)\s*=>\s*sum\s*\+\s*month\.investment,\s*0\)/,
-    "total investment should be derived from actual monthly investment values",
+    /totalInvestment\s*=\s*months\.reduce\(\(sum,\s*month\)\s*=>\s*sum\s*\+\s*totalMonthlyInvestment\(month\),\s*0\)/,
+    "total investment should use the shared monthly total",
   );
+  assert.match(source, /months\.filter\(\(month\) => totalMonthlyInvestment\(month\) > 0\)/);
   assert.match(source, /t\("totalInvestment"\)/, "component should render the total investment label");
   assert.match(source, /t\("totalInvestmentNote"\)/, "component should render the total investment note");
   assert.doesNotMatch(primaryMetrics, /t\("totalInvestment"\)/, "investment should not be a primary annual KPI");
@@ -86,12 +87,12 @@ test("annual KPI investment labels are localized", async () => {
   const en = JSON.parse(await readSource("messages/en.json"));
 
   assert.equal(es.Annual.kpis.totalInvestment, "Inversión total");
-  assert.equal(es.Annual.kpis.totalInvestmentNote, "Suma de las inversiones mensuales");
+  assert.equal(es.Annual.kpis.totalInvestmentNote, "Inversiones mensuales y aportaciones adicionales");
   assert.equal(es.Annual.kpis.heroTitle, "Saldo final y ahorro acumulado");
   assert.match(es.Annual.kpis.investmentMonths, /mes(?:es)? con inversión/);
 
   assert.equal(en.Annual.kpis.totalInvestment, "Total invested");
-  assert.equal(en.Annual.kpis.totalInvestmentNote, "Sum of monthly investments");
+  assert.equal(en.Annual.kpis.totalInvestmentNote, "Monthly investments and additional contributions");
   assert.equal(en.Annual.kpis.heroTitle, "Final balance and total savings");
   assert.match(en.Annual.kpis.investmentMonths, /month(?:s)? invested/);
 });
