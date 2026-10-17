@@ -23,7 +23,9 @@
     "createYearButton": "Create {year}",
     "logout_confirm_title": "Log out?",
     "logout_confirm_description": "Are you sure you want to log out? You will need to sign in again to access your data.",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "personalRemainingOutOfRange": "Personal surplus must be between zero and the personal budget. Review these months: {months}.",
+    "personalRemainingWarning": "Personal surplus is outside the personal budget in these months: {months}. Correct it manually; savings are preserved in the meantime."
   },
   "Settings": {
     "title": "Settings",
@@ -167,7 +169,7 @@
       "grandTotalLabel": "Total fixed expenses:",
       "emptyState": "No fixed expense data recorded.",
       "home": "Home",
-      "personal": "Personal budget",
+      "personal": "Net personal spending",
       "recurring": "Recurring expenses",
       "shareLabel": "{pct}% of total",
       "entryCount": "{count, plural, one {# entry} other {# entries}}"
@@ -465,15 +467,17 @@
       "payslip": "Salary",
       "additionalPayslip": "Extra pay",
       "interests": "Interests",
-      "personalRemaining": "Personal surplus"
+      "personalRemaining": "Personal surplus",
+      "personalRemainingHint": "Reduces personal spending; it is not added to income."
     },
     "fixedExpenses": {
       "title": "Fixed Expenses",
       "description": "Budgets for recurring expenses and investments.",
       "homeExpense": "Home expenses",
-      "personalExpense": "Personal expenses",
+      "personalExpense": "Personal budget",
       "investment": "Investment",
-      "recurringExpensesTitle": "Recurring expenses"
+      "recurringExpensesTitle": "Recurring expenses",
+      "personalNet": "Net personal spending: {amount}"
     },
     "additionalEntries": {
       "titleIncome": "Additional income",
@@ -668,9 +672,10 @@
       "estimatedPortfolioLabel": "Est. portfolio value",
       "estimatedTotalWealthLabel": "Est. total wealth",
       "savedTitle": "Savings per year",
-      "savedDescription": "Difference between starting and final balance, with savings rate over income.",
+      "savedDescription": "Difference between starting and final balance, with savings and investment rates over income.",
       "savedLabel": "Savings",
       "savingsRateLabel": "Savings rate",
+      "investmentRateLabel": "Investment rate",
       "investedTitle": "Investment per year",
       "investedDescription": "Sum of recorded monthly investment.",
       "investedLabel": "Investment",

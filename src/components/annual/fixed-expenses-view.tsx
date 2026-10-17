@@ -16,7 +16,7 @@ export function FixedExpensesView({ yearData }: Props) {
   const locale = useLocale();
   const { stats, grandTotal } = useMemo(() => computeFixedStats(yearData), [yearData]);
 
-  if (grandTotal === 0) {
+  if (stats.length === 0) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-12 text-center text-sm text-muted-foreground">
         {t("emptyState")}

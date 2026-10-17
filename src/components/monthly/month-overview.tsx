@@ -1,5 +1,7 @@
 "use client";
 
+import { isPersonalRemainingValid, PERSONAL_REMAINING_OUT_OF_RANGE } from "@/lib/personal-remaining";
+
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Download, Eye, EyeOff } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -97,6 +99,8 @@ export function MonthOverview({
   toggleAllGroupsRef,
 }: Props) {
   const t = useTranslations("Monthly");
+  const tCommon = useTranslations("Common");
+  const [fixedError, setFixedError] = useState<{ monthId: number; message: string } | null>(null);
   const tOverview = useTranslations("Monthly.overview");
   const locale = useLocale();
   const [tags, setTags] = useState<Tag[]>([]);
@@ -303,12 +307,21 @@ export function MonthOverview({
 
   const handleFixedUpdate = useCallback(async (field: string, value: number, options?: FixedUpdateOptions) => {
     if (!month) return;
+    setFixedError(null);
     const res = await fetch(`/api/months/${month.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ [field]: value, ...options }),
     });
-    if (!res.ok) throw new Error("Failed to update");
+    if (!res.ok) {
+      const error = await res.json();
+      if (error.code === PERSONAL_REMAINING_OUT_OF_RANGE) {
+        setFixedError({ monthId: month.id, message: tCommon("personalRemainingOutOfRange", {
+          months: error.months.map((number: number) => formatMonthName(number, locale)).join(", "),
+        }) });
+      }
+      throw new Error("Failed to update");
+    }
 
     commitMonthsChange((prev) =>
       prev.map((m) =>
@@ -329,7 +342,7 @@ export function MonthOverview({
           : m
       )
     );
-  }, [commitMonthsChange, month]);
+  }, [commitMonthsChange, month, locale, tCommon]);
 
   const handleEntriesChange = useCallback((type: "income" | "expense", entries: AdditionalEntry[]) => {
     commitMonthsChange((prev) =>
@@ -817,6 +830,15 @@ export function MonthOverview({
           </div>
         </CardContent>
       </Card>
+
+      {!isPersonalRemainingValid(month.personalExpense, month.personalRemaining) && (
+        <p role="alert" className="mb-4 rounded-md border border-destructive/20 bg-destructive/5 p-3 text-sm text-destructive">
+          {tCommon("personalRemainingWarning", { months: formatMonthName(month.month, locale) })}
+        </p>
+      )}
+      {fixedError?.monthId === month.id && (
+        <p role="alert" className="mb-4 text-sm text-destructive">{fixedError.message}</p>
+      )}
 
       {renderFixedEditors ? (
         <div

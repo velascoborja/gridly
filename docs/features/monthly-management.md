@@ -8,8 +8,8 @@ The Monthly View (`/locale/[year]/[month]`) is the primary workspace for users. 
 
 ## Key Components
 
-- **Income Card:** Displays net salary (`payslip`), extra payments (`additionalPayslip`), generated interests, and personal surplus (`personalRemaining`).
-- **Fixed Expenses Card:** Tracks recurring costs such as housing (`homeExpense`), personal budget (`personalExpense`), and investments (`investment`).
+- **Income Card:** Displays net salary (`payslip`), extra payments (`additionalPayslip`), generated interests. The personal surplus (`personalRemaining`) editor remains here with a note explaining that it reduces personal spending, rather than increasing income.
+- **Fixed Expenses Card:** Tracks recurring costs such as housing (`homeExpense`), personal budget (`personalExpense`), its net spending (`personalExpense - personalRemaining`), and investments (`investment`).
 - **Recurring Expenses Section:** Shows named planned expenses copied from the year template inside the Fixed Expenses card. Users can edit or delete rows for the current month only.
 - **Summary Card:** Provides a real-time breakdown of `Total Income`, `Total Expenses`, and the resulting `Savings`.
 - **Month Chain:** Shows the `Starting Balance` (inherited from the previous month) and the `Ending Balance` (starting balance + savings).
@@ -65,3 +65,9 @@ Monthly recurring expense rows live in `monthly_recurring_expenses`.
 ## Atomic Persistence
 
 Monthly fixed-field saves and financial mutations commit together with downstream year balances. A failed propagation rolls back the originating change. Mixed metadata/financial handlers also serialize their ownership and state checks within the same account transaction. See [Atomic Financial Writes](financial-transactions.md).
+
+## Personal Budget and Surplus Validation
+
+Editing either `personalExpense` or `personalRemaining` validates the resulting pair inside the financial transaction, before writing. Both values must be finite numbers and satisfy `0 <= personalRemaining <= personalExpense`, including a zero budget. Resetting the budget follows the same validation. Invalid requests return HTTP 400 with `code: PERSONAL_REMAINING_OUT_OF_RANGE` and `months: number[]`; values and override flags remain unchanged. The client shows a localized error and clears pending state while retaining the editor.
+
+Legacy out-of-range values produce a warning above the fixed editors, even when the panel is collapsed. Unrelated monthly fields remain editable; users can correct the pair by changing the budget or surplus. No automatic data repair occurs.

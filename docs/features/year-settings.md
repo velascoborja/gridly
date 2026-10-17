@@ -149,3 +149,9 @@ A year and all its data can be permanently deleted from the Year Configuration p
 ## Atomic Persistence
 
 Guided setup, REST creation, annual configuration updates, prefill, and year deletion each run their complete database operation and downstream carry-over in one user-serialized transaction. The two-step REST creation contract remains unchanged. Cache invalidation occurs after commit. See [Atomic Financial Writes](financial-transactions.md) for transaction boundaries and verification.
+
+## Personal Budget Conflicts
+
+Before any annual configuration or month write, `PATCH /api/years/[year]` checks the resulting personal budget against the surplus of every stored month from `applyFromMonth` through December. This also applies when another setting triggers reapplication of the existing annual budget. Negative or non-finite budgets, negative surplus, or surplus exceeding the new budget reject the entire operation with HTTP 400, `code: PERSONAL_REMAINING_OUT_OF_RANGE`, and the affected `months` array. Earlier months do not block a later range. This validation runs under the same per-user transaction lock as the writes.
+
+The configuration dialog translates conflicts into month names and preserves the previous configuration, monthly values and save state. Legacy invalid values are preserved until corrected manually; no migration is performed.

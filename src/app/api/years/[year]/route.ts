@@ -1,3 +1,4 @@
+import { personalRemainingConflicts, PERSONAL_REMAINING_OUT_OF_RANGE } from "@/lib/personal-remaining";
 import { withFinancialTransaction } from "@/db/financial-transaction";
 import type { FinancialTransaction } from "@/db/financial-transaction";
 import { months, years } from "@/db/schema";
@@ -105,6 +106,18 @@ export async function PATCH(
     if (body.monthlyHomeExpense !== undefined) updates.monthlyHomeExpense = String(body.monthlyHomeExpense);
     if (body.monthlyPersonalBudget !== undefined) updates.monthlyPersonalBudget = String(body.monthlyPersonalBudget);
     if (body.interestRate !== undefined) updates.interestRate = String(body.interestRate);
+
+    const affectedMonths = await db.select({ month: months.month, personalRemaining: months.personalRemaining })
+      .from(months).where(and(eq(months.yearId, yearRow.id), gte(months.month, applyFromMonth)));
+    const budget = body.monthlyPersonalBudget !== undefined
+      ? body.monthlyPersonalBudget : Number(yearRow.monthlyPersonalBudget);
+    const conflicts = personalRemainingConflicts(affectedMonths.map((month) => ({
+      month: month.month, personalRemaining: Number(month.personalRemaining),
+    })), budget, applyFromMonth);
+    if (conflicts.length > 0 || typeof budget !== "number" || !Number.isFinite(budget) || budget < 0) {
+      return Response.json({ error: PERSONAL_REMAINING_OUT_OF_RANGE,
+        code: PERSONAL_REMAINING_OUT_OF_RANGE, months: conflicts }, { status: 400 });
+    }
 
     const updatedRows = await db.update(years).set(updates).where(eq(years.id, yearRow.id)).returning();
     await applyYearConfigToStoredMonths(yearRow.id, applyFromMonth, db);

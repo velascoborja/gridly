@@ -23,7 +23,9 @@
     "createYearButton": "Crear {year}",
     "logout_confirm_title": "¿Cerrar sesión?",
     "logout_confirm_description": "¿Estás seguro de que quieres salir? Tendrás que volver a identificarte para acceder a tus datos.",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "personalRemainingOutOfRange": "El remanente debe estar entre cero y el presupuesto personal. Revisa los meses: {months}.",
+    "personalRemainingWarning": "El remanente de estos meses está fuera del presupuesto personal: {months}. Corrígelo manualmente; el ahorro se conserva mientras tanto."
   },
   "Settings": {
     "title": "Ajustes",
@@ -167,7 +169,7 @@
       "grandTotalLabel": "Total gastos fijos:",
       "emptyState": "No hay datos de gastos fijos registrados.",
       "home": "Vivienda",
-      "personal": "Presupuesto personal",
+      "personal": "Gasto personal neto",
       "recurring": "Gastos recurrentes",
       "shareLabel": "{pct}% del total",
       "entryCount": "{count, plural, one {# entrada} other {# entradas}}"
@@ -465,15 +467,17 @@
       "payslip": "Nómina",
       "additionalPayslip": "Paga extra",
       "interests": "Intereses cuenta",
-      "personalRemaining": "Sobrante propios"
+      "personalRemaining": "Sobrante propios",
+      "personalRemainingHint": "Reduce el gasto personal; no se suma a los ingresos."
     },
     "fixedExpenses": {
       "title": "Gastos fijos",
       "description": "Presupuestos para gastos recurrentes e inversión.",
       "homeExpense": "Casa (mes siguiente)",
-      "personalExpense": "Gastos propios",
+      "personalExpense": "Presupuesto personal",
       "investment": "Inversión",
-      "recurringExpensesTitle": "Gastos recurrentes"
+      "recurringExpensesTitle": "Gastos recurrentes",
+      "personalNet": "Gasto personal neto: {amount}"
     },
     "additionalEntries": {
       "titleIncome": "Ingresos adicionales",
@@ -668,9 +672,10 @@
       "estimatedPortfolioLabel": "Valor estimado cartera",
       "estimatedTotalWealthLabel": "Patrimonio estimado",
       "savedTitle": "Ahorro por año",
-      "savedDescription": "Variación entre saldo inicial y final, con tasa de ahorro sobre ingresos.",
+      "savedDescription": "Variación entre saldo inicial y final, con tasas de ahorro e inversión sobre ingresos.",
       "savedLabel": "Ahorro",
       "savingsRateLabel": "Tasa de ahorro",
+      "investmentRateLabel": "Tasa de inversión",
       "investedTitle": "Inversión por año",
       "investedDescription": "Suma de la inversión mensual registrada.",
       "investedLabel": "Inversión",

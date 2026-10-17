@@ -24,7 +24,7 @@ function buildStats(
   const grandTotal = homeTotal + personalTotal + recurringTotal;
   const raw: FixedExpenseStat[] = [];
 
-  if (homeTotal > 0) {
+  if (homeEntries.length > 0) {
     raw.push({
       key: "home",
       totalAmount: homeTotal,
@@ -32,7 +32,7 @@ function buildStats(
       entries: homeEntries,
     });
   }
-  if (personalTotal > 0) {
+  if (personalEntries.length > 0) {
     raw.push({
       key: "personal",
       totalAmount: personalTotal,
@@ -40,7 +40,7 @@ function buildStats(
       entries: personalEntries,
     });
   }
-  if (recurringTotal > 0) {
+  if (recurringEntries.length > 0) {
     raw.push({
       key: "recurring",
       totalAmount: recurringTotal,
@@ -62,16 +62,16 @@ export function computeFixedStats(yearData: YearData): FixedExpenseStats {
   const recurringEntries: DrilldownEntry[] = [];
 
   for (const m of yearData.months) {
-    if (m.homeExpense > 0) {
+    if (m.homeExpense !== 0) {
       homeTotal += m.homeExpense;
       homeEntries.push({ month: m.month, description: "", amount: m.homeExpense });
     }
-    if (m.personalExpense > 0) {
-      personalTotal += m.personalExpense;
-      personalEntries.push({ month: m.month, description: "", amount: m.personalExpense });
+    if (m.personalExpense - m.personalRemaining !== 0) {
+      personalTotal += m.personalExpense - m.personalRemaining;
+      personalEntries.push({ month: m.month, description: "", amount: m.personalExpense - m.personalRemaining });
     }
     for (const e of m.recurringExpenses) {
-      if (e.amount > 0) {
+      if (e.amount !== 0) {
         recurringTotal += e.amount;
         recurringEntries.push({ month: m.month, description: e.label, amount: e.amount });
       }
@@ -83,9 +83,9 @@ export function computeFixedStats(yearData: YearData): FixedExpenseStats {
 
 export function hasFixedStats(yearData: YearData): boolean {
   return yearData.months.some((month) =>
-    month.homeExpense > 0
-    || month.personalExpense > 0
-    || month.recurringExpenses.some((expense) => expense.amount > 0)
+    month.homeExpense !== 0
+    || month.personalExpense - month.personalRemaining !== 0
+    || month.recurringExpenses.some((expense) => expense.amount !== 0)
   );
 }
 

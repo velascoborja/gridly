@@ -87,7 +87,7 @@ Grouped expenses are attributed to the group's tag, ungrouped additional expense
 
 When at least one full Gridly year has non-zero fixed expense data, the dashboard header shows a `LayoutList` icon button. The button opens a dialog titled by `Evolution.fixedExpensesTitle` with the same **year pager** structure as the Tags dialog.
 
-Three rows appear — home expense, personal budget, and aggregated recurring expenses — rendered using `FixedStatRow` (from `src/components/annual/fixed-stat-row.tsx`). Each row shows total, share of fixed spend, and a monthly (or cross-year) drilldown via the existing `DrilldownList` component. Monthly drilldown headers show a subtotal when the month contains multiple visible expense rows. Rows with a zero total are omitted. Rows are sorted by total amount descending.
+Three rows appear — home expense, net personal spending (budget minus surplus), and aggregated recurring expenses — rendered using `FixedStatRow` (from `src/components/annual/fixed-stat-row.tsx`). Each row shows total, share of fixed spend, and a monthly (or cross-year) drilldown via the existing `DrilldownList` component. Monthly drilldown headers show a subtotal when the month contains multiple visible expense rows. Rows without nonzero monthly entries are omitted. Negative legacy adjustments and categories whose monthly entries cancel to zero remain visible; visual bar widths are clamped to 0–100%. Rows are sorted by total amount descending.
 
 The set of years in the pager respects the `includeFuture` toggle. Historical summary-only imports are excluded. The dialog resets to the combined "Todos los años" page each time it is opened.
 
@@ -116,11 +116,11 @@ The user can enter an annual return rate (%) directly in the Total Wealth box. T
 ### Charts
 
 1. **Final Balance (LineChart)** — Year-over-year trend. Without a return rate: three lines — `finalBalance` (primary), `accumulatedInvested` (teal, dashed), `totalWealth` (orange, dotted). With a return rate: `finalBalance` (primary), `estimatedPortfolioValue` (teal, dashed), `estimatedTotalWealth` (orange, dotted). A legend labels each line.
-2. **Savings per Year (ComposedChart)** — `savedAmount` per year (left Y-axis, currency). Bars are green when `savedAmount ≥ 0` and red when negative. A `savingsRate` trend line (right Y-axis, %) is overlaid using `var(--color-chart-3)`. Historical import years where `savingsRate` is `null` produce a gap in the line (`connectNulls={false}`).
+2. **Savings per Year (ComposedChart)** — `savedAmount` per year (left Y-axis, currency). Bars are green when `savedAmount ≥ 0` and red when negative. Two trend lines share the right percentage Y-axis: `savingsRate` uses `var(--color-chart-3)`, and `investmentRate` uses dashed teal (`var(--color-chart-2)`) with point markers. The chart derives `investmentRate` locally as `investedAmount / totalIncome` using recorded annual investment, independently of portfolio return assumptions. Positive income with zero investment produces 0%; null or non-positive income produces `null`, including historical imports without income data. Rates are not capped at 100%. Both lines use `connectNulls={false}`, and manually supplied historical savings rates remain visible. The legend labels both rates; tooltips format them as localized percentages with one decimal place while savings amounts remain currency values.
 3. **Investment per Year (BarChart)** — `investedAmount` per year in primary color.
 4. **Interest per year (BarChart)** — `interestsEarned` per year in teal (`chart-2`). The secondary-chart row is a 3-column grid at `lg`.
 
-Y-axes on all currency charts are formatted as `Xk` (thousands). The savings chart has a second right Y-axis formatted as `%` for the savings rate line.
+Y-axes on all currency charts are formatted as `Xk` (thousands). The savings chart has a second right Y-axis formatted as `%` shared by the savings and investment rate lines.
 
 Each chart is hosted in a fixed-height, `min-w-0` frame, and each Recharts `ResponsiveContainer` sets `minWidth={0}` and `minHeight={0}` so responsive grid measurement cannot produce invalid negative dimensions.
 
@@ -141,3 +141,7 @@ The Tags and Fixed Expenses dialogs share `DrilldownLoading` while fetching an u
 ## Out Of Scope
 
 The first version does not include forecasting, planning controls, scenario comparisons, or export.
+
+## Personal Surplus Classification
+
+Gridly year income excludes personal surplus, which instead reduces personal expenses in the shared month-chain calculation. Cash savings, balances and interests remain unchanged. Savings and investment rates use corrected income. Fixed-spending drilldowns include negative legacy adjustments across individual and combined years, even when the grand total is zero or negative. Historical summary-only imports remain unchanged.

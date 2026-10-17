@@ -33,7 +33,7 @@ function month(overrides: Partial<MonthData>): MonthData {
     additionalPayslipManualOverride: false,
     interests: 0,
     interestsManualOverride: false,
-    personalRemaining: 0,
+    personalRemaining: overrides.personalRemaining ?? 0,
     recurringExpenses: overrides.recurringExpenses ?? [],
     additionalExpenses: [],
     additionalExpenseGroups: [],
@@ -182,4 +182,19 @@ test("mergeFixedStatsByYear recomputes shares based on merged grand total", () =
   const stats2023 = computeFixedStats(yearData([month({ month: 1, homeExpense: 600, personalExpense: 400 })]));
   const merged = mergeFixedStatsByYear([{ year: 2023, stats: stats2023 }]);
   assert.ok(Math.abs(merged.stats[0].shareOfTotal - 600 / 1000) < 0.001);
+});
+
+test("fixed stats show net spending and preserve negative and cancelling legacy months", () => {
+  const data = yearData([month({ month: 1, personalExpense: 100, personalRemaining: 50 }),
+    month({ month: 2, personalExpense: 100, personalRemaining: 150 })]);
+  const result = computeFixedStats(data);
+  assert.equal(result.grandTotal, 0);
+  assert.equal(result.stats.length, 1);
+  assert.deepEqual(result.stats[0].entries.map((entry) => entry.amount), [50, -50]);
+  assert.equal(hasFixedStats(data), true);
+  const negative = computeFixedStats(yearData([data.months[1]]));
+  assert.equal(negative.stats[0].totalAmount, -50);
+  const merged = mergeFixedStatsByYear([{ year: 2026, stats: result }, { year: 2027, stats: negative }]);
+  assert.equal(merged.stats[0].totalAmount, -50);
+  assert.equal(merged.stats[0].entries.length, 3);
 });

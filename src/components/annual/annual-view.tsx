@@ -1,6 +1,8 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { isPersonalRemainingValid } from "@/lib/personal-remaining";
+import { formatMonthName } from "@/lib/utils";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { applyYearConfigToMonth, computeMonthChain } from "@/lib/calculations";
 import { KpiCards } from "./kpi-cards";
@@ -30,6 +32,8 @@ export function AnnualView({
   onYearDataChange,
 }: Props) {
   const t = useTranslations("Annual");
+  const tCommon = useTranslations("Common");
+  const locale = useLocale();
   const [config, setConfig] = useState<YearConfig>(initial.config);
   const [monthRows, setMonthRows] = useState(initial.months);
   const [recurringExpenses, setRecurringExpenses] = useState(initial.recurringExpenses);
@@ -109,13 +113,14 @@ export function AnnualView({
     pendingSavesRef.current.add(savePromise);
     setSavingConfig(true);
 
-    void savePromise.finally(() => {
+    const finishSave = () => {
       pendingSavesRef.current.delete(savePromise);
       pendingSaveCountRef.current = Math.max(0, pendingSaveCountRef.current - 1);
       if (pendingSaveCountRef.current === 0) {
         setSavingConfig(false);
       }
-    });
+    };
+    void savePromise.then(finishSave, finishSave);
   };
 
   const waitForPendingSaves = async () => {
@@ -135,6 +140,13 @@ export function AnnualView({
 
   return (
     <div className="space-y-5">
+      {months.some((month) => !isPersonalRemainingValid(month.personalExpense, month.personalRemaining)) && (
+        <p role="alert" className="rounded-md border border-destructive/20 bg-destructive/5 p-3 text-sm text-destructive">
+          {tCommon("personalRemainingWarning", { months: months
+            .filter((month) => !isPersonalRemainingValid(month.personalExpense, month.personalRemaining))
+            .map((month) => formatMonthName(month.month, locale)).join(", ") })}
+        </p>
+      )}
       <KpiCards
         months={months}
         startingBalance={config.startingBalance}

@@ -23,8 +23,8 @@ The generated workbook contains 13 sheets, or 14 if the year has any tagged or u
     - Year configuration values.
 - **Sheet 2 — "Categorías" / "Categories" (optional):** Tag analysis summary. Only present when the year has at least one additional or recurring expense entry. Contains a ranked table of tags (sorted by total spend descending, untagged last) with columns: tag name, total amount, and percentage share of total additional spending. Computed via `computeTagStats` — no extra DB queries.
 - **Sheets 3–14 (localized month names):** One sheet per month with a horizontal two-column layout:
-    - Left side (columns A–B): Expenses — fixed expenses subsection (home, personal, investment, recurring expenses), then additional expenses subsection, then total expenses.
-    - Right side (columns D–E): Income — fixed income subsection (salary, extra pay, interests, personal surplus), then additional income subsection, then total income.
+    - Left side (columns A–B): Expenses — fixed expenses subsection (home, personal budget, personal surplus as a negative expense, investment, recurring expenses), then additional expenses subsection, then total expenses.
+    - Right side (columns D–E): Income — fixed income subsection (salary, extra pay, interests), then additional income subsection, then total income.
     - Month summary below both sections: starting balance, savings (color-coded green/red), ending balance.
 - Formatting: Professional styling with Stripe-inspired colors and numeric formatting.
 
@@ -33,9 +33,13 @@ The generated workbook contains 13 sheets, or 14 if the year has any tagged or u
 The monthly export creates a `.md` file for the selected month. It follows the visible sections of the compact monthly template:
 
 - **Expenses for next month:** home expense.
-- **Fixed expenses:** personal budget, investment, and monthly recurring expense copies.
+- **Fixed expenses:** personal budget, personal surplus as a negative expense, investment, and monthly recurring expense copies.
 - **Current month expenses:** ungrouped additional expenses plus grouped expense entries labelled as `Group - Entry`.
-- **Income:** fixed income rows (salary, interests, and personal surplus) followed by a separate additional income table that includes extra pay and additional income entries.
+- **Income:** fixed income rows (salary and interests) followed by a separate additional income table that includes extra pay and additional income entries.
 - **Current summary:** starting balance, total income, total expenses, savings, and ending balance.
 
 The Markdown is generated from server-side year data via `buildMonthlyMarkdown` and downloaded from the month header.
+
+## Personal Surplus Totals
+
+Both exports retain the editable gross personal budget and show surplus separately as a negative fixed-expense row. Income excludes surplus, and total expenses include its full subtraction, including legacy adjustments outside the valid range. Savings and balances remain unchanged.

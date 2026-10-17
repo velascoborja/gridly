@@ -32,7 +32,7 @@ export function FixedStatRow({ stat, maxAmount }: Props) {
   const t = useTranslations("Annual.fixedExpenses");
   const locale = useLocale();
 
-  const barWidth = maxAmount > 0 ? (stat.totalAmount / maxAmount) * 100 : 0;
+  const barWidth = maxAmount > 0 ? Math.min(100, Math.max(0, (stat.totalAmount / maxAmount) * 100)) : 0;
   const styles = KEY_STYLES[stat.key];
 
   return (

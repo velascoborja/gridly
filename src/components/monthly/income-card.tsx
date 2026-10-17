@@ -81,6 +81,7 @@ export function IncomeCard({ month, onUpdate, showAdditionalPayslip, annualDefau
           showReset={Math.abs(month.personalRemaining) > 0.005}
           resetLabel={tCommon("resetToZero")}
         />
+        <p className="px-2 text-xs text-muted-foreground">{t("personalRemainingHint")}</p>
       </CardContent>
     </Card>
   );

@@ -22,7 +22,7 @@ const EXPORT_MESSAGES = {
     interestRate: "Interest rate",
     recurringExpenses: "Recurring expenses",
     homeExpense: "Home expenses",
-    personalExpense: "Personal expenses",
+    personalExpense: "Personal budget",
     investment: "Investment",
     payslip: "Salary",
     additionalPayslip: "Extra pay",
@@ -62,7 +62,7 @@ const EXPORT_MESSAGES = {
     interestRate: "Tipo interés",
     recurringExpenses: "Gastos recurrentes",
     homeExpense: "Casa (mes siguiente)",
-    personalExpense: "Gastos propios",
+    personalExpense: "Presupuesto personal",
     investment: "Inversión",
     payslip: "Nómina",
     additionalPayslip: "Paga extra",
@@ -165,6 +165,9 @@ function buildMonthSheet(
   ws.getCell(`A${expRow}`).value = t.personalExpense;
   money(ws, `B${expRow}`, month.personalExpense);
   expRow++;
+  ws.getCell(`A${expRow}`).value = t.personalRemaining;
+  money(ws, `B${expRow}`, -month.personalRemaining);
+  expRow++;
   ws.getCell(`A${expRow}`).value = t.investment;
   money(ws, `B${expRow}`, month.investment);
   expRow++;
@@ -202,9 +205,6 @@ function buildMonthSheet(
   }
   ws.getCell(`D${incRow}`).value = t.interests;
   money(ws, `E${incRow}`, month.interests);
-  incRow++;
-  ws.getCell(`D${incRow}`).value = t.personalRemaining;
-  money(ws, `E${incRow}`, month.personalRemaining);
   incRow++;
 
   subsectionLabel(ws, `D${incRow}`, t.additionalIncomeLabel);

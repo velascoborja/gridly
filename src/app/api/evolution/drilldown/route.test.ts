@@ -25,7 +25,7 @@ test("evolution drilldown computes only the requested detail shape", () => {
   assert.match(source, /mergeFixedStatsByYear/);
   assert.match(source, /getYearData\(user\.id, year\)/);
   assert.match(source, /stats\.totalAdditional > 0/);
-  assert.match(source, /stats\.grandTotal > 0/);
+  assert.match(source, /stats\.stats\.length > 0/);
 });
 
 test("all-years drilldown filters future years unless explicitly included", () => {

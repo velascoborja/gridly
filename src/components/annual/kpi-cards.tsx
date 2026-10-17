@@ -157,7 +157,7 @@ export function KpiCards({
   const tAnnual = useTranslations("Annual");
   const t = useTranslations("Annual.kpis");
   const locale = useLocale();
-  const populated = months.filter((m) => m.totalIncome > 0 || m.totalExpenses > 0);
+  const populated = months.filter((m) => m.totalIncome !== 0 || m.totalExpenses !== 0 || m.savings !== 0);
   const totalSavings = populated.reduce((s, m) => s + m.savings, 0);
   const totalInvestment = months.reduce((sum, month) => sum + month.investment, 0);
   const investmentMonths = months.filter((month) => month.investment > 0).length;

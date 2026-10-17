@@ -40,7 +40,7 @@ The month and summary server routes load this comparison context through `getAnn
 
 ## Fixed Expenses Drilldown
 
-The Fixed expenses dialog groups annual fixed spend into home expense, personal budget, and recurring expenses. Expanding a row shows the chronological monthly drilldown. Month headers show a subtotal when that month contains more than one visible expense row, so recurring-expense months with multiple items can be read without manual addition.
+The Fixed expenses dialog groups annual fixed spend into home expense, net personal spending (budget minus surplus), and recurring expenses. Expanding a row shows the chronological monthly drilldown. Month headers show a subtotal when that month contains more than one visible expense row, so recurring-expense months with multiple items can be read without manual addition.
 
 ## Monthly Balance Chart
 
@@ -55,3 +55,7 @@ When the viewed year is the current calendar year, the X-axis tick for the curre
 The monthly savings chart plots each month's net savings as bars. Positive months stay green and negative months stay red so the savings direction remains the primary signal. `AnnualView` also passes the selected calendar year into `SavingsChart`; when the viewed year matches the browser's current year, the current month bar receives a subtle primary-colored outline and glow, and the tooltip labels it as the current month.
 
 Negative-month abbreviations on the X axis use the same red status color as their bars. This negative-state color takes priority over the primary-colored current-month label, while the small primary dot beneath the label continues to identify the current month.
+
+## Personal Surplus Warnings and Adjustments
+
+A localized warning lists every month whose surplus is outside its personal budget. Personal fixed-expense drilldowns use net spending and retain negative legacy adjustments, including categories that cancel to zero across months. Bar widths stay within 0–100%. Months with negative totals or savings remain included in savings KPIs. Income totals and savings-rate denominators exclude personal surplus; cash savings are unchanged.

@@ -26,7 +26,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+import { PERSONAL_REMAINING_OUT_OF_RANGE } from "@/lib/personal-remaining";
+import { cn, formatMonthName } from "@/lib/utils";
 import { hasInvalidRecurringExpenseAmounts, type RecurringExpenseInput } from "@/lib/recurring-expenses";
 import type { YearConfig, YearData, YearRecurringExpense } from "@/lib/types";
 
@@ -58,6 +59,8 @@ export function YearConfigForm({
   onPendingSave,
 }: Props) {
   const t = useTranslations("Annual.config");
+  const tCommon = useTranslations("Common");
+  const [configError, setConfigError] = useState("");
   const locale = useLocale();
   const router = useRouter();
   const [savingFields, setSavingFields] = useState<Set<keyof YearConfig>>(() => new Set());
@@ -158,6 +161,7 @@ export function YearConfigForm({
       return;
     }
 
+    setConfigError("");
     setSavingFields((current) => new Set(current).add(field));
     if (field === "hasExtraPayments") {
       setOptimisticExtraPayments(Boolean(value));
@@ -169,7 +173,15 @@ export function YearConfigForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ [field]: value, applyFromMonth }),
       });
-      if (!res.ok) throw new Error("Failed to update");
+      if (!res.ok) {
+        const error = await res.json();
+        if (error.code === PERSONAL_REMAINING_OUT_OF_RANGE) {
+          setConfigError(tCommon("personalRemainingOutOfRange", {
+            months: error.months.map((number: number) => formatMonthName(number, locale)).join(", "),
+          }));
+        }
+        throw new Error("Failed to update");
+      }
       onConfigChange((current) => {
         const next = { ...current, [field]: value };
         onConfigApplied?.(next, applyFromMonth);
@@ -224,6 +236,7 @@ export function YearConfigForm({
 
   return (
     <div className="space-y-4">
+      {configError && <p role="alert" className="text-sm text-destructive">{configError}</p>}
       <AlertDialog open={pendingOverwrite !== null} onOpenChange={(open) => {
         if (!open) settleOverwriteConfirmation(false);
       }}>

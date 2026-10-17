@@ -190,29 +190,33 @@ test("evolution dashboard only shows tags button when there are visible tag year
   assert.match(source, /visibleTagYears/);
 });
 
-test("evolution charts savings rate label and description keys exist in both locales", () => {
+test("evolution charts savings and investment rate labels and descriptions exist in both locales", () => {
   const spanish = JSON.parse(readFileSync(new URL("../../../messages/es.json", import.meta.url), "utf8"));
   const english = JSON.parse(readFileSync(new URL("../../../messages/en.json", import.meta.url), "utf8"));
 
   assert.equal(spanish.Evolution.charts.savingsRateLabel, "Tasa de ahorro");
   assert.equal(english.Evolution.charts.savingsRateLabel, "Savings rate");
+  assert.equal(spanish.Evolution.charts.investmentRateLabel, "Tasa de inversión");
+  assert.equal(english.Evolution.charts.investmentRateLabel, "Investment rate");
   assert.equal(
     spanish.Evolution.charts.savedDescription,
-    "Variación entre saldo inicial y final, con tasa de ahorro sobre ingresos."
+    "Variación entre saldo inicial y final, con tasas de ahorro e inversión sobre ingresos."
   );
   assert.equal(
     english.Evolution.charts.savedDescription,
-    "Difference between starting and final balance, with savings rate over income."
+    "Difference between starting and final balance, with savings and investment rates over income."
   );
 });
 
-test("evolution charts savings bar includes savings rate line overlay with dual Y-axis", () => {
+test("evolution charts savings bar includes savings and investment rate lines with dual Y-axis", () => {
   const source = readFileSync(new URL("./evolution-charts.tsx", import.meta.url), "utf8");
 
   assert.match(source, /dataKey="savingsRate"/);
+  assert.match(source, /dataKey="investmentRate"/);
   assert.match(source, /yAxisId="right"/);
   assert.match(source, /orientation="right"/);
   assert.match(source, /connectNulls=\{false\}/);
   assert.match(source, /savingsRateLabel/);
+  assert.match(source, /investmentRateLabel/);
   assert.match(source, /ComposedChart/);
 });

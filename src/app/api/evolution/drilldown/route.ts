@@ -20,7 +20,7 @@ function buildDrilldown(kind: "tags" | "fixed", years: YearData[]) {
   return mergeFixedStatsByYear(
     years
       .map((yearData) => ({ year: yearData.config.year, stats: computeFixedStats(yearData) }))
-      .filter(({ stats }) => stats.grandTotal > 0),
+      .filter(({ stats }) => stats.stats.length > 0),
   );
 }
 

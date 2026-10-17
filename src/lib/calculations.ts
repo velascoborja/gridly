@@ -45,7 +45,7 @@ export function calculateMonthlyInterest(startingBalance: number, interestRate: 
 
 export function totalIncome(m: RawMonthData): number {
   const additionalSum = m.additionalIncomes.reduce((sum, e) => sum + e.amount, 0);
-  return m.payslip + m.additionalPayslip + m.interests + m.personalRemaining + additionalSum;
+  return m.payslip + m.additionalPayslip + m.interests + additionalSum;
 }
 
 export function totalExpenses(m: RawMonthData): number {
@@ -55,7 +55,7 @@ export function totalExpenses(m: RawMonthData): number {
     0
   );
   const recurringSum = (m.recurringExpenses ?? []).reduce((sum, e) => sum + e.amount, 0);
-  return m.homeExpense + m.personalExpense + m.investment + recurringSum + additionalSum + groupedSum;
+  return m.homeExpense + (m.personalExpense - m.personalRemaining) + m.investment + recurringSum + additionalSum + groupedSum;
 }
 
 export function savings(m: RawMonthData): number {
@@ -66,8 +66,8 @@ export function calculateMonthFinancials(input: AggregatedMonthFinancialInput) {
   const interests = input.interestsManualOverride
     ? input.interests
     : calculateMonthlyInterest(input.startingBalance, input.interestRate);
-  const income = input.payslip + input.additionalPayslip + interests + input.personalRemaining + input.additionalIncome;
-  const expenses = input.homeExpense + input.personalExpense + input.investment + input.recurringExpense + input.additionalExpense;
+  const income = input.payslip + input.additionalPayslip + interests + input.additionalIncome;
+  const expenses = input.homeExpense + (input.personalExpense - input.personalRemaining) + input.investment + input.recurringExpense + input.additionalExpense;
   const monthSavings = income - expenses;
 
   return {

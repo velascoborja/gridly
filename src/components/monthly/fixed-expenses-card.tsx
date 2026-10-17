@@ -65,6 +65,9 @@ export function FixedExpensesCard({ tags, onCreateTag, month, onUpdate, onRecurr
           showReset={month.personalExpenseManualOverride}
           onReset={(v) => onUpdate("personalExpense", v, { personalExpenseManualOverride: false })}
         />
+        <p className="px-2 pb-2 text-xs text-muted-foreground tabular-nums">
+          {t("personalNet", { amount: formatCurrency(month.personalExpense - month.personalRemaining, locale) })}
+        </p>
         <InlineEditField
           label={t("investment")}
           value={month.investment}

@@ -20,6 +20,17 @@ const chartFrameClassName = "min-w-0 overflow-hidden";
 export function EvolutionCharts({ metrics, estimatedValues }: Props) {
   const t = useTranslations("Evolution.charts");
   const locale = useLocale();
+  const rateFormatter = new Intl.NumberFormat(locale, {
+    style: "percent",
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
+  const savingsData = metrics.map((metric) => ({
+    ...metric,
+    investmentRate: metric.totalIncome !== null && metric.totalIncome > 0
+      ? metric.investedAmount / metric.totalIncome
+      : null,
+  }));
 
   const balanceData = metrics.map((m, idx) => {
     const ep = estimatedValues?.[idx]?.estimatedPortfolioValue;
@@ -77,7 +88,7 @@ export function EvolutionCharts({ metrics, estimatedValues }: Props) {
             <div className="rounded-lg border border-border/60 bg-muted/20 p-2 sm:p-3">
               <div className={`${chartFrameClassName} h-[180px] sm:h-[240px]`}>
                 <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-                  <ComposedChart data={metrics} margin={{ top: 6, right: 8, bottom: 0, left: 4 }}>
+                  <ComposedChart data={savingsData} margin={{ top: 6, right: 8, bottom: 0, left: 4 }}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-border/80" />
                     <XAxis dataKey="year" tick={{ fontSize: 11 }} />
                     <YAxis yAxisId="left" tickFormatter={axisCurrency} tick={{ fontSize: 11 }} width={44} />
@@ -89,9 +100,9 @@ export function EvolutionCharts({ metrics, estimatedValues }: Props) {
                       width={36}
                     />
                     <Tooltip
-                      formatter={(value, name) =>
-                        name === t("savingsRateLabel")
-                          ? `${(Number(value) * 100).toFixed(1)}%`
+                      formatter={(value, _name, item) =>
+                        item.dataKey === "savingsRate" || item.dataKey === "investmentRate"
+                          ? rateFormatter.format(Number(value))
                           : formatCurrency(Number(value), locale)
                       }
                     />
@@ -110,6 +121,18 @@ export function EvolutionCharts({ metrics, estimatedValues }: Props) {
                       dot={{ r: 3 }}
                       activeDot={{ r: 5 }}
                       stroke="var(--color-chart-3)"
+                      connectNulls={false}
+                    />
+                    <Line
+                      yAxisId="right"
+                      name={t("investmentRateLabel")}
+                      type="monotone"
+                      dataKey="investmentRate"
+                      strokeWidth={2}
+                      dot={{ r: 3 }}
+                      activeDot={{ r: 5 }}
+                      stroke="var(--color-chart-2)"
+                      strokeDasharray="5 3"
                       connectNulls={false}
                     />
                   </ComposedChart>

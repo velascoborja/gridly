@@ -1,3 +1,4 @@
+import { isPersonalRemainingValid, PERSONAL_REMAINING_OUT_OF_RANGE } from "@/lib/personal-remaining";
 import { withFinancialTransaction } from "@/db/financial-transaction";
 import { months } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -66,6 +67,15 @@ export async function PATCH(
 
     const ownedMonth = await getOwnedMonth(user.id, id, db);
     if (!ownedMonth) return Response.json({ error: "Month not found" }, { status: 404 });
+
+    if ((body.personalExpense !== undefined || body.personalRemaining !== undefined)
+      && !isPersonalRemainingValid(
+        body.personalExpense !== undefined ? body.personalExpense : Number(ownedMonth.personalExpense),
+        body.personalRemaining !== undefined ? body.personalRemaining : Number(ownedMonth.personalRemaining),
+      )) {
+      return Response.json({ error: PERSONAL_REMAINING_OUT_OF_RANGE,
+        code: PERSONAL_REMAINING_OUT_OF_RANGE, months: [ownedMonth.month] }, { status: 400 });
+    }
 
     const [updated] = await db.update(months).set(updates).where(eq(months.id, ownedMonth.id)).returning();
     const yearNumber = await getYearNumberForYearId(ownedMonth.yearId, db);
