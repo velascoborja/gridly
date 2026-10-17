@@ -55,7 +55,8 @@ test("navigation keeps evolution tab enabled for single-year users", () => {
 test("navigation handles evolution active state and hides year selector", () => {
   const navSource = readFileSync(new URL("./nav-selectors.tsx", import.meta.url), "utf8");
 
-  assert.match(navSource, /view === "summary" \? "summary" : view === "evolution" \? "evolution"/);
+  assert.match(navSource, /const annualView = view === "movements" \? "summary" : view/);
+  assert.match(navSource, /annualView === "summary" \? "summary" : view === "evolution" \? "evolution"/);
   assert.match(navSource, /const showYearControls = !hideYearSelector && view !== "evolution"/);
 });
 

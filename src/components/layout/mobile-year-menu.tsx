@@ -14,6 +14,7 @@ import { getGridlyYears, getNextCreatableYearFromOptions } from "@/lib/server/ye
 import {
   buildYearMonthHref,
   buildYearSummaryHref,
+  buildYearMovementsHref,
   buildSetupHrefFromPathname,
   buildEvolutionHref,
 } from "@/lib/year-routes";
@@ -22,7 +23,7 @@ import type { YearOption } from "@/lib/types";
 interface Props {
   currentYear: number;
   currentMonth: number | null;
-  view: "overview" | "summary" | "settings" | "evolution";
+  view: "overview" | "summary" | "movements" | "settings" | "evolution";
   years: number[] | YearOption[];
 }
 
@@ -51,6 +52,10 @@ export function MobileYearMenu({ currentYear, currentMonth, view, years }: Props
     const option = yearOptions.find((o) => o.year === year);
     if (option?.source === "historical") {
       router.push(evolutionHref);
+      return;
+    }
+    if (view === "movements") {
+      router.push(buildYearMovementsHref(undefined, year));
       return;
     }
     if (view === "summary") router.push(buildYearSummaryHref(undefined, year));

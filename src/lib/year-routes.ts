@@ -1,4 +1,4 @@
-export type YearRouteView = "overview" | "summary" | "settings" | "evolution";
+export type YearRouteView = "overview" | "summary" | "movements" | "settings" | "evolution";
 
 export function parseYearRoutePathname(pathname: string): { year: number | null; view: YearRouteView; month: number | null } | null {
   if (pathname.match(/\/settings$/)) {
@@ -7,6 +7,11 @@ export function parseYearRoutePathname(pathname: string): { year: number | null;
 
   if (pathname.match(/\/evolution$/)) {
     return { year: null, view: "evolution", month: null };
+  }
+
+  const movementsMatch = pathname.match(/\/(\d+)\/movements$/);
+  if (movementsMatch) {
+    return { year: Number.parseInt(movementsMatch[1], 10), view: "movements", month: null };
   }
 
   const summaryMatch = pathname.match(/\/(\d+)\/summary$/);
@@ -23,7 +28,7 @@ export function parseYearRoutePathname(pathname: string): { year: number | null;
 }
 
 export function getYearRoutePrefix(pathname: string, year: number): string {
-  const yearMatch = pathname.match(new RegExp(`^(.*)/${year}/(?:summary|\\d+)$`));
+  const yearMatch = pathname.match(new RegExp(`^(.*)/${year}/(?:summary|movements|\\d+)$`));
   if (yearMatch) return yearMatch[1];
 
   const settingsMatch = pathname.match(/^(.*)\/settings$/);
@@ -43,6 +48,10 @@ export function buildYearSummaryHref(prefix: string | undefined, year: number): 
   return `${prefix ?? ""}/${year}/summary`;
 }
 
+export function buildYearMovementsHref(prefix: string | undefined, year: number): string {
+  return `${prefix ?? ""}/${year}/movements`;
+}
+
 export function buildSettingsHref(prefix: string): string {
   return prefix ? `${prefix}/settings` : "/settings";
 }
@@ -56,6 +65,7 @@ export function buildSetupHref(nextYear: number, returnPath: string): string {
 }
 
 export function buildReturnPathFromView(currentYear: number, currentMonth: number, view: YearRouteView): string {
+  if (view === "movements") return buildYearMovementsHref(undefined, currentYear);
   if (view === "summary") return `/${currentYear}/summary`;
   return `/${currentYear}/${currentMonth}`;
 }
@@ -67,6 +77,11 @@ export function buildSetupHrefFromPathname(
   currentMonth: number,
   view: YearRouteView
 ): string {
+  const movementsState = parseYearRoutePathname(pathname);
+  if (movementsState?.view === "movements" && movementsState.year === currentYear) {
+    return buildSetupHref(nextYear, buildYearMovementsHref(undefined, currentYear));
+  }
+
   const summaryMatch = pathname.match(new RegExp(`/(?:${currentYear})/summary$`));
   if (summaryMatch) return buildSetupHref(nextYear, `/${currentYear}/summary`);
 

@@ -18,6 +18,7 @@ import {
 import {
   buildYearMonthHref,
   buildYearSummaryHref,
+  buildYearMovementsHref,
   buildSetupHrefFromPathname,
   buildEvolutionHref,
 } from "@/lib/year-routes";
@@ -25,7 +26,7 @@ import {
 interface Props {
   currentYear: number;
   currentMonth: number | null;
-  view: "overview" | "summary" | "settings" | "evolution";
+  view: "overview" | "summary" | "movements" | "settings" | "evolution";
   years: number[] | YearOption[];
   monthPathPrefix?: string;
   summaryPathPrefix?: string;
@@ -65,7 +66,8 @@ export function NavSelectors({
   const isHistoricalYearSelected = selectedYearOption?.source === "historical";
   const showCurrentYearMarker = yearOptions.length > 1 && gridlyYears.length > 0;
   const nextCreatableYear = getNextCreatableYearFromOptions(yearOptions, currentYear);
-  const activeMainView = view === "summary" ? "summary" : view === "evolution" ? "evolution" : view === "settings" ? null : "overview";
+  const annualView = view === "movements" ? "summary" : view;
+  const activeMainView = annualView === "summary" ? "summary" : view === "evolution" ? "evolution" : view === "settings" ? null : "overview";
   const showYearControls = !hideYearSelector && view !== "evolution";
 
   const handleYearChange = (val: string | null) => {
@@ -74,6 +76,10 @@ export function NavSelectors({
     const option = yearOptions.find((candidate) => candidate.year === y);
     if (option?.source === "historical") {
       router.push(buildEvolutionHref(undefined));
+      return;
+    }
+    if (view === "movements") {
+      router.push(buildYearMovementsHref(summaryPathPrefix, y));
       return;
     }
     if (view === "summary") router.push(buildYearSummaryHref(summaryPathPrefix, y));

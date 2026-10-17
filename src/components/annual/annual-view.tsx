@@ -20,6 +20,7 @@ interface Props {
   startingBalanceEditable: boolean;
   expectedEntriesStorageNamespace: string;
   readOnly?: boolean;
+  onMovementsSelect?: () => void;
   onYearDataChange?: (yearData: YearData) => void;
 }
 
@@ -30,6 +31,7 @@ export function AnnualView({
   expectedEntriesStorageNamespace,
   readOnly = false,
   onYearDataChange,
+  onMovementsSelect,
 }: Props) {
   const t = useTranslations("Annual");
   const tCommon = useTranslations("Common");
@@ -155,6 +157,7 @@ export function AnnualView({
         savingConfig={readOnly ? false : savingConfig}
         startingBalanceEditable={startingBalanceEditable}
         readOnly={readOnly}
+        onMovementsSelect={onMovementsSelect}
         onConfigChange={setConfig}
         onConfigApplied={applyConfigToMonths}
         yearData={initial}

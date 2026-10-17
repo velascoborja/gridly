@@ -1,12 +1,16 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-type View = "overview" | "summary" | "settings";
+type View = "overview" | "summary" | "movements" | "settings";
 
 interface Props {
   view: View;
 }
 
 export function YearViewLoading({ view }: Props) {
+  if (view === "movements") {
+    return <MovementsViewSkeleton />;
+  }
+
   if (view === "settings") {
     return <SettingsViewSkeleton />;
   }
@@ -211,5 +215,17 @@ function ChartSkeleton() {
         ))}
       </div>
     </section>
+  );
+}
+
+function MovementsViewSkeleton() {
+  return (
+    <LoadingRegion className="space-y-6 motion-reduce:[&_[data-slot=skeleton]]:animate-none">
+      <Skeleton className="h-8 w-44" />
+      <ContentCard rows={2} />
+      {Array.from({ length: 3 }, (_, index) => (
+        <ContentCard key={index} rows={3} />
+      ))}
+    </LoadingRegion>
   );
 }

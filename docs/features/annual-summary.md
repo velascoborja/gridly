@@ -65,3 +65,11 @@ Negative-month abbreviations on the X axis use the same red status color as thei
 ## Personal Surplus Warnings and Adjustments
 
 A localized warning lists every month whose surplus is outside its personal budget. Personal fixed-expense drilldowns use net spending and retain negative legacy adjustments, including categories that cancel to zero across months. Bar widths stay within 0–100%. Months with negative totals or savings remain included in savings KPIs. Income totals and savings-rate denominators exclude personal surplus; cash savings are unchanged.
+
+
+## Year Movements Screen
+
+The Annual summary's **Yearly movements** button opens a separate read-only screen with all twelve months, a selector for additional expenses or income, annual and monthly totals, peak-month highlights, and entry/group breakdowns. Months start expanded and have sticky collapsible headers; savings/loss and ending balance provide secondary context. The screen shares the mounted year data and is also available in the public demo. See [Year Movements](year-movements.md) for calculation scope, routing and interaction details.
+
+
+The movements action retains its labeled button on desktop and becomes an icon-only link in the action row below 640px, including the read-only demo. Export uses a separate line on mobile to preserve space for the icon controls.

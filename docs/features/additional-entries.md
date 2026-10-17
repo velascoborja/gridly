@@ -102,3 +102,8 @@ Any **ungrouped** additional entry (income or expense) can be marked as recurrin
 ## Atomic Persistence
 
 Entry creation, edits, moves, and deletion run in the same transaction as any required carry-over. State/ownership checks run after acquiring the account lock, preventing an edit from using a stale month or group during a concurrent move. Metadata-only edits retain propagation suppression. See [Atomic Financial Writes](financial-transactions.md).
+
+
+## Year Movements Screen
+
+The Annual summary's **Yearly movements** button opens a separate read-only screen with all twelve months, a selector for additional expenses or income, annual and monthly totals, peak-month highlights, and entry/group breakdowns. Months start expanded and have sticky collapsible headers; savings/loss and ending balance provide secondary context. The screen shares the mounted year data and is also available in the public demo. See [Year Movements](year-movements.md) for calculation scope, routing and interaction details.

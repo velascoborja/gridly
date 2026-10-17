@@ -12,7 +12,7 @@ import type { YearOption } from "@/lib/types";
 interface Props {
   currentYear: number;
   currentMonth: number | null;
-  view: "overview" | "summary" | "settings" | "evolution";
+  view: "overview" | "summary" | "movements" | "settings" | "evolution";
   years: number[] | YearOption[];
   user: {
     id: string;

@@ -17,6 +17,7 @@ import {
   getYearRoutePrefix,
   buildYearMonthHref,
   buildYearSummaryHref,
+  buildYearMovementsHref,
   buildSettingsHref,
 } from "@/lib/year-routes";
 import { getUserExpectedEntriesNamespace } from "@/lib/expected-entries-storage";
@@ -24,6 +25,11 @@ import { getUserExpectedEntriesNamespace } from "@/lib/expected-entries-storage"
 const AnnualView = dynamic(
   () => import("@/components/annual/annual-view").then((module) => module.AnnualView),
   { loading: () => <YearViewLoading view="summary" /> }
+);
+
+const YearMovementsView = dynamic(
+  () => import("@/components/annual/year-movements-view").then((module) => module.YearMovementsView),
+  { loading: () => <YearViewLoading view="movements" /> }
 );
 
 const MonthOverview = dynamic(
@@ -40,7 +46,7 @@ interface Props {
   yearData: YearData;
   annualComparison?: AnnualKpiComparisonData;
   initialMonth: number;
-  initialView: "overview" | "summary";
+  initialView: "overview" | "summary" | "movements";
   years: number[];
   startingBalanceEditable?: boolean;
   user: {
@@ -55,7 +61,7 @@ function getInitialStateFromPathname(
   pathname: string,
   currentYear: number,
   fallbackMonth: number,
-  fallbackView: "overview" | "summary"
+  fallbackView: "overview" | "summary" | "movements"
 ): { month: number; view: YearRouteView } {
   const pathnameState = parseYearRoutePathname(pathname);
   if (pathnameState?.view === "evolution") {
@@ -161,6 +167,14 @@ export function YearPageClient({
 
     setSelectedView("summary");
     window.history.pushState(null, "", buildYearSummaryHref(routePrefix, currentYearData.config.year));
+  }, [currentYearData.config.year, routePrefix, selectedView]);
+
+  const handleMovementsSelect = useCallback(() => {
+    if (selectedView === "movements") return;
+
+    setSelectedView("movements");
+    window.history.pushState(null, "", buildYearMovementsHref(routePrefix, currentYearData.config.year));
+    window.scrollTo({ top: 0, behavior: "instant" });
   }, [currentYearData.config.year, routePrefix, selectedView]);
 
   useEffect(() => {
@@ -289,6 +303,12 @@ export function YearPageClient({
         <div className="mx-auto max-w-4xl py-6">
           <SettingsForm userId={user.id} />
         </div>
+      ) : selectedView === "movements" ? (
+        <YearMovementsView
+          key={currentYearData.config.year}
+          yearData={currentYearData}
+          onSummarySelect={handleSummarySelect}
+        />
       ) : selectedView === "summary" ? (
         <AnnualView
           yearData={currentYearData}
@@ -296,6 +316,7 @@ export function YearPageClient({
           startingBalanceEditable={startingBalanceEditable}
           expectedEntriesStorageNamespace={getUserExpectedEntriesNamespace(user.id)}
           onYearDataChange={setCurrentYearData}
+          onMovementsSelect={handleMovementsSelect}
         />
       ) : (
         <MonthOverview

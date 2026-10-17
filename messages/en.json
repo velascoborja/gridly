@@ -237,7 +237,34 @@
     "expectedEntryLabelPlaceholder": "Description (e.g. annual bonus)",
     "expectedEntryAddButton": "Add",
     "expectedEntryIncomeBadge": "Income",
-    "expectedEntryExpenseBadge": "Expense"
+    "expectedEntryExpenseBadge": "Expense",
+    "movementsButton": "Yearly movements",
+    "movements": {
+      "title": "Yearly movements",
+      "eyebrow": "Details for {year}",
+      "description": "Compare additional movements across months and explore each breakdown. Includes all recorded entries, including planned ones.",
+      "back": "Back to annual summary",
+      "typeLabel": "Movement type",
+      "expense": "Additional expenses",
+      "income": "Additional income",
+      "expenseTotal": "Yearly additional expenses",
+      "incomeTotal": "Yearly additional income",
+      "expensePeak": "Months with the highest additional expenses",
+      "incomePeak": "Months with the highest additional income",
+      "emptyYear": "No movements of this type yet.",
+      "expandAll": "Expand all",
+      "collapseAll": "Collapse all",
+      "expandMonth": "Expand {month}",
+      "collapseMonth": "Collapse {month}",
+      "forecast": "Planned",
+      "peakBadge": "Highest amount",
+      "savings": "Savings",
+      "endingBalance": "Balance at month end",
+      "emptyExpenseMonth": "No additional expenses this month.",
+      "emptyIncomeMonth": "No additional income this month.",
+      "loss": "Loss",
+      "group": "Group"
+    }
   },
   "Setup": {
     "title": "Configure {year}",
@@ -422,6 +449,11 @@
       "eyebrow": "Demo",
       "title": "Annual Summary {year}",
       "description": "Explore the projected close for {year} with sample data. Sign in with Google to create your own private workspace."
+    },
+    "movements": {
+      "eyebrow": "Public demo",
+      "title": "Movements for {year}",
+      "description": "Explore an example year’s movements using fictional data."
     }
   },
   "Monthly": {

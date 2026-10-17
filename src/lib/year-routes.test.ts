@@ -5,6 +5,7 @@ import {
   getYearRoutePrefix,
   buildYearMonthHref,
   buildYearSummaryHref,
+  buildYearMovementsHref,
   buildSettingsHref,
   buildEvolutionHref,
   buildSetupHref,
@@ -112,5 +113,20 @@ describe("year-routes", () => {
         "/setup/2027?redirect=%2F2026%2F5"
       );
     });
+  });
+});
+
+
+describe("year movements routes", () => {
+  it("parses locale and demo prefixes and preserves them in builders", () => {
+    for (const prefix of ["", "/es", "/en", "/es/demo", "/demo"]) {
+      const href = buildYearMovementsHref(prefix, 2026);
+      assert.deepEqual(parseYearRoutePathname(href), { year: 2026, view: "movements", month: null });
+      assert.equal(getYearRoutePrefix(href, 2026), prefix);
+    }
+  });
+  it("retains movements as the return destination after year creation", () => {
+    assert.equal(buildSetupHrefFromPathname(2027, "/es/2026/movements", 2026, 4, "movements"), "/setup/2027?redirect=%2F2026%2Fmovements");
+    assert.equal(buildSetupHrefFromPathname(2027, "/es/settings", 2026, 4, "movements"), "/setup/2027?redirect=%2F2026%2Fmovements");
   });
 });

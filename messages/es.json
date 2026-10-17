@@ -237,7 +237,34 @@
     "expectedEntryLabelPlaceholder": "Descripción (ej. bono anual)",
     "expectedEntryAddButton": "Añadir",
     "expectedEntryIncomeBadge": "Ingreso",
-    "expectedEntryExpenseBadge": "Gasto"
+    "expectedEntryExpenseBadge": "Gasto",
+    "movementsButton": "Movimientos del año",
+    "movements": {
+      "title": "Movimientos del año",
+      "eyebrow": "Detalle de {year}",
+      "description": "Compara los movimientos adicionales de cada mes y consulta su desglose. Incluye todas las entradas registradas, también las previstas.",
+      "back": "Volver al resumen anual",
+      "typeLabel": "Tipo de movimiento",
+      "expense": "Gastos adicionales",
+      "income": "Ingresos adicionales",
+      "expenseTotal": "Gastos adicionales del año",
+      "incomeTotal": "Ingresos adicionales del año",
+      "expensePeak": "Meses con más gastos adicionales",
+      "incomePeak": "Meses con más ingresos adicionales",
+      "emptyYear": "Todavía no hay movimientos de este tipo.",
+      "expandAll": "Desplegar todos",
+      "collapseAll": "Plegar todos",
+      "expandMonth": "Desplegar {month}",
+      "collapseMonth": "Plegar {month}",
+      "forecast": "Previsto",
+      "peakBadge": "Mayor importe",
+      "savings": "Ahorro",
+      "endingBalance": "Saldo a final de mes",
+      "emptyExpenseMonth": "Sin gastos adicionales este mes.",
+      "emptyIncomeMonth": "Sin ingresos adicionales este mes.",
+      "loss": "Pérdida",
+      "group": "Grupo"
+    }
   },
   "Setup": {
     "title": "Configurar {year}",
@@ -422,6 +449,11 @@
       "eyebrow": "Demo",
       "title": "Resumen anual {year}",
       "description": "Explora el cierre previsto de {year} con datos de ejemplo. Inicia sesión con Google para crear tu propio espacio privado."
+    },
+    "movements": {
+      "eyebrow": "Demo pública",
+      "title": "Movimientos de {year}",
+      "description": "Explora los movimientos de un año de ejemplo, con datos ficticios."
     }
   },
   "Monthly": {

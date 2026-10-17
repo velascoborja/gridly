@@ -113,6 +113,7 @@ When changing any of the features listed below, update the related documentation
 
 - [Year Settings & Setup](docs/features/year-settings.md): Details on year creation, configuration fields, and prefill logic.
 - [Monthly Management](docs/features/monthly-management.md): Core tracking interface for income, fixed expenses, and interest calculations.
+- [Year Movements](docs/features/year-movements.md): Monthly additional expense/income breakdowns, comparison totals, and sticky collapsible month headers.
 - [Annual Summary](docs/features/annual-summary.md): Annual KPI cards, expected-entry estimates, charts, and multi-year comparison context.
 - [Recurring Expenses](docs/features/recurring-expenses.md): Annual recurring expense templates and monthly recurring expense copies.
 - [Additional Entries](docs/features/additional-entries.md): Management of granular variable expenses and income transactions.

@@ -1,7 +1,9 @@
 import { useLocale, useTranslations } from "next-intl";
-import { ArrowDownRight, ArrowUpRight, Download, LayoutList, Minus, Percent, PiggyBank, Settings, Sparkles, Tags, type LucideIcon } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, ArrowLeftRight, Download, LayoutList, Minus, Percent, PiggyBank, Settings, Sparkles, Tags, type LucideIcon } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
-import { Button } from "@/components/ui/button";
+import { Link, usePathname } from "@/i18n/routing";
+import { buildYearMovementsHref, getYearRoutePrefix } from "@/lib/year-routes";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
@@ -11,7 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, cn } from "@/lib/utils";
 import { calculateSavingsRate, formatSavingsRate } from "@/lib/annual-savings-rate";
 import { calculateInvestmentRate } from "@/lib/annual-investment-rate";
 import { totalMonthlyInvestment } from "@/lib/calculations";
@@ -32,6 +34,7 @@ interface Props {
   yearData: YearData;
   annualComparison?: AnnualKpiComparisonData;
   readOnly?: boolean;
+  onMovementsSelect?: () => void;
   onConfigChange: Dispatch<SetStateAction<YearConfig>>;
   onConfigApplied: (config: YearConfig, applyFromMonth: number) => void;
   recurringExpenses: YearRecurringExpense[];
@@ -145,6 +148,7 @@ export function KpiCards({
   yearData,
   annualComparison,
   readOnly = false,
+  onMovementsSelect,
   onConfigChange,
   onConfigApplied,
   recurringExpenses,
@@ -157,6 +161,8 @@ export function KpiCards({
   onAddExpectedEntry,
   onDeleteExpectedEntry,
 }: Props) {
+  const pathname = usePathname();
+  const movementsHref = buildYearMovementsHref(getYearRoutePrefix(pathname, config.year), config.year);
   const tAnnual = useTranslations("Annual");
   const t = useTranslations("Annual.kpis");
   const locale = useLocale();
@@ -333,9 +339,34 @@ export function KpiCards({
             </div>
 
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center lg:flex-col lg:items-end">
-              {!readOnly ? (
-                <>
-                  <div className="flex items-center gap-2">
+              <Link
+                href={movementsHref}
+                onNavigate={(event) => {
+                  if (!onMovementsSelect) return;
+                  event.preventDefault();
+                  onMovementsSelect();
+                }}
+                className={cn(buttonVariants({ variant: "outline", className: "h-9 rounded-md border-primary/20 bg-background/80 text-primary" }), "hidden sm:inline-flex")}
+              >
+                <LayoutList className="size-4" aria-hidden="true" />
+                {tAnnual("movementsButton")}
+              </Link>
+              <div className={cn("flex flex-wrap items-center gap-2 sm:flex-nowrap", readOnly && "sm:hidden")}>
+                <Link
+                  href={movementsHref}
+                  onNavigate={(event) => {
+                    if (!onMovementsSelect) return;
+                    event.preventDefault();
+                    onMovementsSelect();
+                  }}
+                  aria-label={tAnnual("movementsButton")}
+                  title={tAnnual("movementsButton")}
+                  className={cn(buttonVariants({ variant: "outline", size: "icon" }), "h-9 w-9 rounded-md border-border/70 bg-background/80 text-muted-foreground shadow-sm hover:border-primary/30 hover:bg-primary/[0.06] hover:text-primary sm:hidden")}
+                >
+                  <ArrowLeftRight className="size-4" aria-hidden="true" />
+                </Link>
+                {!readOnly ? (
+                  <>
                     <Dialog>
                       <DialogTrigger
                         render={
@@ -448,19 +479,18 @@ export function KpiCards({
                       size="sm"
                       onClick={onExport}
                       disabled={savingConfig}
-                      className="border-primary/20 bg-primary/[0.06] text-primary shadow-sm hover:border-primary/35 hover:bg-primary/[0.1] hover:text-primary"
+                      className="max-sm:w-full border-primary/20 bg-primary/[0.06] text-primary shadow-sm hover:border-primary/35 hover:bg-primary/[0.1] hover:text-primary"
                     >
                       <Download className="mr-2 h-4 w-4" />
                       {savingConfig ? tAnnual("saving") : tAnnual("exportExcel")}
                     </Button>
-                  </div>
-
-                  {savingConfig ? (
-                    <p className="max-w-sm text-xs leading-5 text-muted-foreground sm:max-w-md lg:text-right">
-                      {tAnnual("savingDescription")}
-                    </p>
-                  ) : null}
-                </>
+                  </>
+                ) : null}
+              </div>
+              {!readOnly && savingConfig ? (
+                <p className="max-w-sm text-xs leading-5 text-muted-foreground sm:max-w-md lg:text-right">
+                  {tAnnual("savingDescription")}
+                </p>
               ) : null}
             </div>
           </div>
