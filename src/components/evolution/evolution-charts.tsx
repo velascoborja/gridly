@@ -5,6 +5,7 @@ import { Bar, BarChart, CartesianGrid, Cell, ComposedChart, Legend, Line, LineCh
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { EvolutionYearMetric } from "@/lib/evolution";
 import { formatCurrency } from "@/lib/utils";
+import { calculateInvestmentRate } from "@/lib/annual-investment-rate";
 
 interface Props {
   metrics: EvolutionYearMetric[];
@@ -27,9 +28,7 @@ export function EvolutionCharts({ metrics, estimatedValues }: Props) {
   });
   const savingsData = metrics.map((metric) => ({
     ...metric,
-    investmentRate: metric.totalIncome !== null && metric.totalIncome > 0
-      ? metric.investedAmount / metric.totalIncome
-      : null,
+    investmentRate: calculateInvestmentRate(metric.investedAmount, metric.totalIncome),
   }));
 
   const balanceData = metrics.map((m, idx) => {

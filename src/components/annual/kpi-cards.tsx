@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { formatCurrency } from "@/lib/utils";
 import { calculateSavingsRate, formatSavingsRate } from "@/lib/annual-savings-rate";
+import { calculateInvestmentRate } from "@/lib/annual-investment-rate";
 import { CategoriesView } from "./categories-view";
 import { FixedExpensesView } from "./fixed-expenses-view";
 import { YearConfigForm } from "./year-config-form";
@@ -65,6 +66,7 @@ interface KpiMetric {
   tone: MetricTone;
   isEstimate?: boolean;
   savingsRate?: number | null;
+  investmentRate?: number | null;
   expectedAnnotations?: Array<{ text: string; colorClass: string }>;
 }
 
@@ -194,6 +196,7 @@ export function KpiCards({
   const totalIncome = months.reduce((sum, month) => sum + month.totalIncome, 0);
   const adjustedTotalIncome = totalIncome + (hasExpected ? expectedIncome : 0);
   const savingsRate = calculateSavingsRate(displayedTotalSavings, adjustedTotalIncome);
+  const investmentRate = calculateInvestmentRate(totalInvestment, adjustedTotalIncome);
   const savingsVsPreviousYearDifference = annualComparison?.previousYear
     ? displayedTotalSavings - annualComparison.previousYear.savedAmount
     : null;
@@ -280,6 +283,7 @@ export function KpiCards({
         : undefined,
       comparisonLines: savingsComparisonLines,
       savingsRate,
+      investmentRate,
       tone: getMetricTone(displayedTotalSavings, toneLabels),
       isEstimate: hasExpected,
       expectedAnnotations: hasExpected ? expectedAnnotationLines : [],
@@ -486,6 +490,16 @@ export function KpiCards({
                           {metric.savingsRate === null
                             ? t("savingsRateUnavailable")
                             : formatSavingsRate(metric.savingsRate, locale)}
+                        </span>
+                      </p>
+                    ) : null}
+                    {metric.investmentRate !== undefined ? (
+                      <p className="text-xs text-muted-foreground/80">
+                        {t(metric.isEstimate ? "estimatedInvestmentRate" : "investmentRate")}{" "}
+                        <span className={`finance-number ${getComparisonColorClassName(metric.investmentRate ?? 0)}`}>
+                          {metric.investmentRate === null
+                            ? t("investmentRateUnavailable")
+                            : formatSavingsRate(metric.investmentRate, locale)}
                         </span>
                       </p>
                     ) : null}

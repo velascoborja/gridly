@@ -55,6 +55,8 @@ Returns a per-year array of `{ year, estimatedPortfolioValue }`. For each year Y
 
 Annual savings intentionally means cash balance growth. Investment remains a separate metric because Gridly counts monthly investment inside expenses.
 
+The chart derives investment rates with `calculateInvestmentRate` from `src/lib/annual-investment-rate.ts`, shared with the annual summary. Evolution passes recorded annual income; the annual summary can additionally include expected income. Null or non-positive income produces `null`, and positive income preserves zero, negative, and above-100% investment rates.
+
 ## Historical Imports
 
 Evolution can include both full Gridly years and summary-only historical imports. Historical imports are limited to years before the earliest full Gridly year and are intended for pre-Gridly history. They provide starting balance, final balance, and invested amount, while income, expenses, and savings rate remain unavailable.
@@ -116,7 +118,7 @@ The user can enter an annual return rate (%) directly in the Total Wealth box. T
 ### Charts
 
 1. **Final Balance (LineChart)** — Year-over-year trend. Without a return rate: three lines — `finalBalance` (primary), `accumulatedInvested` (teal, dashed), `totalWealth` (orange, dotted). With a return rate: `finalBalance` (primary), `estimatedPortfolioValue` (teal, dashed), `estimatedTotalWealth` (orange, dotted). A legend labels each line.
-2. **Savings per Year (ComposedChart)** — `savedAmount` per year (left Y-axis, currency). Bars are green when `savedAmount ≥ 0` and red when negative. Two trend lines share the right percentage Y-axis: `savingsRate` uses `var(--color-chart-3)`, and `investmentRate` uses dashed teal (`var(--color-chart-2)`) with point markers. The chart derives `investmentRate` locally as `investedAmount / totalIncome` using recorded annual investment, independently of portfolio return assumptions. Positive income with zero investment produces 0%; null or non-positive income produces `null`, including historical imports without income data. Rates are not capped at 100%. Both lines use `connectNulls={false}`, and manually supplied historical savings rates remain visible. The legend labels both rates; tooltips format them as localized percentages with one decimal place while savings amounts remain currency values.
+2. **Savings per Year (ComposedChart)** — `savedAmount` per year (left Y-axis, currency). Bars are green when `savedAmount ≥ 0` and red when negative. Two trend lines share the right percentage Y-axis: `savingsRate` uses `var(--color-chart-3)`, and `investmentRate` uses dashed teal (`var(--color-chart-2)`) with point markers. The chart derives `investmentRate` with the shared `calculateInvestmentRate(investedAmount, totalIncome)` helper using recorded annual investment, independently of portfolio return assumptions. Positive income with zero investment produces 0%; null or non-positive income produces `null`, including historical imports without income data. Rates are not capped at 100%. Both lines use `connectNulls={false}`, and manually supplied historical savings rates remain visible. The legend labels both rates; tooltips format them as localized percentages with one decimal place while savings amounts remain currency values.
 3. **Investment per Year (BarChart)** — `investedAmount` per year in primary color.
 4. **Interest per year (BarChart)** — `interestsEarned` per year in teal (`chart-2`). The secondary-chart row is a 3-column grid at `lg`.
 

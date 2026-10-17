@@ -23,7 +23,25 @@ test("annual savings rate uses displayed savings and adjusted full-year income o
   assert.ok(source.indexOf('metric.savingsRate !== undefined') < source.indexOf('{metric.comparison}'));
 });
 
-test("annual savings rate labels and unavailable value are localized", async () => {
+test("annual investment rate shares Evolution's calculation and follows the savings rate", async () => {
+  const annual = await readSource("src/components/annual/kpi-cards.tsx");
+  const evolution = await readSource("src/components/evolution/evolution-charts.tsx");
+
+  for (const source of [annual, evolution]) {
+    assert.match(source, /import \{ calculateInvestmentRate \} from "@\/lib\/annual-investment-rate"/);
+  }
+  assert.match(evolution, /investmentRate: calculateInvestmentRate\(metric\.investedAmount, metric\.totalIncome\)/);
+  assert.match(annual, /const investmentRate = calculateInvestmentRate\(totalInvestment, adjustedTotalIncome\)/);
+  assert.match(annual, /label: t\("totalSavings"\),[\s\S]*?savingsRate,\s+investmentRate,/);
+  assert.equal((annual.match(/^      investmentRate,/gm) ?? []).length, 1);
+  assert.ok(annual.indexOf('metric.investmentRate !== undefined') > annual.indexOf('metric.savingsRate !== undefined'));
+  assert.ok(annual.indexOf('metric.investmentRate !== undefined') < annual.indexOf('{metric.comparison}'));
+  assert.match(annual, /t\(metric\.isEstimate \? "estimatedInvestmentRate" : "investmentRate"\)/);
+  assert.match(annual, /getComparisonColorClassName\(metric\.investmentRate \?\? 0\)/);
+  assert.match(annual, /metric\.investmentRate === null\s+\? t\("investmentRateUnavailable"\)\s+: formatSavingsRate\(metric\.investmentRate, locale\)/);
+});
+
+test("annual rate labels and unavailable values are localized", async () => {
   const es = JSON.parse(await readSource("messages/es.json"));
   const en = JSON.parse(await readSource("messages/en.json"));
 
@@ -33,6 +51,12 @@ test("annual savings rate labels and unavailable value are localized", async () 
   assert.equal(en.Annual.kpis.estimatedSavingsRate, "Estimated savings rate:");
   assert.equal(es.Annual.kpis.savingsRateUnavailable, "—");
   assert.equal(en.Annual.kpis.savingsRateUnavailable, "—");
+  assert.equal(es.Annual.kpis.investmentRate, "Tasa de inversión:");
+  assert.equal(es.Annual.kpis.estimatedInvestmentRate, "Tasa de inversión estimada:");
+  assert.equal(en.Annual.kpis.investmentRate, "Investment rate:");
+  assert.equal(en.Annual.kpis.estimatedInvestmentRate, "Estimated investment rate:");
+  assert.equal(es.Annual.kpis.investmentRateUnavailable, "—");
+  assert.equal(en.Annual.kpis.investmentRateUnavailable, "—");
 });
 
 test("annual KPI cards expose total investment from monthly investment values", async () => {

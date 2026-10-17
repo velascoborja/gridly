@@ -22,6 +22,12 @@ The numerator is the displayed total savings, including expected income minus ex
 
 `KpiCards` derives the value directly from its existing props during render, so edits to months, annual setup, and expected entries update it immediately without additional requests or stored state. Without expected entries, its displayed rate matches Evolution for the same full year.
 
+### Investment Rate
+
+Immediately below the savings rate, the Total savings block also shows the annual investment rate. It uses the same localized one-decimal percentage format, muted label, and positive/negative/neutral value colors. The label becomes estimated whenever expected entries are present.
+
+The numerator is the sum of monthly `investment` across all loaded months, including configured future months. The denominator is the same adjusted annual income used by the savings rate, including expected income when expected entries exist. Expected expenses do not affect the investment rate. `src/lib/annual-investment-rate.ts` exports `calculateInvestmentRate`, shared with Evolution's chart; without expected entries, both screens show the same investment rate. Income that is null, zero or negative produces `null`, displayed as `—`; zero investment with positive income displays 0.0%, and negative rates or rates above 100% are preserved. The value is derived during render, so edits update it immediately without additional requests or stored state.
+
 ## Comparison Lines
 
 The hero KPI card adds extra context from Evolution metrics:
