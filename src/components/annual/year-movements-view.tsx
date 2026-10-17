@@ -106,27 +106,33 @@ export function YearMovementsView({ yearData, years, onSummarySelect, pathPrefix
         </div>
       </section>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+      <div role="group" aria-label={t("controlsLabel")} className="flex flex-nowrap items-center gap-1 sm:flex-wrap sm:justify-between sm:gap-3">
+        <div className="flex min-w-0 flex-1 items-center gap-1 sm:flex-none sm:flex-wrap sm:gap-x-5 sm:gap-y-3">
           {years && years.length > 1 && <MovementsYearSelector year={year} pathPrefix={pathPrefix} />}
-          <div className="flex flex-wrap items-center gap-2">
-            <span id={sortLabelId} className="text-sm text-muted-foreground">{t("sortLabel")}</span>
+          <div className="flex min-w-0 flex-1 items-center gap-2 sm:flex-none sm:flex-wrap">
+            <span id={sortLabelId} className="sr-only text-sm text-muted-foreground sm:not-sr-only">{t("sortLabel")}</span>
             <Select value={order} onValueChange={(value) => {
               if (value === "chronological" || value === "descending" || value === "ascending") setOrder(value);
             }}>
-              <SelectTrigger aria-labelledby={sortLabelId} className="min-h-9 rounded-md bg-card"><SelectValue>{t(order)}</SelectValue></SelectTrigger>
+              <SelectTrigger aria-labelledby={sortLabelId} title={t(order)} className="min-h-11 w-full min-w-0 rounded-md bg-card px-2 sm:min-h-9 sm:w-fit sm:px-2.5">
+                <SelectValue>
+                  <span className="min-[360px]:hidden">{t(`shortSort.${order}`)}</span>
+                  <span className="hidden min-[360px]:inline sm:hidden">{t(`compactSort.${order}`)}</span>
+                  <span className="hidden sm:inline">{t(order)}</span>
+                </SelectValue>
+              </SelectTrigger>
               <SelectContent alignItemWithTrigger={false} align="start" className="w-max min-w-(--anchor-width) max-w-(--available-width)">
                 {(["chronological", "descending", "ascending"] as const).map((option) => <SelectItem key={option} value={option}>{t(option)}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Button variant="outline" className="min-h-9 rounded-md" disabled={collapsedMonths.size === 0} onClick={() => setCollapsedMonths(new Set())}>
-            <ChevronsUpDown className="size-4" aria-hidden="true" />{t("expandAll")}
+        <div className="flex shrink-0 gap-1 sm:gap-2">
+          <Button variant="outline" aria-label={t("expandAll")} title={t("expandAll")} className="size-11 rounded-md px-0 sm:h-9 sm:w-auto sm:px-2.5" disabled={collapsedMonths.size === 0} onClick={() => setCollapsedMonths(new Set())}>
+            <ChevronsUpDown className="size-4" aria-hidden="true" /><span className="hidden sm:inline">{t("expandAll")}</span>
           </Button>
-          <Button variant="outline" className="min-h-9 rounded-md" disabled={collapsedMonths.size === summary.rows.length} onClick={() => setCollapsedMonths(new Set(summary.rows.map((row) => row.month.month)))}>
-            <ChevronsDownUp className="size-4" aria-hidden="true" />{t("collapseAll")}
+          <Button variant="outline" aria-label={t("collapseAll")} title={t("collapseAll")} className="size-11 rounded-md px-0 sm:h-9 sm:w-auto sm:px-2.5" disabled={collapsedMonths.size === summary.rows.length} onClick={() => setCollapsedMonths(new Set(summary.rows.map((row) => row.month.month)))}>
+            <ChevronsDownUp className="size-4" aria-hidden="true" /><span className="hidden sm:inline">{t("collapseAll")}</span>
           </Button>
         </div>
       </div>

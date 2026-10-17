@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useState, useTransition } from "react";
-import { LoaderCircle } from "lucide-react";
+import { LoaderCircle, RefreshCw } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
@@ -35,32 +35,36 @@ export function MovementsYearSelector({ year, pathPrefix }: { year: number; path
   }, [attempt]);
 
   if (state.status === "loading") {
-    return <span role="status" className="flex min-h-9 items-center gap-2 text-sm text-muted-foreground"><LoaderCircle className="size-4 animate-spin motion-reduce:animate-none" aria-hidden="true" />{t("loadingYears")}</span>;
+    return <span role="status" className="flex h-11 w-[4.25rem] shrink-0 items-center justify-center gap-2 text-sm text-muted-foreground sm:h-auto sm:min-h-9 sm:w-auto"><LoaderCircle className="size-4 animate-spin motion-reduce:animate-none" aria-hidden="true" /><span className="sr-only sm:not-sr-only">{t("loadingYears")}</span></span>;
   }
   if (state.status === "error") {
     return (
-      <div className="flex flex-wrap items-center gap-2 text-sm">
-        <span role="alert" className="text-muted-foreground">{t("yearsError")}</span>
-        <Button variant="outline" onClick={() => { setState({ status: "loading" }); setAttempt((value) => value + 1); }}>{t("retryYears")}</Button>
+      <div className="flex shrink-0 items-center gap-2 text-sm sm:flex-wrap">
+        <span id={labelId} role="alert" className="sr-only text-muted-foreground sm:not-sr-only">{t("yearsError")}</span>
+        <Button variant="outline" aria-label={t("retryYears")} aria-describedby={labelId} title={t("yearsError")} className="size-11 rounded-md px-0 text-destructive sm:h-8 sm:w-auto sm:px-2.5 sm:text-foreground" onClick={() => { setState({ status: "loading" }); setAttempt((value) => value + 1); }}>
+          <RefreshCw className="size-4 sm:hidden" aria-hidden="true" /><span className="hidden sm:inline">{t("retryYears")}</span>
+        </Button>
       </div>
     );
   }
   if (state.years.length < 2) return null;
 
   return (
-    <div className="flex flex-wrap items-center gap-2" aria-busy={pending}>
-      <span id={labelId} className="text-sm text-muted-foreground">{t("yearLabel")}</span>
+    <div className="relative flex shrink-0 items-center gap-2 sm:flex-wrap" aria-busy={pending}>
+      <span id={labelId} className="sr-only text-sm text-muted-foreground sm:not-sr-only">{t("yearLabel")}</span>
       <Select value={String(year)} disabled={pending} onValueChange={(value) => {
         if (!value || Number(value) === year || !state.years.includes(Number(value))) return;
         startTransition(() => router.push(buildYearMovementsHref(pathPrefix, Number(value))));
       }}>
-        <SelectTrigger aria-labelledby={labelId} className="min-h-9 rounded-md bg-card"><SelectValue>{state.years.includes(year) ? year : t("yearWithoutMovements", { year })}</SelectValue></SelectTrigger>
+        <SelectTrigger aria-labelledby={labelId} title={state.years.includes(year) ? String(year) : t("yearWithoutMovements", { year })} className="min-h-11 w-[4.25rem] rounded-md bg-card px-2 sm:min-h-9 sm:w-fit sm:px-2.5">
+          <SelectValue><span className="sm:hidden">{year}</span><span className="hidden sm:inline">{state.years.includes(year) ? year : t("yearWithoutMovements", { year })}</span></SelectValue>
+        </SelectTrigger>
         <SelectContent>
           {!state.years.includes(year) && <SelectItem value={String(year)} disabled>{t("yearWithoutMovements", { year })}</SelectItem>}
           {state.years.map((option) => <SelectItem key={option} value={String(option)}>{option}</SelectItem>)}
         </SelectContent>
       </Select>
-      {pending && <span role="status" className="flex items-center gap-2 text-sm text-muted-foreground"><LoaderCircle className="size-4 animate-spin motion-reduce:animate-none" aria-hidden="true" />{t("loadingYear")}</span>}
+      {pending && <span role="status" className="pointer-events-none absolute inset-0 flex items-center justify-center gap-2 rounded-md bg-card text-sm text-muted-foreground sm:static sm:bg-transparent"><LoaderCircle className="size-4 animate-spin motion-reduce:animate-none" aria-hidden="true" /><span className="sr-only sm:not-sr-only">{t("loadingYear")}</span></span>}
     </div>
   );
 }

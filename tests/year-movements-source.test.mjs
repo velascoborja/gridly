@@ -70,12 +70,37 @@ test("sorting and colors stay local while account years are omitted from the dem
   const source = read("src/components/annual/year-movements-view.tsx");
   assert.match(source, /useState<MovementSort>\("chronological"\)/);
   assert.match(source, /sortMovementMonths\(summary.rows, order\)/);
-  assert.match(source, /<SelectValue>\{t\(order\)\}<\/SelectValue>/);
+  assert.match(source, /<span className="hidden sm:inline">\{t\(order\)\}<\/span>/);
   assert.match(source, /getMovementColorIntensity\(row, summary.rows\)/);
   assert.match(source, /color-mix\(in srgb/);
   assert.match(source, /dark:\[--movement-neutral:var\(--foreground\)\]/);
   assert.match(source, /years && years.length > 1 && <MovementsYearSelector/);
   assert.match(read("src/components/year/year-page-client.tsx"), /yearData=\{currentYearData\}\s+years=\{years\}/);
+});
+
+test("mobile controls retain accessible actions and translated compact sort values", () => {
+  const source = read("src/components/annual/year-movements-view.tsx");
+  assert.match(source, /role="group" aria-label=\{t\("controlsLabel"\)\}/);
+  assert.match(source, /flex flex-nowrap items-center gap-1 sm:flex-wrap/);
+  for (const action of ["expandAll", "collapseAll"]) {
+    assert.match(source, new RegExp(`aria-label=\\{t\\("${action}"\\)\\} title=\\{t\\("${action}"\\)\\}`));
+  }
+  assert.match(source, /size-11 rounded-md px-0 sm:h-9 sm:w-auto/);
+  assert.match(source, /min-\[360px\]:hidden/);
+  assert.match(source, /t\(`shortSort\.\$\{order\}`\)/);
+  assert.match(source, /t\(`compactSort\.\$\{order\}`\)/);
+  assert.match(source, /w-max min-w-\(--anchor-width\) max-w-\(--available-width\)/);
+  const selector = read("src/components/annual/movements-year-selector.tsx");
+  assert.match(selector, /role="alert" className="sr-only/);
+  assert.match(selector, /aria-label=\{t\("retryYears"\)\} aria-describedby=\{labelId\}/);
+  assert.match(selector, /pointer-events-none absolute inset-0/);
+  for (const locale of ["es", "en"]) {
+    const messages = JSON.parse(read(`messages/${locale}.json`)).Annual.movements;
+    assert.ok(messages.controlsLabel);
+    for (const order of ["chronological", "ascending", "descending"]) {
+      assert.ok(messages.compactSort[order] && messages.shortSort[order]);
+    }
+  }
 });
 
 test("year selection has cancellable fetching, retry and pending navigation feedback", () => {

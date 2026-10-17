@@ -264,6 +264,17 @@
       "emptyIncomeMonth": "No additional income this month.",
       "loss": "Loss",
       "group": "Group",
+      "controlsLabel": "Movement controls",
+      "compactSort": {
+        "chronological": "Chronological",
+        "descending": "Highest amount",
+        "ascending": "Lowest amount"
+      },
+      "shortSort": {
+        "chronological": "Date",
+        "descending": "Highest",
+        "ascending": "Lowest"
+      },
       "sortLabel": "Sort by",
       "chronological": "Chronological",
       "descending": "Amount: highest first",

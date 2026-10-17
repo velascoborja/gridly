@@ -264,6 +264,17 @@
       "emptyIncomeMonth": "Sin ingresos adicionales este mes.",
       "loss": "Pérdida",
       "group": "Grupo",
+      "controlsLabel": "Controles de movimientos",
+      "compactSort": {
+        "chronological": "Cronológico",
+        "descending": "Mayor importe",
+        "ascending": "Menor importe"
+      },
+      "shortSort": {
+        "chronological": "Fecha",
+        "descending": "Mayor",
+        "ascending": "Menor"
+      },
       "sortLabel": "Ordenar por",
       "chronological": "Cronológico",
       "descending": "Importe: mayor a menor",
