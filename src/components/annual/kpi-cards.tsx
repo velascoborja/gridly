@@ -12,6 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { formatCurrency } from "@/lib/utils";
+import { calculateSavingsRate, formatSavingsRate } from "@/lib/annual-savings-rate";
 import { CategoriesView } from "./categories-view";
 import { FixedExpensesView } from "./fixed-expenses-view";
 import { YearConfigForm } from "./year-config-form";
@@ -63,6 +64,7 @@ interface KpiMetric {
   comparisonLines?: Array<{ text: string; emphasizedText: string; colorClassName: string }>;
   tone: MetricTone;
   isEstimate?: boolean;
+  savingsRate?: number | null;
   expectedAnnotations?: Array<{ text: string; colorClass: string }>;
 }
 
@@ -189,6 +191,9 @@ export function KpiCards({
   const adjustedTotalSavings = totalSavings + expectedNet;
   const displayedEndingBalance = hasExpected ? adjustedEndingBalance : endingBalance;
   const displayedTotalSavings = hasExpected ? adjustedTotalSavings : totalSavings;
+  const totalIncome = months.reduce((sum, month) => sum + month.totalIncome, 0);
+  const adjustedTotalIncome = totalIncome + (hasExpected ? expectedIncome : 0);
+  const savingsRate = calculateSavingsRate(displayedTotalSavings, adjustedTotalIncome);
   const savingsVsPreviousYearDifference = annualComparison?.previousYear
     ? displayedTotalSavings - annualComparison.previousYear.savedAmount
     : null;
@@ -274,6 +279,7 @@ export function KpiCards({
         ? t("baseValueComparison", { amount: formatCurrency(totalSavings, locale) })
         : t("activeMonths", { count: populated.length }),
       comparisonLines: savingsComparisonLines,
+      savingsRate,
       tone: getMetricTone(displayedTotalSavings, toneLabels),
       isEstimate: hasExpected,
       expectedAnnotations: hasExpected ? expectedAnnotationLines : [],
@@ -471,6 +477,16 @@ export function KpiCards({
                     {formatCurrency(metric.value, locale)}
                     {metric.isEstimate ? <sup className="ml-0.5 align-top text-base font-medium">*</sup> : null}
                   </p>
+                  {metric.savingsRate !== undefined ? (
+                    <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                      {t(metric.isEstimate ? "estimatedSavingsRate" : "savingsRate")}{" "}
+                      <span className={`finance-number ${getComparisonColorClassName(metric.savingsRate ?? 0)}`}>
+                        {metric.savingsRate === null
+                          ? t("savingsRateUnavailable")
+                          : formatSavingsRate(metric.savingsRate, locale)}
+                      </span>
+                    </p>
+                  ) : null}
                   <div className="mt-4 space-y-1 text-sm leading-5 text-muted-foreground">
                     <p className={metric.isEstimate ? "text-amber-600 dark:text-amber-400" : undefined}>{metric.note}</p>
                     <p className="finance-number text-xs text-muted-foreground/80">{metric.comparison}</p>

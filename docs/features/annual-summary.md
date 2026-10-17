@@ -12,6 +12,16 @@ The main card shows the final balance and total savings for the selected year.
 - **Total savings:** Sum of savings across months with activity, adjusted by expected entries when any are present.
 - **Expected entries:** Stored in browser local storage per account and year and displayed as estimate annotations in the hero card. Public demo projections use a separate namespace, and account projection keys are cleared after logout or account deletion.
 
+### Savings Rate
+
+Below the Total savings amount, the card shows the annual savings rate with one localized decimal place. Its label is muted; the percentage uses positive, negative, or neutral comparison colors. When expected entries exist, the label explicitly identifies the rate as estimated.
+
+The numerator is the displayed total savings, including expected income minus expected expenses. The denominator is the sum of `totalIncome` across all loaded months, including configured future months, plus expected income. Expected expenses only affect the numerator. The starting balance is not income, and investment remains an expense rather than being added back to savings, matching Evolution's cash savings definition.
+
+`src/lib/annual-savings-rate.ts` provides the pure ratio calculation and localized percentage formatter. Zero or negative adjusted income produces `null`, displayed as `—`; zero savings with positive income displays 0.0%, and negative rates or rates above 100% are preserved. The rate is an annual aggregate, not an average of monthly percentages.
+
+`KpiCards` derives the value directly from its existing props during render, so edits to months, annual setup, and expected entries update it immediately without additional requests or stored state. Without expected entries, its displayed rate matches Evolution for the same full year.
+
 ## Comparison Lines
 
 The hero KPI card adds extra context from Evolution metrics:
