@@ -115,7 +115,7 @@ export function YearMovementsView({ yearData, years, onSummarySelect, pathPrefix
               if (value === "chronological" || value === "descending" || value === "ascending") setOrder(value);
             }}>
               <SelectTrigger aria-labelledby={sortLabelId} className="min-h-9 rounded-md bg-card"><SelectValue>{t(order)}</SelectValue></SelectTrigger>
-              <SelectContent>
+              <SelectContent alignItemWithTrigger={false} align="start" className="w-max min-w-(--anchor-width) max-w-(--available-width)">
                 {(["chronological", "descending", "ascending"] as const).map((option) => <SelectItem key={option} value={option}>{t(option)}</SelectItem>)}
               </SelectContent>
             </Select>
