@@ -18,7 +18,9 @@ test("annual savings rate uses displayed savings and adjusted full-year income o
   assert.match(source, /metric\.savingsRate === null\s+\? t\("savingsRateUnavailable"\)\s+: formatSavingsRate\(metric\.savingsRate, locale\)/);
   assert.match(source, /t\(metric\.isEstimate \? "estimatedSavingsRate" : "savingsRate"\)/);
   assert.match(source, /getComparisonColorClassName\(metric\.savingsRate \?\? 0\)/);
-  assert.ok(source.indexOf('metric.savingsRate !== undefined') < source.indexOf('{metric.note}'));
+  assert.doesNotMatch(source, /t\("activeMonths"/);
+  assert.ok(source.indexOf('metric.savingsRate !== undefined') > source.indexOf('{metric.note}'));
+  assert.ok(source.indexOf('metric.savingsRate !== undefined') < source.indexOf('{metric.comparison}'));
 });
 
 test("annual savings rate labels and unavailable value are localized", async () => {

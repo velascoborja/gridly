@@ -14,7 +14,7 @@ The main card shows the final balance and total savings for the selected year.
 
 ### Savings Rate
 
-Below the Total savings amount, the card shows the annual savings rate with one localized decimal place. Its label is muted; the percentage uses positive, negative, or neutral comparison colors. When expected entries exist, the label explicitly identifies the rate as estimated.
+Below the Total savings description, the card shows the annual savings rate with one localized decimal place, replacing the active-month count. Its label is muted; the percentage uses positive, negative, or neutral comparison colors. When expected entries exist, the label explicitly identifies the rate as estimated, followed by the base savings amount without expected entries.
 
 The numerator is the displayed total savings, including expected income minus expected expenses. The denominator is the sum of `totalIncome` across all loaded months, including configured future months, plus expected income. Expected expenses only affect the numerator. The starting balance is not income, and investment remains an expense rather than being added back to savings, matching Evolution's cash savings definition.
 
