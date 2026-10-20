@@ -17,7 +17,7 @@ Each entry consists of:
 
 ## Additional Investments
 
-Ungrouped expenses expose an investment action in their create/edit form, including the mobile Actions menu. Saved rows show an `Additional investment` badge beside their description, including on mobile and in read-only views. Tags and annual recurrence remain independent. Completed entries must be reopened before changing the flag.
+Ungrouped expenses expose an investment action in their create/edit form, including the mobile Actions menu. Saved rows show an `Additional investment` badge beside their description, including in read-only views. Below 640px, the badge shows only its trend icon and the description row stays on one line; its localized label remains available to screen readers and as a title. From 640px upward, the badge also shows the full label. Tags and annual recurrence remain independent. Completed entries must be reopened before changing the flag.
 
 `POST` and `PATCH` accept a boolean `isInvestment`. Non-boolean values, marked incomes, and marked grouped entries return HTTP `400`; invalid combinations use `investment_requires_ungrouped_expense`. Moving a marked expense into a group is blocked in the menu, drag-and-drop, and API until the investment flag is removed. Month moves preserve it. Guided year creation copies it for annually recurring entries.
 

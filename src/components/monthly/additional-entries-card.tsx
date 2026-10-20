@@ -684,11 +684,11 @@ export function AdditionalEntriesCard({
             const isEditing = !readOnly && editingId === entry.id;
             const investmentBadge = entry.isInvestment ? (
               <span
-                className="inline-flex max-w-full shrink-0 items-center gap-1 rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium leading-none text-primary"
+                className="inline-flex max-w-full shrink-0 items-center gap-1 whitespace-nowrap rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium leading-none text-primary"
                 title={t("investmentBadge")}
               >
                 <TrendingUp className="size-3 shrink-0" aria-hidden="true" />
-                <span className="truncate">{t("investmentBadge")}</span>
+                <span className="sr-only sm:not-sr-only">{t("investmentBadge")}</span>
               </span>
             ) : null;
             return (
@@ -853,7 +853,7 @@ export function AdditionalEntriesCard({
                       "min-w-0 flex-1 truncate text-left text-sm font-medium text-foreground",
                       entry.isCompleted && "text-muted-foreground/65"
                     )} title={entry.label}>
-                      <span className={cn("flex min-w-0 items-center gap-1.5", entry.isInvestment && "flex-wrap")}>
+                      <span className={cn("flex min-w-0 items-center gap-1.5", entry.isInvestment && "sm:flex-wrap")}>
                         <span className="truncate">{entry.label}</span>
                         {investmentBadge}
                         {displayTag && TAG_COLORS[displayTag.color] && (
@@ -902,7 +902,7 @@ export function AdditionalEntriesCard({
                       title={entry.label}
                       disabled={deletingId === entry.id}
                     >
-                      <span className={cn("flex min-w-0 items-center gap-1.5", entry.isInvestment && "flex-wrap")}>
+                      <span className={cn("flex min-w-0 items-center gap-1.5", entry.isInvestment && "sm:flex-wrap")}>
                         <span className="truncate">{entry.label}</span>
                         {investmentBadge}
                         {displayTag && TAG_COLORS[displayTag.color] && (
