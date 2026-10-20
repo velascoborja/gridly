@@ -257,6 +257,7 @@
       "expandMonth": "Expand {month}",
       "collapseMonth": "Collapse {month}",
       "forecast": "Planned",
+      "currentMonth": "Current month",
       "peakBadge": "Highest amount",
       "savings": "Savings",
       "endingBalance": "Balance at month end",

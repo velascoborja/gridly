@@ -144,6 +144,7 @@ export function YearMovementsView({ yearData, years, onSummarySelect, pathPrefix
           const name = formatMonthName(month.month, locale);
           const expanded = !collapsedMonths.has(month.month);
           const monthId = `${regionId}-month-${month.month}`;
+          const isCurrentMonth = year === now.getFullYear() && month.month === now.getMonth() + 1;
           const future = year > now.getFullYear() || (year === now.getFullYear() && month.month > now.getMonth() + 1);
           return (
             <section key={month.month} aria-labelledby={`${monthId}-heading`} className={cn("rounded-md border bg-card shadow-[0_3px_6px_rgba(50,50,93,0.06)]", isPeak ? "border-primary/30" : "border-border/80")}>
@@ -153,13 +154,18 @@ export function YearMovementsView({ yearData, years, onSummarySelect, pathPrefix
                     type="button"
                     onClick={() => toggleMonth(month.month)}
                     aria-label={t(expanded ? "collapseMonth" : "expandMonth", { month: name })}
+                    aria-describedby={isCurrentMonth ? `${monthId}-current` : undefined}
                     aria-expanded={expanded}
                     aria-controls={monthId}
-                    className="block w-full rounded-t-md px-4 py-4 text-left outline-none transition-colors hover:bg-primary/[0.03] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary sm:px-6"
+                    className={cn(
+                      "block w-full rounded-t-md px-4 py-4 text-left outline-none transition-colors hover:bg-primary/[0.03] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary sm:px-6",
+                      isCurrentMonth && "bg-primary/5 shadow-[inset_2px_0_0_var(--primary)] hover:bg-primary/[0.08] dark:bg-primary/10 dark:hover:bg-primary/[0.13]"
+                    )}
                   >
                     <span className="flex items-center justify-between gap-4">
                       <span className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
                         <span className="text-xl font-light capitalize tracking-[-0.02em]">{name}</span>
+                        {isCurrentMonth && <span id={`${monthId}-current`} className="rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[11px] font-normal text-primary">{t("currentMonth")}</span>}
                         {future && <span className="rounded border border-primary/15 bg-primary/5 px-1.5 py-0.5 text-[11px] font-normal text-primary">{t("forecast")}</span>}
                         {isPeak && <span className="rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[11px] font-normal text-primary">{t("peakBadge")}</span>}
                       </span>

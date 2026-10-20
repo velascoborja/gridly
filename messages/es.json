@@ -257,6 +257,7 @@
       "expandMonth": "Desplegar {month}",
       "collapseMonth": "Plegar {month}",
       "forecast": "Previsto",
+      "currentMonth": "Mes actual",
       "peakBadge": "Mayor importe",
       "savings": "Ahorro",
       "endingBalance": "Saldo a final de mes",
