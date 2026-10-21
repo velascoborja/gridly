@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
-import { ArrowLeft, ArrowDownRight, ArrowUpRight, ChevronDown, ChevronsDownUp, ChevronsUpDown } from "lucide-react";
+import { ArrowLeft, ArrowDownRight, ArrowUpRight, ChevronDown, ChevronsDownUp, ChevronsUpDown, Trophy } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -154,7 +154,7 @@ export function YearMovementsView({ yearData, years, onSummarySelect, pathPrefix
                     type="button"
                     onClick={() => toggleMonth(month.month)}
                     aria-label={t(expanded ? "collapseMonth" : "expandMonth", { month: name })}
-                    aria-describedby={isCurrentMonth ? `${monthId}-current` : undefined}
+                    aria-describedby={[isCurrentMonth && `${monthId}-current`, isPeak && `${monthId}-peak`].filter(Boolean).join(" ") || undefined}
                     aria-expanded={expanded}
                     aria-controls={monthId}
                     className={cn(
@@ -162,12 +162,17 @@ export function YearMovementsView({ yearData, years, onSummarySelect, pathPrefix
                       isCurrentMonth && "bg-primary/5 shadow-[inset_2px_0_0_var(--primary)] hover:bg-primary/[0.08] dark:bg-primary/10 dark:hover:bg-primary/[0.13]"
                     )}
                   >
-                    <span className="flex items-center justify-between gap-4">
-                      <span className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
-                        <span className="text-xl font-light capitalize tracking-[-0.02em]">{name}</span>
-                        {isCurrentMonth && <span id={`${monthId}-current`} className="rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[11px] font-normal text-primary">{t("currentMonth")}</span>}
-                        {future && <span className="rounded border border-primary/15 bg-primary/5 px-1.5 py-0.5 text-[11px] font-normal text-primary">{t("forecast")}</span>}
-                        {isPeak && <span className="rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[11px] font-normal text-primary">{t("peakBadge")}</span>}
+                    <span className="flex items-center justify-between gap-2 sm:gap-4">
+                      <span className="flex min-w-0 items-center gap-1.5 sm:gap-3">
+                        <span className="inline-flex min-w-0 items-center gap-1.5">
+                          <span className="truncate text-xl font-light capitalize tracking-[-0.02em]">{name}</span>
+                          {isPeak && <span title={t("peakBadge")} className="inline-flex shrink-0 text-primary">
+                            <Trophy aria-hidden="true" className="size-4" />
+                            <span id={`${monthId}-peak`} className="sr-only">{t("peakBadge")}</span>
+                          </span>}
+                        </span>
+                        {isCurrentMonth && <span id={`${monthId}-current`} className="shrink-0 whitespace-nowrap rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[11px] font-normal text-primary">{t("currentMonth")}</span>}
+                        {future && <span className="shrink-0 whitespace-nowrap rounded border border-primary/15 bg-primary/5 px-1.5 py-0.5 text-[11px] font-normal text-primary">{t("forecast")}</span>}
                       </span>
                       <span className="flex shrink-0 items-center gap-3">
                         <span

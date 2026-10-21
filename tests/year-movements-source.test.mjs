@@ -3,6 +3,18 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 
+test("peak month headers use a compact icon with a translated accessible description", () => {
+  const source = read("src/components/annual/year-movements-view.tsx");
+  assert.match(source, /<Trophy aria-hidden="true" className="size-4"/);
+  assert.match(source, /title=\{t\("peakBadge"\)\}/);
+  assert.match(source, /id=\{`\$\{monthId\}-peak`\} className="sr-only">\{t\("peakBadge"\)\}/);
+  assert.match(source, /aria-describedby=\{\[isCurrentMonth && `\$\{monthId\}-current`, isPeak && `\$\{monthId\}-peak`\]/);
+  assert.match(source, /inline-flex min-w-0 items-center gap-1\.5/);
+  assert.match(source, /truncate text-xl font-light capitalize/);
+  assert.match(source, /future && <span className="shrink-0 whitespace-nowrap/);
+  assert.doesNotMatch(source, /isPeak && <span className="rounded border/);
+});
+
 test("movements share the mounted year data and provide immediate lazy-loading feedback", () => {
   const source = read("src/components/year/year-page-client.tsx");
   assert.match(source, /import\("@\/components\/annual\/year-movements-view"\)/);
