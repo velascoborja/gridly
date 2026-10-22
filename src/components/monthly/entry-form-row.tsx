@@ -242,7 +242,7 @@ export function EntryFormRow({
           }
           disabled={fieldsDisabled}
           onKeyDown={onKeyDown}
-          inputMode={amountMode === "expression" ? "text" : "decimal"}
+          inputMode="decimal"
           autoFocus={autoFocusTarget === "amount"}
           aria-invalid={amountError ? true : undefined}
           aria-describedby={hasAmountFeedback ? amountFeedbackId : undefined}
