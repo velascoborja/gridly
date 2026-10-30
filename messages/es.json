@@ -374,7 +374,7 @@
     "interestRatePlaceholder": "Ej. 2,5",
     "startingBalancePlaceholder": "Ej. 12.500 €",
     "growthCollapsedDescription": "Opcional. Se crea con 0% si no lo abres.",
-    "errorOnlyNextYear": "Solo puedes crear el siguiente ejercicio disponible.",
+    "errorOnlyNextYear": "Solo puedes crear el siguiente año registrado o el año actual.",
     "errorGeneric": "No se ha podido crear el año. Revisa los datos e inténtalo de nuevo.",
     "errorConnection": "No se ha podido crear el año. Revisa la conexión e inténtalo de nuevo.",
     "submitting": "Creando...",
@@ -969,5 +969,12 @@
     "deleteTitle": "Eliminar cuenta",
     "deleteSummary": "Elimina permanentemente tu cuenta y todos tus datos (requiere escribir una frase de confirmación).",
     "deleteDetail": "La eliminación de cuenta borra de forma permanente todos tus años, meses, entradas y etiquetas. La acción requiere que escribas una frase de confirmación y no se puede deshacer."
+  },
+  "YearRollover": {
+    "title": "{year} ya ha terminado",
+    "description": "Te mostramos su resumen porque todavía no has creado {currentYear}. Puedes configurar el nuevo año o seguir consultando y editando {previousYear}.",
+    "create": "Crear {year}",
+    "continue": "Seguir en {year}",
+    "opening": "Abriendo configuración…"
   }
 }

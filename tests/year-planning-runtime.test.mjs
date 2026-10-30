@@ -58,23 +58,33 @@ test("getNextCreatableYear returns the first year when none exist", async () => 
   }
 });
 
-test("getNextCreatableYear returns only the immediate successor of the latest year", async () => {
+test("getNextCreatableYear prefers the current year while retaining consecutive future creation", async () => {
   const { getNextCreatableYear, cleanup } = await loadYearPlanningHelpers();
 
   try {
-    assert.equal(getNextCreatableYear([2024, 2025, 2026], 2030), 2027);
+    assert.equal(getNextCreatableYear([2024, 2025, 2026], 2030), 2030);
   } finally {
     await cleanup();
   }
 });
 
-test("shouldAllowYearCreation only accepts the next creatable year", async () => {
-  const { shouldAllowYearCreation, cleanup } = await loadYearPlanningHelpers();
+test("shouldAllowYearCreation accepts only the consecutive successor or the current calendar year", async () => {
+  const { shouldAllowYearCreation, getNextCreatableYear, cleanup } = await loadYearPlanningHelpers();
 
   try {
     assert.equal(shouldAllowYearCreation([2024, 2025], 2026, 2026), true);
     assert.equal(shouldAllowYearCreation([2024, 2025], 2026, 2027), false);
     assert.equal(shouldAllowYearCreation([], 2026, 2026), true);
+    assert.equal(shouldAllowYearCreation([], 2026, 2020), true);
+    assert.equal(shouldAllowYearCreation([2025], 2028, 2028), true);
+    assert.equal(shouldAllowYearCreation([2025], 2028, 2026), true);
+    assert.equal(shouldAllowYearCreation([2025], 2028, 2027), false);
+    assert.equal(shouldAllowYearCreation([2025], 2028, 2029), false);
+    assert.equal(shouldAllowYearCreation([2028], 2028, 2028), false);
+    assert.equal(shouldAllowYearCreation([2029], 2028, 2028), false);
+    assert.equal(shouldAllowYearCreation([2029], 2028, 2030), true);
+    assert.equal(shouldAllowYearCreation([2025], 2028, 2028.5), false);
+    assert.equal(getNextCreatableYear([2029], 2028), 2030);
   } finally {
     await cleanup();
   }

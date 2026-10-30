@@ -43,8 +43,8 @@ export async function createAndPrefillYear(data: {
       .where(eq(years.userId, user.id))
       .orderBy(asc(years.year));
 
-    if (!shouldAllowYearCreation(existingYears.map((row) => row.year), data.year, data.year)) {
-      throw new Error("Only the next year can be created");
+    if (!shouldAllowYearCreation(existingYears.map((row) => row.year), new Date().getFullYear(), data.year)) {
+      throw new Error("Only the next or current year can be created");
     }
 
     // Later years always derive their starting balance from the server-side predecessor.
@@ -149,9 +149,9 @@ export async function createAndPrefillYear(data: {
       );
     }
 
-    // 4b. Copy recurring additional entries from previous year
-    const previousYear = await db.query.years.findFirst({
-      where: and(eq(years.userId, user.id), eq(years.year, data.year - 1)),
+    // 4b. Copy recurring additional entries from the latest registered year
+    const previousYear = latestYear === undefined ? undefined : await db.query.years.findFirst({
+      where: and(eq(years.userId, user.id), eq(years.year, latestYear)),
     });
 
     if (previousYear) {

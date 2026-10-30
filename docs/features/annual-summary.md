@@ -4,6 +4,19 @@ The annual summary is the in-year overview shown at `/{locale}/{year}/summary`. 
 
 `AnnualView` is a separate `next/dynamic` client chunk within `YearPageClient`. Month routes therefore do not include the annual UI or Recharts in their initial JavaScript; opening the summary for the first time renders an in-shell skeleton until the chunk is available. Direct summary visits retain server rendering and load the annual chunk immediately, while later in-year switches reuse the cached chunk and shared `YearData`.
 
+## Year-ended Entry Dialog
+
+When an authenticated user enters through the locale root and the current calendar year does not exist, `getAppRedirectPath` opens the latest registered Gridly year's summary instead of January. A past fallback year carries `yearEnded=1`; a future fallback year opens its summary without a year-ended message. With no registered Gridly years, the root retains initial setup. Direct month and summary links retain their normal behavior.
+
+The summary server route validates that the marker accompanies the latest registered year, that the viewed year is past, and that the actual calendar year remains absent. The shared year workspace shows a localized dialog over the summary explaining that the displayed year has ended and the current year has not been created. Its actions are:
+
+- **Create the current year:** Opens guided setup with the new year's current month as its post-creation destination. Navigation provides immediate loading feedback and uses localized routing.
+- **Continue in the displayed year:** Dismisses the dialog and leaves the summary and normal editing/navigation available. Escape and outside dismissal have the same effect.
+
+The client consumes only the transient marker with `window.history.replaceState`, preserving other query parameters and avoiding a data reload. Dismissal is local state, with no local-storage or session-storage preference: local view changes, history restores, and reload after consumption do not reopen it. A new entry through the root can show it again while the current year is still absent. Creating a new year remains an explicit setup submission, never a side effect of showing the dialog.
+
+For accounts missing several calendar years, the primary action offers the actual calendar year. The latest registered predecessor supplies the linked starting balance, setup defaults, and recurring entries without creating intermediate years. See [Year Settings & Setup](year-settings.md#allowed-years-and-calendar-catch-up).
+
 ## Hero KPI Card
 
 The main card shows the final balance and total savings for the selected year.

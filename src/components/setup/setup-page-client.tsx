@@ -376,7 +376,7 @@ export function SetupPageClient({
       window.location.href = `/${locale}${redirectTo}`;
     } catch (err) {
       const message = err instanceof Error ? err.message : "";
-      setError(message === "Only the next year can be created" ? t("errorOnlyNextYear") : t("errorGeneric"));
+      setError(message === "Only the next or current year can be created" ? t("errorOnlyNextYear") : t("errorGeneric"));
       setSubmitting(false);
     }
   };

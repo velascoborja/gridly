@@ -14,13 +14,15 @@ The helper explicitly owns and releases its client, including failures during co
 
 ## Covered operations
 
-- Guided year creation: configuration, templates, twelve months, monthly recurring copies, recurring additional entries from the previous year, and carry-over.
+- Guided year creation: configuration, templates, twelve months, monthly recurring copies, recurring additional entries from the latest registered predecessor (including when calendar years are skipped), and carry-over.
 - REST year creation: configuration, templates, and carry-over. The existing two-step API is preserved: a separate prefill request creates the months. Atomicity applies to each request, not across the two HTTP requests.
 - Year configuration changes: annual fields, selected monthly baselines, and downstream balances.
 - Year deletion: cascaded records and subsequent carry-over repair.
 - Prefill: deletion of existing months and their dependent records, recreation, recurring copies, and downstream balances.
 - Annual recurring replacement: templates, selected monthly copies, and downstream balances. Earlier monthly values remain unchanged; their old template references become null as before.
 - Monthly fixed fields, additional entries, group movement/deletion, and monthly recurring changes, including associated group-child and series-tag writes.
+
+Year creation validates the shared immediate-successor/current-calendar-year rule against the year list read under the user lock. The actual calendar year is server-derived. A jump to the current year still inserts only the requested year, derives its starting balance from the latest registered predecessor, and performs recurring copying and carry-over in the same transaction; no intermediate years or schema changes are introduced.
 
 Metadata-only changes retain the existing propagation suppression. They still use the transaction in mixed financial handlers so their state checks and multi-row writes cannot race with financial operations.
 

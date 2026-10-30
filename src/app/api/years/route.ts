@@ -76,8 +76,8 @@ export async function POST(request: Request) {
       .orderBy(asc(years.year));
 
     const latestYear = existingYears.at(-1)?.year;
-    if (!shouldAllowYearCreation(existingYears.map((row) => row.year), year, year)) {
-      return Response.json({ error: "Only the next year can be created" }, { status: 400 });
+    if (!shouldAllowYearCreation(existingYears.map((row) => row.year), new Date().getFullYear(), year)) {
+      return Response.json({ error: "Only the next or current year can be created" }, { status: 400 });
     }
 
     const existingYear = await db.query.years.findFirst({

@@ -90,7 +90,7 @@ The collection and item APIs enforce the same model as the UI: grouped entries m
 
 ## Recurring Entries
 
-Any **ungrouped** additional entry (income or expense) can be marked as recurring. When the next year is created, all recurring entries from the previous year are automatically copied into the same month number in the new year, preserving label, amount, type, `isRecurring = true`, and `tagId` (so any assigned tag carries over too).
+Any **ungrouped** additional entry (income or expense) can be marked as recurring. When a later year is created through guided setup, all recurring entries from the latest registered predecessor are automatically copied into the same month number in the new year, preserving label, amount, type, `isRecurring = true`, `isInvestment`, and `tagId` (so any assigned tag carries over too). The source is the latest registered year rather than the immediately preceding calendar year: creating 2028 after 2025 copies the recurring entries from 2025 without creating intermediate years. Grouped and non-recurring entries are not copied. The two-step REST creation/prefill contract does not add this guided-only additional-entry copy.
 
 - **Toggle:** A repeat-icon `command` action in the add/edit form marks or unmarks an entry as recurring. The action is not included for entries inside expense groups.
 - **Visual indicator:** Recurring entries show an "anual" pill badge after their label in the list view.

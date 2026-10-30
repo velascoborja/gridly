@@ -6,11 +6,11 @@ async function readSource(path) {
   return readFile(new URL(`../${path}`, import.meta.url), "utf8");
 }
 
-test("year creation source enforces sequential creation and derived carry-over", async () => {
+test("year creation source enforces allowed creation targets and derived carry-over", async () => {
   const source = await readSource("src/lib/server/actions/years.ts");
 
   assert.match(source, /latestYear/, "create year action should look up the latest existing year");
-  assert.match(source, /Only the next year can be created/, "create year action should reject non-sequential requests");
+  assert.match(source, /Only the next or current year can be created/, "create year action should reject non-sequential requests");
   assert.match(source, /deriveStartingBalance/, "create year action should derive the next starting balance from prior data");
   assert.match(source, /propagateYearCarryOver\(user\.id, latestYear \?\? data\.year, db\)/, "create year action should repair from the predecessor after creation");
   assert.doesNotMatch(source, /finalStartingBalance === 0/, "later-year creation must not trust a client zero check");
@@ -87,4 +87,19 @@ test("month route passes starting balance editability into the shared year shell
 
   assert.match(source, /const startingBalanceEditable = years\[0\] === year;/, "month route should derive the same editable first-year state as summary");
   assert.match(source, /startingBalanceEditable=\{startingBalanceEditable\}/, "month route should pass editability into the shared year shell");
+});
+
+
+test("creation uses the server calendar and copies recurring entries across missing years", async () => {
+  const action = await readSource("src/lib/server/actions/years.ts");
+  const api = await readSource("src/app/api/years/route.ts");
+  const setup = await readSource("src/app/[locale]/setup/[year]/page.tsx");
+  assert.match(action, /shouldAllowYearCreation\(existingYears\.map\(\(row\) => row\.year\), new Date\(\)\.getFullYear\(\), data\.year\)/);
+  assert.match(api, /shouldAllowYearCreation\(existingYears\.map\(\(row\) => row\.year\), new Date\(\)\.getFullYear\(\), year\)/);
+  assert.match(setup, /shouldAllowYearCreation\(years, calendarYear, yearNum\)/);
+  assert.match(action, /eq\(years\.year, latestYear\)/);
+  assert.doesNotMatch(action, /data\.year - 1/);
+  for (const path of ["src/components/layout/nav-selectors.tsx", "src/components/layout/mobile-year-menu.tsx"]) {
+    assert.match(await readSource(path), /getNextCreatableYearFromOptions\(yearOptions, calendarYear\)/);
+  }
 });

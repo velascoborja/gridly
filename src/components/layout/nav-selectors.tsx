@@ -65,7 +65,7 @@ export function NavSelectors({
   const selectedYearOption = yearOptions.find((option) => option.year === currentYear);
   const isHistoricalYearSelected = selectedYearOption?.source === "historical";
   const showCurrentYearMarker = yearOptions.length > 1 && gridlyYears.length > 0;
-  const nextCreatableYear = getNextCreatableYearFromOptions(yearOptions, currentYear);
+  const nextCreatableYear = getNextCreatableYearFromOptions(yearOptions, calendarYear);
   const annualView = view === "movements" ? "summary" : view;
   const activeMainView = annualView === "summary" ? "summary" : view === "evolution" ? "evolution" : view === "settings" ? null : "overview";
   const showYearControls = !hideYearSelector && view !== "evolution";

@@ -270,6 +270,45 @@ test('financial operations are atomic on isolated Neon', { timeout: 180000 }, as
       assert.equal((await prefilled.json()).length, 12);
       await chainIsConsistent();
     });
+    await t.test('current-year gaps preserve recurring copies, carry-over and atomic rollback', async (gapTest) => {
+      gapTest.mock.timers.enable({ apis: ['Date'], now: new Date('2040-06-15T12:00:00Z') });
+      const sourceMonth = (await fixture.query('select m.id from months m join years y on y.id = m.year_id where y.year = 2034 and m.month = 3')).rows[0];
+      await fixture.query('insert into additional_entries (month_id, type, label, amount, is_recurring, is_investment, is_completed, tag_id) values ($1, $2, $3, 17, true, true, true, $4)', [sourceMonth.id, 'expense', 'Gap investment', tag.id]);
+      const before = await snapshot();
+      let injected = false;
+      afterQuery = (query) => {
+        if (!injected && /^insert into "additional_entries"/.test(query)) {
+          injected = true;
+          throw new Error('injected gap copy failure');
+        }
+      };
+      try { await assert.rejects(() => m.action.createAndPrefillYear(config(2040))); }
+      finally { afterQuery = undefined; }
+      assert.ok(injected);
+      assert.deepEqual(await snapshot(), before);
+      await m.action.createAndPrefillYear(config(2040));
+      assert.deepEqual((await fixture.query('select year from years order by year')).rows.map((row) => row.year), [2030, 2031, 2032, 2033, 2034, 2040]);
+      const copied = (await fixture.query('select m.month, e.* from additional_entries e join months m on m.id = e.month_id join years y on y.id = m.year_id where y.year = 2040 and e.label = $1', ['Gap investment'])).rows;
+      assert.equal(copied.length, 1);
+      assert.equal(copied[0].month, 3);
+      assert.equal(Number(copied[0].amount), 17);
+      assert.equal(copied[0].is_investment, true);
+      assert.equal(copied[0].is_completed, false);
+      assert.equal(copied[0].tag_id, tag.id);
+      await chainIsConsistent();
+      const changed = await call('month', 'PATCH', { monthId: sourceMonth.id }, { payslip: 300 });
+      assert.equal(changed.status, 200);
+      await chainIsConsistent();
+
+      gapTest.mock.timers.setTime(new Date('2042-06-15T12:00:00Z').getTime());
+      assert.equal((await call('years', 'POST', {}, config(2043))).status, 400);
+      const response = await call('years', 'POST', {}, config(2042));
+      assert.equal(response.status, 201);
+      const row = await response.json();
+      assert.equal((await fixture.query('select count(*)::int as n from months where year_id = $1', [row.id])).rows[0].n, 0);
+      assert.equal((await call('prefill', 'POST', { year: 2042 })).status, 201);
+      await chainIsConsistent();
+    });
   } finally {
     beforeQuery = undefined;
     afterQuery = undefined;

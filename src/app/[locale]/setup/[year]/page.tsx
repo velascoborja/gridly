@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { deriveStartingBalance } from "@/lib/server/year-planning";
+import { deriveStartingBalance, shouldAllowYearCreation } from "@/lib/server/year-planning";
 import { getNextCreatableYear } from "@/lib/server/year-navigation";
 import { getYearData, getYearsForUser } from "@/lib/server/year-data";
 import { requireSessionUser } from "@/lib/server/session";
@@ -16,9 +16,10 @@ export default async function SetupPage({ params }: { params: Promise<{ year: st
   }
 
   const years = await getYearsForUser(user.id);
-  const nextCreatableYear = getNextCreatableYear(years, yearNum);
+  const calendarYear = new Date().getFullYear();
+  const nextCreatableYear = getNextCreatableYear(years, calendarYear);
 
-  if (yearNum !== nextCreatableYear) {
+  if (!shouldAllowYearCreation(years, calendarYear, yearNum)) {
     redirect(`/setup/${nextCreatableYear}`);
   }
 

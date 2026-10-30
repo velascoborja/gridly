@@ -1,5 +1,6 @@
 "use client";
 
+import { YearRolloverDialog, type YearRolloverContext } from "./year-rollover-dialog";
 import dynamic from "next/dynamic";
 import { useLocale } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -49,6 +50,7 @@ interface Props {
   initialView: "overview" | "summary" | "movements";
   years: number[];
   startingBalanceEditable?: boolean;
+  yearRollover?: YearRolloverContext;
   user: {
     id: string;
     email?: string | null;
@@ -91,6 +93,7 @@ export function YearPageClient({
   initialView,
   years,
   startingBalanceEditable = false,
+  yearRollover,
   user,
 }: Props) {
   const pathname = usePathname();
@@ -333,6 +336,7 @@ export function YearPageClient({
           toggleAllGroupsRef={toggleAllGroupsRef}
         />
       )}
+      <YearRolloverDialog context={yearRollover} />
       <SearchPalette
         yearData={currentYearData}
         open={searchOpen}

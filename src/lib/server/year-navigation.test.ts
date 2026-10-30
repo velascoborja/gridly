@@ -25,6 +25,6 @@ test("year option helpers keep creation and default selection tied to Gridly yea
   ];
 
   assert.deepEqual(getGridlyYears(options), [2024]);
-  assert.equal(getNextCreatableYearFromOptions(options, 2026), 2025);
+  assert.equal(getNextCreatableYearFromOptions(options, 2026), 2026);
   assert.deepEqual(pickDefaultYearOption(options, 2026), { year: 2024, source: "gridly" });
 });

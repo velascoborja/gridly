@@ -44,7 +44,7 @@ export function MobileYearMenu({ currentYear, currentMonth, view, years }: Props
   );
   const gridlyYears = getGridlyYears(yearOptions);
   const showCurrentYearMarker = yearOptions.length > 1 && gridlyYears.length > 0;
-  const nextCreatableYear = getNextCreatableYearFromOptions(yearOptions, currentYear);
+  const nextCreatableYear = getNextCreatableYearFromOptions(yearOptions, calendarYear);
   const createYearHref = buildSetupHrefFromPathname(nextCreatableYear, pathname, currentYear, selectedMonth, view);
   const evolutionHref = buildEvolutionHref(undefined);
 

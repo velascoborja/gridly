@@ -9,9 +9,19 @@ Years are created through a guided setup process located at `/setup/[year]`.
 1. **Setup Page:** `src/app/[locale]/setup/[year]/page.tsx` serves the setup form.
 2. **Client Component:** `src/components/setup/setup-page-client.tsx` handles the form state and submission.
 3. **Server Action:** `createAndPrefillYear` in `src/lib/server/actions/years.ts` validates ownership, inserts the year configuration, stores recurring expense templates, initializes all 12 months, copies recurring expenses into each month, propagates carry-over, and revalidates the app layout.
-4. **Return Navigation:** The create-year entry point includes a `redirect` query pointing to the current month or annual summary route. Navigation components use `buildSetupHrefFromPathname` from `src/lib/year-routes.ts` to derive this redirect from the current browser pathname at click time. This ensures that even if the user has navigated locally (via `pushState`), the setup flow returns them to the exact view they were looking at. After the Server Action completes, the setup client performs a hard navigation to the localized redirect target.
+4. **Return Navigation:** The navigation create-year entry point includes a `redirect` query pointing to the current month or annual summary route. The year-ended dialog instead points this return target to the current month of the new calendar year. Navigation components use `buildSetupHrefFromPathname` from `src/lib/year-routes.ts` to derive this redirect from the current browser pathname at click time. This ensures that even if the user has navigated locally (via `pushState`), the setup flow returns them to the exact view they were looking at. After the Server Action completes, the setup client performs a hard navigation to the localized redirect target.
 
 The setup screen is a single-page guided workspace. Desktop layouts use a left section stepper, central grouped setup form, and sticky year preview panel. Mobile layouts collapse the stepper into a horizontal section row and render the preview as a normal review block near submission. The mobile stepper sticks to the top on an opaque setup-background band so scrolled form content does not show through above or behind the toolbar. The mobile stepper selects Starting point when entering mobile mode, then scroll-linked active-step selection follows the first setup card that is fully visible in the viewport; desktop keeps the stepper as navigation and completion status without changing the selected tab while scrolling.
+
+## Allowed Years and Calendar Catch-up
+
+Years are created explicitly; crossing January 1 does not insert a new year. Desktop and mobile creation controls offer `max(current calendar year, latest registered Gridly year + 1)`. Summary-only historical imports do not determine this target.
+
+For an account with existing Gridly years, guided setup, its Server Action, and `POST /api/years` allow either the immediate successor of the latest registered year or the current calendar year when it is later than that latest year. The server obtains the calendar year from its own date, never from the requested year. First-year setup retains its existing behavior. Other forward jumps and creation before or within the existing chain remain unavailable.
+
+For example, with 2025 as the latest registered year in calendar year 2028, the default action offers 2028, while `/setup/2026` still allows the immediate successor. Creating 2028 does not create 2026 or 2027, and those skipped years cannot subsequently be backfilled through this creation flow. Setup prefills configuration and recurring expense templates from 2025, and its starting balance remains linked to December 2025. No data or interest is synthesized for the missing calendar years. See [Yearly Carry-over](balance-carry-over.md).
+
+The REST request and success response shapes are unchanged; only the allowed-year rule expands. REST creation still requires the separate prefill request below to create months.
 
 ## Setup Layout
 
@@ -51,6 +61,7 @@ Gridly employs an "In-Year Workspace" model to manage the complex financial stat
 - **Pure Local Navigation:** Switching between months or views (summary/settings) uses `window.history.pushState()`. This avoids server-side data refetching, allowing the UI to remain responsive and preserve unsaved client-side recalculations.
 - **Route Synchronization:** The `YearPageClient` listens for `popstate` events and uses `parseYearRoutePathname` from `src/lib/year-routes.ts` to keep the UI tabs and the URL in sync.
 - **Server Navigation:** Changing the *year* (e.g., from 2024 to 2025) or going to the landing page uses standard Next.js router transitions, as these require entirely new data sets or different layouts.
+- **Default entry:** The locale root opens the current month when the calendar year exists. Otherwise it opens the latest registered year's annual summary; when that year is in the past, it includes the transient `yearEnded=1` marker for the [year-ended dialog](annual-summary.md#year-ended-entry-dialog). With no registered years it opens initial setup. Direct month and summary links are not redirected by this rule.
 - **Current Year Marker:** When more than one year is available, `NavSelectors` marks the real calendar year in the year selector with a localized compact badge (`Nav.currentYear`). The marker is informational only; it does not change the selected year or default routing.
 
 ## Configuration Fields (YearConfig)
@@ -158,4 +169,4 @@ The configuration dialog translates conflicts into month names and preserves the
 
 ## Annually Recurring Additional Investments
 
-When guided year creation copies ungrouped additional entries marked `isRecurring` from the previous year, it also preserves `isInvestment`. Copies reopen with `isCompleted: false`, retaining their investment classification and tags. The investment flag alone never schedules or copies an entry.
+When guided year creation copies ungrouped additional entries marked `isRecurring` from the latest registered predecessor, it also preserves `isInvestment`. This uses the same predecessor even when calendar years are skipped; it does not require the preceding calendar year to exist. Copies reopen with `isCompleted: false`, retaining their investment classification and tags. The investment flag alone never schedules or copies an entry.

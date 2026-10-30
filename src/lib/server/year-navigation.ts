@@ -5,7 +5,7 @@ export function getNextCreatableYear(existingYears: number[], fallbackYear: numb
     return fallbackYear;
   }
 
-  return Math.max(...existingYears) + 1;
+  return Math.max(fallbackYear, Math.max(...existingYears) + 1);
 }
 
 export function pickDefaultYear(availableYears: number[], currentYear: number): number {

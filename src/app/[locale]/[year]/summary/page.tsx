@@ -6,8 +6,10 @@ import { requireSessionUser } from "@/lib/server/session";
 
 export default async function SummaryPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ year: string }>;
+  searchParams: Promise<{ yearEnded?: string | string[] }>;
 }) {
   const { year: yearStr } = await params;
   const year = parseInt(yearStr, 10);
@@ -22,6 +24,12 @@ export default async function SummaryPage({
   const { years, comparison: annualComparison } = comparisonContext;
   const startingBalanceEditable = years[0] === year;
   const now = new Date();
+  const { yearEnded } = await searchParams;
+  const calendarYear = now.getFullYear();
+  const yearRollover = yearEnded === "1" && year < calendarYear &&
+    year === Math.max(...years) && !years.includes(calendarYear)
+    ? { previousYear: year, currentYear: calendarYear, currentMonth: now.getMonth() + 1 }
+    : undefined;
   const defaultMonth = now.getFullYear() === year ? now.getMonth() + 1 : 1;
 
   return (
@@ -33,6 +41,7 @@ export default async function SummaryPage({
       years={years.length > 0 ? years : [year]}
       startingBalanceEditable={startingBalanceEditable}
       user={user}
+      yearRollover={yearRollover}
     />
   );
 }

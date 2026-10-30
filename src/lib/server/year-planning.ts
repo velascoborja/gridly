@@ -1,11 +1,14 @@
-import { getNextCreatableYear } from "./year-navigation";
-
 export function shouldAllowYearCreation(
   existingYears: number[],
-  fallbackYear: number,
+  calendarYear: number,
   requestedYear: number,
 ) {
-  return requestedYear === getNextCreatableYear(existingYears, fallbackYear);
+  if (!Number.isInteger(requestedYear)) return false;
+  if (existingYears.length === 0) return true;
+
+  const latestYear = Math.max(...existingYears);
+  return requestedYear === latestYear + 1 ||
+    (requestedYear === calendarYear && requestedYear > latestYear);
 }
 
 export function deriveStartingBalance(previousYear: {
