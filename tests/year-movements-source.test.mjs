@@ -3,6 +3,13 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 
+test("shell background sizing stays independent of expanded month content height", () => {
+  const source = read("src/components/layout/base-app-shell.tsx");
+  assert.match(source, /bg-size-\[100%_100svh\]/);
+  assert.match(source, /bg-no-repeat/);
+  assert.match(source, /bg-white/);
+});
+
 test("peak month headers use a compact icon with a translated accessible description", () => {
   const source = read("src/components/annual/year-movements-view.tsx");
   assert.match(source, /<Trophy aria-hidden="true" className="size-4"/);
