@@ -147,8 +147,8 @@ export function YearMovementsView({ yearData, years, onSummarySelect, pathPrefix
           const isCurrentMonth = year === now.getFullYear() && month.month === now.getMonth() + 1;
           const future = year > now.getFullYear() || (year === now.getFullYear() && month.month > now.getMonth() + 1);
           return (
-            <section key={month.month} aria-labelledby={`${monthId}-heading`} className={cn("rounded-md border bg-card shadow-[0_3px_6px_rgba(50,50,93,0.06)]", isPeak ? "border-primary/30" : "border-border/80")}>
-              <div className="sticky top-[var(--app-sticky-header-height,0px)] z-20 rounded-t-md border-b border-border/60 bg-card/95 backdrop-blur-xl">
+            <section key={month.month} aria-labelledby={`${monthId}-heading`} className={cn("rounded-md border bg-card transition-shadow duration-200 ease-in-out motion-reduce:transition-none", expanded ? "shadow-[0_3px_6px_rgba(50,50,93,0.06)]" : "shadow-none", isPeak ? "border-primary/30" : "border-border/80")}>
+              <div className={cn("sticky top-[var(--app-sticky-header-height,0px)] z-20 border-b bg-card/95 backdrop-blur-xl transition-colors duration-200 ease-in-out motion-reduce:transition-none", expanded ? "rounded-t-md border-border/60" : "rounded-md border-transparent")}>
                 <h2 id={`${monthId}-heading`}>
                   <button
                     type="button"
@@ -158,7 +158,8 @@ export function YearMovementsView({ yearData, years, onSummarySelect, pathPrefix
                     aria-expanded={expanded}
                     aria-controls={monthId}
                     className={cn(
-                      "block w-full rounded-t-md px-4 py-4 text-left outline-none transition-colors hover:bg-primary/[0.03] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary sm:px-6",
+                      "block w-full px-4 py-4 text-left outline-none transition-colors hover:bg-primary/[0.03] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary sm:px-6",
+                      expanded ? "rounded-t-md" : "rounded-md",
                       isCurrentMonth && "bg-primary/5 shadow-[inset_2px_0_0_var(--primary)] hover:bg-primary/[0.08] dark:bg-primary/10 dark:hover:bg-primary/[0.13]"
                     )}
                   >
@@ -184,7 +185,7 @@ export function YearMovementsView({ yearData, years, onSummarySelect, pathPrefix
                           )}
                           style={{ color: `color-mix(in srgb, var(--movement-neutral) ${100 - intensity * 100}%, var(--movement-accent))` }}
                         >{formatCurrency(total, locale)}</span>
-                        <ChevronDown aria-hidden="true" className={cn("size-4 text-muted-foreground transition-transform motion-reduce:transition-none", !expanded && "-rotate-90")} />
+                        <ChevronDown aria-hidden="true" className={cn("size-4 text-muted-foreground transition-transform duration-200 ease-in-out motion-reduce:transition-none", !expanded && "-rotate-90")} />
                       </span>
                     </span>
                     <span className="mt-3 block h-1 overflow-hidden rounded-sm bg-muted" aria-hidden="true">
@@ -197,25 +198,32 @@ export function YearMovementsView({ yearData, years, onSummarySelect, pathPrefix
                   </button>
                 </h2>
               </div>
-              <div id={monthId} hidden={!expanded}>
-                {entryCount === 0 ? (
-                  <p className="px-4 py-5 text-sm text-muted-foreground sm:px-6">{t(isExpense ? "emptyExpenseMonth" : "emptyIncomeMonth")}</p>
-                ) : (
-                  <div className="px-4 py-2 sm:px-6">
-                    {groups.map((group) => (
-                      <div key={group.id} className="border-b border-border/50 py-3 last:border-b-0">
-                        <div className="flex items-start justify-between gap-4 border-l-2 border-primary/30 pl-3 text-sm">
-                          <span className="flex min-w-0 flex-wrap items-center gap-2">
-                            <span className="min-w-0 max-w-full break-words font-medium">{group.label}</span>
-                            <span className="rounded border border-primary/15 bg-primary/5 px-1.5 py-0.5 text-[11px] text-primary">{t("group")}</span>
-                          </span>
-                          <span className="finance-number shrink-0 text-muted-foreground">{formatCurrency(group.total, locale)}</span>
+              <div
+                id={monthId}
+                aria-hidden={!expanded}
+                inert={!expanded}
+                className={cn("grid transition-[grid-template-rows,opacity] duration-200 ease-in-out motion-reduce:transition-none", expanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0")}
+              >
+                <div className="min-h-0 overflow-hidden">
+                  {entryCount === 0 ? (
+                    <p className="px-4 py-5 text-sm text-muted-foreground sm:px-6">{t(isExpense ? "emptyExpenseMonth" : "emptyIncomeMonth")}</p>
+                  ) : (
+                    <div className="px-4 py-2 sm:px-6">
+                      {groups.map((group) => (
+                        <div key={group.id} className="border-b border-border/50 py-3 last:border-b-0">
+                          <div className="flex items-start justify-between gap-4 border-l-2 border-primary/30 pl-3 text-sm">
+                            <span className="flex min-w-0 flex-wrap items-center gap-2">
+                              <span className="min-w-0 max-w-full break-words font-medium">{group.label}</span>
+                              <span className="rounded border border-primary/15 bg-primary/5 px-1.5 py-0.5 text-[11px] text-primary">{t("group")}</span>
+                            </span>
+                            <span className="finance-number shrink-0 text-muted-foreground">{formatCurrency(group.total, locale)}</span>
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                    <EntryList entries={entries} locale={locale} />
-                  </div>
-                )}
+                      ))}
+                      <EntryList entries={entries} locale={locale} />
+                    </div>
+                  )}
+                </div>
               </div>
             </section>
           );

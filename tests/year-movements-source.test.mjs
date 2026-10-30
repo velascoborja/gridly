@@ -40,7 +40,14 @@ test("month expansion and selector state are independent, accessible and initial
   assert.match(source, /aria-pressed=\{type === option\}/);
   assert.match(source, /aria-expanded=\{expanded\}/);
   assert.match(source, /aria-controls=\{monthId\}/);
-  assert.match(source, /hidden=\{!expanded\}/);
+  assert.doesNotMatch(source, /\shidden=\{!expanded\}/);
+  assert.match(source, /aria-hidden=\{!expanded\}/);
+  assert.match(source, /inert=\{!expanded\}/);
+  assert.match(source, /grid transition-\[grid-template-rows,opacity\] duration-200 ease-in-out motion-reduce:transition-none/);
+  assert.match(source, /expanded \? "grid-rows-\[1fr\] opacity-100" : "grid-rows-\[0fr\] opacity-0"/);
+  assert.match(source, /className="min-h-0 overflow-hidden"/);
+  assert.match(source, /expanded \? "shadow-\[0_3px_6px_rgba\(50,50,93,0\.06\)\]" : "shadow-none"/);
+  assert.match(source, /expanded \? "rounded-t-md border-border\/60" : "rounded-md border-transparent"/);
   assert.match(source, /sticky top-\[var\(--app-sticky-header-height,0px\)\]/);
   assert.match(read("src/components/layout/base-app-shell.tsx"), /new ResizeObserver\(measureHeader\)/);
 });
