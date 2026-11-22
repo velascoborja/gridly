@@ -20,7 +20,9 @@ test('monthly errors are localized, scoped to the originating month and prevent 
   assert.match(save, /tCommon\("personalRemainingOutOfRange"/);
   assert.ok(save.indexOf('throw new Error') < save.indexOf('commitMonthsChange'));
   assert.match(monthly, /fixedError\?\.monthId === month.id/);
-  assert.ok(monthly.indexOf('tCommon("personalRemainingWarning"') < monthly.indexOf('{renderFixedEditors ? ('));
+  assert.ok(monthly.indexOf('tCommon("personalRemainingWarning"') < monthly.indexOf('const fixedValueCards'));
+  assert.ok(monthly.indexOf('{fixedAlerts}') < monthly.indexOf('{renderFixedEditors && !usesFixedValuesSheet ? ('));
+  assert.match(monthly, /\{fixedAlerts\}\n\s*\{fixedValueCards\}/);
 });
 
 test('annual errors preserve pending cleanup and warn with all affected month names', () => {

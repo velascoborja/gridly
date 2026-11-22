@@ -2,12 +2,13 @@
 
 import { isPersonalRemainingValid, PERSONAL_REMAINING_OUT_OF_RANGE } from "@/lib/personal-remaining";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Download, Eye, EyeOff } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Sheet, SheetBody, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { AdditionalEntriesCard } from "./additional-entries-card";
 import { FixedExpensesCard } from "./fixed-expenses-card";
 import { IncomeCard } from "./income-card";
@@ -81,7 +82,24 @@ type SwipeStart = {
   y: number;
 };
 
-const interactiveSwipeIgnoreSelector = "a, button, input, textarea, select, [role='button'], [draggable='true']";
+const interactiveSwipeIgnoreSelector = "a, button, input, textarea, select, [role='button'], [role='dialog'], [draggable='true']";
+
+const MOBILE_FIXED_SHEET_QUERY = "(max-width: 767px)";
+
+function subscribeToMobileQuery(onChange: () => void) {
+  const query = window.matchMedia(MOBILE_FIXED_SHEET_QUERY);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+}
+
+/** Fixed values open in a bottom sheet on phones so they never blend into the additional-entry cards below. */
+function useUsesFixedValuesSheet() {
+  return useSyncExternalStore(
+    subscribeToMobileQuery,
+    () => window.matchMedia(MOBILE_FIXED_SHEET_QUERY).matches,
+    () => false
+  );
+}
 
 export function MonthOverview({
   yearData: initialYearData,
@@ -136,6 +154,9 @@ export function MonthOverview({
   const [renderFixedEditors, setRenderFixedEditors] = useState(false);
   const [fixedEditorsVisible, setFixedEditorsVisible] = useState(false);
   const [fixedEditorsHeight, setFixedEditorsHeight] = useState<number | "auto">(0);
+  const [fixedSheetOpen, setFixedSheetOpen] = useState(false);
+  const usesFixedValuesSheet = useUsesFixedValuesSheet();
+  const fixedValuesExpanded = usesFixedValuesSheet ? fixedSheetOpen : showFixedEditors;
   const [draggedEntry, setDraggedEntry] = useState<DraggedAdditionalEntry | null>(null);
   const [draggedGroup, setDraggedGroup] = useState<DraggedAdditionalGroup | null>(null);
   const [dragOverMonthId, setDragOverMonthId] = useState<number | null>(null);
@@ -204,7 +225,7 @@ export function MonthOverview({
       setFixedEditorsHeight(0);
       fixedEditorsFrameRef.current = null;
     });
-  }, [renderFixedEditors, showFixedEditors]);
+  }, [renderFixedEditors, showFixedEditors, usesFixedValuesSheet]);
 
   useEffect(() => {
     activeMonthTabRef.current?.scrollIntoView({
@@ -215,15 +236,30 @@ export function MonthOverview({
   }, [monthNumber]);
 
   useEffect(() => {
-    if (!toggleFixedEditorsRef) return;
-    toggleFixedEditorsRef.current = () => setShowFixedEditors((prev) => !prev);
-    return () => { toggleFixedEditorsRef.current = null; };
-  }, [toggleFixedEditorsRef]);
+    if (!usesFixedValuesSheet) setFixedSheetOpen(false);
+  }, [usesFixedValuesSheet]);
+
+  const toggleFixedValues = useCallback(() => {
+    if (window.matchMedia(MOBILE_FIXED_SHEET_QUERY).matches) {
+      setFixedSheetOpen((prev) => !prev);
+      return;
+    }
+    setShowFixedEditors((prev) => !prev);
+  }, []);
 
   useEffect(() => {
-    if (highlightId?.startsWith("recurring-")) {
-      setShowFixedEditors(true);
+    if (!toggleFixedEditorsRef) return;
+    toggleFixedEditorsRef.current = toggleFixedValues;
+    return () => { toggleFixedEditorsRef.current = null; };
+  }, [toggleFixedEditorsRef, toggleFixedValues]);
+
+  useEffect(() => {
+    if (!highlightId?.startsWith("recurring-")) return;
+    if (window.matchMedia(MOBILE_FIXED_SHEET_QUERY).matches) {
+      setFixedSheetOpen(true);
+      return;
     }
+    setShowFixedEditors(true);
   }, [highlightId]);
 
   useEffect(() => {
@@ -569,6 +605,41 @@ export function MonthOverview({
     config.year > today.getFullYear() || (config.year === today.getFullYear() && month.month > today.getMonth() + 1);
   const temporalContext = isPastMonth ? "past" : isFutureMonth ? "future" : "current";
   const CurrentMonthArrowIcon = isPastMonth ? ArrowRight : ArrowLeft;
+  const fixedAlerts = (
+    <>
+      {!isPersonalRemainingValid(month.personalExpense, month.personalRemaining) && (
+        <p role="alert" className="mb-4 rounded-md border border-destructive/20 bg-destructive/5 p-3 text-sm text-destructive">
+          {tCommon("personalRemainingWarning", { months: formatMonthName(month.month, locale) })}
+        </p>
+      )}
+      {fixedError?.monthId === month.id && (
+        <p role="alert" className="mb-4 text-sm text-destructive">{fixedError.message}</p>
+      )}
+    </>
+  );
+  const fixedValueCards = (
+    <>
+      <FixedExpensesCard
+        tags={tags}
+        onCreateTag={handleCreateTag}
+        key={`fixed-expenses-${month.id}`}
+        month={month}
+        onUpdate={handleFixedUpdate}
+        onRecurringEntriesChange={handleRecurringExpensesChange}
+        annualDefaults={config}
+        readOnly={readOnly}
+        highlightId={highlightId}
+      />
+      <IncomeCard
+        key={`fixed-income-${month.id}`}
+        month={month}
+        onUpdate={handleFixedUpdate}
+        showAdditionalPayslip={config.hasExtraPayments && (month.month === 6 || month.month === 12)}
+        annualDefaults={config}
+        readOnly={readOnly}
+      />
+    </>
+  );
   return (
     <div
       className="md:touch-auto touch-pan-y"
@@ -759,20 +830,21 @@ export function MonthOverview({
                 <div className="mt-2 flex flex-wrap items-center justify-center gap-2 lg:justify-start">
                   <button
                     type="button"
-                    aria-expanded={showFixedEditors}
-                    aria-controls="month-fixed-editors"
+                    aria-expanded={fixedValuesExpanded}
+                    aria-controls={usesFixedValuesSheet ? undefined : "month-fixed-editors"}
+                    aria-haspopup={usesFixedValuesSheet ? "dialog" : undefined}
                     className="inline-flex items-center gap-1 rounded-md border border-white/18 bg-white/10 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:border-white/28 hover:bg-white/16"
                     aria-label={tOverview(readOnly ? "viewMonthAria" : "editMonthAria", {
                       month: formatMonthName(month.month, locale),
                     })}
-                    onClick={() => setShowFixedEditors((prev) => !prev)}
+                    onClick={toggleFixedValues}
                   >
-                    {showFixedEditors ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+                    {fixedValuesExpanded ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
                     <span aria-hidden="true" className="grid">
-                      <span className={cn("col-start-1 row-start-1", showFixedEditors ? "visible" : "invisible")}>
+                      <span className={cn("col-start-1 row-start-1", fixedValuesExpanded ? "visible" : "invisible")}>
                         {tOverview("hideMonthEditor")}
                       </span>
-                      <span className={cn("col-start-1 row-start-1", showFixedEditors ? "invisible" : "visible")}>
+                      <span className={cn("col-start-1 row-start-1", fixedValuesExpanded ? "invisible" : "visible")}>
                         {tOverview("editMonth")}
                       </span>
                     </span>
@@ -831,21 +903,14 @@ export function MonthOverview({
         </CardContent>
       </Card>
 
-      {!isPersonalRemainingValid(month.personalExpense, month.personalRemaining) && (
-        <p role="alert" className="mb-4 rounded-md border border-destructive/20 bg-destructive/5 p-3 text-sm text-destructive">
-          {tCommon("personalRemainingWarning", { months: formatMonthName(month.month, locale) })}
-        </p>
-      )}
-      {fixedError?.monthId === month.id && (
-        <p role="alert" className="mb-4 text-sm text-destructive">{fixedError.message}</p>
-      )}
+      {fixedAlerts}
 
-      {renderFixedEditors ? (
+      {renderFixedEditors && !usesFixedValuesSheet ? (
         <div
           id="month-fixed-editors"
           aria-hidden={!showFixedEditors}
           className={cn(
-            "overflow-hidden transition-[height,opacity,transform] duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-[height,opacity,transform]",
+            "max-md:hidden overflow-hidden transition-[height,opacity,transform] duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-[height,opacity,transform]",
             fixedEditorsVisible
               ? "opacity-100 translate-y-0"
               : "opacity-0 -translate-y-1.5 pointer-events-none"
@@ -869,28 +934,27 @@ export function MonthOverview({
                   : "opacity-0 translate-y-1.5 blur-[2px]"
               )}
             >
-              <FixedExpensesCard
-                tags={tags}
-                onCreateTag={handleCreateTag}
-                key={`fixed-expenses-${month.id}`}
-                month={month}
-                onUpdate={handleFixedUpdate}
-                onRecurringEntriesChange={handleRecurringExpensesChange}
-                annualDefaults={config}
-                readOnly={readOnly}
-                highlightId={highlightId}
-              />
-              <IncomeCard
-                key={`fixed-income-${month.id}`}
-                month={month}
-                onUpdate={handleFixedUpdate}
-                showAdditionalPayslip={config.hasExtraPayments && (month.month === 6 || month.month === 12)}
-                annualDefaults={config}
-                readOnly={readOnly}
-              />
+              {fixedValueCards}
             </div>
           </div>
         </div>
+      ) : null}
+
+      {usesFixedValuesSheet ? (
+        <Sheet open={fixedSheetOpen} onOpenChange={setFixedSheetOpen}>
+          <SheetContent closeLabel={tOverview("fixedSheetClose")}>
+            <SheetHeader>
+              <SheetTitle className="first-letter:uppercase">
+                {tOverview("fixedSheetTitle", { month: formatMonthName(month.month, locale) })}
+              </SheetTitle>
+              <SheetDescription>{tOverview("fixedSheetDescription")}</SheetDescription>
+            </SheetHeader>
+            <SheetBody className="space-y-4">
+              {fixedAlerts}
+              {fixedValueCards}
+            </SheetBody>
+          </SheetContent>
+        </Sheet>
       ) : null}
 
       <div className="grid gap-4 lg:grid-cols-2">

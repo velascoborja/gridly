@@ -270,8 +270,8 @@ test("fixed editor toggle keeps a stable width across show and hide labels", () 
   const source = readFileSync(new URL("./month-overview.tsx", import.meta.url), "utf8");
 
   assert.match(source, /<span aria-hidden="true" className="grid">/);
-  assert.match(source, /showFixedEditors \? "visible" : "invisible"/);
-  assert.match(source, /showFixedEditors \? "invisible" : "visible"/);
+  assert.match(source, /fixedValuesExpanded \? "visible" : "invisible"/);
+  assert.match(source, /fixedValuesExpanded \? "invisible" : "visible"/);
   assert.match(source, /tOverview\("hideMonthEditor"\)/);
   assert.match(source, /tOverview\("editMonth"\)/);
 });

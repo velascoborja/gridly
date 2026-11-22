@@ -25,3 +25,16 @@ test("month overview exposes projected year-end balance beside the month status"
   assert.match(source, /yearEndBalanceAria/);
   assert.match(source, /yearEndMonth\.endingBalance/);
 });
+
+test("month overview opens fixed values in a bottom sheet on mobile", () => {
+  const source = readFileSync(new URL("./month-overview.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /MOBILE_FIXED_SHEET_QUERY = "\(max-width: 767px\)"/);
+  assert.match(source, /useSyncExternalStore/);
+  assert.match(source, /renderFixedEditors && !usesFixedValuesSheet/);
+  assert.match(source, /<Sheet open=\{fixedSheetOpen\} onOpenChange=\{setFixedSheetOpen\}>/);
+  assert.match(source, /aria-haspopup=\{usesFixedValuesSheet \? "dialog" : undefined\}/);
+  assert.match(source, /toggleFixedEditorsRef\.current = toggleFixedValues/);
+  assert.match(source, /\[role='dialog'\]/);
+  assert.match(source, /fixedSheetTitle/);
+});

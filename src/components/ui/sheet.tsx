@@ -1,0 +1,102 @@
+"use client"
+
+import * as React from "react"
+import { Dialog as SheetPrimitive } from "@base-ui/react/dialog"
+import { XIcon } from "lucide-react"
+
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+
+function Sheet({ ...props }: SheetPrimitive.Root.Props) {
+  return <SheetPrimitive.Root data-slot="sheet" {...props} />
+}
+
+function SheetClose({ ...props }: SheetPrimitive.Close.Props) {
+  return <SheetPrimitive.Close data-slot="sheet-close" {...props} />
+}
+
+/** Bottom sheet anchored to the viewport's lower edge, used for mobile-only secondary panels. */
+function SheetContent({
+  className,
+  children,
+  closeLabel,
+  ...props
+}: SheetPrimitive.Popup.Props & { closeLabel: string }) {
+  return (
+    <SheetPrimitive.Portal data-slot="sheet-portal">
+      <SheetPrimitive.Backdrop
+        data-slot="sheet-overlay"
+        className="fixed inset-0 isolate z-50 bg-[#061b31]/35 duration-200 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0"
+      />
+      <SheetPrimitive.Popup
+        data-slot="sheet-content"
+        className={cn(
+          "fixed inset-x-0 bottom-0 z-50 flex max-h-[88dvh] flex-col rounded-t-2xl border-t border-border/70 bg-background text-sm text-foreground shadow-[0_-12px_30px_-6px_rgba(3,3,39,0.25)] outline-none duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] data-open:animate-in data-open:slide-in-from-bottom data-closed:animate-out data-closed:slide-out-to-bottom",
+          className
+        )}
+        {...props}
+      >
+        <div aria-hidden="true" className="mx-auto mt-2 h-1 w-9 shrink-0 rounded-full bg-border" />
+        {children}
+        <SheetPrimitive.Close
+          data-slot="sheet-close"
+          render={
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="absolute top-3 right-3 text-muted-foreground hover:text-foreground"
+            />
+          }
+        >
+          <XIcon />
+          <span className="sr-only">{closeLabel}</span>
+        </SheetPrimitive.Close>
+      </SheetPrimitive.Popup>
+    </SheetPrimitive.Portal>
+  )
+}
+
+function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="sheet-header"
+      className={cn("flex shrink-0 flex-col gap-1 px-4 pt-2 pb-3 pr-12", className)}
+      {...props}
+    />
+  )
+}
+
+function SheetBody({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="sheet-body"
+      className={cn(
+        "min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[max(1rem,env(safe-area-inset-bottom))]",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function SheetTitle({ className, ...props }: SheetPrimitive.Title.Props) {
+  return (
+    <SheetPrimitive.Title
+      data-slot="sheet-title"
+      className={cn("text-base font-semibold tracking-tight", className)}
+      {...props}
+    />
+  )
+}
+
+function SheetDescription({ className, ...props }: SheetPrimitive.Description.Props) {
+  return (
+    <SheetPrimitive.Description
+      data-slot="sheet-description"
+      className={cn("text-xs text-muted-foreground", className)}
+      {...props}
+    />
+  )
+}
+
+export { Sheet, SheetBody, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle }
