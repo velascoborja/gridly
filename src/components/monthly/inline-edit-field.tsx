@@ -9,6 +9,7 @@ import { cn, formatCurrency } from "@/lib/utils";
 
 interface InlineEditFieldProps {
   label: string;
+  icon?: React.ReactNode;
   value: number;
   onSave: (newValue: number) => Promise<void>;
   formatDisplayValue?: (value: number, locale: string) => string;
@@ -29,6 +30,7 @@ const defaultParseInputValue = (input: string) => parseFloat(input.replace(",", 
 
 export function InlineEditField({
   label,
+  icon,
   value,
   onSave,
   formatDisplayValue = formatCurrency,
@@ -158,7 +160,19 @@ export function InlineEditField({
       role={isRowInteractive ? "button" : undefined}
       tabIndex={isRowInteractive ? 0 : undefined}
     >
-      <span className="min-w-0 truncate whitespace-nowrap text-sm font-medium text-foreground">{label}</span>
+      {icon ? (
+        <span className="flex min-w-0 items-center gap-2.5">
+          <span
+            aria-hidden="true"
+            className="inline-flex size-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary [&_svg]:size-3.5"
+          >
+            {icon}
+          </span>
+          <span className="min-w-0 truncate whitespace-nowrap text-sm font-medium text-foreground">{label}</span>
+        </span>
+      ) : (
+        <span className="min-w-0 truncate whitespace-nowrap text-sm font-medium text-foreground">{label}</span>
+      )}
       {editing ? (
         <div
           className="col-span-2 grid min-w-0 grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2"

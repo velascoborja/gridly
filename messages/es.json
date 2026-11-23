@@ -518,12 +518,8 @@
       "deleteIncomeAria": "Eliminar ingreso {label}",
       "noAdditionalIncome": "No hay ingresos adicionales todavía. Registra una entrada puntual si corresponde."
     },
-    "fixed": {
-      "badge": "Predeterminado"
-    },
     "income": {
       "title": "Ingresos fijos",
-      "description": "Entradas base del mes, incluyendo pagas extra y complementos cuando aplican.",
       "payslip": "Nómina",
       "additionalPayslip": "Paga extra",
       "interests": "Intereses cuenta",
@@ -532,7 +528,6 @@
     },
     "fixedExpenses": {
       "title": "Gastos fijos",
-      "description": "Presupuestos para gastos recurrentes e inversión.",
       "homeExpense": "Casa (mes siguiente)",
       "personalExpense": "Presupuesto personal",
       "investment": "Inversión",

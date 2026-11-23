@@ -1,8 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { House, Repeat, TrendingUp, Wallet } from "lucide-react";
 import { InlineEditField } from "./inline-edit-field";
 import { RecurringExpensesList } from "./recurring-expenses-list";
 import { sumRecurringExpenses } from "@/lib/recurring-expenses";
@@ -27,77 +26,70 @@ interface Props {
 
 export function FixedExpensesCard({ tags, onCreateTag, month, onUpdate, onRecurringEntriesChange, annualDefaults, readOnly = false, highlightId = null }: Props) {
   const t = useTranslations("Monthly.fixedExpenses");
-  const tFixed = useTranslations("Monthly.fixed");
   const locale = useLocale();
   const recurringTotal = sumRecurringExpenses(month.recurringExpenses);
 
   return (
-    <Card size="sm" className="relative border-border/70 bg-muted/40 shadow-sm shadow-black/5">
-      <CardHeader className="pb-1">
-        <div className="flex items-start justify-between">
-          <CardTitle className="text-sm font-medium">{t("title")}</CardTitle>
-          <Badge variant="outline" className="h-4.5 border-border/60 bg-background/50 px-1.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80">
-            {tFixed("badge")}
-          </Badge>
+    <div className="flex min-w-0 flex-col gap-1 p-4">
+      <p className="px-2 pb-1 text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
+        {t("title")}
+      </p>
+      <InlineEditField
+        label={t("homeExpense")}
+        icon={<House />}
+        value={month.homeExpense}
+        onSave={(v) => onUpdate("homeExpense", v)}
+        readOnly={readOnly}
+        activateOnRowPress
+        resetValue={annualDefaults.monthlyHomeExpense}
+        showReset={month.homeExpenseManualOverride}
+        onReset={(v) => onUpdate("homeExpense", v, { homeExpenseManualOverride: false })}
+      />
+      <InlineEditField
+        label={t("personalExpense")}
+        icon={<Wallet />}
+        value={month.personalExpense}
+        onSave={(v) => onUpdate("personalExpense", v)}
+        readOnly={readOnly}
+        activateOnRowPress
+        resetValue={annualDefaults.monthlyPersonalBudget}
+        showReset={month.personalExpenseManualOverride}
+        onReset={(v) => onUpdate("personalExpense", v, { personalExpenseManualOverride: false })}
+      />
+      <p className="pb-2 pl-11.5 pr-2 text-xs text-muted-foreground tabular-nums">
+        {t("personalNet", { amount: formatCurrency(month.personalExpense - month.personalRemaining, locale) })}
+      </p>
+      <InlineEditField
+        label={t("investment")}
+        icon={<TrendingUp />}
+        value={month.investment}
+        onSave={(v) => onUpdate("investment", v)}
+        readOnly={readOnly}
+        activateOnRowPress
+        resetValue={annualDefaults.monthlyInvestment}
+        showReset={month.investmentManualOverride}
+        onReset={(v) => onUpdate("investment", v, { investmentManualOverride: false })}
+      />
+      <div className="mt-3 border-t border-border/60 pt-3">
+        <div className="mb-2 flex items-center justify-between gap-3 px-2">
+          <p className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
+            <Repeat aria-hidden="true" className="size-3" />
+            {t("recurringExpensesTitle")}
+          </p>
+          <span className="whitespace-nowrap text-xs font-semibold tabular-nums text-rose-600 dark:text-rose-300">
+            {formatCurrency(recurringTotal, locale)}
+          </span>
         </div>
-        <CardDescription>
-          {t("description")}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-1">
-        <InlineEditField
-          label={t("homeExpense")}
-          value={month.homeExpense}
-          onSave={(v) => onUpdate("homeExpense", v)}
+        <RecurringExpensesList
+          tags={tags}
+          onCreateTag={onCreateTag}
+          monthId={month.id}
+          entries={month.recurringExpenses}
+          onEntriesChange={onRecurringEntriesChange}
           readOnly={readOnly}
-          activateOnRowPress
-          resetValue={annualDefaults.monthlyHomeExpense}
-          showReset={month.homeExpenseManualOverride}
-          onReset={(v) => onUpdate("homeExpense", v, { homeExpenseManualOverride: false })}
+          highlightId={highlightId}
         />
-        <InlineEditField
-          label={t("personalExpense")}
-          value={month.personalExpense}
-          onSave={(v) => onUpdate("personalExpense", v)}
-          readOnly={readOnly}
-          activateOnRowPress
-          resetValue={annualDefaults.monthlyPersonalBudget}
-          showReset={month.personalExpenseManualOverride}
-          onReset={(v) => onUpdate("personalExpense", v, { personalExpenseManualOverride: false })}
-        />
-        <p className="px-2 pb-2 text-xs text-muted-foreground tabular-nums">
-          {t("personalNet", { amount: formatCurrency(month.personalExpense - month.personalRemaining, locale) })}
-        </p>
-        <InlineEditField
-          label={t("investment")}
-          value={month.investment}
-          onSave={(v) => onUpdate("investment", v)}
-          readOnly={readOnly}
-          activateOnRowPress
-          resetValue={annualDefaults.monthlyInvestment}
-          showReset={month.investmentManualOverride}
-          onReset={(v) => onUpdate("investment", v, { investmentManualOverride: false })}
-        />
-        <div className="mt-3 border-t border-border/60 pt-3">
-          <div className="mb-2 flex items-center justify-between gap-3 px-2">
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
-              {t("recurringExpensesTitle")}
-            </p>
-            <span className="whitespace-nowrap text-xs font-semibold tabular-nums text-rose-600 dark:text-rose-300">
-              {formatCurrency(recurringTotal, locale)}
-            </span>
-          </div>
-          <RecurringExpensesList
-            tags={tags}
-            onCreateTag={onCreateTag}
-            monthId={month.id}
-            entries={month.recurringExpenses}
-            onEntriesChange={onRecurringEntriesChange}
-            readOnly={readOnly}
-            highlightId={highlightId}
-          />
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

@@ -938,3 +938,21 @@ test("ungrouped completion collapses the editor and restores it after a failed l
   assert.match(optimisticSource, /if \(nextCompleted\) setEditingId\(null\);/);
   assert.match(failureSource, /if \(nextCompleted\) setEditingId\(entry\.id\);/);
 });
+
+test("fixed values render as a single monthly plan panel distinct from variable cards", () => {
+  const overviewSource = readFileSync(new URL("./month-overview.tsx", import.meta.url), "utf8");
+  const panelSource = readFileSync(new URL("./fixed-plan-panel.tsx", import.meta.url), "utf8");
+  const incomeSource = readFileSync(new URL("./income-card.tsx", import.meta.url), "utf8");
+  const expensesSource = readFileSync(new URL("./fixed-expenses-card.tsx", import.meta.url), "utf8");
+  const inlineSource = readFileSync(new URL("./inline-edit-field.tsx", import.meta.url), "utf8");
+
+  assert.match(overviewSource, /<FixedPlanPanel>\s*<FixedExpensesCard[\s\S]*<IncomeCard[\s\S]*<\/FixedPlanPanel>/);
+  assert.match(panelSource, /md:divide-x/);
+  assert.doesNotMatch(panelSource, /<header|<footer/);
+  assert.doesNotMatch(panelSource, /shadow-/);
+  assert.doesNotMatch(incomeSource, /@\/components\/ui\/card/);
+  assert.doesNotMatch(expensesSource, /@\/components\/ui\/card/);
+  assert.match(expensesSource, /icon=\{<House \/>\}/);
+  assert.match(incomeSource, /icon=\{<BriefcaseBusiness \/>\}/);
+  assert.match(inlineSource, /icon\?: React\.ReactNode/);
+});

@@ -12,6 +12,7 @@ import { Sheet, SheetBody, SheetContent, SheetDescription, SheetHeader, SheetTit
 import { AdditionalEntriesCard } from "./additional-entries-card";
 import { FixedExpensesCard } from "./fixed-expenses-card";
 import { IncomeCard } from "./income-card";
+import { FixedPlanPanel } from "./fixed-plan-panel";
 import { sortAdditionalEntriesDesc } from "@/lib/additional-entries";
 import { sortRecurringExpensesAsc } from "@/lib/recurring-expenses";
 import { cn, formatCurrency, formatMonthName } from "@/lib/utils";
@@ -618,7 +619,7 @@ export function MonthOverview({
     </>
   );
   const fixedValueCards = (
-    <>
+    <FixedPlanPanel>
       <FixedExpensesCard
         tags={tags}
         onCreateTag={handleCreateTag}
@@ -638,7 +639,7 @@ export function MonthOverview({
         annualDefaults={config}
         readOnly={readOnly}
       />
-    </>
+    </FixedPlanPanel>
   );
   return (
     <div
@@ -928,7 +929,7 @@ export function MonthOverview({
           <div ref={fixedEditorsInnerRef} className="overflow-hidden pb-6">
             <div
               className={cn(
-                "grid gap-4 pt-1 pb-0.5 transition-[opacity,transform,filter] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] md:grid-cols-2",
+                "pt-1 pb-0.5 transition-[opacity,transform,filter] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
                 fixedEditorsVisible
                   ? "opacity-100 translate-y-0 blur-0"
                   : "opacity-0 translate-y-1.5 blur-[2px]"

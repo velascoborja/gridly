@@ -518,12 +518,8 @@
       "deleteIncomeAria": "Delete income {label}",
       "noAdditionalIncome": "There is no additional income yet. Add one if applicable."
     },
-    "fixed": {
-      "badge": "Default"
-    },
     "income": {
       "title": "Fixed Income",
-      "description": "Base income for the month, including extra pays when applicable.",
       "payslip": "Salary",
       "additionalPayslip": "Extra pay",
       "interests": "Interests",
@@ -532,7 +528,6 @@
     },
     "fixedExpenses": {
       "title": "Fixed Expenses",
-      "description": "Budgets for recurring expenses and investments.",
       "homeExpense": "Home expenses",
       "personalExpense": "Personal budget",
       "investment": "Investment",

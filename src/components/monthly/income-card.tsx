@@ -1,8 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { BriefcaseBusiness, Gift, Percent, Undo2 } from "lucide-react";
 import { InlineEditField } from "./inline-edit-field";
 import { calculateMonthlyInterest } from "@/lib/calculations";
 import type { MonthData, YearConfig } from "@/lib/types";
@@ -22,67 +21,60 @@ interface Props {
 
 export function IncomeCard({ month, onUpdate, showAdditionalPayslip, annualDefaults, readOnly = false }: Props) {
   const t = useTranslations("Monthly.income");
-  const tFixed = useTranslations("Monthly.fixed");
   const tCommon = useTranslations("Common");
 
   return (
-    <Card size="sm" className="relative border-border/70 bg-muted/40 shadow-sm shadow-black/5">
-      <CardHeader className="pb-1">
-        <div className="flex items-start justify-between">
-          <CardTitle className="text-sm font-medium">{t("title")}</CardTitle>
-          <Badge variant="outline" className="h-4.5 border-border/60 bg-background/50 px-1.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/80">
-            {tFixed("badge")}
-          </Badge>
-        </div>
-        <CardDescription>
-          {t("description")}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-1">
+    <div className="flex min-w-0 flex-col gap-1 p-4">
+      <p className="px-2 pb-1 text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
+        {t("title")}
+      </p>
+      <InlineEditField
+        label={t("payslip")}
+        icon={<BriefcaseBusiness />}
+        value={month.payslip}
+        onSave={(v) => onUpdate("payslip", v)}
+        readOnly={readOnly}
+        activateOnRowPress
+        resetValue={annualDefaults.estimatedSalary}
+        showReset={month.payslipManualOverride}
+        onReset={(v) => onUpdate("payslip", v, { payslipManualOverride: false })}
+      />
+      {showAdditionalPayslip && (
         <InlineEditField
-          label={t("payslip")}
-          value={month.payslip}
-          onSave={(v) => onUpdate("payslip", v)}
+          label={t("additionalPayslip")}
+          icon={<Gift />}
+          value={month.additionalPayslip}
+          onSave={(v) => onUpdate("additionalPayslip", v)}
           readOnly={readOnly}
           activateOnRowPress
-          resetValue={annualDefaults.estimatedSalary}
-          showReset={month.payslipManualOverride}
-          onReset={(v) => onUpdate("payslip", v, { payslipManualOverride: false })}
+          resetValue={annualDefaults.estimatedExtraPayment}
+          showReset={month.additionalPayslipManualOverride}
+          onReset={(v) => onUpdate("additionalPayslip", v, { additionalPayslipManualOverride: false })}
         />
-        {showAdditionalPayslip && (
-          <InlineEditField
-            label={t("additionalPayslip")}
-            value={month.additionalPayslip}
-            onSave={(v) => onUpdate("additionalPayslip", v)}
-            readOnly={readOnly}
-            activateOnRowPress
-            resetValue={annualDefaults.estimatedExtraPayment}
-            showReset={month.additionalPayslipManualOverride}
-            onReset={(v) => onUpdate("additionalPayslip", v, { additionalPayslipManualOverride: false })}
-          />
-        )}
-        <InlineEditField
-          label={t("interests")}
-          value={month.interests}
-          onSave={(v) => onUpdate("interests", v)}
-          readOnly={readOnly}
-          activateOnRowPress
-          resetValue={calculateMonthlyInterest(month.startingBalance, annualDefaults.interestRate)}
-          showReset={month.interestsManualOverride}
-          onReset={(v) => onUpdate("interests", v, { interestsManualOverride: false })}
-        />
-        <InlineEditField
-          label={t("personalRemaining")}
-          value={month.personalRemaining}
-          onSave={(v) => onUpdate("personalRemaining", v)}
-          readOnly={readOnly}
-          activateOnRowPress
-          resetValue={0}
-          showReset={Math.abs(month.personalRemaining) > 0.005}
-          resetLabel={tCommon("resetToZero")}
-        />
-        <p className="px-2 text-xs text-muted-foreground">{t("personalRemainingHint")}</p>
-      </CardContent>
-    </Card>
+      )}
+      <InlineEditField
+        label={t("interests")}
+        icon={<Percent />}
+        value={month.interests}
+        onSave={(v) => onUpdate("interests", v)}
+        readOnly={readOnly}
+        activateOnRowPress
+        resetValue={calculateMonthlyInterest(month.startingBalance, annualDefaults.interestRate)}
+        showReset={month.interestsManualOverride}
+        onReset={(v) => onUpdate("interests", v, { interestsManualOverride: false })}
+      />
+      <InlineEditField
+        label={t("personalRemaining")}
+        icon={<Undo2 />}
+        value={month.personalRemaining}
+        onSave={(v) => onUpdate("personalRemaining", v)}
+        readOnly={readOnly}
+        activateOnRowPress
+        resetValue={0}
+        showReset={Math.abs(month.personalRemaining) > 0.005}
+        resetLabel={tCommon("resetToZero")}
+      />
+      <p className="pl-11.5 pr-2 text-xs text-muted-foreground">{t("personalRemainingHint")}</p>
+    </div>
   );
 }
