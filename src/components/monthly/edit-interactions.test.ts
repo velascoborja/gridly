@@ -950,7 +950,7 @@ test("fixed values render as a single monthly plan panel distinct from variable 
   assert.match(panelSource, /md:divide-x/);
   assert.doesNotMatch(panelSource, /<header|<footer/);
   assert.doesNotMatch(panelSource, /shadow-/);
-  assert.match(panelSource, /bg-\[#533afd\]/);
+  assert.match(panelSource, /bg-linear-to-br from-\[#533afd\]/);
   assert.doesNotMatch(incomeSource, /@\/components\/ui\/card/);
   assert.doesNotMatch(expensesSource, /@\/components\/ui\/card/);
   assert.match(expensesSource, /icon=\{<House \/>\}/);
