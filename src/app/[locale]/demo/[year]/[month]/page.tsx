@@ -38,7 +38,6 @@ export default async function DemoMonthPage({
 
   return (
     <PublicDemoShell
-      eyebrow={t("eyebrow")}
       title={`${monthName} ${year}`}
       description={t("description", { month: monthName, year })}
     >

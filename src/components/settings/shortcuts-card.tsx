@@ -70,7 +70,7 @@ export function ShortcutsCard() {
         <div className="grid grid-cols-2">
           {groups.map((group) => (
             <Fragment key={group.label}>
-              <div className="col-span-2 pb-1 pt-3 text-[9.5px] font-bold uppercase tracking-widest text-muted-foreground">
+              <div className="col-span-2 pb-1 pt-3 text-xs font-medium text-muted-foreground">
                 {group.label}
               </div>
               {group.shortcuts.map((shortcut) => (
@@ -82,7 +82,7 @@ export function ShortcutsCard() {
                     {shortcut.keys.map((key, i) => (
                       <kbd
                         key={i}
-                        className="inline-flex items-center justify-center rounded-[5px] border border-b-2 border-border bg-muted px-1.5 py-0.5 font-mono text-[10.5px] text-foreground/70 shadow-sm"
+                        className="inline-flex items-center justify-center rounded-sm border border-b-2 border-border bg-muted px-1.5 py-0.5 font-mono text-xs text-foreground/70 shadow-sm"
                       >
                         {key}
                       </kbd>

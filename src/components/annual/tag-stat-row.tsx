@@ -40,10 +40,10 @@ export function TagStatRow({ stat, maxAmount }: Props) {
       >
         <div className="mb-2.5 flex items-center gap-3">
           <span className="size-2.5 shrink-0 rounded-full border" style={dotStyle} />
-          <span className="flex-1 truncate text-sm font-semibold text-foreground">
+          <span className="flex-1 truncate text-sm font-medium text-foreground">
             {stat.tag?.name ?? t("untagged")}
           </span>
-          <span className="tabular-nums text-sm font-bold text-foreground">
+          <span className="finance-number text-sm font-semibold text-foreground">
             {formatCurrency(stat.totalAmount, locale)}
           </span>
           <ChevronRight

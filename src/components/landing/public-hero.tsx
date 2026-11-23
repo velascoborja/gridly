@@ -50,11 +50,11 @@ export function PublicHero({ accountDeleted = false, authError = false }: Public
     },
   ];
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#fbfcff] text-foreground">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[34rem] bg-[radial-gradient(circle_at_18%_0%,rgba(83,58,253,0.16),transparent_30%),radial-gradient(circle_at_82%_6%,rgba(249,107,238,0.12),transparent_26%),linear-gradient(180deg,#ffffff_0%,rgba(246,249,252,0.86)_56%,transparent_100%)]" />
+    <div className="relative min-h-screen overflow-hidden bg-background text-foreground">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[34rem] landing-atmosphere" />
 
       <header className="relative z-10 mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 sm:flex-row sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-4 rounded-[8px] border border-[#e5edf5]/80 bg-white/86 px-4 py-3 shadow-[0_15px_35px_-28px_rgba(50,50,93,0.28),0_8px_18px_-14px_rgba(0,0,0,0.12)] backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 rounded-lg border border-border/80 bg-card/85 px-4 py-3 shadow-sm backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
           <Link href="/" className="group inline-flex items-center gap-2">
             <Image
               src="/gridly-wordmark.svg"
@@ -65,7 +65,7 @@ export function PublicHero({ accountDeleted = false, authError = false }: Public
               priority
             />
             {process.env.NODE_ENV === "development" && (
-              <Badge variant="default" className="pointer-events-none rounded-[4px] uppercase">
+              <Badge variant="default" className="pointer-events-none">
                 DEV
               </Badge>
             )}
@@ -75,7 +75,7 @@ export function PublicHero({ accountDeleted = false, authError = false }: Public
               href={demoHref}
               className={cn(
                 buttonVariants({ variant: "outline", size: "lg" }),
-                "w-full justify-center rounded-[4px] border-[#b9b9f9] bg-white/88 px-5 text-base font-normal text-[#533afd] shadow-[0_15px_35px_-18px_rgba(50,50,93,0.18)] backdrop-blur-sm hover:bg-[#533afd]/[0.05] hover:text-[#533afd] sm:w-auto",
+                "w-full justify-center rounded-md border-primary/35 bg-card/90 px-5 text-base font-normal text-primary shadow-sm backdrop-blur-sm hover:bg-primary/[0.05] hover:text-primary sm:w-auto",
               )}
             >
               {t("demoCta")}
@@ -87,21 +87,21 @@ export function PublicHero({ accountDeleted = false, authError = false }: Public
 
       <div className="relative z-10 mx-auto w-full max-w-7xl space-y-3 px-4 sm:px-6 lg:px-8">
         {accountDeleted ? (
-          <div className="flex max-w-2xl items-start gap-3 rounded-[6px] border border-[rgba(21,190,83,0.4)] bg-[rgba(21,190,83,0.12)] px-4 py-3 text-[#108c3d] shadow-[0_15px_35px_-28px_rgba(50,50,93,0.25)]">
+          <div className="flex max-w-2xl items-start gap-3 rounded-md border border-financial-positive/40 bg-financial-positive/15 px-4 py-3 text-financial-positive shadow-sm">
             <CheckCircle2 className="mt-0.5 size-5 shrink-0" />
             <div className="space-y-1">
               <p className="text-sm font-medium">{t("accountDeletedTitle")}</p>
-              <p className="text-sm leading-6 text-[#108c3d]/85">{t("accountDeletedDescription")}</p>
+              <p className="text-sm leading-6 text-financial-positive/85">{t("accountDeletedDescription")}</p>
             </div>
           </div>
         ) : null}
 
         {authError ? (
-          <div className="flex max-w-2xl items-start gap-3 rounded-[6px] border border-[#b9b9f9] bg-white/86 px-4 py-3 text-[#533afd] shadow-[0_15px_35px_-28px_rgba(50,50,93,0.25)] backdrop-blur-sm">
+          <div className="flex max-w-2xl items-start gap-3 rounded-md border border-primary/35 bg-card/90 px-4 py-3 text-primary shadow-sm">
             <Info className="mt-0.5 size-5 shrink-0" />
             <div className="space-y-1">
-              <p className="text-sm font-medium text-[#061b31]">{t("authErrorTitle")}</p>
-              <p className="text-sm leading-6 text-[#64748d]">{t("authErrorDescription")}</p>
+              <p className="text-sm font-medium text-foreground">{t("authErrorTitle")}</p>
+              <p className="text-sm leading-6 text-muted-foreground">{t("authErrorDescription")}</p>
             </div>
           </div>
         ) : null}
@@ -111,25 +111,22 @@ export function PublicHero({ accountDeleted = false, authError = false }: Public
         <section className="grid gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(24rem,1.05fr)] lg:items-center">
           <div className="space-y-7">
             <div className="max-w-2xl space-y-5">
-              <p className="inline-flex rounded-[4px] border border-[#ffd7ef] bg-white px-2 py-1 text-xs font-normal uppercase tracking-[0.14em] text-[#ea2261] shadow-[0_12px_28px_-24px_rgba(50,50,93,0.28)]">
-                {t("heroEyebrow")}
-              </p>
-              <h1 className="max-w-3xl text-[clamp(2.7rem,6.8vw,5rem)] font-light leading-[1.02] tracking-[-0.05em] text-[#061b31]">
+              <h1 className="max-w-3xl text-5xl font-light leading-none tracking-[-0.04em] sm:text-6xl lg:text-7xl text-foreground">
                 {t("heroTitle")}
               </h1>
-              <p className="max-w-xl text-base font-light leading-7 text-[#64748d] sm:text-lg">{t("heroDescription")}</p>
+              <p className="max-w-xl text-base font-light leading-7 text-muted-foreground sm:text-lg">{t("heroDescription")}</p>
             </div>
           </div>
 
           <section className="relative">
-            <div className="relative overflow-hidden rounded-[8px] border border-[#d6d9fc] bg-white shadow-[0_30px_45px_-30px_rgba(50,50,93,0.36),0_18px_36px_-18px_rgba(0,0,0,0.14)]">
-              <div className="border-b border-[#e5edf5] bg-[linear-gradient(180deg,#ffffff_0%,#f6f9fc_100%)] px-5 py-4">
+            <div className="relative overflow-hidden rounded-lg border border-primary/20 bg-card shadow-featured">
+              <div className="border-b border-border bg-linear-to-b from-card to-muted/50 px-5 py-4">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="text-xs font-normal uppercase tracking-[0.16em] text-[#64748d]">{t("preview.title")}</p>
-                    <h2 className="mt-1 text-2xl font-light tracking-[-0.026em] text-[#061b31]">{t("preview.yearLabel")}</h2>
+                    <p className="text-xs font-medium text-muted-foreground">{t("preview.title")}</p>
+                    <h2 className="mt-1 text-2xl font-light text-foreground">{t("preview.yearLabel")}</h2>
                   </div>
-                  <div className="rounded-[4px] border border-[#e5edf5] bg-white px-2 py-1 text-xs font-normal text-[#64748d]">
+                  <div className="rounded-md border border-border bg-card px-2 py-1 text-xs font-normal text-muted-foreground">
                     {t("preview.privateAccount")}
                   </div>
                 </div>
@@ -142,13 +139,13 @@ export function PublicHero({ accountDeleted = false, authError = false }: Public
                   <PreviewMetric label={t("preview.extraPays")} value="2" />
                 </div>
 
-                <div className="rounded-[8px] border border-[#e5edf5] bg-[linear-gradient(180deg,#ffffff_0%,#f6f8fc_100%)] p-4">
+                <div className="rounded-lg border border-border bg-linear-to-b from-card to-muted/50 p-4">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                      <p className="text-sm font-normal text-[#061b31]">{t("preview.currentMonth")}</p>
-                      <p className="mt-1 text-sm font-light leading-6 text-[#64748d]">{t("preview.connectedBalance")}</p>
+                      <p className="text-sm font-normal text-foreground">{t("preview.currentMonth")}</p>
+                      <p className="mt-1 text-sm font-light leading-6 text-muted-foreground">{t("preview.connectedBalance")}</p>
                     </div>
-                    <div className="w-fit rounded-[4px] bg-[#533afd] px-3 py-1 text-xs font-normal text-white">
+                    <div className="w-fit rounded-md bg-primary px-3 py-1 text-xs font-normal text-primary-foreground">
                       {t("preview.monthName")}
                     </div>
                   </div>
@@ -164,36 +161,35 @@ export function PublicHero({ accountDeleted = false, authError = false }: Public
           </section>
         </section>
 
-        <section className="mt-12 grid gap-6 rounded-[8px] border border-[#e5edf5] bg-white px-4 py-5 shadow-[0_30px_45px_-38px_rgba(50,50,93,0.26),0_18px_36px_-24px_rgba(0,0,0,0.1)] sm:px-5 lg:mt-16 lg:grid-cols-[0.82fr_1.18fr] lg:items-center lg:p-6">
+        <section className="mt-12 grid gap-6 rounded-lg border border-border bg-card px-4 py-5 shadow-sm sm:px-5 lg:mt-16 lg:grid-cols-[0.82fr_1.18fr] lg:items-center lg:p-6">
           <div className="max-w-xl space-y-3">
-            <p className="text-xs font-normal uppercase tracking-[0.16em] text-[#533afd]">{t("annualStory.eyebrow")}</p>
-            <h2 className="text-3xl font-light tracking-[-0.04em] text-[#061b31] sm:text-4xl">{t("annualStory.title")}</h2>
-            <p className="text-base font-light leading-7 text-[#64748d]">{t("annualStory.description")}</p>
+            <h2 className="text-3xl font-light tracking-[-0.04em] text-foreground sm:text-4xl">{t("annualStory.title")}</h2>
+            <p className="text-base font-light leading-7 text-muted-foreground">{t("annualStory.description")}</p>
           </div>
 
-          <div className="rounded-[8px] border border-[#e5edf5] bg-[#fbfcff] p-4">
+          <div className="rounded-lg border border-border bg-background p-4">
             <div className="flex items-center justify-between gap-4">
-              <p className="text-sm font-normal text-[#273951]">{t("annualStory.projectedClose")}</p>
-              <p className="finance-number text-lg font-normal text-[#061b31]">18.420 EUR</p>
+              <p className="text-sm font-normal text-foreground/80">{t("annualStory.projectedClose")}</p>
+              <p className="finance-number text-lg font-normal text-foreground">18.420 EUR</p>
             </div>
             <div className="mt-5 grid h-40 grid-cols-12 items-end gap-1.5 sm:gap-2">
               {ANNUAL_BARS.map((bar, index) => (
                 <div key={`${bar.month}-${index}`} className="flex h-full min-w-0 flex-col items-center justify-end gap-2">
                   <div
                     className={cn(
-                      "w-full rounded-[3px] border transition-colors",
+                      "w-full rounded-sm border transition-colors",
                       bar.highlight
-                        ? "border-[#533afd] bg-[#533afd] shadow-[0_14px_21px_-14px_rgba(50,50,93,0.34)]"
-                        : "border-[#d6d9fc] bg-[#b9b9f9]/70",
+                        ? "border-primary bg-primary shadow-sm"
+                        : "border-primary/20 bg-primary/25",
                     )}
                     style={{ height: `${bar.value}%` }}
                   />
-                  <span className="text-[10px] font-light text-[#64748d]">{bar.month}</span>
+                  <span className="text-xs font-light text-muted-foreground">{bar.month}</span>
                 </div>
               ))}
             </div>
-            <div className="mt-4 flex items-center gap-2 text-xs font-light text-[#64748d]">
-              <span className="size-2 rounded-[2px] bg-[#533afd]" />
+            <div className="mt-4 flex items-center gap-2 text-xs font-light text-muted-foreground">
+              <span className="size-2 rounded-sm bg-primary" />
               {t("annualStory.extraPayMarker")}
             </div>
           </div>
@@ -203,23 +199,23 @@ export function PublicHero({ accountDeleted = false, authError = false }: Public
           {FEATURE_PROOF.map(({ icon: Icon, title, description }) => (
             <article
               key={title}
-              className="rounded-[8px] border border-[#e5edf5] bg-white/88 p-5 shadow-[0_18px_36px_-30px_rgba(50,50,93,0.26)] backdrop-blur-sm"
+              className="rounded-lg border border-border bg-card p-5 shadow-sm"
             >
-              <div className="flex size-10 items-center justify-center rounded-[6px] border border-[#d6d9fc] bg-[#533afd]/[0.06] text-[#533afd]">
+              <div className="flex size-10 items-center justify-center rounded-md border border-primary/20 bg-primary/[0.06] text-primary">
                 <Icon className="size-5" />
               </div>
-              <h2 className="mt-4 text-xl font-light tracking-[-0.026em] text-[#061b31]">{title}</h2>
-              <p className="mt-2 text-sm font-light leading-6 text-[#64748d]">{description}</p>
+              <h2 className="mt-4 text-xl font-light text-foreground">{title}</h2>
+              <p className="mt-2 text-sm font-light leading-6 text-muted-foreground">{description}</p>
             </article>
           ))}
         </section>
 
-        <footer className="mt-10 flex items-center gap-4 text-xs font-light text-[#64748d] lg:mt-14">
+        <footer className="mt-10 flex items-center gap-4 text-xs font-light text-muted-foreground lg:mt-14">
           <span>{t("footer.copyright", { year: new Date().getFullYear() })}</span>
-          <Link href="/privacy" className="hover:text-[#061b31] transition-colors">
+          <Link href="/privacy" className="hover:text-foreground transition-colors">
             {t("footer.privacy")}
           </Link>
-          <Link href="/terms" className="hover:text-[#061b31] transition-colors">
+          <Link href="/terms" className="hover:text-foreground transition-colors">
             {t("footer.terms")}
           </Link>
         </footer>
@@ -232,14 +228,14 @@ function PreviewMetric({ label, value, active = false }: { label: string; value:
   return (
     <div
       className={cn(
-        "rounded-[6px] border p-3",
+        "rounded-md border p-3",
         active
-          ? "border-[#d6d9fc] bg-[linear-gradient(180deg,rgba(83,58,253,0.08),#ffffff)]"
-          : "border-[#e5edf5] bg-white",
+          ? "border-primary/20 bg-linear-to-b from-primary/[0.08] to-card"
+          : "border-border bg-card",
       )}
     >
-      <p className="text-[11px] font-light uppercase leading-4 tracking-[0.12em] text-[#64748d]">{label}</p>
-      <p className="finance-number mt-2 text-xl font-normal tracking-[-0.02em] text-[#061b31]">{value}</p>
+      <p className="text-xs font-medium leading-4 text-muted-foreground">{label}</p>
+      <p className="finance-number mt-2 text-xl font-normal text-foreground">{value}</p>
     </div>
   );
 }
@@ -256,9 +252,9 @@ function PreviewRow({
   strong?: boolean;
 }) {
   return (
-    <div className={cn("grid grid-cols-[1fr_auto] items-center gap-3", strong && "border-t border-[#e5edf5] pt-3")}>
-      <p className={cn("text-sm font-light text-[#64748d]", strong && "font-normal text-[#061b31]")}>{label}</p>
-      <p className={cn("finance-number text-sm font-normal text-[#061b31]", emphasis && "text-[#533afd]")}>{value}</p>
+    <div className={cn("grid grid-cols-[1fr_auto] items-center gap-3", strong && "border-t border-border pt-3")}>
+      <p className={cn("text-sm font-light text-muted-foreground", strong && "font-normal text-foreground")}>{label}</p>
+      <p className={cn("finance-number text-sm font-normal text-foreground", emphasis && "text-primary")}>{value}</p>
     </div>
   );
 }

@@ -61,7 +61,7 @@ const setupMobileStepperQuery = "(max-width: 1023px)";
 const isSetupMobileStepper = () =>
   typeof window !== "undefined" && window.matchMedia(setupMobileStepperQuery).matches;
 const setupInputClassName =
-  "h-11 rounded-md border-[#e5edf5] px-3 text-sm text-[#061b31] shadow-none focus-visible:ring-[#533afd]/20";
+  "h-11 rounded-md border-border px-3 text-sm text-foreground shadow-none focus-visible:ring-primary/20";
 
 export function SetupPageClient({
   year,
@@ -218,7 +218,7 @@ export function SetupPageClient({
 
     return (
       <div className="space-y-2">
-        <label className="text-sm font-medium text-[#273951]" htmlFor={key}>
+        <label className="text-sm font-medium text-foreground/80" htmlFor={key}>
           {label}
         </label>
         <div className="relative">
@@ -237,7 +237,7 @@ export function SetupPageClient({
           <span
             aria-hidden="true"
             className={cn(
-              "pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#64748d] transition-opacity",
+              "pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground transition-opacity",
               value.trim() ? "opacity-100" : "opacity-0"
             )}
           >
@@ -254,7 +254,7 @@ export function SetupPageClient({
 
     return (
       <div className="space-y-2">
-        <label className="text-sm font-medium text-[#273951]" htmlFor={field.key}>
+        <label className="text-sm font-medium text-foreground/80" htmlFor={field.key}>
           {field.label}
         </label>
         <div className="relative">
@@ -272,7 +272,7 @@ export function SetupPageClient({
             <span
               aria-hidden="true"
               className={cn(
-                "pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#64748d] transition-opacity",
+                "pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground transition-opacity",
                 value.trim() ? "opacity-100" : "opacity-0"
               )}
             >
@@ -323,20 +323,20 @@ export function SetupPageClient({
 
   const summaryContent = (
     <div className="space-y-4">
-      <div className="divide-y divide-[#e5edf5] rounded-md border border-[#e5edf5] bg-white">
+      <div className="divide-y divide-border rounded-md border border-border bg-card">
         {summaryRows.map((row) => (
           <div key={row.label} className="flex items-start justify-between gap-4 px-3 py-3">
             <div className="min-w-0 space-y-1">
-              <p className="text-xs font-medium text-[#64748d]">{row.label}</p>
-              {row.note ? <p className="text-xs leading-5 text-[#64748d]">{row.note}</p> : null}
+              <p className="text-xs font-medium text-muted-foreground">{row.label}</p>
+              {row.note ? <p className="text-xs leading-5 text-muted-foreground">{row.note}</p> : null}
             </div>
-            <p className="shrink-0 text-right text-sm font-medium tabular-nums text-[#061b31]">
+            <p className="shrink-0 text-right text-sm font-medium tabular-nums text-foreground">
               {row.value}
             </p>
           </div>
         ))}
       </div>
-      <p className="rounded-md border border-[#d6d9fc] bg-[#533afd]/[0.04] px-3 py-2 text-xs leading-5 text-[#273951]">
+      <p className="rounded-md border border-primary/20 bg-primary/[0.04] px-3 py-2 text-xs leading-5 text-foreground/80">
         {t("summary.recurringNote")}
       </p>
     </div>
@@ -382,9 +382,9 @@ export function SetupPageClient({
   };
 
   return (
-    <div className="min-h-screen bg-[#f6f9fc] px-4 py-6 text-[#061b31] sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-muted/50 px-4 py-6 text-foreground sm:px-6 lg:px-8">
       <div className="mx-auto w-full max-w-7xl space-y-6">
-        <header className="rounded-lg border border-[#e5edf5] bg-white px-4 py-4 shadow-[0_15px_35px_0_rgba(23,23,23,0.08)] sm:px-5">
+        <header className="rounded-lg border border-border bg-card px-4 py-4 shadow-sm sm:px-5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
@@ -397,19 +397,16 @@ export function SetupPageClient({
                   priority
                 />
                 {process.env.NODE_ENV === "development" && (
-                  <Badge variant="default" className="pointer-events-none rounded uppercase">
+                  <Badge variant="default" className="pointer-events-none">
                     DEV
                   </Badge>
                 )}
               </div>
               <div className="max-w-2xl space-y-2">
-                <p className="text-xs font-medium uppercase text-[#533afd]">
-                  {t("headerEyebrow")}
-                </p>
-                <h1 className="text-3xl font-light leading-tight text-[#061b31] sm:text-4xl">
+                <h1 className="text-3xl font-light leading-tight text-foreground sm:text-4xl">
                   {t("mainHeading", { year })}
                 </h1>
-                <p className="text-sm leading-6 text-[#64748d] sm:text-base">
+                <p className="text-sm leading-6 text-muted-foreground sm:text-base">
                   {startingBalanceEditable
                     ? t("descriptionEditable")
                     : t("descriptionFixed", { year, previousYear: previousYear ?? "" })}
@@ -423,7 +420,7 @@ export function SetupPageClient({
           <nav
             ref={navRef}
             aria-label={t("stepperLabel")}
-            className="sticky top-0 z-10 -mx-4 overflow-x-auto border-y border-[#e5edf5] bg-[#f6f9fc] px-4 py-2 shadow-[0_8px_20px_rgba(15,23,42,0.05)] lg:top-3 lg:mx-0 lg:overflow-visible lg:rounded-lg lg:border lg:bg-white lg:p-2 lg:shadow-[0_15px_35px_0_rgba(23,23,23,0.06)]"
+            className="sticky top-0 z-10 -mx-4 overflow-x-auto border-y border-border bg-muted/50 px-4 py-2 shadow-sm lg:top-3 lg:mx-0 lg:overflow-visible lg:rounded-lg lg:border lg:bg-card lg:p-2 lg:shadow-sm"
           >
             <ol className="flex min-w-max gap-2 lg:min-w-0 lg:flex-col">
               {SETUP_STEPS.map((step, index) => {
@@ -438,24 +435,24 @@ export function SetupPageClient({
                     href={`#${step.id}`}
                     aria-current={isActive ? "step" : undefined}
                     className={cn(
-                      "flex h-10 items-center gap-2 rounded-md border px-3 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#533afd]/25",
+                      "flex h-10 items-center gap-2 rounded-md border px-3 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25",
                       showOptionalState
-                        ? "border-dashed border-[#d6d9fc] bg-[#f6f9fc] text-[#64748d] hover:border-[#b9b9f9] hover:bg-[#533afd]/[0.04] hover:text-[#533afd]"
+                        ? "border-dashed border-primary/20 bg-muted/50 text-muted-foreground hover:border-primary/35 hover:bg-primary/[0.04] hover:text-primary"
                         : isStepComplete
-                        ? "border-[#15be53]/30 bg-[rgba(21,190,83,0.08)] text-[#108c3d] hover:border-[#15be53]/50 hover:bg-[rgba(21,190,83,0.12)]"
-                        : "border-transparent text-[#273951] hover:border-[#d6d9fc] hover:bg-[#533afd]/[0.04] hover:text-[#533afd]",
-                      isActive && "max-lg:border-solid max-lg:border-[#533afd] max-lg:bg-[#533afd]/[0.04] max-lg:text-[#533afd]"
+                        ? "border-financial-positive/30 bg-financial-positive/10 text-financial-positive hover:border-financial-positive/50 hover:bg-financial-positive/15"
+                        : "border-transparent text-foreground/80 hover:border-primary/20 hover:bg-primary/[0.04] hover:text-primary",
+                      isActive && "max-lg:border-solid max-lg:border-primary max-lg:bg-primary/[0.04] max-lg:text-primary"
                     )}
                   >
                     <span
                       className={cn(
-                        "flex size-5 shrink-0 items-center justify-center rounded border text-[11px] tabular-nums",
+                        "flex size-5 shrink-0 items-center justify-center rounded-sm border text-xs tabular-nums",
                         showOptionalState
-                          ? "border-dashed border-[#b9b9f9] bg-white text-[#64748d]"
+                          ? "border-dashed border-primary/35 bg-card text-muted-foreground"
                           : isStepComplete
-                          ? "border-[#15be53] bg-[#15be53] text-white"
-                          : "border-[#d6d9fc] bg-white text-[#533afd]",
-                        isActive && "max-lg:border-solid max-lg:border-[#533afd] max-lg:bg-[#533afd] max-lg:text-white"
+                          ? "border-financial-positive bg-financial-positive text-primary-foreground"
+                          : "border-primary/20 bg-card text-primary",
+                        isActive && "max-lg:border-solid max-lg:border-primary max-lg:bg-primary max-lg:text-primary-foreground"
                       )}
                     >
                       {index + 1}
@@ -469,10 +466,10 @@ export function SetupPageClient({
           </nav>
 
           <main className="space-y-4">
-            <Card id="starting-point" className="rounded-lg border-[#e5edf5] bg-white shadow-[rgba(50,50,93,0.25)_0px_30px_45px_-30px,rgba(0,0,0,0.1)_0px_18px_36px_-18px]">
+            <Card id="starting-point" className="rounded-lg border-border bg-card shadow-sm">
               <CardHeader className="space-y-2 pb-4">
-                <CardTitle className="text-2xl font-light text-[#061b31]">{t("sections.startingPoint.title")}</CardTitle>
-                <CardDescription className="text-sm leading-6 text-[#64748d]">
+                <CardTitle className="text-2xl font-light text-foreground">{t("sections.startingPoint.title")}</CardTitle>
+                <CardDescription className="text-sm leading-6 text-muted-foreground">
                   {t("sections.startingPoint.description")}
                 </CardDescription>
               </CardHeader>
@@ -485,7 +482,7 @@ export function SetupPageClient({
                   })
                 ) : (
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-[#273951]" htmlFor="startingBalance">
+                    <label className="text-sm font-medium text-foreground/80" htmlFor="startingBalance">
                       {t("startingBalanceDerived")}
                     </label>
                     <Input
@@ -499,30 +496,30 @@ export function SetupPageClient({
                   </div>
                 )}
                 {!startingBalanceEditable ? (
-                  <p className="text-sm leading-6 text-[#64748d]">
+                  <p className="text-sm leading-6 text-muted-foreground">
                     {t("startingBalanceNote", { previousYear: previousYear ?? "" })}
                   </p>
                 ) : null}
               </CardContent>
             </Card>
 
-            <Card id="income" className="rounded-lg border-[#e5edf5] bg-white shadow-[rgba(50,50,93,0.25)_0px_30px_45px_-30px,rgba(0,0,0,0.1)_0px_18px_36px_-18px]">
+            <Card id="income" className="rounded-lg border-border bg-card shadow-sm">
               <CardHeader className="space-y-2 pb-4">
-                <CardTitle className="text-2xl font-light text-[#061b31]">{t("sections.income.title")}</CardTitle>
-                <CardDescription className="text-sm leading-6 text-[#64748d]">
+                <CardTitle className="text-2xl font-light text-foreground">{t("sections.income.title")}</CardTitle>
+                <CardDescription className="text-sm leading-6 text-muted-foreground">
                   {t("sections.income.description")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {renderCurrencyInput(numericFieldByKey.estimatedSalary)}
 
-                <div className="rounded-lg border border-[#e5edf5] bg-[#f6f9fc] p-4">
+                <div className="rounded-lg border border-border bg-muted/50 p-4">
                   <label className="flex items-start justify-between gap-4">
                     <span className="space-y-1">
-                      <span className="block text-sm font-medium text-[#273951]">
+                      <span className="block text-sm font-medium text-foreground/80">
                         {t("hasExtraPayments")}
                       </span>
-                      <span className="block text-sm leading-6 text-[#64748d]">
+                      <span className="block text-sm leading-6 text-muted-foreground">
                         {t("hasExtraPaymentsDescription")}
                       </span>
                     </span>
@@ -538,16 +535,16 @@ export function SetupPageClient({
                       <span
                         aria-hidden="true"
                         className={cn(
-                          "inline-flex h-6 w-11 items-center rounded-full border p-0.5 transition-[background-color,box-shadow] duration-200 ease-out peer-focus-visible:ring-4 peer-focus-visible:ring-[#533afd]/20",
+                          "inline-flex h-6 w-11 items-center rounded-full border p-0.5 transition-[background-color,box-shadow] duration-200 ease-out peer-focus-visible:ring-4 peer-focus-visible:ring-primary/20",
                           hasExtraPayments
-                            ? "border-[#533afd]/70 bg-[#533afd] shadow-[0_8px_18px_-10px_rgba(83,58,253,0.7)]"
-                            : "border-[#d4dee9] bg-white shadow-inner",
+                            ? "border-primary/70 bg-primary shadow-sm"
+                            : "border-border bg-card shadow-inner",
                           submitting ? "opacity-50" : "cursor-pointer"
                         )}
                       >
                         <span
                           className={cn(
-                            "block size-5 rounded-full bg-white shadow-[0_2px_8px_rgba(15,23,42,0.18)] transition-transform duration-200 ease-out",
+                            "block size-5 rounded-full bg-card shadow-sm transition-transform duration-200 ease-out",
                             hasExtraPayments ? "translate-x-5" : "translate-x-0"
                           )}
                         />
@@ -563,7 +560,7 @@ export function SetupPageClient({
                     aria-hidden={!hasExtraPayments}
                   >
                     <div className="overflow-hidden px-1 pb-2">
-                      <div className="border-t border-[#e5edf5] pt-4">
+                      <div className="border-t border-border pt-4">
                         {renderCurrencyInput({
                           key: "estimatedExtraPayment",
                           label: t("estimatedExtraPayment"),
@@ -577,10 +574,10 @@ export function SetupPageClient({
               </CardContent>
             </Card>
 
-            <Card id="monthly-plan" className="rounded-lg border-[#e5edf5] bg-white shadow-[rgba(50,50,93,0.25)_0px_30px_45px_-30px,rgba(0,0,0,0.1)_0px_18px_36px_-18px]">
+            <Card id="monthly-plan" className="rounded-lg border-border bg-card shadow-sm">
               <CardHeader className="space-y-2 pb-4">
-                <CardTitle className="text-2xl font-light text-[#061b31]">{t("sections.monthlyPlan.title")}</CardTitle>
-                <CardDescription className="text-sm leading-6 text-[#64748d]">
+                <CardTitle className="text-2xl font-light text-foreground">{t("sections.monthlyPlan.title")}</CardTitle>
+                <CardDescription className="text-sm leading-6 text-muted-foreground">
                   {t("sections.monthlyPlan.description")}
                 </CardDescription>
               </CardHeader>
@@ -591,27 +588,27 @@ export function SetupPageClient({
               </CardContent>
             </Card>
 
-            <Card className="rounded-lg border-[#d6d9fc] bg-white shadow-[rgba(50,50,93,0.18)_0px_24px_40px_-30px,rgba(0,0,0,0.08)_0px_14px_28px_-18px]">
+            <Card className="rounded-lg border-primary/20 bg-card shadow-sm">
               <CardHeader className="space-y-0 pb-4">
                 <button
                   type="button"
-                  className="flex w-full items-center justify-between gap-4 rounded-md text-left outline-none transition-colors hover:bg-[#533afd]/[0.04] focus-visible:ring-2 focus-visible:ring-[#533afd]/20"
+                  className="flex w-full items-center justify-between gap-4 rounded-md text-left outline-none transition-colors hover:bg-primary/[0.04] focus-visible:ring-2 focus-visible:ring-primary/20"
                   aria-expanded={isGrowthExpanded}
                   aria-controls="growth-setup-panel"
                   onClick={() => setIsGrowthExpanded((current) => !current)}
                 >
                   <span className="space-y-1">
-                    <CardTitle className="text-2xl font-light text-[#061b31]">
+                    <CardTitle className="text-2xl font-light text-foreground">
                       {t("sections.growth.title")}
                     </CardTitle>
-                    <CardDescription className="text-sm leading-6 text-[#64748d]">
+                    <CardDescription className="text-sm leading-6 text-muted-foreground">
                       {t("sections.growth.description")}
                     </CardDescription>
                   </span>
                   <ChevronDown
                     aria-hidden="true"
                     className={cn(
-                      "size-5 shrink-0 text-[#533afd] transition-transform duration-200",
+                      "size-5 shrink-0 text-primary transition-transform duration-200",
                       isGrowthExpanded && "rotate-180"
                     )}
                   />
@@ -637,10 +634,10 @@ export function SetupPageClient({
               />
             </div>
 
-            <Card id="review-create" className="rounded-lg border-[#e5edf5] bg-white shadow-[rgba(50,50,93,0.25)_0px_30px_45px_-30px,rgba(0,0,0,0.1)_0px_18px_36px_-18px] lg:hidden">
+            <Card id="review-create" className="rounded-lg border-border bg-card shadow-sm lg:hidden">
               <CardHeader className="space-y-2 pb-4">
-                <CardTitle className="text-2xl font-light text-[#061b31]">{t("sections.reviewCreate.title")}</CardTitle>
-                <CardDescription className="text-sm leading-6 text-[#64748d]">
+                <CardTitle className="text-2xl font-light text-foreground">{t("sections.reviewCreate.title")}</CardTitle>
+                <CardDescription className="text-sm leading-6 text-muted-foreground">
                   {t("sections.reviewCreate.description")}
                 </CardDescription>
               </CardHeader>
@@ -649,7 +646,7 @@ export function SetupPageClient({
                 {errorAlert}
                 <Button
                   type="submit"
-                  className="h-11 w-full rounded-md bg-[#533afd] text-sm font-medium text-white hover:bg-[#4434d4]"
+                  className="h-11 w-full rounded-md bg-primary text-sm font-medium text-primary-foreground hover:bg-primary/90"
                   disabled={submitting || !canSubmit}
                   aria-busy={submitting}
                 >
@@ -660,10 +657,10 @@ export function SetupPageClient({
           </main>
 
           <aside className="hidden lg:sticky lg:top-3 lg:block">
-            <Card className="rounded-lg border-[#e5edf5] bg-white shadow-[rgba(50,50,93,0.25)_0px_30px_45px_-30px,rgba(0,0,0,0.1)_0px_18px_36px_-18px]">
+            <Card className="rounded-lg border-border bg-card shadow-sm">
               <CardHeader className="space-y-2 pb-4">
-                <CardTitle className="text-xl font-light text-[#061b31]">{t("summary.title")}</CardTitle>
-                <CardDescription className="text-sm leading-6 text-[#64748d]">
+                <CardTitle className="text-xl font-light text-foreground">{t("summary.title")}</CardTitle>
+                <CardDescription className="text-sm leading-6 text-muted-foreground">
                   {t("summary.description")}
                 </CardDescription>
               </CardHeader>
@@ -672,7 +669,7 @@ export function SetupPageClient({
                 {errorAlert}
                 <Button
                   type="submit"
-                  className="h-11 w-full rounded-md bg-[#533afd] text-sm font-medium text-white hover:bg-[#4434d4]"
+                  className="h-11 w-full rounded-md bg-primary text-sm font-medium text-primary-foreground hover:bg-primary/90"
                   disabled={submitting || !canSubmit}
                   aria-busy={submitting}
                 >

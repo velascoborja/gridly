@@ -39,6 +39,31 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-financial-positive: var(--financial-positive);
+  --color-financial-negative: var(--financial-negative);
+  --color-financial-neutral: var(--financial-neutral);
+  --color-warning: var(--warning);
+  --color-overlay: var(--overlay);
+  --color-month-past: var(--month-past);
+  --color-month-past-foreground: var(--month-past-foreground);
+  --color-month-future: var(--month-future);
+  --color-month-future-foreground: var(--month-future-foreground);
+  --color-hero-foreground: var(--hero-foreground);
+  --color-hero-muted-foreground: var(--hero-muted-foreground);
+  --color-hero-border: var(--hero-border);
+  --color-hero-control: var(--hero-control);
+  --color-hero-positive: var(--hero-positive);
+  --color-hero-negative: var(--hero-negative);
+  --color-hero-accent: var(--hero-accent);
+  --color-decorative-ruby: var(--decorative-ruby);
+  --color-decorative-magenta: var(--decorative-magenta);
+  --shadow-featured: var(--featured-shadow);
+  --shadow-sheet: var(--sheet-shadow);
+  --shadow-raised: var(--elevation-2);
+  --shadow-floating: var(--elevation-3);
+  --shadow-inset-accent: inset 2px 0 0 var(--primary);
+  --shadow-hero: var(--hero-shadow);
+  --shadow-hero-current: var(--hero-current-shadow);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -156,6 +181,34 @@
   --financial-positive: oklch(0.55 0.16 155);
   --financial-negative: oklch(0.62 0.2 25);
   --financial-neutral: var(--muted-foreground);
+  --warning: oklch(0.555 0.163 49); /* amber, estimates and soft warnings */
+  --overlay: #061b31; /* deep navy, used with an opacity modifier */
+  --featured-shadow: 0 30px 45px -30px rgba(50, 50, 93, 0.25), 0 18px 36px -18px rgba(0, 0, 0, 0.1);
+  --sheet-shadow: 0 -12px 30px -6px rgba(3, 3, 39, 0.25);
+  /* Month timeline: past and future months in the month rail and entry cards */
+  --month-past: #1e293b;
+  --month-past-foreground: #f1f5f9;
+  --month-future: #4338ca;
+  --month-future-foreground: #eef2ff;
+  /* Month hero: a dark navy surface in both themes */
+  --hero-current-from: #1e1b4b;
+  --hero-current-via: #312e81;
+  --hero-past-from: #0f172a;
+  --hero-future-from: #1c1e54;
+  --hero-deep-via: #0d253d;
+  --hero-deep-to: #020617;
+  --hero-foreground: #ffffff;
+  --hero-muted-foreground: rgb(255 255 255 / 0.55);
+  --hero-border: rgb(255 255 255 / 0.1);
+  --hero-control: #ffffff; /* used with opacity modifiers for buttons on the hero */
+  --hero-positive: #6ee7b7;
+  --hero-negative: #fda4af;
+  --hero-accent: #b9b9f9;
+  --hero-shadow: 0 30px 45px -30px rgba(50, 50, 93, 0.45), 0 18px 36px -18px rgba(0, 0, 0, 0.22);
+  --hero-current-shadow: 0 30px 60px -15px rgba(83, 58, 253, 0.25);
+  /* Decorative only (illustration, marketing); never buttons, links or amounts */
+  --decorative-ruby: #ea2261;
+  --decorative-magenta: #f96bee;
 }
 
 .dark {
@@ -199,6 +252,15 @@
   --financial-positive: oklch(0.78 0.13 155);
   --financial-negative: oklch(0.75 0.17 24);
   --financial-neutral: var(--muted-foreground);
+  --warning: oklch(0.88 0.17 92);
+  --overlay: #000000;
+  --featured-shadow: 0 30px 45px -30px rgb(0 0 0 / 0.5), 0 18px 36px -18px rgb(0 0 0 / 0.3);
+  --sheet-shadow: 0 -12px 30px -6px rgb(0 0 0 / 0.5);
+  --month-past: #334155;
+  --month-past-foreground: #f1f5f9;
+  --month-future: #6366f1;
+  --month-future-foreground: #eef2ff;
+  /* Hero tokens keep their :root values: the hero is dark in both themes. */
 }
 
 @layer base {
@@ -333,6 +395,39 @@
     background: var(--surface-3);
     box-shadow: var(--elevation-3);
     backdrop-filter: blur(24px);
+  }
+
+  /* Page atmosphere for the app shell; set once here, not per component. */
+  .app-atmosphere {
+    background-color: var(--card);
+    background-image:
+      radial-gradient(circle at top left, color-mix(in oklch, var(--primary) 12%, transparent), transparent 32%),
+      radial-gradient(circle at top right, color-mix(in oklch, var(--chart-2) 10%, transparent), transparent 28%),
+      linear-gradient(180deg, color-mix(in oklch, var(--background) 96%, transparent), var(--card));
+    background-size: 100% 100svh;
+    background-repeat: no-repeat;
+  }
+
+  /* Public landing atmosphere: brand purple with a decorative magenta wash. */
+  .landing-atmosphere {
+    background-image:
+      radial-gradient(circle at 18% 0%, color-mix(in oklch, var(--primary) 16%, transparent), transparent 30%),
+      radial-gradient(circle at 82% 6%, color-mix(in oklch, var(--decorative-magenta) 12%, transparent), transparent 26%),
+      linear-gradient(180deg, var(--card) 0%, color-mix(in oklch, var(--background) 86%, transparent) 56%, transparent 100%);
+  }
+
+  /* The month hero: the one dark featured surface on the monthly screen.
+     Pair with text-hero-foreground, border-hero-border and shadow-hero(-current). */
+  .surface-hero {
+    background-image: linear-gradient(to bottom right, var(--hero-current-from), var(--hero-current-via), var(--hero-current-from));
+  }
+
+  .surface-hero-past {
+    background-image: linear-gradient(to bottom right, var(--hero-past-from), var(--hero-deep-via), var(--hero-deep-to));
+  }
+
+  .surface-hero-future {
+    background-image: linear-gradient(to bottom right, var(--hero-future-from), var(--hero-deep-via), var(--hero-deep-to));
   }
 
   .finance-number {

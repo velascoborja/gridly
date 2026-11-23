@@ -81,12 +81,12 @@ export function CompletionLockButton({
       className={cn(
         "relative shrink-0 overflow-visible transition-[color,background-color,box-shadow] duration-200 motion-reduce:transition-none",
         showText
-          ? "h-7 gap-1.5 px-2 text-[11px]"
+          ? "h-7 gap-1.5 px-2 text-xs"
           : actionSize
             ? "h-9 w-9"
             : "h-7 w-7",
         completed
-          ? "bg-emerald-500/10 text-emerald-700 shadow-[inset_0_0_0_1px_rgb(21_190_83_/_0.18)] hover:bg-emerald-500/15 hover:text-emerald-800 dark:text-emerald-300"
+          ? "bg-financial-positive/10 text-financial-positive ring-1 ring-inset ring-financial-positive/20 hover:bg-financial-positive/15"
           : "text-muted-foreground hover:bg-primary/10 hover:text-primary",
         pending && "cursor-wait",
         className

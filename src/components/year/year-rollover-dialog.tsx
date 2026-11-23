@@ -49,7 +49,7 @@ export function YearRolloverDialog({ context }: { context?: YearRolloverContext 
   const { previousYear, currentYear, currentMonth } = context;
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent showCloseButton={false} className="rounded-lg border border-primary/20 p-6 shadow-[rgba(50,50,93,0.25)_0px_30px_45px_-30px,rgba(0,0,0,0.1)_0px_18px_36px_-18px] sm:max-w-lg">
+      <DialogContent showCloseButton={false} className="rounded-lg border border-primary/20 p-6 shadow-featured sm:max-w-lg">
         <span className="flex size-11 items-center justify-center rounded-md bg-primary/10 text-primary"><CalendarDays aria-hidden className="size-6" /></span>
         <DialogHeader>
           <DialogTitle className="text-2xl font-light tracking-tight">{t("title", { year: previousYear })}</DialogTitle>

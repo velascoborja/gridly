@@ -51,7 +51,7 @@ The annual KPI header also includes an **Expected Entries** dialog for temporary
 
 **Relevant Code:**
 - `avgAdditionalEntriesPerMonth()` in `src/lib/additional-entries.ts`: Calculates the yearly average for a given entry type (includes grouped entries for expense type).
-- `AdditionalEntriesAverages` component in `src/components/annual/additional-entries-averages.tsx`: Renders the stat cards with currency formatting and tone-coded icon indicators (rose/ArrowDownRight for expenses, emerald/ArrowUpRight for income, neutral/Minus when the value is zero).
+- `AdditionalEntriesAverages` component in `src/components/annual/additional-entries-averages.tsx`: Renders the stat cards with currency formatting and tone-coded icon indicators (`financial-negative`/ArrowDownRight for expenses, `financial-positive`/ArrowUpRight for income, neutral/Minus when the value is zero).
 - `ExpectedEntriesDialog` component in `src/components/annual/expected-entries-dialog.tsx`: Renders the expected-entry list, empty state, and add/delete controls used by the annual KPI header dialog.
 
 ## Expense Groups
@@ -75,7 +75,7 @@ The collection and item APIs enforce the same model as the UI: grouped entries m
 
 ### UI
 - **`AdditionalEntryGroupRow`** (`src/components/monthly/additional-entry-group-row.tsx`): self-contained collapsed/expanded group row. Owns its own UI state (collapsed, rename, add-entry form, per-entry edit/delete).
-- Additional-entry cards stay expanded and interactive in every month. Their temporal context controls presentation only: past months use a slate historical surface, the current month uses the standard card surface, and future months use an indigo forecast surface; non-current cards also show their localized status beside the title.
+- Additional-entry cards stay expanded and interactive in every month. Their temporal context controls presentation only: past months use a faint `month-past` tint and leading edge, the current month uses the standard card surface, and future months use a faint `month-future` tint and leading edge; non-current cards also show their localized status beside the title.
 - Groups render above ungrouped entries in `AdditionalEntriesCard`.
 - Groups can be moved to another month from the group header. Desktop drag-and-drop and the compact month menu both persist through `PATCH /api/months/[monthId]/entry-groups/[groupId]` with a target `monthId`.
 - Creating a group updates the mounted month state immediately, then calls `router.refresh()` to invalidate the App Router client cache for route restores after leaving and returning to the year workspace.

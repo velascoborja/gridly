@@ -57,15 +57,15 @@ test("TagManagerCard translations exist in Spanish and English", () => {
 
 test("TagManagerCard uses elevated card and header shadow treatments", () => {
   assert.match(source, /<Card className="[^"]*gap-0[^"]*bg-primary\/\[0\.03\][^"]*py-0/);
-  assert.match(source, /shadow-\[0_30px_45px_-30px_rgba\(50,50,93,0\.25\),0_18px_36px_-24px_rgba\(0,0,0,0\.1\)\]/);
+  assert.match(source, /<Card className="[^"]*shadow-featured/);
   assert.match(source, /CardHeader className="[^"]*pt-5/);
-  assert.match(source, /CardHeader className="[^"]*relative[^"]*z-10[^"]*shadow-\[0_18px_30px_-24px_rgba\(50,50,93,0\.45\)\]/);
+  assert.match(source, /CardHeader className="[^"]*relative[^"]*z-10[^"]*shadow-sm/);
   assert.doesNotMatch(source, /CardHeader className="[^"]*bg-primary\/\[0\.03\]/);
   assert.match(source, /CardContent className="[^"]*bg-background\/95[^"]*pb-5/);
 });
 
 test("TagManagerCard icon badge avoids a pale seam inside the border", () => {
-  assert.match(source, /border-\[#b9b9f9\] bg-\[#dbe8ff\]/);
+  assert.match(source, /border-primary\/30 bg-primary\/10/);
   assert.doesNotMatch(source, /border-primary\/15 bg-primary\/10/);
 });
 

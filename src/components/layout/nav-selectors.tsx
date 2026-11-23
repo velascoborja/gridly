@@ -135,7 +135,7 @@ export function NavSelectors({
     <div className="flex w-full min-w-0 justify-center md:justify-end">
       <div className="flex max-w-full flex-wrap items-center justify-center gap-2 md:justify-end md:gap-3">
         {showYearControls && (
-          <div className="hidden shrink-0 items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground md:flex">
+          <div className="hidden shrink-0 items-center justify-center gap-2 text-sm font-medium text-muted-foreground md:flex">
             <span className="sr-only md:not-sr-only">{t("yearLabel")}</span>
             <Select value={String(currentYear)} onValueChange={handleYearChange}>
               <SelectTrigger className="h-8 rounded-md border-border/70 bg-background/90 pl-3 pr-3 font-medium text-foreground shadow-sm focus:border-primary focus:ring-primary/20 sm:h-9 sm:pl-4 sm:pr-4">
@@ -146,12 +146,12 @@ export function NavSelectors({
                   <SelectItem key={`${option.source}-${option.year}`} value={String(option.year)}>
                     <span>{option.year}</span>
                     {option.source === "historical" && (
-                      <span className="rounded border border-border bg-muted px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                      <span className="rounded-md border border-border bg-muted px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
                         {t("historicalYear")}
                       </span>
                     )}
                     {showCurrentYearMarker && option.year === calendarYear && (
-                      <span className="rounded border border-primary/20 bg-primary/[0.08] px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.12em] text-primary">
+                      <span className="rounded-md border border-primary/20 bg-primary/[0.08] px-1.5 py-0.5 text-xs font-medium text-primary">
                         {t("currentYear")}
                       </span>
                     )}

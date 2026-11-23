@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { signIn } from "@/auth";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -8,6 +9,8 @@ type GoogleSignInButtonProps = {
 };
 
 export function GoogleSignInButton({ className, buttonClassName }: GoogleSignInButtonProps = {}) {
+  const t = useTranslations("Common");
+
   async function signInWithGoogle() {
     "use server";
     await signIn("google", { redirectTo: "/" });
@@ -19,13 +22,13 @@ export function GoogleSignInButton({ className, buttonClassName }: GoogleSignInB
         type="submit" 
         size="lg" 
         className={cn(
-          "group relative flex h-10 items-center gap-3 rounded-[4px] bg-[#533afd] px-5 text-base font-normal text-white shadow-[0_15px_35px_-5px_rgba(50,50,93,0.15),0_5px_15px_-5px_rgba(0,0,0,0.08)] transition-all duration-200 hover:bg-[#4434d4] hover:shadow-[0_18px_40px_-5px_rgba(50,50,93,0.2),0_8px_20px_-5px_rgba(0,0,0,0.1)] focus:outline-none focus:ring-2 focus:ring-[#533afd] focus:ring-offset-2 active:transform active:scale-[0.98]",
+          "group relative flex h-10 items-center gap-3 rounded-md px-5 text-base font-normal shadow-featured transition-[background-color,box-shadow,transform] duration-200 active:scale-[0.98] motion-reduce:active:scale-100",
           buttonClassName,
         )}
       >
         <svg 
           viewBox="0 0 24 24" 
-          className="size-[18px] fill-current text-white/90 transition-transform duration-200 group-hover:scale-110"
+          className="size-4 fill-current text-primary-foreground/90 transition-transform duration-200 group-hover:scale-110 motion-reduce:group-hover:scale-100"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -33,7 +36,7 @@ export function GoogleSignInButton({ className, buttonClassName }: GoogleSignInB
           <path d="M5.84 14.11c-.22-.67-.35-1.39-.35-2.11s.13-1.44.35-2.11V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.83z" />
           <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.83c.87-2.6 3.3-4.51 6.16-4.51z" />
         </svg>
-        <span className="tracking-tight">Continuar con Google</span>
+        <span>{t("continueWithGoogle")}</span>
       </Button>
     </form>
   );

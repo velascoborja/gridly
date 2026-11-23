@@ -97,7 +97,7 @@ function OpenMonthNavigationPalette({
     <Dialog open onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
       <DialogPortal>
         <DialogOverlay />
-        <DialogPrimitive.Popup className="fixed left-1/2 top-[15vh] z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 overflow-hidden rounded-xl border border-border/70 bg-popover shadow-2xl ring-1 ring-foreground/10 outline-none duration-100 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95">
+        <DialogPrimitive.Popup className="fixed left-1/2 top-[15vh] z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 overflow-hidden rounded-lg border border-border/70 bg-popover shadow-floating ring-1 ring-foreground/10 outline-none duration-100 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95">
           <DialogPrimitive.Title className="sr-only">
             {t("title")}
           </DialogPrimitive.Title>
@@ -156,14 +156,14 @@ function OpenMonthNavigationPalette({
                     onMouseEnter={() => setActiveIndex(index)}
                     onClick={() => selectMonth(option.month)}
                   >
-                    <span className="w-6 font-mono text-[11px] font-medium tabular-nums text-muted-foreground">
+                    <span className="w-6 font-mono text-xs font-medium tabular-nums text-muted-foreground">
                       {String(option.month).padStart(2, "0")}
                     </span>
                     <span className="flex-1 text-sm font-medium capitalize">
                       {option.label}
                     </span>
                     {isCurrent && (
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
+                      <span className="text-xs font-medium text-primary">
                         {t("selected")}
                       </span>
                     )}
@@ -173,7 +173,7 @@ function OpenMonthNavigationPalette({
             )}
           </div>
 
-          <div className="flex items-center gap-4 border-t border-border/70 bg-muted/25 px-4 py-2 text-[10px] font-medium text-muted-foreground">
+          <div className="flex items-center gap-4 border-t border-border/70 bg-muted/25 px-4 py-2 text-xs font-medium text-muted-foreground">
             <span className="inline-flex items-center gap-1.5">
               <kbd className="font-mono text-foreground/70">↑↓</kbd>
               {t("navigateHint")}

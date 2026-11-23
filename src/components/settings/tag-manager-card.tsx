@@ -159,12 +159,12 @@ export function TagManagerCard() {
   }
 
   return (
-    <Card className="gap-0 border-primary/20 bg-primary/[0.03] py-0 shadow-[0_30px_45px_-30px_rgba(50,50,93,0.25),0_18px_36px_-24px_rgba(0,0,0,0.1)]">
-      <CardHeader className="relative z-10 gap-3 border-b border-border/60 pt-5 shadow-[0_18px_30px_-24px_rgba(50,50,93,0.45)]">
+    <Card className="gap-0 border-primary/20 bg-primary/[0.03] py-0 shadow-featured">
+      <CardHeader className="relative z-10 gap-3 border-b border-border/60 pt-5 shadow-sm">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
-              <span className="flex size-8 items-center justify-center rounded-lg border border-[#b9b9f9] bg-[#dbe8ff] text-primary">
+              <span className="flex size-8 items-center justify-center rounded-lg border border-primary/30 bg-primary/10 text-primary">
                 <TagIcon className="size-4" />
               </span>
               <CardTitle>{t("title")}</CardTitle>

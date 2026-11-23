@@ -25,7 +25,8 @@
     "logout_confirm_description": "¿Estás seguro de que quieres salir? Tendrás que volver a identificarte para acceder a tus datos.",
     "cancel": "Cancelar",
     "personalRemainingOutOfRange": "El remanente debe estar entre cero y el presupuesto personal. Revisa los meses: {months}.",
-    "personalRemainingWarning": "El remanente de estos meses está fuera del presupuesto personal: {months}. Corrígelo manualmente; el ahorro se conserva mientras tanto."
+    "personalRemainingWarning": "El remanente de estos meses está fuera del presupuesto personal: {months}. Corrígelo manualmente; el ahorro se conserva mientras tanto.",
+    "continueWithGoogle": "Continuar con Google"
   },
   "Settings": {
     "title": "Ajustes",
@@ -103,7 +104,6 @@
     "exportDescription": "Exporta el año completo en Excel con la configuración más reciente.",
     "savingDescription": "Se están guardando cambios en la configuración antes de lanzar acciones del año.",
     "kpis": {
-      "heroEyebrow": "Cierre anual",
       "heroTitle": "Saldo final y ahorro acumulado",
       "totalSavings": "Ahorro total",
       "savingsRate": "Tasa de ahorro:",
@@ -292,7 +292,6 @@
     "title": "Configurar {year}",
     "subtitle": "Arranque del año financiero",
     "guidedConfig": "Configuración guiada",
-    "headerEyebrow": "Nuevo ejercicio",
     "mainHeading": "Configura {year}",
     "descriptionEditable": "Estos valores crearán los 12 meses del año. Podrás ajustar cualquier mes después.",
     "descriptionFixed": "Gridly usará el cierre previsto de {previousYear} como saldo inicial de {year}.",
@@ -407,7 +406,6 @@
     }
   },
   "Landing": {
-    "heroEyebrow": "Planificador financiero anual",
     "heroTitle": "Planifica tu año financiero mes a mes.",
     "heroDescription": "Gridly une ingresos, gastos, ahorro y saldo inicial en una cadena anual clara, con pagas extra, resumen del ejercicio y exportación a Excel.",
     "demoCta": "Ver demo",
@@ -435,7 +433,6 @@
       }
     },
     "annualStory": {
-      "eyebrow": "Cierre anual",
       "title": "Cada mes empuja el cierre del año.",
       "description": "El saldo inicial, los ingresos, los gastos y el ahorro mensual se encadenan para mostrar cómo evoluciona el ejercicio completo.",
       "extraPayMarker": "Pagas extra",
@@ -464,16 +461,13 @@
   },
   "Demo": {
     "month": {
-      "eyebrow": "Demo",
       "description": "Explora {month} {year} con datos de ejemplo en modo lectura. Inicia sesión con Google para crear tu propio espacio privado."
     },
     "summary": {
-      "eyebrow": "Demo",
       "title": "Resumen anual {year}",
       "description": "Explora el cierre previsto de {year} con datos de ejemplo. Inicia sesión con Google para crear tu propio espacio privado."
     },
     "movements": {
-      "eyebrow": "Demo pública",
       "title": "Movimientos de {year}",
       "description": "Explora los movimientos de un año de ejemplo, con datos ficticios."
     }
@@ -617,7 +611,6 @@
     "historicalYear": "Histórico"
   },
   "Evolution": {
-    "eyebrow": "Evolución histórica",
     "title": "Evolución financiera",
     "description": "Compara el saldo, el ahorro y la inversión entre el año actual y los anteriores.",
     "addHistoricalYear": "Añadir año histórico",
@@ -653,7 +646,6 @@
       "historical": "Histórico"
     },
     "emptyState": {
-      "eyebrow": "Histórico pendiente",
       "title": "Añade años históricos para comparar",
       "description": "Con un solo año, la evolución todavía no tiene una tendencia útil. Añade un año anterior resumido para activar la comparación sin crear meses ni afectar la cadena de saldos."
     },

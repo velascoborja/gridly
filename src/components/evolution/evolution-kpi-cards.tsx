@@ -69,7 +69,7 @@ export function EvolutionKpiCards({ summary, estimatedPortfolioValue, returnRate
       tag: undefined as string | undefined,
       subItems: undefined as string[] | undefined,
       Icon: TrendingUp,
-      className: summary.totalSaved >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400",
+      className: summary.totalSaved >= 0 ? "text-financial-positive" : "text-financial-negative",
     },
     { ...investedCard, subItems: undefined as string[] | undefined },
     {
@@ -79,7 +79,7 @@ export function EvolutionKpiCards({ summary, estimatedPortfolioValue, returnRate
       tag: savingsRateTag,
       subItems: undefined as string[] | undefined,
       Icon: CalendarDays,
-      className: summary.averageSavingsPerYear >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400",
+      className: summary.averageSavingsPerYear >= 0 ? "text-financial-positive" : "text-financial-negative",
     },
     {
       label: t("bestYear"),

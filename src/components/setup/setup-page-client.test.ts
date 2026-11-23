@@ -77,8 +77,8 @@ test("setup stepper marks each step complete when its section data is ready", ()
   assert.match(source, /hasSetupFieldValue/);
   assert.match(source, /const completedSteps = /);
   assert.match(source, /completedSteps\[step\.id\]/);
-  assert.match(source, /bg-\[#15be53\]/);
-  assert.match(source, /border-\[#15be53\]/);
+  assert.match(source, /bg-financial-positive/);
+  assert.match(source, /border-financial-positive/);
   assert.match(source, /aria-current=\{isActive \? "step" : undefined\}/);
 });
 
@@ -92,16 +92,16 @@ test("setup stepper marks recurring expenses as optional instead of completed", 
   assert.doesNotMatch(source, /optionalStep/);
   assert.match(source, /"recurring-expenses": recurringExpenses\.length > 0/);
   assert.match(source, /showOptionalState[\s\S]*border-dashed/);
-  assert.match(source, /showOptionalState[\s\S]*bg-\[#f6f9fc\]/);
+  assert.match(source, /showOptionalState[\s\S]*bg-muted\/50/);
 });
 
 test("setup mobile stepper sticks on an opaque top band", () => {
   const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
 
   assert.match(source, /sticky top-0/);
-  assert.match(source, /bg-\[#f6f9fc\]/);
+  assert.match(source, /bg-muted\/50/);
   assert.match(source, /lg:top-3/);
-  assert.doesNotMatch(source, /bg-\[#f6f9fc\]\/95/);
+  assert.doesNotMatch(source, /bg-muted\/50\/95/);
 });
 
 test("setup scroll-linked active step is mobile-only", () => {
@@ -110,7 +110,7 @@ test("setup scroll-linked active step is mobile-only", () => {
   assert.match(source, /const setupMobileStepperQuery = "\(max-width: 1023px\)"/);
   assert.match(source, /const \[isMobileStepper, setIsMobileStepper\]/);
   assert.match(source, /if \(!isMobileStepper\) return/);
-  assert.match(source, /max-lg:border-\[#533afd\]/);
+  assert.match(source, /max-lg:border-primary/);
 });
 
 test("setup mobile stepper selects the first step when entering the screen", () => {
@@ -126,7 +126,7 @@ test("setup mobile active step styling does not wait for matchMedia state", () =
   const source = readFileSync(new URL("./setup-page-client.tsx", import.meta.url), "utf8");
 
   assert.match(source, /const isActive = activeStep === step\.id/);
-  assert.match(source, /isActive && "max-lg:border-solid max-lg:border-\[#533afd\]/);
+  assert.match(source, /isActive && "max-lg:border-solid max-lg:border-primary/);
   assert.doesNotMatch(source, /const isActive = isMobileStepper && activeStep === step\.id/);
 });
 

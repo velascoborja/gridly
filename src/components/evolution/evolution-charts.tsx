@@ -45,7 +45,7 @@ export function EvolutionCharts({ metrics, estimatedValues }: Props) {
     <div className="space-y-4 sm:space-y-6">
       <Card className="border-border/70 bg-card/90 shadow-sm">
         <CardHeader className="space-y-1 pb-2">
-          <CardTitle className="text-base font-light tracking-[-0.02em]">{t("balanceTitle")}</CardTitle>
+          <CardTitle>{t("balanceTitle")}</CardTitle>
           <p className="text-sm leading-5 text-muted-foreground">{t("balanceDescription")}</p>
         </CardHeader>
         <CardContent className="pt-0">
@@ -80,7 +80,7 @@ export function EvolutionCharts({ metrics, estimatedValues }: Props) {
       <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card className="border-border/70 bg-card/90 shadow-sm">
           <CardHeader className="space-y-1 pb-2">
-            <CardTitle className="text-base font-light tracking-[-0.02em]">{t("savedTitle")}</CardTitle>
+            <CardTitle>{t("savedTitle")}</CardTitle>
             <p className="text-sm leading-5 text-muted-foreground">{t("savedDescription")}</p>
           </CardHeader>
           <CardContent className="pt-0">
@@ -143,7 +143,7 @@ export function EvolutionCharts({ metrics, estimatedValues }: Props) {
 
         <Card className="border-border/70 bg-card/90 shadow-sm">
           <CardHeader className="space-y-1 pb-2">
-            <CardTitle className="text-base font-light tracking-[-0.02em]">{t("investedTitle")}</CardTitle>
+            <CardTitle>{t("investedTitle")}</CardTitle>
             <p className="text-sm leading-5 text-muted-foreground">{t("investedDescription")}</p>
           </CardHeader>
           <CardContent className="pt-0">
@@ -165,7 +165,7 @@ export function EvolutionCharts({ metrics, estimatedValues }: Props) {
 
         <Card className="border-border/70 bg-card/90 shadow-sm">
           <CardHeader className="space-y-1 pb-2">
-            <CardTitle className="text-base font-light tracking-[-0.02em]">{t("interestTitle")}</CardTitle>
+            <CardTitle>{t("interestTitle")}</CardTitle>
             <p className="text-sm leading-5 text-muted-foreground">{t("interestDescription")}</p>
           </CardHeader>
           <CardContent className="pt-0">

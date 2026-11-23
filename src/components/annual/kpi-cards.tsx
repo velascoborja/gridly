@@ -77,8 +77,8 @@ interface KpiMetric {
 function getMetricTone(value: number, labels: ToneLabels): MetricTone {
   if (value > 0) {
     return {
-      valueClassName: "text-emerald-600 dark:text-emerald-400",
-      badgeClassName: "border-emerald-500/25 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
+      valueClassName: "text-financial-positive",
+      badgeClassName: "border-financial-positive/25 bg-financial-positive/10 text-financial-positive",
       label: labels.positive,
       Icon: ArrowUpRight,
     };
@@ -86,8 +86,8 @@ function getMetricTone(value: number, labels: ToneLabels): MetricTone {
 
   if (value < 0) {
     return {
-      valueClassName: "text-rose-600 dark:text-rose-400",
-      badgeClassName: "border-rose-500/25 bg-rose-500/10 text-rose-700 dark:text-rose-300",
+      valueClassName: "text-financial-negative",
+      badgeClassName: "border-financial-negative/25 bg-financial-negative/10 text-financial-negative",
       label: labels.negative,
       Icon: ArrowDownRight,
     };
@@ -102,8 +102,8 @@ function getMetricTone(value: number, labels: ToneLabels): MetricTone {
 }
 
 function getComparisonColorClassName(value: number) {
-  if (value > 0) return "text-emerald-600 dark:text-emerald-400";
-  if (value < 0) return "text-rose-600 dark:text-rose-400";
+  if (value > 0) return "text-financial-positive";
+  if (value < 0) return "text-financial-negative";
   return "text-muted-foreground/80";
 }
 
@@ -217,10 +217,10 @@ export function KpiCards({
 
   const expectedAnnotationLines: Array<{ text: string; colorClass: string }> = [
     ...(expectedIncome > 0
-      ? [{ text: t("expectedIncomeAnnotation", { amount: formatCurrency(expectedIncome, locale) }), colorClass: "text-emerald-600 dark:text-emerald-400" }]
+      ? [{ text: t("expectedIncomeAnnotation", { amount: formatCurrency(expectedIncome, locale) }), colorClass: "text-financial-positive" }]
       : []),
     ...(expectedExpenses > 0
-      ? [{ text: t("expectedExpensesAnnotation", { amount: formatCurrency(expectedExpenses, locale) }), colorClass: "text-rose-600 dark:text-rose-400" }]
+      ? [{ text: t("expectedExpensesAnnotation", { amount: formatCurrency(expectedExpenses, locale) }), colorClass: "text-financial-negative" }]
       : []),
   ];
   const savingsComparisonLines: KpiMetric["comparisonLines"] = [
@@ -327,10 +327,7 @@ export function KpiCards({
         <CardContent className="px-5 py-5 md:px-6">
           <div className="mb-6 grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
             <div className="min-w-0">
-              <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-                {t("heroEyebrow")}
-              </p>
-              <h1 className="mt-2 text-3xl font-light tracking-[-0.04em] text-foreground md:text-4xl">
+              <h1 className="text-3xl font-light tracking-[-0.04em] text-foreground md:text-4xl">
                 {tAnnual("yearLabel", { year: config.year })}
               </h1>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
@@ -455,7 +452,7 @@ export function KpiCards({
                       />
                       <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-3xl lg:max-w-4xl">
                         <div className="max-h-[calc(100dvh-2rem)] overflow-y-auto">
-                          <DialogHeader className="sticky top-0 z-10 border-b border-border/50 bg-card/70 px-5 pt-5 pr-14 pb-4 shadow-[0_10px_30px_-24px_rgba(50,50,93,0.45)] backdrop-blur-xl supports-[backdrop-filter]:bg-card/55 md:px-6 md:pt-6 md:pr-16 md:pb-5">
+                          <DialogHeader className="sticky top-0 z-10 border-b border-border/50 bg-card/70 px-5 pt-5 pr-14 pb-4 shadow-sm backdrop-blur-xl supports-[backdrop-filter]:bg-card/55 md:px-6 md:pt-6 md:pr-16 md:pb-5">
                             <DialogTitle>{tAnnual("configTitle")}</DialogTitle>
                             <DialogDescription>
                               {tAnnual("configDescription")}
@@ -512,12 +509,12 @@ export function KpiCards({
                       {metric.tone.label}
                     </span>
                   </div>
-                  <p className={`mt-3 text-[2.1rem] font-light leading-none tracking-[-0.05em] finance-number md:text-5xl ${metric.tone.valueClassName}`}>
+                  <p className={`mt-3 text-4xl font-light leading-none tracking-[-0.04em] finance-number md:text-5xl ${metric.tone.valueClassName}`}>
                     {formatCurrency(metric.value, locale)}
                     {metric.isEstimate ? <sup className="ml-0.5 align-top text-base font-medium">*</sup> : null}
                   </p>
                   <div className="mt-4 space-y-1 text-sm leading-5 text-muted-foreground">
-                    <p className={metric.isEstimate ? "text-amber-600 dark:text-amber-400" : undefined}>{metric.note}</p>
+                    <p className={metric.isEstimate ? "text-warning" : undefined}>{metric.note}</p>
                     {metric.savingsRate !== undefined ? (
                       <p className="text-xs text-muted-foreground/80">
                         {t(metric.isEstimate ? "estimatedSavingsRate" : "savingsRate")}{" "}
@@ -589,7 +586,7 @@ export function KpiCards({
                         {metric.label}
                       </p>
                     </div>
-                    <p className="mt-2 text-[13px] leading-5 text-muted-foreground/70">
+                    <p className="mt-2 text-sm leading-5 text-muted-foreground/70">
                       {metric.note}
                     </p>
                   </div>

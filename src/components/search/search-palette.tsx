@@ -81,9 +81,9 @@ function OpenSearchPalette({ yearData, onClose, onSelect }: Omit<Props, "open">)
 
   const kindClass = (kind: SearchEntry["kind"]) =>
     cn(
-      "rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase",
-      kind === "income" && "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
-      kind === "expense" && "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300",
+      "rounded-md px-1.5 py-0.5 text-xs font-medium",
+      kind === "income" && "bg-financial-positive/10 text-financial-positive",
+      kind === "expense" && "bg-financial-negative/10 text-financial-negative",
       kind === "recurring" && "bg-muted text-muted-foreground"
     );
 
@@ -98,7 +98,7 @@ function OpenSearchPalette({ yearData, onClose, onSelect }: Omit<Props, "open">)
       <DialogPortal>
         <DialogOverlay />
         <DialogPrimitive.Popup
-          className="fixed left-1/2 top-[15vh] z-50 w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 overflow-hidden rounded-xl border border-border/70 bg-popover shadow-2xl ring-1 ring-foreground/10 outline-none duration-100 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95"
+          className="fixed left-1/2 top-[15vh] z-50 w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 overflow-hidden rounded-lg border border-border/70 bg-popover shadow-floating ring-1 ring-foreground/10 outline-none duration-100 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95"
         >
           <DialogPrimitive.Title className="sr-only">
             {t("placeholder")}
@@ -122,7 +122,7 @@ function OpenSearchPalette({ yearData, onClose, onSelect }: Omit<Props, "open">)
             )}
             {query.length > 0 && months.map((month) => (
               <div key={month}>
-                <div className="px-4 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70 capitalize">
+                <div className="px-4 py-1.5 text-xs font-medium text-muted-foreground/70 capitalize">
                   {formatMonthName(month, locale)}
                 </div>
                 {grouped[month].map((entry) => {
@@ -148,7 +148,7 @@ function OpenSearchPalette({ yearData, onClose, onSelect }: Omit<Props, "open">)
                       </div>
                       <div className="flex shrink-0 items-center gap-2">
                         <span className={kindClass(entry.kind)}>{kindLabel(entry.kind)}</span>
-                        <span className="tabular-nums text-sm font-semibold text-foreground">
+                        <span className="finance-number text-sm font-medium text-foreground">
                           {formatCurrency(entry.amount, locale)}
                         </span>
                       </div>

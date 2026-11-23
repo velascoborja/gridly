@@ -37,7 +37,14 @@ Use these through Tailwind classes (`bg-card`, `text-muted-foreground`, `border-
 | `financial-positive` / `financial-negative` / `financial-neutral` | Amount coloring, via `.finance-number-positive`, `.finance-number-negative`, `.finance-number-neutral` |
 | `chart-1` … `chart-5` | Chart series beyond the primary one |
 | `surface-1` … `surface-3` | Translucent layered surfaces (used by `.surface-depth*`) |
-| `elevation-1` … `elevation-3` | Shadow levels (used by `.surface-depth*`) |
+| `elevation-1` … `elevation-3` | Shadow levels (used by `.surface-depth*`, and as `shadow-raised` / `shadow-floating`) |
+| `warning` | Estimates and soft warnings (amber); never errors, which use `destructive` |
+| `month-past` / `month-future` (+ `-foreground`) | Temporal context of a month: month rail chips and the leading edge of past/forecast entry cards |
+| `hero-*` | The dark month hero only: `hero-foreground`, `hero-muted-foreground`, `hero-border`, `hero-control`, `hero-positive`, `hero-negative`, `hero-accent`, with `.surface-hero*` gradients and `shadow-hero*` |
+| `overlay` | Backdrop behind dialogs and sheets, always with an opacity modifier |
+| `decorative-ruby` / `decorative-magenta` | Marketing illustration only (see brand values below) |
+
+Shadow tokens beyond the `Card` default: `shadow-featured` (the one hero surface), `shadow-sheet` (bottom sheets), `shadow-raised`, `shadow-floating`, `shadow-inset-accent` (2px primary leading edge). Page atmospheres live in `.app-atmosphere` (app shell, demo, loading) and `.landing-atmosphere` (public landing).
 
 ### Brand reference values
 
@@ -164,6 +171,8 @@ Run this before calling any UI work done.
 - Centered layouts on data screens
 - A new component when a primitive in `src/components/ui/` already covers the need
 - Placeholder copy or fake data in shipped UI
+
+`tests/design-tokens-source.test.mjs` enforces the checkable rules (hex, raw palette, bold, eyebrows, one-off shadows, `rgba()`) across `src/app` and `src/components`.
 
 ### Ask yourself
 

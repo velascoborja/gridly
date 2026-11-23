@@ -24,11 +24,11 @@ export function AdditionalEntriesAverages({ months }: Props) {
 
   const expensesTone = avgExpenses === 0
     ? { Icon: Minus, ...neutral }
-    : { Icon: ArrowDownRight, badgeClass: "border-rose-500/25 bg-rose-500/10 text-rose-700 dark:text-rose-300", valueClass: "text-rose-600 dark:text-rose-400" };
+    : { Icon: ArrowDownRight, badgeClass: "border-financial-negative/25 bg-financial-negative/10 text-financial-negative", valueClass: "text-financial-negative" };
 
   const incomeTone = avgIncome === 0
     ? { Icon: Minus, ...neutral }
-    : { Icon: ArrowUpRight, badgeClass: "border-emerald-500/25 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300", valueClass: "text-emerald-600 dark:text-emerald-400" };
+    : { Icon: ArrowUpRight, badgeClass: "border-financial-positive/25 bg-financial-positive/10 text-financial-positive", valueClass: "text-financial-positive" };
 
   const { Icon: ExpensesIcon } = expensesTone;
   const { Icon: IncomeIcon } = incomeTone;
@@ -47,7 +47,7 @@ export function AdditionalEntriesAverages({ months }: Props) {
                   {t("expensesLabel")}
                 </p>
               </div>
-              <p className="mt-2 text-[13px] leading-5 text-muted-foreground/70">
+              <p className="mt-2 text-sm leading-5 text-muted-foreground/70">
                 {t("expensesNote")}
               </p>
             </div>
@@ -72,7 +72,7 @@ export function AdditionalEntriesAverages({ months }: Props) {
                   {t("incomeLabel")}
                 </p>
               </div>
-              <p className="mt-2 text-[13px] leading-5 text-muted-foreground/70">
+              <p className="mt-2 text-sm leading-5 text-muted-foreground/70">
                 {t("incomeNote")}
               </p>
             </div>

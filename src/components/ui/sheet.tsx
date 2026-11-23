@@ -26,12 +26,12 @@ function SheetContent({
     <SheetPrimitive.Portal data-slot="sheet-portal">
       <SheetPrimitive.Backdrop
         data-slot="sheet-overlay"
-        className="fixed inset-0 isolate z-50 bg-[#061b31]/35 opacity-100 transition-opacity duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] supports-backdrop-filter:backdrop-blur-xs data-starting-style:opacity-0 data-ending-style:opacity-0 data-ending-style:duration-200 data-ending-style:ease-in motion-reduce:transition-none"
+        className="fixed inset-0 isolate z-50 bg-overlay/35 opacity-100 transition-opacity duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] supports-backdrop-filter:backdrop-blur-xs data-starting-style:opacity-0 data-ending-style:opacity-0 data-ending-style:duration-200 data-ending-style:ease-in motion-reduce:transition-none"
       />
       <SheetPrimitive.Popup
         data-slot="sheet-content"
         className={cn(
-          "fixed inset-x-0 bottom-0 z-50 flex max-h-[88dvh] flex-col rounded-t-2xl border-t border-border/70 bg-background text-sm text-foreground shadow-[0_-12px_30px_-6px_rgba(3,3,39,0.25)] outline-none translate-y-0 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform data-starting-style:translate-y-full data-ending-style:translate-y-full data-ending-style:duration-200 data-ending-style:ease-in motion-reduce:transition-none",
+          "fixed inset-x-0 bottom-0 z-50 flex max-h-[88dvh] flex-col rounded-t-2xl border-t border-border/70 bg-background text-sm text-foreground shadow-sheet outline-none translate-y-0 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform data-starting-style:translate-y-full data-ending-style:translate-y-full data-ending-style:duration-200 data-ending-style:ease-in motion-reduce:transition-none",
           className
         )}
         {...props}
@@ -83,7 +83,7 @@ function SheetTitle({ className, ...props }: SheetPrimitive.Title.Props) {
   return (
     <SheetPrimitive.Title
       data-slot="sheet-title"
-      className={cn("text-base font-semibold tracking-tight", className)}
+      className={cn("text-base font-medium", className)}
       {...props}
     />
   )

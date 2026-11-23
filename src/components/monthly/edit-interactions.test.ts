@@ -255,7 +255,7 @@ test("EntryFormRow reveals expression feedback only while a calculation or messa
   assert.match(source, /const shouldShowAmountFeedback = isAmountCalculationInProgress \|\| hasAmountFeedback;/);
   assert.match(source, /shouldShowAmountFeedback \? "mt-2 max-h-4 opacity-100" : "mt-0 max-h-0 opacity-0"/);
   assert.match(source, /transition-\[max-height,margin-top,opacity\] duration-200 ease-out motion-reduce:transition-none/);
-  assert.match(source, /min-h-4 text-right text-\[11px\] leading-4 tabular-nums/);
+  assert.match(source, /min-h-4 text-right text-xs leading-4 finance-number/);
 });
 
 test("fixed editor reveal animates without an extra parent stack gap", () => {
@@ -527,7 +527,7 @@ test("ungrouped expenses can be dropped onto eligible expense groups with pendin
   assert.match(groupRowSource, /onDragLeave=\{handleExpenseDragLeave\}/);
   assert.match(groupRowSource, /onDrop=\{handleExpenseDrop\}/);
   assert.match(groupRowSource, /aria-busy=\{dropPending\}/);
-  assert.match(groupRowSource, /border-dashed border-\[#362baa\]/);
+  assert.match(groupRowSource, /border-dashed border-primary\/55/);
   assert.match(groupRowSource, /!groupMutationLocked[\s\S]*?!hasConflictingMutation[\s\S]*?completionSavingId === null/);
 
   assert.match(esMessages, /"moveToGroupError": "No se ha podido mover el gasto al grupo\. Inténtalo de nuevo\."/);
@@ -798,16 +798,11 @@ test("additional entry cards expose distinct past, current, and forecast treatme
   assert.match(cardSource, /type TemporalContext = "past" \| "current" \| "future"/);
   assert.match(cardSource, /temporalContext\?: TemporalContext/);
   assert.match(cardSource, /temporalContext = "current"/);
-  assert.match(cardSource, /border-slate-300 border-l-\[3px\] border-l-slate-500\/70/);
-  assert.match(cardSource, /bg-gradient-to-br from-slate-200\/75 via-slate-100\/65 to-card/);
-  assert.match(cardSource, /dark:from-slate-800\/80 dark:via-slate-900\/55 dark:to-card/);
-  assert.match(cardSource, /shadow-\[0_8px_18px_-16px_rgba\(15,23,42,0\.45\)\]/);
-  assert.match(cardSource, /border-indigo-200\/70 border-l-\[3px\] border-l-indigo-400\/55/);
-  assert.match(cardSource, /bg-gradient-to-br from-indigo-50\/70 via-indigo-50\/30 to-card/);
-  assert.match(cardSource, /dark:from-indigo-950\/45 dark:via-indigo-950\/25 dark:to-card/);
-  assert.match(cardSource, /shadow-\[0_8px_18px_-16px_rgba\(79,70,229,0\.08\)\]/);
-  assert.match(cardSource, /bg-slate-400 dark:bg-slate-500/);
-  assert.match(cardSource, /bg-sky-400 dark:bg-sky-400/);
+  assert.match(cardSource, /border-month-past\/20 border-l-2 border-l-month-past\/50 bg-month-past\/\[0\.04\]/);
+  assert.match(cardSource, /border-month-future\/15 border-l-2 border-l-month-future\/45 bg-month-future\/\[0\.03\]/);
+  assert.match(cardSource, /bg-month-past\/50/);
+  assert.match(cardSource, /bg-month-future\/70/);
+  assert.doesNotMatch(cardSource, /bg-gradient-to-br|shadow-\[/);
   assert.match(cardSource, /tOverview\(temporalContext === "past" \? "pastMonth" : "futureMonth"\)/);
   assert.doesNotMatch(cardSource, /collapsible|setCollapsed/);
   assert.match(esMessages, /"pastMonth": "Mes pasado"/);
@@ -950,7 +945,7 @@ test("fixed values render as a single monthly plan panel distinct from variable 
   assert.match(panelSource, /md:divide-x/);
   assert.doesNotMatch(panelSource, /<header|<footer/);
   assert.doesNotMatch(panelSource, /shadow-/);
-  assert.match(panelSource, /bg-linear-to-br from-\[#533afd\]/);
+  assert.match(panelSource, /bg-linear-to-br from-primary\/10 via-primary\/5 to-primary\/\[0\.02\]/);
   assert.doesNotMatch(incomeSource, /@\/components\/ui\/card/);
   assert.doesNotMatch(expensesSource, /@\/components\/ui\/card/);
   assert.match(expensesSource, /icon=\{<House \/>\}/);

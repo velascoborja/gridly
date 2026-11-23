@@ -440,10 +440,10 @@ export function AdditionalEntriesCard({
       className={cn(
         "transition-[border-color,background-color,box-shadow] duration-300",
         temporalContext === "past"
-          ? "border-slate-300 border-l-[3px] border-l-slate-500/70 bg-gradient-to-br from-slate-200/75 via-slate-100/65 to-card shadow-[0_8px_18px_-16px_rgba(15,23,42,0.45)] dark:border-slate-700 dark:border-l-slate-500/80 dark:from-slate-800/80 dark:via-slate-900/55 dark:to-card"
+          ? "border-month-past/20 border-l-2 border-l-month-past/50 bg-month-past/[0.04]"
           : temporalContext === "future"
-            ? "border-indigo-200/70 border-l-[3px] border-l-indigo-400/55 bg-gradient-to-br from-indigo-50/70 via-indigo-50/30 to-card shadow-[0_8px_18px_-16px_rgba(79,70,229,0.08)] dark:border-indigo-800/60 dark:border-l-indigo-500/60 dark:from-indigo-950/45 dark:via-indigo-950/25 dark:to-card"
-            : "border-border/70 bg-card/95 shadow-sm shadow-black/5"
+            ? "border-month-future/15 border-l-2 border-l-month-future/45 bg-month-future/[0.03]"
+            : "border-border/70 bg-card/95"
       )}
     >
       <CardHeader className="pb-3">
@@ -454,10 +454,10 @@ export function AdditionalEntriesCard({
               {temporalContext !== "current" ? (
                 <span
                   className={cn(
-                    "inline-flex items-center gap-1.5 text-[9px] font-medium uppercase tracking-[0.14em]",
+                    "inline-flex items-center gap-1.5 text-xs font-medium",
                     temporalContext === "past"
-                      ? "text-slate-500 dark:text-slate-400"
-                      : "text-indigo-500 dark:text-indigo-300"
+                      ? "text-muted-foreground"
+                      : "text-month-future"
                   )}
                 >
                   <span
@@ -465,8 +465,8 @@ export function AdditionalEntriesCard({
                     className={cn(
                       "size-1.5 rounded-full",
                       temporalContext === "past"
-                        ? "bg-slate-400 dark:bg-slate-500"
-                        : "bg-sky-400 dark:bg-sky-400"
+                        ? "bg-month-past/50"
+                        : "bg-month-future/70"
                     )}
                   />
                   {tOverview(temporalContext === "past" ? "pastMonth" : "futureMonth")}
@@ -478,10 +478,10 @@ export function AdditionalEntriesCard({
             </CardDescription>
           </div>
           <div className="grid shrink-0 justify-items-center rounded-md border border-border/70 bg-background/80 px-2.5 py-1 text-center shadow-sm">
-            <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+            <p className="text-xs font-medium text-muted-foreground">
               {t("total")}
             </p>
-            <p className={`text-sm font-semibold tabular-nums ${type === "income" ? "text-emerald-600 dark:text-emerald-300" : "text-rose-600 dark:text-rose-300"}`}>
+            <p className={`text-sm font-medium finance-number ${type === "income" ? "finance-number-positive" : "finance-number-negative"}`}>
               {formatCurrency(entriesTotal, locale)}
             </p>
           </div>
@@ -684,7 +684,7 @@ export function AdditionalEntriesCard({
             const isEditing = !readOnly && editingId === entry.id;
             const investmentBadge = entry.isInvestment ? (
               <span
-                className="inline-flex max-w-full shrink-0 items-center gap-1 whitespace-nowrap rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium leading-none text-primary"
+                className="inline-flex max-w-full shrink-0 items-center gap-1 whitespace-nowrap rounded-md border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-xs font-medium leading-none text-primary"
                 title={t("investmentBadge")}
               >
                 <TrendingUp className="size-3 shrink-0" aria-hidden="true" />
@@ -841,7 +841,7 @@ export function AdditionalEntriesCard({
                 onDragEnd={handleDragEnd}
                 className={cn(
                   "min-h-10 rounded-xl border border-transparent px-2 py-1.5 transition-[border-color,background-color,box-shadow,opacity] duration-150 hover:border-border/70 hover:bg-muted/40",
-                  entry.isCompleted && "border-emerald-500/10 bg-muted/45 hover:border-emerald-500/15 hover:bg-muted/55",
+                  entry.isCompleted && "border-financial-positive/10 bg-muted/45 hover:border-financial-positive/15 hover:bg-muted/55",
                   canMoveEntry(entry) && "cursor-grab active:cursor-grabbing",
                   (deletingId === entry.id || movingEntryId === entry.id) && "pointer-events-none opacity-60",
                   highlightId === `entry-${entry.id}` && "animate-entry-highlight"
@@ -858,7 +858,7 @@ export function AdditionalEntriesCard({
                         {investmentBadge}
                         {displayTag && TAG_COLORS[displayTag.color] && (
                           <span
-                            className="shrink-0 inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-medium leading-none"
+                            className="shrink-0 inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-xs font-medium leading-none"
                             style={{
                               background: TAG_COLORS[displayTag.color].bg,
                               borderColor: TAG_COLORS[displayTag.color].border,
@@ -881,7 +881,7 @@ export function AdditionalEntriesCard({
                               />
                             )}
                             <span className={cn(
-                              "shrink-0 rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium leading-none text-primary",
+                              "shrink-0 rounded-md border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-xs font-medium leading-none text-primary",
                               displayTag && "hidden sm:inline-block"
                             )}>
                               {t("recurringBadge")}
@@ -907,7 +907,7 @@ export function AdditionalEntriesCard({
                         {investmentBadge}
                         {displayTag && TAG_COLORS[displayTag.color] && (
                           <span
-                            className="shrink-0 inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-medium leading-none"
+                            className="shrink-0 inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-xs font-medium leading-none"
                             style={{
                               background: TAG_COLORS[displayTag.color].bg,
                               borderColor: TAG_COLORS[displayTag.color].border,
@@ -930,7 +930,7 @@ export function AdditionalEntriesCard({
                               />
                             )}
                             <span className={cn(
-                              "shrink-0 rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium leading-none text-primary",
+                              "shrink-0 rounded-md border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-xs font-medium leading-none text-primary",
                               displayTag && "hidden sm:inline-block"
                             )}>
                               {t("recurringBadge")}
@@ -946,7 +946,7 @@ export function AdditionalEntriesCard({
                     ) : null}
                     {readOnly || completionPending || completionConfirming ? (
                       <span className={cn(
-                        "inline-flex h-7 items-center whitespace-nowrap rounded-md px-2 text-sm font-semibold tabular-nums",
+                        "inline-flex h-7 items-center whitespace-nowrap rounded-md px-2 text-sm font-medium finance-number",
                         entry.isCompleted && "text-muted-foreground/65"
                       )}>
                         {formatCurrency(entry.amount, locale)}
@@ -954,7 +954,7 @@ export function AdditionalEntriesCard({
                     ) : (
                       <button
                         className={cn(
-                          "whitespace-nowrap rounded-md px-2 py-1 text-sm font-semibold tabular-nums text-foreground transition-colors hover:bg-background hover:text-primary",
+                          "whitespace-nowrap rounded-md px-2 py-1 text-sm font-medium finance-number text-foreground transition-colors hover:bg-background hover:text-primary",
                           entry.isCompleted && "text-muted-foreground/65"
                         )}
                         onClick={() => openEditForm(entry, "amount")}

@@ -177,10 +177,7 @@ export function EvolutionDashboard({ metrics, historicalYears, calendarYear, tag
       <section className="surface-depth-floating rounded-lg border border-primary/20 bg-linear-to-b from-primary/[0.08] via-card/98 to-card/95 px-4 py-4 sm:px-5 sm:py-5 md:px-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
-              {t("eyebrow")}
-            </p>
-            <h1 className="mt-1.5 text-2xl font-light tracking-[-0.04em] text-foreground sm:mt-2 sm:text-3xl md:text-4xl">
+            <h1 className="text-2xl font-light tracking-[-0.04em] text-foreground sm:text-3xl md:text-4xl">
               {t("title")}
             </h1>
           </div>
@@ -221,7 +218,7 @@ export function EvolutionDashboard({ metrics, historicalYears, calendarYear, tag
                           </Button>
                           <span
                             aria-live="polite"
-                            className="finance-number text-sm font-semibold tabular-nums text-foreground"
+                            className="finance-number text-sm font-medium text-foreground"
                           >
                             {currentFixedYear === null ? t("fixedPager.allYears") : currentFixedYear}
                           </span>
@@ -307,7 +304,7 @@ export function EvolutionDashboard({ metrics, historicalYears, calendarYear, tag
                           </Button>
                           <span
                             aria-live="polite"
-                            className="finance-number text-sm font-semibold tabular-nums text-foreground"
+                            className="finance-number text-sm font-medium text-foreground"
                           >
                             {currentTagYear === null ? t("tagsPager.allYears") : currentTagYear}
                           </span>
@@ -385,7 +382,7 @@ export function EvolutionDashboard({ metrics, historicalYears, calendarYear, tag
           {t("description")}
         </p>
         <div className="mt-4 rounded-lg border border-primary/25 bg-primary/[0.06] px-4 py-3 sm:mt-5 sm:px-5 sm:py-4">
-          <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-primary">
+          <p className="text-sm font-medium text-primary">
             {t("totalWealth")}
           </p>
           <p key={String(includeFuture)} className="finance-number mt-1.5 text-3xl font-light tracking-[-0.04em] text-primary animate-in fade-in slide-in-from-bottom-1 duration-300 sm:mt-2 sm:text-4xl md:text-5xl">
@@ -428,10 +425,7 @@ export function EvolutionDashboard({ metrics, historicalYears, calendarYear, tag
       {showEmptyState ? (
         <section className="rounded-lg border border-dashed border-primary/30 bg-card/85 px-5 py-6 shadow-sm md:px-6">
           <div className="max-w-2xl">
-            <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-primary">
-              {t("emptyState.eyebrow")}
-            </p>
-            <h2 className="mt-2 text-2xl font-light tracking-[-0.03em] text-foreground">
+            <h2 className="text-2xl font-light tracking-[-0.04em] text-foreground">
               {t("emptyState.title")}
             </h2>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">

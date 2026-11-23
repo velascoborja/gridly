@@ -36,9 +36,8 @@ export function BaseAppShell({ headerRightContent, children }: Props) {
   }, []);
 
   return (
-    // Keep the gradients independent of content height when month sections collapse.
-    <div ref={rootRef} className="relative min-h-screen bg-white bg-[radial-gradient(circle_at_top_left,rgba(64,148,255,0.12),transparent_32%),radial-gradient(circle_at_top_right,rgba(16,185,129,0.08),transparent_28%),linear-gradient(180deg,rgba(248,250,252,0.96),rgba(255,255,255,1))] bg-size-[100%_100svh] bg-no-repeat text-foreground">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[linear-gradient(180deg,rgba(255,255,255,0.75),transparent)]" />
+    // app-atmosphere sizes its gradients to the viewport so they stay put when month sections collapse.
+    <div ref={rootRef} className="app-atmosphere relative min-h-screen text-foreground">
       <header ref={headerRef} className="relative md:sticky top-0 z-40 app-header-surface">
         <div className="mx-auto grid w-full max-w-7xl grid-cols-[1fr_auto] items-center gap-x-3 gap-y-2 px-4 py-2 sm:px-6 md:flex md:items-center md:justify-between md:gap-4 md:py-4 lg:px-8">
           <Link href="/" className="group inline-flex items-center gap-2 justify-self-start">
@@ -51,7 +50,7 @@ export function BaseAppShell({ headerRightContent, children }: Props) {
               priority
             />
             {process.env.NODE_ENV === "development" && (
-              <Badge variant="default" className="pointer-events-none uppercase">
+              <Badge variant="default" className="pointer-events-none">
                 DEV
               </Badge>
             )}

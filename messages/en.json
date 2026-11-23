@@ -25,7 +25,8 @@
     "logout_confirm_description": "Are you sure you want to log out? You will need to sign in again to access your data.",
     "cancel": "Cancel",
     "personalRemainingOutOfRange": "Personal surplus must be between zero and the personal budget. Review these months: {months}.",
-    "personalRemainingWarning": "Personal surplus is outside the personal budget in these months: {months}. Correct it manually; savings are preserved in the meantime."
+    "personalRemainingWarning": "Personal surplus is outside the personal budget in these months: {months}. Correct it manually; savings are preserved in the meantime.",
+    "continueWithGoogle": "Continue with Google"
   },
   "Settings": {
     "title": "Settings",
@@ -103,7 +104,6 @@
     "exportDescription": "Export the full year in Excel with the latest configuration.",
     "savingDescription": "Configuration changes are being saved before launching year actions.",
     "kpis": {
-      "heroEyebrow": "Annual close",
       "heroTitle": "Final balance and total savings",
       "totalSavings": "Total savings",
       "savingsRate": "Savings rate:",
@@ -292,7 +292,6 @@
     "title": "Configure {year}",
     "subtitle": "Financial year kickoff",
     "guidedConfig": "Guided Configuration",
-    "headerEyebrow": "New financial year",
     "mainHeading": "Configure {year}",
     "descriptionEditable": "These values will create the 12 months of the year. You can adjust any month later.",
     "descriptionFixed": "Gridly will use the projected close of {previousYear} as the starting balance for {year}.",
@@ -407,7 +406,6 @@
     }
   },
   "Landing": {
-    "heroEyebrow": "Annual finance planner",
     "heroTitle": "Plan your financial year month by month.",
     "heroDescription": "Gridly connects income, expenses, savings, and starting balance into a clear annual chain, with extra pay periods, year summary, and Excel export.",
     "demoCta": "View demo",
@@ -435,7 +433,6 @@
       }
     },
     "annualStory": {
-      "eyebrow": "Annual close",
       "title": "Every month moves the year-end picture.",
       "description": "Starting balance, income, expenses, and monthly savings are chained together so you can see how the full year evolves.",
       "extraPayMarker": "Extra pay",
@@ -464,16 +461,13 @@
   },
   "Demo": {
     "month": {
-      "eyebrow": "Demo",
       "description": "Explore {month} {year} with sample data in read-only mode. Sign in with Google to create your own private workspace."
     },
     "summary": {
-      "eyebrow": "Demo",
       "title": "Annual Summary {year}",
       "description": "Explore the projected close for {year} with sample data. Sign in with Google to create your own private workspace."
     },
     "movements": {
-      "eyebrow": "Public demo",
       "title": "Movements for {year}",
       "description": "Explore an example year’s movements using fictional data."
     }
@@ -617,7 +611,6 @@
     "historicalYear": "Historical"
   },
   "Evolution": {
-    "eyebrow": "Historical evolution",
     "title": "Financial evolution",
     "description": "Compare balance, savings, and investment across the current and previous years.",
     "addHistoricalYear": "Add historical year",
@@ -653,7 +646,6 @@
       "historical": "Historical"
     },
     "emptyState": {
-      "eyebrow": "History needed",
       "title": "Add historical years to compare",
       "description": "With one year, Evolution does not have a useful trend yet. Add a summarized earlier year to enable comparison without creating months or affecting the balance chain."
     },

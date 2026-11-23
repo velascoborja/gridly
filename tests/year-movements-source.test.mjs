@@ -5,9 +5,9 @@ const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf
 
 test("shell background sizing stays independent of expanded month content height", () => {
   const source = read("src/components/layout/base-app-shell.tsx");
-  assert.match(source, /bg-size-\[100%_100svh\]/);
-  assert.match(source, /bg-no-repeat/);
-  assert.match(source, /bg-white/);
+  const globals = read("src/app/globals.css");
+  assert.match(source, /className="app-atmosphere relative min-h-screen/);
+  assert.match(globals, /\.app-atmosphere \{[\s\S]*?background-size: 100% 100svh;[\s\S]*?background-repeat: no-repeat;/);
 });
 
 test("peak month headers use a compact icon with a translated accessible description", () => {
@@ -53,7 +53,7 @@ test("month expansion and selector state are independent, accessible and initial
   assert.match(source, /grid transition-\[grid-template-rows,opacity\] duration-200 ease-in-out motion-reduce:transition-none/);
   assert.match(source, /expanded \? "grid-rows-\[1fr\] opacity-100" : "grid-rows-\[0fr\] opacity-0"/);
   assert.match(source, /className="min-h-0 overflow-hidden"/);
-  assert.match(source, /expanded \? "shadow-\[0_3px_6px_rgba\(50,50,93,0\.06\)\]" : "shadow-none"/);
+  assert.match(source, /expanded \? "shadow-sm" : "shadow-none"/);
   assert.match(source, /expanded \? "rounded-t-md border-border\/60" : "rounded-md border-transparent"/);
   assert.match(source, /sticky top-\[var\(--app-sticky-header-height,0px\)\]/);
   assert.match(read("src/components/layout/base-app-shell.tsx"), /new ResizeObserver\(measureHeader\)/);
@@ -99,7 +99,7 @@ test("sorting and colors stay local while account years are omitted from the dem
   assert.match(source, /<span className="hidden sm:inline">\{t\(order\)\}<\/span>/);
   assert.match(source, /getMovementColorIntensity\(row, summary.rows\)/);
   assert.match(source, /color-mix\(in srgb/);
-  assert.match(source, /dark:\[--movement-neutral:var\(--foreground\)\]/);
+  assert.match(source, /\[--movement-neutral:var\(--foreground\)\]/);
   assert.match(source, /years && years.length > 1 && <MovementsYearSelector/);
   assert.match(read("src/components/year/year-page-client.tsx"), /yearData=\{currentYearData\}\s+years=\{years\}/);
 });

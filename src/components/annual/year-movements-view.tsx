@@ -34,7 +34,7 @@ export function YearMovementsView({ yearData, years, onSummarySelect, pathPrefix
   const now = new Date();
   const year = yearData.config.year;
   const isExpense = type === "expense";
-  const tone = isExpense ? "text-rose-600 dark:text-rose-400" : "text-emerald-600 dark:text-emerald-400";
+  const tone = isExpense ? "text-financial-negative" : "text-financial-positive";
   const Icon = isExpense ? ArrowDownRight : ArrowUpRight;
 
   function toggleMonth(month: number) {
@@ -147,7 +147,7 @@ export function YearMovementsView({ yearData, years, onSummarySelect, pathPrefix
           const isCurrentMonth = year === now.getFullYear() && month.month === now.getMonth() + 1;
           const future = year > now.getFullYear() || (year === now.getFullYear() && month.month > now.getMonth() + 1);
           return (
-            <section key={month.month} aria-labelledby={`${monthId}-heading`} className={cn("rounded-md border bg-card transition-shadow duration-200 ease-in-out motion-reduce:transition-none", expanded ? "shadow-[0_3px_6px_rgba(50,50,93,0.06)]" : "shadow-none", isPeak ? "border-primary/30" : "border-border/80")}>
+            <section key={month.month} aria-labelledby={`${monthId}-heading`} className={cn("rounded-md border bg-card transition-shadow duration-200 ease-in-out motion-reduce:transition-none", expanded ? "shadow-sm" : "shadow-none", isPeak ? "border-primary/30" : "border-border/80")}>
               <div className={cn("sticky top-[var(--app-sticky-header-height,0px)] z-20 border-b bg-card/95 backdrop-blur-xl transition-colors duration-200 ease-in-out motion-reduce:transition-none", expanded ? "rounded-t-md border-border/60" : "rounded-md border-transparent")}>
                 <h2 id={`${monthId}-heading`}>
                   <button
@@ -160,28 +160,28 @@ export function YearMovementsView({ yearData, years, onSummarySelect, pathPrefix
                     className={cn(
                       "block w-full px-4 py-4 text-left outline-none transition-colors hover:bg-primary/[0.03] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary sm:px-6",
                       expanded ? "rounded-t-md" : "rounded-md",
-                      isCurrentMonth && "bg-primary/5 shadow-[inset_2px_0_0_var(--primary)] hover:bg-primary/[0.08] dark:bg-primary/10 dark:hover:bg-primary/[0.13]"
+                      isCurrentMonth && "bg-primary/5 shadow-inset-accent hover:bg-primary/[0.08] dark:bg-primary/10 dark:hover:bg-primary/[0.13]"
                     )}
                   >
                     <span className="flex items-center justify-between gap-2 sm:gap-4">
                       <span className="flex min-w-0 items-center gap-1.5 sm:gap-3">
                         <span className="inline-flex min-w-0 items-center gap-1.5">
-                          <span className="truncate text-xl font-light capitalize tracking-[-0.02em]">{name}</span>
+                          <span className="truncate text-xl font-light capitalize">{name}</span>
                           {isPeak && <span title={t("peakBadge")} className="inline-flex shrink-0 text-primary">
                             <Trophy aria-hidden="true" className="size-4" />
                             <span id={`${monthId}-peak`} className="sr-only">{t("peakBadge")}</span>
                           </span>}
                         </span>
-                        {isCurrentMonth && <span id={`${monthId}-current`} className="shrink-0 whitespace-nowrap rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[11px] font-normal text-primary">{t("currentMonth")}</span>}
-                        {future && <span className="shrink-0 whitespace-nowrap rounded border border-primary/15 bg-primary/5 px-1.5 py-0.5 text-[11px] font-normal text-primary">{t("forecast")}</span>}
+                        {isCurrentMonth && <span id={`${monthId}-current`} className="shrink-0 whitespace-nowrap rounded-md border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-xs font-normal text-primary">{t("currentMonth")}</span>}
+                        {future && <span className="shrink-0 whitespace-nowrap rounded-md border border-primary/15 bg-primary/5 px-1.5 py-0.5 text-xs font-normal text-primary">{t("forecast")}</span>}
                       </span>
                       <span className="flex shrink-0 items-center gap-3">
                         <span
                           className={cn(
-                            "finance-number text-xl font-light tracking-[-0.03em] [--movement-neutral:#000] dark:[--movement-neutral:var(--foreground)] sm:text-2xl",
+                            "finance-number text-xl font-light [--movement-neutral:var(--foreground)] sm:text-2xl",
                             isExpense
-                              ? "[--movement-accent:var(--color-rose-600)] dark:[--movement-accent:var(--color-rose-400)]"
-                              : "[--movement-accent:var(--color-emerald-600)] dark:[--movement-accent:var(--color-emerald-400)]"
+                              ? "[--movement-accent:var(--financial-negative)]"
+                              : "[--movement-accent:var(--financial-positive)]"
                           )}
                           style={{ color: `color-mix(in srgb, var(--movement-neutral) ${100 - intensity * 100}%, var(--movement-accent))` }}
                         >{formatCurrency(total, locale)}</span>
@@ -189,10 +189,10 @@ export function YearMovementsView({ yearData, years, onSummarySelect, pathPrefix
                       </span>
                     </span>
                     <span className="mt-3 block h-1 overflow-hidden rounded-sm bg-muted" aria-hidden="true">
-                      <span className={cn("block h-full rounded-sm", isExpense ? "bg-rose-500/60" : "bg-emerald-500/60")} style={{ width: `${barPercent}%` }} />
+                      <span className={cn("block h-full rounded-sm", isExpense ? "bg-financial-negative/60" : "bg-financial-positive/60")} style={{ width: `${barPercent}%` }} />
                     </span>
                     <span className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-xs font-normal text-muted-foreground">
-                      <span>{t(month.savings < 0 ? "loss" : "savings")} <span className={cn("finance-number ml-1", month.savings < 0 ? "text-rose-600 dark:text-rose-400" : month.savings > 0 ? "text-emerald-600 dark:text-emerald-400" : "")}>{month.savings > 0 ? "+" : ""}{formatCurrency(month.savings, locale)}</span></span>
+                      <span>{t(month.savings < 0 ? "loss" : "savings")} <span className={cn("finance-number ml-1", month.savings < 0 ? "text-financial-negative" : month.savings > 0 ? "text-financial-positive" : "")}>{month.savings > 0 ? "+" : ""}{formatCurrency(month.savings, locale)}</span></span>
                       <span>{t("endingBalance")} <span className="finance-number ml-1 text-foreground/80">{formatCurrency(month.endingBalance, locale)}</span></span>
                     </span>
                   </button>
@@ -214,7 +214,7 @@ export function YearMovementsView({ yearData, years, onSummarySelect, pathPrefix
                           <div className="flex items-start justify-between gap-4 border-l-2 border-primary/30 pl-3 text-sm">
                             <span className="flex min-w-0 flex-wrap items-center gap-2">
                               <span className="min-w-0 max-w-full break-words font-medium">{group.label}</span>
-                              <span className="rounded border border-primary/15 bg-primary/5 px-1.5 py-0.5 text-[11px] text-primary">{t("group")}</span>
+                              <span className="rounded-md border border-primary/15 bg-primary/5 px-1.5 py-0.5 text-xs text-primary">{t("group")}</span>
                             </span>
                             <span className="finance-number shrink-0 text-muted-foreground">{formatCurrency(group.total, locale)}</span>
                           </div>

@@ -27,7 +27,7 @@ export function NotFoundView() {
   const locale = useLocale();
 
   return (
-    <div className="flex min-h-dvh flex-col bg-[#fbfcff] text-foreground">
+    <div className="flex min-h-dvh flex-col bg-background text-foreground">
       <header className="border-b border-border bg-card px-6 py-5 sm:px-8">
         <div className="mx-auto max-w-5xl">
           <Image src="/gridly-wordmark.svg" alt="Gridly" width={216} height={64} className="h-10 w-[135px]" priority />
@@ -35,8 +35,8 @@ export function NotFoundView() {
       </header>
       <main className="mx-auto flex w-full max-w-5xl flex-1 items-center px-6 py-12 sm:px-8 sm:py-20">
         <div className="w-full max-w-xl">
-          <p className="mb-6 text-7xl font-light tracking-[-0.06em] text-[#533afd] sm:text-8xl">404</p>
-          <h1 className="text-[2rem] font-light leading-tight tracking-[-0.04em] text-[#061b31] sm:text-5xl">
+          <p className="mb-6 text-7xl font-light tracking-[-0.04em] text-primary sm:text-8xl">404</p>
+          <h1 className="text-3xl font-light leading-tight tracking-[-0.04em] text-foreground sm:text-5xl">
             {t("title")}
           </h1>
           <p className="mt-5 max-w-md text-base font-light leading-7 text-muted-foreground sm:text-lg">
@@ -45,7 +45,7 @@ export function NotFoundView() {
           <Link
             href="/"
             locale={locale}
-            className={cn(buttonVariants(), "mt-8 min-h-11 w-full min-w-52 rounded-[4px] bg-[#533afd] px-5 text-base font-normal text-white hover:bg-[#4434d4] active:bg-[#4434d4] focus-visible:ring-[#533afd]/30 sm:w-auto")}
+            className={cn(buttonVariants(), "mt-8 min-h-11 w-full min-w-52 px-5 text-base font-normal sm:w-auto")}
           >
             <HomeLinkLabel />
           </Link>

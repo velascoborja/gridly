@@ -650,7 +650,7 @@ export function MonthOverview({
         swipeStartRef.current = null;
       }}
     >
-      <div className="mb-6 overflow-hidden rounded-lg border border-border/70 bg-background/90 shadow-[0_30px_45px_-30px_rgba(50,50,93,0.25),0_18px_36px_-24px_rgba(0,0,0,0.1)]">
+      <div className="mb-6 overflow-hidden rounded-lg border border-border/70 bg-background/90 shadow-sm">
         <div className="flex items-center gap-2 border-b border-border/70 px-3 py-3 sm:px-4">
           {previousMonth ? (
             <Link
@@ -711,15 +711,15 @@ export function MonthOverview({
                         "inline-flex min-w-20 items-center justify-center gap-2 rounded-md border px-3 py-2 text-xs font-medium capitalize transition-all",
                         isActive
                           ? isItemPastMonth
-                            ? "border-slate-700 bg-slate-800 text-slate-100 shadow-sm"
+                            ? "border-month-past bg-month-past text-month-past-foreground shadow-sm"
                             : isItemCurrentMonth
                               ? "border-primary bg-primary text-primary-foreground shadow-sm"
-                              : "border-indigo-600 bg-indigo-700 text-indigo-50 shadow-sm"
+                              : "border-month-future bg-month-future text-month-future-foreground shadow-sm"
                           : isItemCurrentMonth
                             ? "border-primary/25 bg-primary/[0.06] text-foreground hover:border-primary/40 hover:bg-primary/[0.1]"
                             : isItemPastMonth
                               ? "border-border/40 bg-muted/20 text-muted-foreground/60 hover:border-border/60 hover:bg-muted/40 hover:text-foreground/80"
-                              : "border-indigo-100/50 bg-indigo-50/30 text-indigo-700/60 hover:border-indigo-200/70 hover:bg-indigo-50/50 hover:text-indigo-800",
+                              : "border-month-future/10 bg-month-future/[0.04] text-month-future/60 hover:border-month-future/25 hover:bg-month-future/[0.07] hover:text-month-future",
                         isAdditionalEntryDropTarget &&
                           "border-dashed border-primary/45 bg-primary/[0.06] text-primary hover:border-primary/70 hover:bg-primary/[0.1]",
                         isAdditionalEntryDropHovered && "border-primary bg-primary/[0.12] shadow-sm"
@@ -769,12 +769,12 @@ export function MonthOverview({
 
       <Card
         className={cn(
-          "relative mb-6 overflow-hidden border-white/10 text-white shadow-[0_30px_45px_-30px_rgba(50,50,93,0.45),0_18px_36px_-18px_rgba(0,0,0,0.22)] transition-colors duration-500",
+          "relative mb-6 overflow-hidden border-hero-border text-hero-foreground shadow-hero transition-colors duration-500",
           isPastMonth
-            ? "bg-gradient-to-br from-slate-900 via-[#0d253d] to-slate-950"
+            ? "surface-hero-past"
             : isSelectedMonthCurrent
-              ? "bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#1e1b4b] shadow-[0_30px_60px_-15px_rgba(83,58,253,0.25)]"
-              : "bg-gradient-to-br from-[#1c1e54] via-[#0d253d] to-slate-950"
+              ? "surface-hero shadow-hero-current"
+              : "surface-hero-future"
         )}
       >
         <CardContent className="px-6 py-3">
@@ -783,7 +783,7 @@ export function MonthOverview({
               href={currentMonthRoute}
               onClick={canHandleCurrentMonthLocally ? interceptMonthNavigation(today.getMonth() + 1) : undefined}
               aria-label={tOverview("backToCurrentMonth")}
-              className="absolute top-3 right-4 inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1.5 sm:py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-300/80 transition-all hover:border-emerald-400/50 hover:bg-emerald-400/20 hover:text-emerald-200 hover:shadow-[0_0_14px_rgba(52,211,153,0.15)]"
+              className="absolute top-3 right-4 inline-flex items-center gap-1.5 rounded-full border border-hero-positive/30 bg-hero-positive/10 px-2.5 py-1.5 sm:py-1 text-xs font-medium capitalize text-hero-positive/80 transition-colors hover:border-hero-positive/50 hover:bg-hero-positive/20 hover:text-hero-positive"
             >
               <CurrentMonthArrowIcon className="size-3 shrink-0" />
               <span className="hidden sm:inline leading-none">{formatMonthName(today.getMonth() + 1, locale)}</span>
@@ -793,19 +793,19 @@ export function MonthOverview({
             {/* Left: Identification */}
             <div className="flex flex-col items-center gap-4 sm:gap-8 lg:flex-row">
               <div>
-                <h2 className="text-2xl font-bold tracking-tight capitalize">
+                <h2 className="text-3xl font-light tracking-[-0.04em] capitalize">
                   {formatMonthName(month.month, locale)} {config.year}
                 </h2>
                 <div className="mt-1 flex flex-col items-center gap-1.5 sm:flex-row sm:justify-center lg:justify-start">
-                  <div className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-white/40">
+                  <div className="inline-flex items-center gap-1.5 text-xs font-medium text-hero-muted-foreground">
                     <span
                       className={cn(
                         "size-1.5 rounded-full",
                         isSelectedMonthCurrent
-                          ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]"
+                          ? "bg-hero-positive"
                           : isPastMonth
-                            ? "bg-slate-400 shadow-[0_0_8px_rgba(148,163,184,0.5)]"
-                            : "bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.5)]"
+                            ? "bg-hero-muted-foreground"
+                            : "bg-hero-accent"
                       )}
                     />
                     {tOverview(
@@ -814,13 +814,13 @@ export function MonthOverview({
                   </div>
                   {shouldShowYearEndBalance && yearEndMonth ? (
                     <div
-                      className="inline-flex items-center gap-1.5 text-[10px] font-medium normal-case tracking-normal text-white/45"
+                      className="inline-flex items-center gap-1.5 text-xs font-medium text-hero-muted-foreground"
                       aria-label={tOverview("yearEndBalanceAria", {
                         amount: formatCurrency(yearEndMonth.endingBalance, locale),
                       })}
                     >
-                      <span aria-hidden="true" className="hidden text-white/25 sm:inline">/</span>
-                      <span className="tabular-nums text-white/65">
+                      <span aria-hidden="true" className="hidden text-hero-foreground/25 sm:inline">/</span>
+                      <span className="finance-number text-hero-foreground/70">
                         {tOverview("yearEndBalanceInline", {
                           amount: formatCurrency(yearEndMonth.endingBalance, locale),
                         })}
@@ -834,7 +834,7 @@ export function MonthOverview({
                     aria-expanded={fixedValuesExpanded}
                     aria-controls={usesFixedValuesSheet ? undefined : "month-fixed-editors"}
                     aria-haspopup={usesFixedValuesSheet ? "dialog" : undefined}
-                    className="inline-flex items-center gap-1 rounded-md border border-white/18 bg-white/10 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:border-white/28 hover:bg-white/16"
+                    className="inline-flex items-center gap-1 rounded-md border border-hero-control/20 bg-hero-control/10 px-3 py-1.5 text-xs font-medium text-hero-foreground shadow-sm transition-colors hover:border-hero-control/30 hover:bg-hero-control/15"
                     aria-label={tOverview(readOnly ? "viewMonthAria" : "editMonthAria", {
                       month: formatMonthName(month.month, locale),
                     })}
@@ -853,7 +853,7 @@ export function MonthOverview({
                   {!readOnly ? (
                     <button
                       type="button"
-                      className="inline-flex items-center gap-1 rounded-md border border-white/18 bg-white/10 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:border-white/28 hover:bg-white/16"
+                      className="inline-flex items-center gap-1 rounded-md border border-hero-control/20 bg-hero-control/10 px-3 py-1.5 text-xs font-medium text-hero-foreground shadow-sm transition-colors hover:border-hero-control/30 hover:bg-hero-control/15"
                       aria-label={tOverview("exportMonthAria", {
                         month: formatMonthName(month.month, locale),
                       })}
@@ -866,19 +866,19 @@ export function MonthOverview({
                 </div>
               </div>
               
-              <div className="hidden h-12 w-px bg-white/10 lg:block" />
+              <div className="hidden h-12 w-px bg-hero-border lg:block" />
 
               {/* Center: Primary KPIs */}
               <div className="flex gap-8">
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.18em] text-white/50 font-medium">{tOverview("netSavings")}</p>
-                  <p className={`text-3xl font-bold tracking-tight tabular-nums ${savingsPositive ? "text-emerald-300" : "text-rose-300"}`}>
+                  <p className="text-xs font-medium text-hero-muted-foreground">{tOverview("netSavings")}</p>
+                  <p className={`text-3xl font-light tracking-[-0.04em] finance-number ${savingsPositive ? "text-hero-positive" : "text-hero-negative"}`}>
                     {savingsPositive ? "+" : ""}{formatCurrency(month.savings, locale)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.18em] text-white/50 font-medium">{tOverview("endingBalance")}</p>
-                  <p className="text-3xl font-bold tracking-tight tabular-nums text-white/90">
+                  <p className="text-xs font-medium text-hero-muted-foreground">{tOverview("endingBalance")}</p>
+                  <p className="text-3xl font-light tracking-[-0.04em] finance-number text-hero-foreground">
                     {formatCurrency(month.endingBalance, locale)}
                   </p>
                 </div>
@@ -886,18 +886,18 @@ export function MonthOverview({
             </div>
 
             {/* Right: Secondary Stats */}
-            <div className="flex w-full justify-center gap-6 border-t border-white/10 pt-4 lg:w-auto lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
+            <div className="flex w-full justify-center gap-6 border-t border-hero-border pt-4 lg:w-auto lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
               <div className="space-y-1 lg:text-right">
-                <p className="text-xs uppercase tracking-widest text-white/30 font-bold">{tOverview("startingBalance")}</p>
-                <p className="text-base font-medium tabular-nums text-white/80">{formatCurrency(month.startingBalance, locale)}</p>
+                <p className="text-xs font-medium text-hero-muted-foreground">{tOverview("startingBalance")}</p>
+                <p className="text-base finance-number text-hero-foreground/85">{formatCurrency(month.startingBalance, locale)}</p>
               </div>
               <div className="space-y-1 lg:text-right">
-                <p className="text-xs uppercase tracking-widest text-white/30 font-bold">{tOverview("totalIncome")}</p>
-                <p className="text-base font-medium tabular-nums text-emerald-400/80">{formatCurrency(month.totalIncome, locale)}</p>
+                <p className="text-xs font-medium text-hero-muted-foreground">{tOverview("totalIncome")}</p>
+                <p className="text-base finance-number text-hero-positive">{formatCurrency(month.totalIncome, locale)}</p>
               </div>
               <div className="space-y-1 lg:text-right">
-                <p className="text-xs uppercase tracking-widest text-white/30 font-bold">{tOverview("totalExpenses")}</p>
-                <p className="text-base font-medium tabular-nums text-rose-400/80">{formatCurrency(month.totalExpenses, locale)}</p>
+                <p className="text-xs font-medium text-hero-muted-foreground">{tOverview("totalExpenses")}</p>
+                <p className="text-base finance-number text-hero-negative">{formatCurrency(month.totalExpenses, locale)}</p>
               </div>
             </div>
           </div>

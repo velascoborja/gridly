@@ -459,10 +459,10 @@ export function AdditionalEntryGroupRow({
     <div
       className={cn(
         "overflow-hidden rounded-xl border border-primary/20 bg-primary/[0.03] transition-[border-color,background-color,box-shadow,opacity] duration-150",
-        group.isCompleted && "border-emerald-500/15 bg-muted/40",
-        canAcceptUngroupedExpense && "border-dashed border-[#362baa]/55 bg-primary/[0.045]",
-        isExpenseDragHovered && "border-solid border-primary bg-primary/[0.09] shadow-[0_18px_34px_-22px_rgba(50,50,93,0.55),0_10px_20px_-16px_rgba(0,0,0,0.25)]",
-        dropPending && "border-primary bg-primary/[0.09] shadow-[0_18px_34px_-22px_rgba(50,50,93,0.55),0_10px_20px_-16px_rgba(0,0,0,0.25)]",
+        group.isCompleted && "border-financial-positive/15 bg-muted/40",
+        canAcceptUngroupedExpense && "border-dashed border-primary/55 bg-primary/[0.045]",
+        isExpenseDragHovered && "border-solid border-primary bg-primary/[0.09] shadow-raised",
+        dropPending && "border-primary bg-primary/[0.09] shadow-raised",
         canMoveGroup && "cursor-grab active:cursor-grabbing",
         isMovingGroup && "pointer-events-none opacity-60"
       )}
@@ -492,7 +492,7 @@ export function AdditionalEntryGroupRow({
         {groupMutationLocked ? (
           <span
             className={cn(
-              "flex-1 truncate text-left text-sm font-semibold text-foreground",
+              "flex-1 truncate text-left text-sm font-medium text-foreground",
               group.isCompleted && "text-muted-foreground/65"
             )}
           >
@@ -500,7 +500,7 @@ export function AdditionalEntryGroupRow({
           </span>
         ) : isEditingName ? (
           <Input
-            className="h-7 flex-1 text-sm font-semibold"
+            className="h-7 flex-1 text-sm font-medium"
             value={nameValue}
             autoFocus
             onChange={(e) => setNameValue(e.target.value)}
@@ -514,7 +514,7 @@ export function AdditionalEntryGroupRow({
           />
         ) : (
           <button
-            className="flex-1 truncate text-left text-sm font-semibold text-foreground transition-colors hover:text-primary"
+            className="flex-1 truncate text-left text-sm font-medium text-foreground transition-colors hover:text-primary"
             onClick={handleRenameStart}
             type="button"
           >
@@ -522,7 +522,7 @@ export function AdditionalEntryGroupRow({
           </button>
         )}
 
-        <span className="shrink-0 rounded-full bg-muted/40 px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+        <span className="shrink-0 rounded-full bg-muted/40 px-2 py-0.5 text-xs font-medium text-muted-foreground">
           {group.entries.length}
         </span>
 
@@ -542,7 +542,7 @@ export function AdditionalEntryGroupRow({
                 displayGroupTag && TAG_COLORS[displayGroupTag.color] ? (
                   <button
                     type="button"
-                    className="inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-medium leading-none transition-colors hover:opacity-80 disabled:opacity-50"
+                    className="inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-xs font-medium leading-none transition-colors hover:opacity-80 disabled:opacity-50"
                     style={{
                       background: TAG_COLORS[displayGroupTag.color].bg,
                       borderColor: TAG_COLORS[displayGroupTag.color].border,
@@ -610,7 +610,7 @@ export function AdditionalEntryGroupRow({
 
         <div className="flex shrink-0 items-center gap-1 ml-1.5 sm:ml-0">
           <span className={cn(
-            "text-sm font-semibold tabular-nums text-violet-600 dark:text-violet-400",
+            "text-sm font-medium finance-number text-primary",
             group.isCompleted && "text-muted-foreground/65 dark:text-muted-foreground/65"
           )}>
             {formatCurrency(groupTotal, locale)}
@@ -710,7 +710,7 @@ export function AdditionalEntryGroupRow({
                   displayGroupTag && TAG_COLORS[displayGroupTag.color] ? (
                     <button
                       type="button"
-                      className="inline-flex h-7 max-w-32 shrink-0 items-center justify-start gap-1.5 rounded border px-2 text-[11px] font-medium transition-colors hover:opacity-80 disabled:opacity-50"
+                      className="inline-flex h-7 max-w-32 shrink-0 items-center justify-start gap-1.5 rounded-md border px-2 text-xs font-medium transition-colors hover:opacity-80 disabled:opacity-50"
                       style={{
                         background: TAG_COLORS[displayGroupTag.color].bg,
                         borderColor: TAG_COLORS[displayGroupTag.color].border,
@@ -738,7 +738,7 @@ export function AdditionalEntryGroupRow({
                       size="sm"
                       variant="ghost"
                       type="button"
-                      className="h-7 max-w-32 shrink-0 gap-1.5 whitespace-nowrap px-2 text-[11px] text-muted-foreground hover:text-primary"
+                      className="h-7 max-w-32 shrink-0 gap-1.5 whitespace-nowrap px-2 text-xs text-muted-foreground hover:text-primary"
                       disabled={isSavingTag}
                       aria-label={t("tagButton")}
                       title={t("tagButton")}
@@ -762,7 +762,7 @@ export function AdditionalEntryGroupRow({
                         size="sm"
                         variant="ghost"
                         type="button"
-                        className="h-7 w-7 shrink-0 gap-1.5 whitespace-nowrap px-0 text-[11px] text-muted-foreground hover:text-primary min-[480px]:w-auto min-[480px]:px-2"
+                        className="h-7 w-7 shrink-0 gap-1.5 whitespace-nowrap px-0 text-xs text-muted-foreground hover:text-primary min-[480px]:w-auto min-[480px]:px-2"
                         aria-label={`${t("moveGroupToMonth")} ${group.label}`}
                         title={t("moveGroupToMonth")}
                         disabled={!canMoveGroup}
@@ -802,7 +802,7 @@ export function AdditionalEntryGroupRow({
                 size="sm"
                 variant="ghost"
                 type="button"
-                className="h-7 w-7 shrink-0 gap-1.5 whitespace-nowrap px-0 text-[11px] text-muted-foreground hover:text-primary min-[480px]:w-auto min-[480px]:px-2"
+                className="h-7 w-7 shrink-0 gap-1.5 whitespace-nowrap px-0 text-xs text-muted-foreground hover:text-primary min-[480px]:w-auto min-[480px]:px-2"
                 onClick={() => setAddingFormOpen(true)}
                 disabled={addingFormOpen}
                 aria-label={t("addToGroup")}
@@ -920,7 +920,7 @@ export function AdditionalEntryGroupRow({
                 data-highlight-id={`entry-${entry.id}`}
                 className={cn(
                   "min-h-10 rounded-lg border border-transparent px-2 py-1.5 transition-[border-color,background-color,box-shadow,opacity] duration-150 hover:border-border/70 hover:bg-muted/40",
-                  (group.isCompleted || entry.isCompleted) && "border-emerald-500/10 bg-muted/45 hover:border-emerald-500/15 hover:bg-muted/55",
+                  (group.isCompleted || entry.isCompleted) && "border-financial-positive/10 bg-muted/45 hover:border-financial-positive/15 hover:bg-muted/55",
                   deletingId === entry.id && "pointer-events-none opacity-60",
                   highlightId === `entry-${entry.id}` && "animate-entry-highlight"
                 )}
@@ -950,7 +950,7 @@ export function AdditionalEntryGroupRow({
                   <div className="flex shrink-0 items-center gap-1.5">
                     {groupMutationLocked || completionSavingId === entry.id || entryCompletionConfirmationId === entry.id ? (
                       <span className={cn(
-                        "inline-flex h-7 items-center whitespace-nowrap rounded-md px-2 text-sm font-semibold tabular-nums",
+                        "inline-flex h-7 items-center whitespace-nowrap rounded-md px-2 text-sm font-medium finance-number",
                         (group.isCompleted || entry.isCompleted) && "text-muted-foreground/65"
                       )}>
                         {formatCurrency(entry.amount, locale)}
@@ -958,7 +958,7 @@ export function AdditionalEntryGroupRow({
                     ) : (
                       <button
                         className={cn(
-                          "whitespace-nowrap rounded-md px-2 py-1 text-sm font-semibold tabular-nums text-foreground transition-colors hover:bg-background hover:text-primary",
+                          "whitespace-nowrap rounded-md px-2 py-1 text-sm font-medium finance-number text-foreground transition-colors hover:bg-background hover:text-primary",
                           entry.isCompleted && "text-muted-foreground/65"
                         )}
                         onClick={() => openEditForm(entry, "amount")}

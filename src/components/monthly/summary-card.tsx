@@ -23,13 +23,13 @@ function SummaryRow({
   positive?: boolean;
 }) {
   const color = positive !== undefined
-    ? (positive ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400")
+    ? (positive ? "finance-number-positive" : "finance-number-negative")
     : "";
 
   return (
     <div className={`flex items-center justify-between py-2 ${highlight ? "mt-1 border-t border-border/70 pt-3" : ""}`}>
-      <span className={`text-sm ${highlight ? "font-semibold text-foreground" : "text-muted-foreground"}`}>{label}</span>
-      <span className={`text-sm tabular-nums ${color} ${emphasize ? "text-base font-bold text-foreground" : "font-medium"} ${highlight && !emphasize ? "text-base font-bold" : ""}`}>
+      <span className={`text-sm ${highlight ? "font-medium text-foreground" : "text-muted-foreground"}`}>{label}</span>
+      <span className={`text-sm finance-number ${color} ${emphasize ? "text-base font-semibold text-foreground" : "font-medium"} ${highlight && !emphasize ? "text-base font-semibold" : ""}`}>
         {formatCurrency(value, locale)}
       </span>
     </div>
@@ -41,7 +41,7 @@ export function SummaryCard({ month }: Props) {
   const locale = useLocale();
 
   return (
-    <Card className="border-border/80 bg-gradient-to-b from-background to-muted/30 shadow-md shadow-black/5">
+    <Card>
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-medium">{t("title")}</CardTitle>
         <p className="text-xs text-muted-foreground">

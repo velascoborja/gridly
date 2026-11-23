@@ -265,7 +265,7 @@ export function YearConfigForm({
                 <h3 className="text-sm font-medium text-foreground">{t("sectionStartingPoint")}</h3>
                 <p className="mt-1 text-sm leading-6 text-muted-foreground">{t("sectionStartingPointDescription")}</p>
               </div>
-              <span className="inline-flex w-fit shrink-0 items-center rounded-md border border-amber-500/25 bg-amber-500/10 px-2.5 py-1 text-xs font-medium text-amber-700 dark:text-amber-300">
+              <span className="inline-flex w-fit shrink-0 items-center rounded-md border border-warning/25 bg-warning/10 px-2.5 py-1 text-xs font-medium text-warning">
                 {t("startingBalanceScopeBadge")}
               </span>
             </div>
@@ -287,7 +287,7 @@ export function YearConfigForm({
                 <p className="mt-1 text-sm leading-6 text-muted-foreground">
                   {t("applyFromMonthDescription")}
                 </p>
-                <span className="mt-3 inline-flex w-fit items-center rounded-md border border-amber-500/25 bg-amber-500/10 px-2.5 py-1 text-xs font-medium text-amber-700 dark:text-amber-300">
+                <span className="mt-3 inline-flex w-fit items-center rounded-md border border-warning/25 bg-warning/10 px-2.5 py-1 text-xs font-medium text-warning">
                   {t("overwriteBadge", { month: selectedApplyFromMonthLabel })}
                 </span>
               </div>

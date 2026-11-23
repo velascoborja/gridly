@@ -176,7 +176,7 @@ export function RecurringExpensesList({ tags, onCreateTag: handleCreateTag, mont
                 <div className="flex shrink-0 items-center gap-1.5">
                   {!readOnly ? (
                     <button
-                      className="whitespace-nowrap text-sm font-semibold tabular-nums transition-colors hover:text-primary focus-visible:text-primary disabled:pointer-events-none"
+                      className="whitespace-nowrap text-sm font-medium finance-number transition-colors hover:text-primary focus-visible:text-primary disabled:pointer-events-none"
                       onClick={() => openEditForm(entry, "amount")}
                       type="button"
                       disabled={deletingId === entry.id}
@@ -184,7 +184,7 @@ export function RecurringExpensesList({ tags, onCreateTag: handleCreateTag, mont
                       {formatCurrency(entry.amount, locale)}
                     </button>
                   ) : (
-                    <span className="whitespace-nowrap text-sm font-semibold tabular-nums">
+                    <span className="whitespace-nowrap text-sm font-medium finance-number">
                       {formatCurrency(entry.amount, locale)}
                     </span>
                   )}
@@ -200,7 +200,7 @@ export function RecurringExpensesList({ tags, onCreateTag: handleCreateTag, mont
                         entry.tag && TAG_COLORS[entry.tag.color] ? (
                           <button
                             type="button"
-                            className="inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-medium leading-none transition-colors hover:opacity-80 disabled:opacity-50"
+                            className="inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-xs font-medium leading-none transition-colors hover:opacity-80 disabled:opacity-50"
                             style={{
                               background: TAG_COLORS[entry.tag.color].bg,
                               borderColor: TAG_COLORS[entry.tag.color].border,

@@ -164,7 +164,7 @@ export function InlineEditField({
         <span className="flex min-w-0 items-center gap-2.5">
           <span
             aria-hidden="true"
-            className="inline-flex size-7 shrink-0 items-center justify-center rounded-md bg-[#533afd]/10 text-[#533afd] dark:bg-[#8b7cff]/15 dark:text-[#b9b9f9] [&_svg]:size-3.5"
+            className="inline-flex size-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary [&_svg]:size-3.5"
           >
             {icon}
           </span>
@@ -245,7 +245,7 @@ export function InlineEditField({
           ) : null}
           <button
             className={cn(
-              "shrink-0 rounded-md px-2 py-1 text-sm font-semibold tabular-nums transition-colors hover:bg-background hover:text-primary disabled:cursor-default disabled:opacity-50",
+              "shrink-0 rounded-md px-2 py-1 text-sm font-medium finance-number transition-colors hover:bg-background hover:text-primary disabled:cursor-default disabled:opacity-50",
               error ? "text-destructive" : "text-foreground",
               readOnly && "cursor-default hover:bg-transparent hover:text-foreground"
             )}

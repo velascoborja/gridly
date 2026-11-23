@@ -34,7 +34,6 @@ export default async function DemoMovementsPage({
 
   return (
     <PublicDemoShell
-      eyebrow={t("eyebrow")}
       title={t("title", { year })}
       description={t("description", { year })}
     >

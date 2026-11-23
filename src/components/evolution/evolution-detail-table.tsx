@@ -60,13 +60,13 @@ export function EvolutionDetailTable({ metrics, historicalYears, onEditHistorica
   return (
     <Card className="border-border/70 bg-card/90 shadow-sm">
       <CardHeader className="space-y-1 pb-2">
-        <CardTitle className="text-base font-light tracking-[-0.02em]">{t("title")}</CardTitle>
+        <CardTitle>{t("title")}</CardTitle>
         <p className="text-sm leading-5 text-muted-foreground">{t("description")}</p>
       </CardHeader>
       <CardContent className="pt-0">
         <div className="overflow-x-auto rounded-lg border border-border/60">
           <table className="min-w-[1040px] w-full text-left text-sm">
-            <thead className="bg-muted/40 text-xs uppercase tracking-[0.12em] text-muted-foreground">
+            <thead className="bg-muted/40 text-xs font-medium text-muted-foreground">
               <tr>
                 <th className="px-3 py-3 font-medium text-center">{t("sourceLabel")}</th>
                 <th className="px-3 py-3 font-medium text-center">{t("year")}</th>

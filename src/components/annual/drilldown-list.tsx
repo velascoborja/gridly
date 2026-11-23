@@ -55,7 +55,7 @@ export function DrilldownList({ entries, fallbackLabel }: Props) {
                 <ChevronRight
                   className={`size-3.5 shrink-0 transition-transform duration-150 ${isExpanded ? "rotate-90" : ""}`}
                 />
-                <span className="flex-1 uppercase tracking-wide">{year}</span>
+                <span className="flex-1">{year}</span>
                 <span className="shrink-0 tabular-nums text-foreground">
                   {formatCurrency(totalAmount, locale)}
                 </span>
@@ -103,10 +103,10 @@ export function DrilldownList({ entries, fallbackLabel }: Props) {
     <div className="border-t border-border/50 bg-muted/30">
       {grouped.map(({ month, entries: monthEntries, totalAmount }) => (
         <div key={month}>
-          <div className="flex items-center justify-between gap-3 border-b border-border/30 bg-muted/50 px-4 py-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          <div className="flex items-center justify-between gap-3 border-b border-border/30 bg-muted/50 px-4 py-1.5 text-xs font-medium text-muted-foreground">
             <span>{formatMonthName(month, locale, "long")}</span>
             {monthEntries.length > 1 && (
-              <span className="shrink-0 font-semibold tabular-nums text-primary">
+              <span className="shrink-0 font-medium finance-number text-primary">
                 {formatCurrency(totalAmount, locale)}
               </span>
             )}

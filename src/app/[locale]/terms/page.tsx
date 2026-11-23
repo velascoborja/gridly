@@ -31,18 +31,18 @@ export default async function TermsPage() {
     <LegalShell>
       <div className="space-y-10">
         <div className="space-y-2">
-          <h1 className="text-3xl font-light tracking-[-0.04em] text-[#061b31] sm:text-4xl">
+          <h1 className="text-3xl font-light tracking-[-0.04em] text-foreground sm:text-4xl">
             {t("title")}
           </h1>
-          <p className="text-sm font-light text-[#64748d]">{t("lastUpdated")}</p>
+          <p className="text-sm font-light text-muted-foreground">{t("lastUpdated")}</p>
         </div>
         <div className="space-y-8">
           {sections.map((section) => (
             <section key={section.key} className="space-y-2">
-              <h2 className="text-lg font-normal tracking-[-0.02em] text-[#061b31]">
+              <h2 className="text-lg font-normal text-foreground">
                 {section.title}
               </h2>
-              <p className="text-sm font-light leading-7 text-[#64748d]">{section.body}</p>
+              <p className="text-sm font-light leading-7 text-muted-foreground">{section.body}</p>
             </section>
           ))}
         </div>

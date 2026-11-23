@@ -46,7 +46,7 @@ export function ExpectedEntriesDialog({ entries, onAdd, onDelete }: Props) {
       </p>
 
       {entries.length === 0 ? (
-        <div className="mb-4 rounded-md border border-dashed border-primary/25 bg-primary/[0.035] px-4 py-5 text-center shadow-[0_15px_35px_0_rgba(23,23,23,0.06)]">
+        <div className="mb-4 rounded-md border border-dashed border-primary/25 bg-primary/[0.035] px-4 py-5 text-center shadow-sm">
           <div className="mx-auto flex size-9 items-center justify-center rounded-md border border-primary/15 bg-background text-primary shadow-sm">
             <CirclePlus className="h-4 w-4" />
           </div>
@@ -70,10 +70,10 @@ export function ExpectedEntriesDialog({ entries, onAdd, onDelete }: Props) {
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium text-foreground">{entry.label}</p>
                 <span
-                  className={`inline-block rounded px-1.5 py-0.5 text-[10px] font-medium ${
+                  className={`inline-block rounded-md px-1.5 py-0.5 text-xs font-medium ${
                     entry.type === "income"
-                      ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
-                      : "bg-rose-500/10 text-rose-700 dark:text-rose-300"
+                      ? "bg-financial-positive/10 text-financial-positive"
+                      : "bg-financial-negative/10 text-financial-negative"
                   }`}
                 >
                   {entry.type === "income" ? t("expectedEntryIncomeBadge") : t("expectedEntryExpenseBadge")}
@@ -82,8 +82,8 @@ export function ExpectedEntriesDialog({ entries, onAdd, onDelete }: Props) {
               <p
                 className={`shrink-0 finance-number text-sm font-medium ${
                   entry.type === "income"
-                    ? "text-emerald-600 dark:text-emerald-400"
-                    : "text-rose-600 dark:text-rose-400"
+                    ? "text-financial-positive"
+                    : "text-financial-negative"
                 }`}
               >
                 {entry.type === "income" ? "+" : "-"}
@@ -110,7 +110,7 @@ export function ExpectedEntriesDialog({ entries, onAdd, onDelete }: Props) {
               onClick={() => setType("income")}
               className={`flex-1 rounded px-3 py-1.5 text-xs font-medium transition-colors sm:flex-none ${
                 type === "income"
-                  ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                  ? "bg-financial-positive/15 text-financial-positive"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -121,7 +121,7 @@ export function ExpectedEntriesDialog({ entries, onAdd, onDelete }: Props) {
               onClick={() => setType("expense")}
               className={`flex-1 rounded px-3 py-1.5 text-xs font-medium transition-colors sm:flex-none ${
                 type === "expense"
-                  ? "bg-rose-500/15 text-rose-700 dark:text-rose-300"
+                  ? "bg-financial-negative/15 text-financial-negative"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >

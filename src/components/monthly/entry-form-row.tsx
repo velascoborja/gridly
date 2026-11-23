@@ -61,7 +61,7 @@ const actionButtonClass = (active?: boolean, activeTone: "primary" | "success" =
   cn(
     "h-9 w-9 shrink-0",
     active && activeTone === "success"
-      ? "bg-emerald-500/10 text-emerald-700 shadow-[inset_0_0_0_1px_rgb(21_190_83_/_0.18)] hover:bg-emerald-500/15 hover:text-emerald-800 dark:text-emerald-300"
+      ? "bg-financial-positive/10 text-financial-positive ring-1 ring-inset ring-financial-positive/20 hover:bg-financial-positive/15"
       : active
         ? "bg-primary/10 text-primary hover:bg-primary/20"
         : "text-muted-foreground hover:text-primary"
@@ -102,7 +102,7 @@ function SelectorPopover({ action }: { action: EntryFormSelectorAction }) {
             className="w-56 max-w-[calc(100vw-1rem)] max-h-[min(var(--available-height),calc(100dvh-1rem))] overflow-y-auto overscroll-contain rounded-lg border border-border bg-popover p-1.5 text-popover-foreground shadow-md outline-none motion-reduce:transition-none"
             finalFocus
           >
-            <p className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            <p className="px-2 py-1 text-xs font-medium text-muted-foreground">
               {action.label}
             </p>
             {action.renderPanel({ close: () => setOpen(false) })}
@@ -262,7 +262,7 @@ export function EntryFormRow({
         <div
           id={amountFeedbackId}
           aria-live="polite"
-          className={`col-span-2 min-h-4 text-right text-[11px] leading-4 tabular-nums ${
+          className={`col-span-2 min-h-4 text-right text-xs leading-4 finance-number ${
             amountError ? "text-destructive" : "text-muted-foreground"
           }`}
         >
@@ -314,7 +314,7 @@ export function EntryFormRow({
                           <ArrowLeft className="h-3.5 w-3.5" />
                           <span>{t("back")}</span>
                         </button>
-                        <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        <p className="px-2 pb-1 text-xs font-medium text-muted-foreground">
                           {mobileSelector.label}
                         </p>
                         {mobileSelector.renderPanel({ close: () => setMoreOpen(false) })}
@@ -329,7 +329,7 @@ export function EntryFormRow({
                               type="button"
                               className={cn(
                                 "flex min-h-10 w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-sm transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 disabled:pointer-events-none disabled:opacity-50",
-                                action.active && (action.activeTone === "success" ? "text-emerald-700 dark:text-emerald-300" : "text-primary")
+                                action.active && (action.activeTone === "success" ? "text-financial-positive" : "text-primary")
                               )}
                               disabled={action.disabled || pending || internalPendingId !== null}
                               aria-busy={pending || undefined}

@@ -60,7 +60,7 @@ export function HelpPageClient() {
   return (
     <div className="mx-auto max-w-2xl space-y-6 py-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">{t("pageTitle")}</h1>
+        <h1 className="text-3xl font-light tracking-[-0.04em] text-foreground md:text-4xl">{t("pageTitle")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{t("pageSubtitle")}</p>
       </div>
 

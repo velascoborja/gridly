@@ -120,7 +120,7 @@ export function SavingsChart({ months, year }: Props) {
   return (
     <Card className="border-border/70 bg-card/90 shadow-sm">
       <CardHeader className="space-y-1 pb-2">
-        <CardTitle className="text-base font-light tracking-[-0.02em]">{t("savingsTitle")}</CardTitle>
+        <CardTitle>{t("savingsTitle")}</CardTitle>
         <p className="text-sm leading-5 text-muted-foreground">{t("savingsDescription")}</p>
       </CardHeader>
       <CardContent className="pt-0">

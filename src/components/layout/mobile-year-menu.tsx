@@ -77,19 +77,19 @@ export function MobileYearMenu({ currentYear, currentMonth, view, years }: Props
             >
               <span className="font-medium">{option.year}</span>
               {option.source === "historical" && (
-                <span className="ml-1.5 rounded border border-border bg-muted px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                <span className="ml-1.5 rounded-md border border-border bg-muted px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
                   {t("historicalYear")}
                 </span>
               )}
               {showCurrentYearMarker && option.year === calendarYear && (
-                <span className="ml-1.5 rounded border border-primary/20 bg-primary/[0.08] px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.12em] text-primary">
+                <span className="ml-1.5 rounded-md border border-primary/20 bg-primary/[0.08] px-1.5 py-0.5 text-xs font-medium text-primary">
                   {t("currentYear")}
                 </span>
               )}
             </DropdownMenuItem>
           ))}
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => window.location.href = `/${locale}${createYearHref}`} className="rounded border border-primary/20 bg-primary/[0.06] font-medium focus:bg-primary/10">
+          <DropdownMenuItem onClick={() => window.location.href = `/${locale}${createYearHref}`} className="rounded-md border border-primary/20 bg-primary/[0.06] font-medium focus:bg-primary/10">
             <Plus className="size-3.5 text-primary" />
             <span className="text-foreground">{nextCreatableYear}</span>
           </DropdownMenuItem>

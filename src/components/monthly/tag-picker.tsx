@@ -61,7 +61,7 @@ export function TagPickerContent({ tags, value, onChange, onCreateTag, disabled,
       <div className="p-0.5">
         {tags.length > 0 ? (
           <>
-            <p className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            <p className="px-2 py-1 text-xs font-medium text-muted-foreground">
               {t("yourTags")}
             </p>
             {tags.map((tag) => (
@@ -125,7 +125,7 @@ export function TagPickerContent({ tags, value, onChange, onCreateTag, disabled,
           <ArrowLeft className="h-3.5 w-3.5" />
           {t("back")}
         </button>
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{t("newTag")}</p>
+        <p className="text-xs font-medium text-muted-foreground">{t("newTag")}</p>
       </div>
       <Input
         className="mb-2 h-8 text-sm"

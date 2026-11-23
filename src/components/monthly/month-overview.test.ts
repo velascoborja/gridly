@@ -19,8 +19,8 @@ test("month overview exposes projected year-end balance beside the month status"
   assert.match(source, /shouldShowYearEndBalance = Boolean\(yearEndMonth && month\?\.month !== 12\)/);
   assert.match(source, /shouldShowYearEndBalance && yearEndMonth/);
   assert.match(source, /sm:flex-row sm:justify-center lg:justify-start/);
-  assert.match(source, /normal-case tracking-normal text-white\/45/);
-  assert.match(source, /hidden text-white\/25 sm:inline/);
+  assert.match(source, /text-xs font-medium text-hero-muted-foreground/);
+  assert.match(source, /hidden text-hero-foreground\/25 sm:inline/);
   assert.match(source, /yearEndBalanceInline/);
   assert.match(source, /yearEndBalanceAria/);
   assert.match(source, /yearEndMonth\.endingBalance/);
