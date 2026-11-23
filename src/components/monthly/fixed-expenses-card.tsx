@@ -70,7 +70,7 @@ export function FixedExpensesCard({ tags, onCreateTag, month, onUpdate, onRecurr
         showReset={month.investmentManualOverride}
         onReset={(v) => onUpdate("investment", v, { investmentManualOverride: false })}
       />
-      <div className="mt-3 border-t border-[#533afd]/10 pt-3 dark:border-[#8b7cff]/15">
+      <div className="mt-3 border-t border-[#533afd]/15 pt-3 dark:border-[#8b7cff]/20">
         <div className="mb-2 flex items-center justify-between gap-3 px-2">
           <p className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
             <Repeat aria-hidden="true" className="size-3" />
