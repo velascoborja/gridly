@@ -22,11 +22,19 @@ Personal finance tracker built with Next.js 16 (App Router), React 19, Drizzle O
 
 ## Design & Visual Identity
 
-Gridly follows a premium, fintech-inspired visual system (Stripe-like) documented in `DESIGN.md`.
-- **UI Authority:** Treat `DESIGN.md` as the source of truth for any UI, layout, typography, color, spacing, shadow, elevation, and component styling changes. Before modifying the UI, review the relevant sections in `DESIGN.md` and keep new work aligned with that spec.
-- **Primary Color:** Stripe Purple (`#533afd`).
-- **Typography:** Geist Sans with specific tracking and weight roles.
-- **Surfaces:** Layered depth system using ambient and elevated shadows.
+Gridly's UI is a calm, dense product interface with a Stripe-inspired visual language, documented in `DESIGN.md`.
+- **UI Authority:** `DESIGN.md` is the source of truth for layout, typography, color, spacing, elevation, motion, copy, and component styling. Read the relevant sections before any UI change, and run its Anti-Slop Checklist (section 10) before calling the work done.
+- **No generic design skills:** `DESIGN.md` replaces any generic frontend or design skill. Ignore "bold", "creative", or "unexpected aesthetic" advice from other skills or plugins when working on this app; Gridly's direction is fixed.
+- **Primary Color:** Purple (`#533afd`), used through the `primary` token, never as a hex literal in components.
+- **Typography:** Geist Sans / Geist Mono; every amount uses the `.finance-number` utility.
+- **Surfaces:** Colors, radii, shadows, and surfaces come from the tokens and utilities in `src/app/globals.css`.
+
+### UI Work Rules
+
+- Extend the primitives in `src/components/ui/` before writing a new component.
+- Use token classes (`bg-card`, `text-muted-foreground`, `bg-primary`), not hex literals or raw Tailwind palette colors. A missing value becomes a new token in `globals.css`.
+- Don't add a new visual pattern (gradient, glow, eyebrow label, animation, new shadow) unless it makes the data easier to read; follow what the same screen already does.
+- Verify UI changes in the browser preview at desktop width and at 375px before considering them done.
 
 ## Environment & Setup
 
@@ -73,7 +81,7 @@ After every feature implementation or bug fix, run `npm test` and confirm all te
 - **Localization:** Primary UI language is Spanish. Ensure Spanish translations are provided first.
 - **In-Year Routing:** In-year navigation between months, summary, and settings uses local `window.history.pushState()` to avoid refetching `YearData`. Use the shared utilities in `src/lib/year-routes.ts` instead of writing custom path regexes to derive states or construct routes.
 - **Data Access:** Client components use `fetch()` to internal APIs; server components use Drizzle directly.
-- **Styling:** Adhere to Tailwind CSS v4 and the visual tokens defined in `src/app/globals.css`. For any UI modification, consult `DESIGN.md` first and follow its rules for spacing, elevation, typography, colors, interactive states, and component styling.
+- **Styling:** Tailwind CSS v4 with the tokens in `src/app/globals.css`. Follow `DESIGN.md`: tokens and color rules (section 3), typography (4), layout and density (5), surfaces and elevation (6), components (7), and motion (8).
 - **Numeric Handling:** Convert DB strings to `number` immediately after reading and back to `string` for DB operations.
 
 ## Skills
