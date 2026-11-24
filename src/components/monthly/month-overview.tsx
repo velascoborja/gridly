@@ -872,7 +872,7 @@ export function MonthOverview({
               <div className="flex gap-8">
                 <div>
                   <p className="text-xs font-medium text-hero-muted-foreground">{tOverview("netSavings")}</p>
-                  <p className={`text-3xl font-light tracking-[-0.04em] finance-number ${savingsPositive ? "text-hero-positive" : "text-hero-negative"}`}>
+                  <p className={`text-3xl font-normal tracking-[-0.04em] finance-number ${savingsPositive ? "text-hero-positive" : "text-hero-negative"}`}>
                     {savingsPositive ? "+" : ""}{formatCurrency(month.savings, locale)}
                   </p>
                 </div>
