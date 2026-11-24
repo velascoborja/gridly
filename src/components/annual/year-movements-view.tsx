@@ -192,7 +192,7 @@ export function YearMovementsView({ yearData, years, onSummarySelect, pathPrefix
                       <span className={cn("block h-full rounded-sm", isExpense ? "bg-financial-negative/60" : "bg-financial-positive/60")} style={{ width: `${barPercent}%` }} />
                     </span>
                     <span className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-xs font-normal text-muted-foreground">
-                      <span>{t(month.savings < 0 ? "loss" : "savings")} <span className={cn("finance-number ml-1", month.savings < 0 ? "text-financial-negative" : month.savings > 0 ? "text-financial-positive" : "")}>{month.savings > 0 ? "+" : ""}{formatCurrency(month.savings, locale)}</span></span>
+                      <span>{t(month.savings < 0 ? "loss" : "savings")} <span className={cn("finance-number ml-1 font-medium", month.savings < 0 ? "text-financial-negative" : month.savings > 0 ? "text-financial-positive" : "")}>{month.savings > 0 ? "+" : ""}{formatCurrency(month.savings, locale)}</span></span>
                       <span>{t("endingBalance")} <span className="finance-number ml-1 text-foreground/80">{formatCurrency(month.endingBalance, locale)}</span></span>
                     </span>
                   </button>
