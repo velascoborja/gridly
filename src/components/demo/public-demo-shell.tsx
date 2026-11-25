@@ -18,14 +18,14 @@ export function PublicDemoShell({
 }: PublicDemoShellProps) {
   return (
     <div className="app-atmosphere min-h-dvh text-foreground">
-      <header className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
+      <header className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-5 sm:px-6 lg:px-8">
         <Link href="/" className="group inline-flex items-center gap-2">
           <Image
             src="/gridly-wordmark.svg"
             alt="Gridly"
             width={216}
             height={64}
-            className="h-11 w-[149px] transition-transform duration-200 group-hover:-translate-y-0.5 sm:h-12 sm:w-[162px]"
+            className="h-auto w-28 transition-transform duration-200 group-hover:-translate-y-0.5 sm:w-[162px]"
             priority
           />
           {process.env.NODE_ENV === "development" && (
@@ -34,7 +34,7 @@ export function PublicDemoShell({
             </Badge>
           )}
         </Link>
-        <GoogleSignInButton />
+        <GoogleSignInButton buttonClassName="gap-2 px-3 sm:gap-3 sm:px-5" />
       </header>
 
       <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pb-10 pt-4 sm:px-6 lg:px-8">

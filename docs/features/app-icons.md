@@ -11,6 +11,7 @@ The brand mark is a white G with diagonal cuts on the primary purple tile. The h
 ## Key Components
 
 - `public/gridly-wordmark.svg` is the 216×64 horizontal logo used by the app shell, landing page, and setup screens.
+- The public demo header uses the same 112px mobile wordmark as the app shell. Its sign-in button can wrap to a second row when space is tight.
 - `src/app/favicon.ico`: Root favicon served by Next.js as `/favicon.ico`. It contains native 16x16, 32x32, 48x48, and 64x64 PNG entries so browser tabs and bookmark surfaces can choose a sharp raster size without upscaling. This is a browser metadata asset and should not include baked-in transparent padding.
 - `src/app/icon.svg`: Scalable app icon used by Next.js file-based metadata. The SVG viewBox is cropped to the visible mark so browser tabs do not render a shrunken icon.
 - `src/app/apple-icon.png`: 180x180 Apple icon used by Next.js file-based metadata and linked as `rel="apple-touch-icon"`. This asset should not include baked-in transparent padding.

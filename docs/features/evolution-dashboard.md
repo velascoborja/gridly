@@ -138,7 +138,7 @@ When there are fewer than two metric rows, `EvolutionDashboard` replaces the cha
 
 The Tags and Fixed Expenses dialogs share `DrilldownLoading` while fetching an uncached page. Its three placeholder rows mirror the label, amount, bar, and metadata of the final rows, with a repeating shimmer using the global `shimmer-slide` animation. The decorative shimmer is hidden for `prefers-reduced-motion`; the localized accessible loading status remains available.
 
-`loading.tsx` renders inside `BaseAppShell` so the app background, sticky header, wordmark, and navigation area remain stable while the server loads all years. The skeleton mirrors the final dashboard structure: hero/header copy, total wealth stripe, six KPI cards, the primary balance chart, three secondary charts, and the detail table grid.
+`loading.tsx` renders inside `BaseAppShell` so the app background, sticky header, wordmark, and navigation area remain stable while the server loads all years. The skeleton mirrors the final dashboard structure: hero/header copy, total wealth stripe, six KPI cards, the primary balance chart, three secondary charts, and the detail table grid. The three secondary chart placeholders stack in one column on phones and fit within the page gutters.
 
 ## Out Of Scope
 
