@@ -1,63 +1,15 @@
-<svg width="216" height="64" viewBox="0 0 216 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="216" height="64" viewBox="0 0 216 64" role="img" aria-labelledby="title">
   <title id="title">Gridly</title>
-  <desc id="desc">Gridly wordmark with a geometric finance grid mark and upward balance stroke.</desc>
-  <defs>
-    <linearGradient id="gridly-mark-bg" x1="8" y1="7" x2="58" y2="57" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#533AFD"/>
-      <stop offset="0.58" stop-color="#2E2B8C"/>
-      <stop offset="1" stop-color="#061B31"/>
-    </linearGradient>
-    <linearGradient id="gridly-mark-accent" x1="20" y1="47" x2="50" y2="25" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#B9B9F9"/>
-      <stop offset="0.55" stop-color="#F96BEE"/>
-      <stop offset="1" stop-color="#EA2261"/>
-    </linearGradient>
-    <filter id="gridly-mark-shadow" x="0" y="0" width="66" height="64" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-      <feOffset dy="3"/>
-      <feGaussianBlur stdDeviation="2.5"/>
-      <feComposite in2="hardAlpha" operator="out"/>
-      <feColorMatrix type="matrix" values="0 0 0 0 0.196 0 0 0 0 0.196 0 0 0 0 0.365 0 0 0 0.18 0"/>
-      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
-      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
-    </filter>
-  </defs>
-
-  <g filter="url(#gridly-mark-shadow)">
-    <rect x="8" y="7" width="50" height="50" rx="8" fill="url(#gridly-mark-bg)"/>
-    <rect x="8.75" y="7.75" width="48.5" height="48.5" rx="7.25" stroke="white" stroke-opacity="0.2" stroke-width="1.5"/>
+  <g transform="translate(4 5) scale(.75)">
+    <rect width="72" height="72" rx="16" fill="#533AFD"/>
+    <path fill="white" d="M36 15H55L46 24H36A12 12 0 0 0 36 48H48V40H34L42 32H57V57H36A21 21 0 0 1 36 15Z"/>
   </g>
-
-  <path
-    d="M42.4 22.35C40.05 20.35 37.02 19.15 33.58 19.15C26.27 19.15 20.32 25.1 20.32 32.42C20.32 39.73 26.27 45.68 33.58 45.68C40.12 45.68 45.35 41.05 46.2 34.92H34.2"
-    stroke="white"
-    stroke-width="5.25"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-  />
-
-  <path
-    d="M20.1 44.25L28.36 36.49L35.27 39.91L47.86 27.18"
-    stroke="url(#gridly-mark-accent)"
-    stroke-width="4.1"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-  />
-
-  <g fill="white" opacity="0.9">
-    <rect x="19" y="18" width="5.8" height="5.8" rx="1.4"/>
-    <rect x="27.7" y="18" width="5.8" height="5.8" rx="1.4" opacity="0.76"/>
-    <rect x="19" y="26.7" width="5.8" height="5.8" rx="1.4" opacity="0.68"/>
+  <g fill="#061B31" stroke="#061B31" stroke-width="16" stroke-linejoin="round" transform="translate(68 47) scale(.054 -.054)">
+    <path transform="translate(0 0)" d="M362 -16Q262 -16 191 32Q120 80 82.5 163.5Q45 247 45 354Q45 461 83 545Q121 629 192.5 677.5Q264 726 364 726Q449 726 507.5 695Q566 664 600.5 611Q635 558 648 492L558 486Q545 555 500 598.5Q455 642 364 642Q283 642 232.5 602Q182 562 158.5 496.5Q135 431 135 354Q135 273 159 208.5Q183 144 234 106Q285 68 364 68Q427 68 473 96.5Q519 125 544 173Q569 221 570 277L366 277L366 359L650 359L650 0L586 0L582 119Q555 59 495 21.5Q435 -16 362 -16Z"/>
+    <path transform="translate(670 0)" d="M80 0L80 530L154 530L157 432Q184 530 283 530L335 530L335 450L284 450Q164 450 164 320L164 0Z"/>
+    <path transform="translate(989 0)" d="M80 0L80 530L164 530L164 0ZM78 613L78 711L166 711L166 613Z"/>
+    <path transform="translate(1193 0)" d="M268 -12Q199 -12 148.5 22Q98 56 71 118Q44 180 44 265Q44 350 71 412Q98 474 148.5 508Q199 542 268 542Q321 542 365 519.5Q409 497 431 456L431 710L515 710L515 0L439 0L436 80Q414 37 369 12.5Q324 -12 268 -12ZM285 68Q356 68 393.5 121Q431 174 431 265Q431 357 393.5 409.5Q356 462 285 462Q215 462 173.5 409.5Q132 357 132 265Q132 174 173.5 121Q215 68 285 68Z"/>
+    <path transform="translate(1748 0)" d="M184 0Q138 0 109 24Q80 48 80 100L80 710L164 710L164 107Q164 74 197 74L243 74L243 0Z"/>
+    <path transform="translate(1961 0)" d="M103 -150L103 -76L164 -76Q192 -76 205.5 -67.5Q219 -59 226 -40L245 10L216 10L22 530L114 530L272 88L423 530L515 530L300 -67Q285 -110 255 -130Q225 -150 172 -150Z"/>
   </g>
-
-  <text
-    x="73"
-    y="41"
-    fill="#061B31"
-    font-family="Geist, 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-    font-size="34"
-    font-weight="300"
-    letter-spacing="-0.8"
-  >Gridly</text>
 </svg>

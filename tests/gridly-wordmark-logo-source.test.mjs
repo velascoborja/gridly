@@ -25,19 +25,12 @@ test("Gridly brand uses a full wordmark image asset", async () => {
   }
 });
 
-test("Gridly wordmark shadow bounds stay inside the SVG viewport", async () => {
-  const source = await readSource("public/gridly-wordmark.svg");
-  const viewBoxMatch = source.match(/viewBox="([^"]+)"/);
-  const filterMatch = source.match(/id="gridly-mark-shadow" x="([^"]+)" y="([^"]+)" width="([^"]+)" height="([^"]+)"/);
+test("the wordmark uses the same monogram as the app icon", async () => {
+  const wordmark = await readSource("public/gridly-wordmark.svg");
+  const icon = await readSource("src/app/icon.svg");
+  const monogram = icon.match(/<path\b[^>]*\bd="([^"]+)"/)?.[1];
 
-  assert.ok(viewBoxMatch, "wordmark should define a viewBox");
-  assert.ok(filterMatch, "wordmark should define explicit shadow filter bounds");
-
-  const [, , viewportWidth, viewportHeight] = viewBoxMatch[1].split(/\s+/).map(Number);
-  const [, x, y, width, height] = filterMatch.map(Number);
-
-  assert.ok(x >= 0, "shadow filter should not start outside the left viewport edge");
-  assert.ok(y >= 0, "shadow filter should not start outside the top viewport edge");
-  assert.ok(x + width <= viewportWidth, "shadow filter should not exceed the right viewport edge");
-  assert.ok(y + height <= viewportHeight, "shadow filter should not exceed the bottom viewport edge");
+  assert.ok(monogram, "app icon should contain a vector monogram");
+  assert.ok(wordmark.includes(`d="${monogram}"`), "wordmark should include the same monogram");
+  assert.match(wordmark, /viewBox="0 0 216 64"/, "wordmark should fit the existing header image dimensions");
 });

@@ -6,14 +6,17 @@ This document describes how Gridly exposes browser, installable app, iOS Safari 
 
 Gridly uses Next.js App Router file-based metadata for primary app icons and keeps one conventional root Apple touch icon in `public/` for Safari iOS bookmark and favorites discovery. Browser and installable metadata icons are intentionally edge-to-edge, because browser tabs, bookmark bars, and Safari iOS add their own visual containers.
 
+The brand mark is a white G with diagonal cuts on the primary purple tile. The horizontal wordmark pairs it with deep navy Geist lettering stored as vector outlines so its spacing and weight render consistently across devices.
+
 ## Key Components
 
+- `public/gridly-wordmark.svg` is the 216×64 horizontal logo used by the app shell, landing page, and setup screens.
 - `src/app/favicon.ico`: Root favicon served by Next.js as `/favicon.ico`. It contains native 16x16, 32x32, 48x48, and 64x64 PNG entries so browser tabs and bookmark surfaces can choose a sharp raster size without upscaling. This is a browser metadata asset and should not include baked-in transparent padding.
 - `src/app/icon.svg`: Scalable app icon used by Next.js file-based metadata. The SVG viewBox is cropped to the visible mark so browser tabs do not render a shrunken icon.
 - `src/app/apple-icon.png`: 180x180 Apple icon used by Next.js file-based metadata and linked as `rel="apple-touch-icon"`. This asset should not include baked-in transparent padding.
 - `public/apple-touch-icon.png`: Conventional 180x180 root fallback for Safari iOS surfaces that probe `/apple-touch-icon.png` directly. Keep it in sync with `src/app/apple-icon.png`.
 - `public/icon.svg`, `public/icon-192.png`, `public/icon-512.png`, and `public/icon-1024.png`: Manifest icons referenced by `src/app/manifest.ts`. These are metadata assets and should stay visually tight.
-- `public/opengraph-image.png`: Original 1200x630 social sharing image retained as a stable asset fallback.
+- `public/opengraph-image.png`: 1200x630 social sharing image with the horizontal wordmark and Spanish tagline on a light surface. The fallback and the metadata image use the same artwork.
 - `public/opengraph-image-gridly.png`: 1200x630 social sharing image referenced by the App Router metadata configuration. The distinct filename gives messaging app scrapers a fresh cache key when previous previews cached a failed image lookup.
 - `public/opengraph-image.alt.txt`: Descriptive source text for the social sharing image. Keep this aligned with the `openGraph.images[].alt` value in `src/app/[locale]/layout.tsx`.
 - `src/app/manifest.ts`: Web app manifest metadata for installable clients.
@@ -33,7 +36,7 @@ Open Graph and Twitter metadata use `metadataBase` from `src/app/[locale]/layout
 
 The root `<html>` element includes the Open Graph RDFa prefix, and the image metadata declares both `og:image` and `og:image:secure_url` along with MIME type, dimensions, and alt text. This keeps the generated tags aligned with the Open Graph protocol while remaining compatible with older or stricter link-preview parsers.
 
-When updating the app icon, replace both Apple PNG files together and run:
+Export both SVG icons, the favicon sizes, and the installable PNGs from the same monogram. The Apple and 512px maskable versions use a solid purple background to the corners so the operating system can apply its mask. Keep both Apple PNGs identical. Run the icon checks with
 
 ```bash
 npm test -- tests/app-icons-source.test.mjs
