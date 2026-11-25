@@ -40,13 +40,13 @@ export function BaseAppShell({ headerRightContent, children }: Props) {
     <div ref={rootRef} className="app-atmosphere relative min-h-screen text-foreground">
       <header ref={headerRef} className="relative md:sticky top-0 z-40 app-header-surface">
         <div className="mx-auto grid w-full max-w-7xl grid-cols-[1fr_auto] items-center gap-x-3 gap-y-2 px-4 py-2 sm:px-6 md:flex md:items-center md:justify-between md:gap-4 md:py-4 lg:px-8">
-          <Link href="/" className="group inline-flex items-center gap-2 justify-self-start">
+          <Link href="/" className="group inline-flex min-w-0 items-center gap-2 justify-self-start">
             <Image
               src="/gridly-wordmark.svg"
               alt="Gridly"
               width={216}
               height={64}
-              className="h-10 w-[135px] transition-transform duration-200 group-hover:-translate-y-0.5 md:h-12 md:w-[162px]"
+              className="h-auto w-28 min-w-0 transition-transform duration-200 group-hover:-translate-y-0.5 md:w-[162px]"
               priority
             />
             {process.env.NODE_ENV === "development" && (

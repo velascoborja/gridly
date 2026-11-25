@@ -11,6 +11,9 @@ test("localized app entry exposes a branded loading shell for first open", async
 
   assert.match(source, /Preparando Gridly/);
   assert.match(source, /gridly-wordmark\.svg/);
+  const logo = source.match(/<Image\b[^>]*gridly-wordmark\.svg[^>]*\/>/)?.[0];
+  assert.match(logo, /h-auto/, "the loading wordmark should preserve its intrinsic aspect ratio");
+  assert.doesNotMatch(source.slice(0, source.indexOf(logo)), /overflow-hidden/, "the loading wordmark should have no clipping ancestor");
   assert.match(source, /animate-shimmer-slide/);
   assert.match(source, /animate-label-fade/);
   assert.match(source, /role="status"/);

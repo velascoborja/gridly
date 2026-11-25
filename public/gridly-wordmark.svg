@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="216" height="64" viewBox="0 0 216 64" role="img" aria-labelledby="title">
   <title id="title">Gridly</title>
-  <g transform="translate(4 5) scale(.75)">
+  <g transform="translate(11 5) scale(.75)">
     <rect width="72" height="72" rx="16" fill="#533AFD"/>
     <path fill="white" d="M36 15H55L46 24H36A12 12 0 0 0 36 48H48V40H34L42 32H57V57H36A21 21 0 0 1 36 15Z"/>
   </g>
-  <g fill="#061B31" stroke="#061B31" stroke-width="16" stroke-linejoin="round" transform="translate(68 47) scale(.054 -.054)">
+  <g fill="#061B31" stroke="#061B31" stroke-width="16" stroke-linejoin="round" transform="translate(76 50.5) scale(.052 -.052)">
     <path transform="translate(0 0)" d="M362 -16Q262 -16 191 32Q120 80 82.5 163.5Q45 247 45 354Q45 461 83 545Q121 629 192.5 677.5Q264 726 364 726Q449 726 507.5 695Q566 664 600.5 611Q635 558 648 492L558 486Q545 555 500 598.5Q455 642 364 642Q283 642 232.5 602Q182 562 158.5 496.5Q135 431 135 354Q135 273 159 208.5Q183 144 234 106Q285 68 364 68Q427 68 473 96.5Q519 125 544 173Q569 221 570 277L366 277L366 359L650 359L650 0L586 0L582 119Q555 59 495 21.5Q435 -16 362 -16Z"/>
     <path transform="translate(670 0)" d="M80 0L80 530L154 530L157 432Q184 530 283 530L335 530L335 450L284 450Q164 450 164 320L164 0Z"/>
     <path transform="translate(989 0)" d="M80 0L80 530L164 530L164 0ZM78 613L78 711L166 711L166 613Z"/>

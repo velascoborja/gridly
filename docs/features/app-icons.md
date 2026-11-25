@@ -6,7 +6,7 @@ This document describes how Gridly exposes browser, installable app, iOS Safari 
 
 Gridly uses Next.js App Router file-based metadata for primary app icons and keeps one conventional root Apple touch icon in `public/` for Safari iOS bookmark and favorites discovery. Browser and installable metadata icons are intentionally edge-to-edge, because browser tabs, bookmark bars, and Safari iOS add their own visual containers.
 
-The brand mark is a white G with diagonal cuts on the primary purple tile. The horizontal wordmark pairs it with deep navy Geist lettering stored as vector outlines so its spacing and weight render consistently across devices.
+The brand mark is a white G with diagonal cuts on the primary purple tile. The horizontal wordmark pairs it with deep navy Geist lettering stored as vector outlines so its spacing and weight render consistently across devices. The capital G and the ascenders are optically centered on the tile, with room below the baseline for the y. The initial loading screen centers the entire SVG at its intrinsic aspect ratio.
 
 ## Key Components
 
