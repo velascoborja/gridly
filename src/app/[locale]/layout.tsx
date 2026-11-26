@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 const productionUrl = "https://appgridly.com";
-const openGraphImagePath = "/opengraph-image-gridly.png";
+const openGraphImagePath = "/opengraph-image-gridly-2026-11.png";
 
 function withProtocol(url: string) {
   return /^https?:\/\//.test(url) ? url : `https://${url}`;

@@ -23,7 +23,7 @@ test("opengraph-image.png exists in public/ and is 1200×630", async () => {
 });
 
 test("cache-busted Open Graph image exists in public/ and is 1200×630", async () => {
-  const png = await readBytes("public/opengraph-image-gridly.png");
+  const png = await readBytes("public/opengraph-image-gridly-2026-11.png");
   assert.deepEqual(pngSize(png), { width: 1200, height: 630 });
 });
 
