@@ -139,3 +139,4 @@ When changing any of the features listed below, update the related documentation
 - [Tags](docs/features/tags.md): Color-coded tags assignable to ungrouped expense entries, with inline creation.
 - [Help Page](docs/features/help.md): Tabbed in-app feature reference accessible from the Settings page.
 - [Application Security](docs/features/application-security.md): At-rest encryption for authentication data and global browser security headers.
+- [MCP Server](docs/features/mcp-server.md): Read-only Model Context Protocol endpoint at `/api/mcp`, personal access tokens, and the available tools.

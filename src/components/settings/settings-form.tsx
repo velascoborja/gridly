@@ -28,6 +28,7 @@ import { Globe, Trash2, AlertCircle } from "lucide-react";
 import { ShortcutsCard } from "./shortcuts-card";
 import { TagManagerCard } from "./tag-manager-card";
 import { HelpCard } from "./help-card";
+import { McpTokensCard } from "./mcp-tokens-card";
 import {
   clearExpectedEntriesStorage,
   getUserExpectedEntriesNamespace,
@@ -156,6 +157,8 @@ export function SettingsForm({ userId }: Props) {
       </Card>
 
       <TagManagerCard />
+
+      <McpTokensCard />
 
       <HelpCard />
 

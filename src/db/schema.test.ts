@@ -33,3 +33,13 @@ test("additional investments default to false in the schema and additive migrati
   assert.match(source, /isInvestment: boolean\("is_investment"\)\.notNull\(\)\.default\(false\)/);
   assert.match(migration, /ALTER TABLE "additional_entries" ADD COLUMN "is_investment" boolean DEFAULT false NOT NULL/);
 });
+
+test("MCP tokens store a unique hash per token and cascade with the user", () => {
+  const block = source.slice(source.indexOf("export const mcpTokens ="));
+  const migration = readFileSync(new URL("../../drizzle/0007_mcp_tokens.sql", import.meta.url), "utf8");
+  assert.match(block, /tokenHash: text\("token_hash"\)\.notNull\(\)\.unique\(\)/);
+  assert.match(block, /references\(\(\) => users\.id, \{ onDelete: "cascade" \}\)/);
+  assert.doesNotMatch(block, /text\("token"\)/);
+  assert.match(migration, /CONSTRAINT "mcp_tokens_token_hash_unique" UNIQUE\("token_hash"\)/);
+  assert.match(migration, /ON DELETE cascade/);
+});
