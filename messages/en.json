@@ -77,7 +77,7 @@
       "create": "Create token",
       "creating": "Creating...",
       "newTokenTitle": "Copy the token now",
-      "newTokenDescription": "It won't be shown again. Paste it as the Bearer token in the connector settings.",
+      "newTokenDescription": "It won't be shown again. In the connector, add it as the x-api-key header (or as a Bearer token in Authorization).",
       "done": "Done",
       "loading": "Loading tokens...",
       "empty": "No tokens yet.",

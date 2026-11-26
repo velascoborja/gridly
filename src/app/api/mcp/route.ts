@@ -14,7 +14,7 @@ function jsonRpcError(status: number, message: string, headers: Record<string, s
 }
 
 export async function POST(request: Request) {
-  const userId = await authenticateMcpRequest(request.headers.get("authorization"));
+  const userId = await authenticateMcpRequest(request.headers);
   if (!userId) {
     return jsonRpcError(401, "Unauthorized", { "WWW-Authenticate": 'Bearer realm="gridly-mcp"' });
   }

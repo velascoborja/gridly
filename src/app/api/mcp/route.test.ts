@@ -7,7 +7,7 @@ const server = readFileSync(new URL("../../../lib/server/mcp-server.ts", import.
 const tokens = readFileSync(new URL("../../../lib/server/mcp-tokens.ts", import.meta.url), "utf8");
 
 test("MCP route authenticates every request with a bearer token before building the server", () => {
-  const authIndex = route.indexOf("authenticateMcpRequest(request.headers.get(\"authorization\"))");
+  const authIndex = route.indexOf("authenticateMcpRequest(request.headers)");
   const serverIndex = route.indexOf("createGridlyMcpServer(userId)");
   assert.ok(authIndex >= 0);
   assert.ok(serverIndex > authIndex);

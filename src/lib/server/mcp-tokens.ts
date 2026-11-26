@@ -1,7 +1,7 @@
 import { and, count, desc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { mcpTokens } from "@/db/schema";
-import { MCP_TOKENS_PER_USER_LIMIT, mcpTokenDisplayPrefix, parseBearerToken } from "@/lib/mcp-tokens";
+import { MCP_TOKENS_PER_USER_LIMIT, extractMcpToken, mcpTokenDisplayPrefix } from "@/lib/mcp-tokens";
 import { generateMcpToken, hashMcpToken } from "./mcp-token-crypto";
 
 export interface McpTokenSummary {
@@ -63,8 +63,8 @@ export async function revokeMcpTokenForUser(userId: string, tokenId: number) {
   return row !== undefined;
 }
 
-export async function authenticateMcpRequest(authorization: string | null): Promise<string | null> {
-  const token = parseBearerToken(authorization);
+export async function authenticateMcpRequest(headers: Pick<Headers, "get">): Promise<string | null> {
+  const token = extractMcpToken(headers);
   if (!token) return null;
 
   const [row] = await db

@@ -77,7 +77,7 @@
       "create": "Crear token",
       "creating": "Creando...",
       "newTokenTitle": "Copia el token ahora",
-      "newTokenDescription": "No se volverá a mostrar. Pégalo como token Bearer en la configuración del conector.",
+      "newTokenDescription": "No se volverá a mostrar. En el conector, añádelo en la cabecera x-api-key (o como token Bearer en Authorization).",
       "done": "Hecho",
       "loading": "Cargando tokens...",
       "empty": "Aún no hay tokens.",

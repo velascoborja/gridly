@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   MCP_TOKEN_NAME_MAX_LENGTH,
   MCP_TOKEN_PREFIX,
+  extractMcpToken,
   isWellFormedMcpToken,
   mcpTokenDisplayPrefix,
   normalizeMcpTokenName,
@@ -51,4 +52,20 @@ test("normalizeMcpTokenName trims and enforces length", () => {
   assert.equal(normalizeMcpTokenName(42), null);
   assert.equal(normalizeMcpTokenName("x".repeat(MCP_TOKEN_NAME_MAX_LENGTH)), "x".repeat(MCP_TOKEN_NAME_MAX_LENGTH));
   assert.equal(normalizeMcpTokenName("x".repeat(MCP_TOKEN_NAME_MAX_LENGTH + 1)), null);
+});
+
+test("extractMcpToken accepts a bearer token or a raw x-api-key token", () => {
+  const token = generateMcpToken();
+  const other = generateMcpToken();
+  assert.equal(extractMcpToken(new Headers({ authorization: `Bearer ${token}` })), token);
+  assert.equal(extractMcpToken(new Headers({ "x-api-key": token })), token);
+  assert.equal(extractMcpToken(new Headers({ "x-api-key": ` ${token} ` })), token);
+  assert.equal(
+    extractMcpToken(new Headers({ authorization: `Bearer ${token}`, "x-api-key": other })),
+    token,
+    "Authorization wins when both are present"
+  );
+  assert.equal(extractMcpToken(new Headers({ "x-api-key": `Bearer ${token}` })), null);
+  assert.equal(extractMcpToken(new Headers({ "x-api-key": "not-a-token" })), null);
+  assert.equal(extractMcpToken(new Headers()), null);
 });

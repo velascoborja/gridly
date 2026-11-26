@@ -22,6 +22,18 @@ export function parseBearerToken(authorization: string | null | undefined): stri
   return isWellFormedMcpToken(match[1]) ? match[1] : null;
 }
 
+export const MCP_API_KEY_HEADER = "x-api-key";
+
+// Clients send the token either as `Authorization: Bearer <token>` or, where the
+// Authorization header can't be set (e.g. claude.ai custom connectors), as
+// `x-api-key: <token>`.
+export function extractMcpToken(headers: Pick<Headers, "get">): string | null {
+  const bearer = parseBearerToken(headers.get("authorization"));
+  if (bearer) return bearer;
+  const apiKey = headers.get(MCP_API_KEY_HEADER)?.trim();
+  return apiKey && isWellFormedMcpToken(apiKey) ? apiKey : null;
+}
+
 export function normalizeMcpTokenName(value: unknown): string | null {
   if (typeof value !== "string") return null;
   const name = value.trim();

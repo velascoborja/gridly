@@ -12,9 +12,14 @@ Gridly exposes a [Model Context Protocol](https://modelcontextprotocol.io) serve
 
 ## Authentication: personal access tokens
 
-MCP clients can't use the NextAuth session cookie, so the endpoint authenticates with a per-user bearer token: `Authorization: Bearer gridly_mcp_…`.
+MCP clients can't use the NextAuth session cookie, so the endpoint authenticates with a per-user token sent in either header:
 
-- **Format:** `gridly_mcp_` + 32 random bytes in base64url (43 characters). Malformed values are rejected before any database query (`parseBearerToken` in `src/lib/mcp-tokens.ts`).
+- `Authorization: Bearer gridly_mcp_…`
+- `x-api-key: gridly_mcp_…` (raw token, no `Bearer`). claude.ai custom connectors don't let you set `Authorization`, so they use this one.
+
+`Authorization` wins when both are present (`extractMcpToken` in `src/lib/mcp-tokens.ts`).
+
+- **Format:** `gridly_mcp_` + 32 random bytes in base64url (43 characters). Malformed values are rejected before any database query.
 - **Storage:** only the SHA-256 hash (`token_hash`, unique) and a display prefix (`gridly_mcp_` + 4 chars) are stored. The plaintext is returned once, at creation, and never again. Generation and hashing live in the server-only `src/lib/server/mcp-token-crypto.ts`, so the client bundle never imports `node:crypto`.
 - **Lookup:** `authenticateMcpRequest` hashes the presented token, updates `last_used_at` and returns the owning `userId` in a single `UPDATE … RETURNING`. An unknown or revoked token returns `401` with `WWW-Authenticate: Bearer realm="gridly-mcp"`.
 - **Limit:** 10 tokens per user (`MCP_TOKENS_PER_USER_LIMIT`). Names are trimmed, 1–60 characters.
@@ -68,14 +73,16 @@ Notes:
 ## Connecting a client
 
 1. In Gridly, open Settings → "Acceso para asistentes de IA (MCP)", create a token and copy it.
-2. Add a remote MCP server in the client with the endpoint URL and the header `Authorization: Bearer <token>`. For Claude Code:
+2. Add a remote MCP server in the client with the endpoint URL and the token:
+   - **claude.ai / Claude app** (Settings → Connectors → custom connector): header name `x-api-key`, value the token.
+   - **Claude Code:**
 
-   ```bash
-   claude mcp add --transport http gridly https://appgridly.com/api/mcp \
-     --header "Authorization: Bearer gridly_mcp_..."
-   ```
+     ```bash
+     claude mcp add --transport http gridly https://appgridly.com/api/mcp \
+       --header "Authorization: Bearer gridly_mcp_..."
+     ```
 
-Clients that only support OAuth for remote connectors can't use personal tokens yet; OAuth support is a possible later phase.
+Clients that only support OAuth for remote connectors can't use personal tokens; OAuth support is a possible later phase.
 
 ## Future phases
 
