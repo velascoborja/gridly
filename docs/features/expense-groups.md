@@ -56,7 +56,7 @@ Both item `PATCH` routes also accept `{ isCompleted: boolean }`. Completed resou
 
 ### Creating a group
 - Click "Añadir grupo" in the expenses card footer.
-- Enter a name and confirm. After the API succeeds, the card publishes the created group to the mounted year state, then calls `router.refresh()` to refresh the server payload used for route restoration. The local update covers navigation within the mounted workspace, but does not establish freshness after leaving and returning to it. `staleTimes.dynamic = 0` does not disable back/forward caching; see [Language Changes and Route Refreshes](internationalization.md#language-changes-and-route-refreshes).
+- Enter a name and confirm. After the API succeeds, the card publishes the created group to the mounted year state. It does not call `router.refresh()`, which would remount the month segment and show its skeleton after in-year `pushState` navigation. Leaving and returning with browser back/forward restores the latest local year state; see [Workspace Restores](internationalization.md#workspace-restores).
 
 ### Adding an entry to a group
 - Expand the group row and click "Añadir al grupo".

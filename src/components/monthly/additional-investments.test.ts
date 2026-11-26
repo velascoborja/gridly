@@ -34,7 +34,8 @@ test("saving investments exposes pending and localized errors while preserving d
   for (const handler of [add, edit]) {
     assert.match(handler, /isInvestment: type === "expense"/);
     assert.match(handler, /if \(!res\.ok\) throw/);
-    assert.match(handler, /router\.refresh\(\)/);
+    assert.match(handler, /onEntriesChange\(/);
+    assert.doesNotMatch(handler, /router\.refresh\(\)/);
   }
   assert.match(add, /setIsAdding\(true\);\s*try/);
   assert.match(edit, /setSavingId\(id\);\s*try/);

@@ -28,6 +28,40 @@ export function sortRecurringExpensesAsc<T extends { id: number; sortOrder: numb
   return [...entries].sort((a, b) => a.sortOrder - b.sortOrder || a.id - b.id);
 }
 
+type RecurringSeriesYearState<TMonth extends { recurringExpenses: RecurringExpense[] }> = {
+  recurringExpenses: YearRecurringExpense[];
+  months: TMonth[];
+};
+
+/**
+ * Mirrors the server-side tag propagation of a recurring expense series: the
+ * annual template and every monthly copy linked to it receive the same tag.
+ */
+export function applyRecurringSeriesTag<TMonth extends { recurringExpenses: RecurringExpense[] }>(
+  yearState: RecurringSeriesYearState<TMonth>,
+  yearRecurringExpenseId: number,
+  tagId: number | null,
+  tag: Tag | null,
+): RecurringSeriesYearState<TMonth> {
+  const isSeriesCopy = (entry: RecurringExpense) => entry.yearRecurringExpenseId === yearRecurringExpenseId;
+
+  return {
+    recurringExpenses: yearState.recurringExpenses.map((template) =>
+      template.id === yearRecurringExpenseId ? { ...template, tagId } : template
+    ),
+    months: yearState.months.map((month) =>
+      month.recurringExpenses.some(isSeriesCopy)
+        ? {
+            ...month,
+            recurringExpenses: month.recurringExpenses.map((entry) =>
+              isSeriesCopy(entry) ? { ...entry, tagId, tag } : entry
+            ),
+          }
+        : month
+    ),
+  };
+}
+
 export function sumRecurringExpenses(entries: Array<Pick<RecurringExpense, "amount">>): number {
   return entries.reduce((sum, entry) => sum + entry.amount, 0);
 }

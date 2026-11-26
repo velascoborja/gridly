@@ -43,6 +43,15 @@ const SettingsForm = dynamic(
   { loading: () => <YearViewLoading view="settings" /> }
 );
 
+// Browser back/forward restores reuse the cached server payload object, so local
+// edits made on top of that payload are kept here instead of refreshing the route.
+// A fresh server render produces a new object and therefore wins automatically.
+const latestLocalYearData = new WeakMap<YearData, YearData>();
+
+function getLatestLocalYearData(serverYearData: YearData): YearData {
+  return latestLocalYearData.get(serverYearData) ?? serverYearData;
+}
+
 interface Props {
   yearData: YearData;
   annualComparison?: AnnualKpiComparisonData;
@@ -99,7 +108,7 @@ export function YearPageClient({
   const pathname = usePathname();
   const locale = useLocale();
   const initialState = getInitialStateFromPathname(pathname, yearData.config.year, initialMonth, initialView);
-  const [currentYearData, setCurrentYearData] = useState<YearData>(yearData);
+  const [currentYearData, setCurrentYearData] = useState<YearData>(() => getLatestLocalYearData(yearData));
   const [selectedMonth, setSelectedMonth] = useState(() => initialState.month);
   const [selectedView, setSelectedView] = useState<YearRouteView>(() => initialState.view);
   const localizedPathname = getPathname({ locale, href: pathname });
@@ -115,7 +124,12 @@ export function YearPageClient({
   const toggleAllGroupsRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
-    setCurrentYearData(yearData);
+    setCurrentYearData(getLatestLocalYearData(yearData));
+  }, [yearData]);
+
+  const handleYearDataChange = useCallback((nextYearData: YearData) => {
+    latestLocalYearData.set(yearData, nextYearData);
+    setCurrentYearData(nextYearData);
   }, [yearData]);
 
   useEffect(() => {
@@ -319,7 +333,7 @@ export function YearPageClient({
           annualComparison={annualComparison}
           startingBalanceEditable={startingBalanceEditable}
           expectedEntriesStorageNamespace={getUserExpectedEntriesNamespace(user.id)}
-          onYearDataChange={setCurrentYearData}
+          onYearDataChange={handleYearDataChange}
           onMovementsSelect={handleMovementsSelect}
         />
       ) : (
@@ -327,7 +341,7 @@ export function YearPageClient({
           yearData={currentYearData}
           monthNumber={selectedMonth}
           onMonthSelect={handleMonthSelect}
-          onYearDataChange={setCurrentYearData}
+          onYearDataChange={handleYearDataChange}
           highlightId={highlightId}
           toggleFixedEditorsRef={toggleFixedRef}
           openAddExpenseFormRef={openAddExpenseFormRef}

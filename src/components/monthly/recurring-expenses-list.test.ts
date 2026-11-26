@@ -19,7 +19,10 @@ test("tag changes are confirmed before saving (pending state + AlertDialog)", ()
   assert.match(source, /AlertDialog/);
 });
 
-test("confirming a tag change PATCHes with tagId and refreshes the year", () => {
+test("confirming a tag change PATCHes with tagId and retags the series locally without a route refresh", () => {
   assert.match(source, /JSON\.stringify\(\{ tagId/);
-  assert.match(source, /router\.refresh\(\)/);
+  assert.match(source, /entry\.yearRecurringExpenseId !== null && onSeriesTagChange/);
+  assert.match(source, /onSeriesTagChange\(entry\.yearRecurringExpenseId, tagId, tag\)/);
+  assert.doesNotMatch(source, /useRouter/);
+  assert.doesNotMatch(source, /router\.refresh\(\)/);
 });

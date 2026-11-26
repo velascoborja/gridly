@@ -20,7 +20,6 @@ import { TagPicker } from "./tag-picker";
 import { sortRecurringExpensesAsc } from "@/lib/recurring-expenses";
 import { cn, formatCurrency } from "@/lib/utils";
 import { TAG_COLORS } from "@/lib/tags";
-import { useRouter } from "@/i18n/routing";
 import type { RecurringExpense, Tag } from "@/lib/types";
 
 type EntryEditFocusTarget = "label" | "amount";
@@ -31,15 +30,15 @@ interface Props {
   monthId: number;
   entries: RecurringExpense[];
   onEntriesChange: (entries: RecurringExpense[]) => void;
+  onSeriesTagChange?: (yearRecurringExpenseId: number, tagId: number | null, tag: Tag | null) => void;
   readOnly?: boolean;
   highlightId?: string | null;
 }
 
-export function RecurringExpensesList({ tags, onCreateTag: handleCreateTag, monthId, entries, onEntriesChange, readOnly = false, highlightId = null }: Props) {
+export function RecurringExpensesList({ tags, onCreateTag: handleCreateTag, monthId, entries, onEntriesChange, onSeriesTagChange, readOnly = false, highlightId = null }: Props) {
   const t = useTranslations("RecurringExpenses.monthly");
   const common = useTranslations("Common");
   const locale = useLocale();
-  const router = useRouter();
   const [savingId, setSavingId] = useState<number | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -110,12 +109,17 @@ export function RecurringExpensesList({ tags, onCreateTag: handleCreateTag, mont
         body: JSON.stringify({ tagId }),
       });
       if (!res.ok) return;
-      onEntriesChange(
-        sortRecurringExpensesAsc(
-          entries.map((e) => (e.id === entry.id ? { ...e, tagId, tag } : e))
-        )
-      );
-      router.refresh();
+      // The API retags the whole series (annual template and every monthly copy),
+      // so mirror that locally instead of refreshing the route.
+      if (entry.yearRecurringExpenseId !== null && onSeriesTagChange) {
+        onSeriesTagChange(entry.yearRecurringExpenseId, tagId, tag);
+      } else {
+        onEntriesChange(
+          sortRecurringExpensesAsc(
+            entries.map((e) => (e.id === entry.id ? { ...e, tagId, tag } : e))
+          )
+        );
+      }
     } finally {
       setSavingTagId(null);
       setPendingTag(null);

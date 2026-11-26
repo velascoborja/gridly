@@ -14,11 +14,11 @@ import { FixedExpensesCard } from "./fixed-expenses-card";
 import { IncomeCard } from "./income-card";
 import { FixedPlanPanel } from "./fixed-plan-panel";
 import { sortAdditionalEntriesDesc } from "@/lib/additional-entries";
-import { sortRecurringExpensesAsc } from "@/lib/recurring-expenses";
+import { applyRecurringSeriesTag, sortRecurringExpensesAsc } from "@/lib/recurring-expenses";
 import { cn, formatCurrency, formatMonthName } from "@/lib/utils";
 import { computeMonthChain } from "@/lib/calculations";
 import { getHorizontalSwipeDirection } from "@/lib/mobile-swipe";
-import type { MonthData, YearData, AdditionalEntry, AdditionalEntryGroup, RecurringExpense, Tag } from "@/lib/types";
+import type { MonthData, YearData, AdditionalEntry, AdditionalEntryGroup, RecurringExpense, Tag, YearRecurringExpense } from "@/lib/types";
 
 interface Props {
   yearData: YearData;
@@ -329,14 +329,17 @@ export function MonthOverview({
     return computeMonthChain(updated, config.startingBalance, config.interestRate);
   }, [config.interestRate, config.startingBalance]);
 
-  const commitMonthsChange = useCallback((update: (previousMonths: MonthData[]) => MonthData[]) => {
+  const commitMonthsChange = useCallback((
+    update: (previousMonths: MonthData[]) => MonthData[],
+    nextYearRecurringExpenses: YearRecurringExpense[] = yearRecurringExpenses
+  ) => {
     const recomputedMonths = recompute(update(monthsRef.current));
     monthsRef.current = recomputedMonths;
     setMonths(recomputedMonths);
     if (onYearDataChange) {
       onYearDataChange({
         config,
-        recurringExpenses: yearRecurringExpenses,
+        recurringExpenses: nextYearRecurringExpenses,
         months: recomputedMonths,
       });
     }
@@ -584,6 +587,20 @@ export function MonthOverview({
     );
   }, [commitMonthsChange, monthNumber]);
 
+  const handleRecurringSeriesTagChange = useCallback((
+    yearRecurringExpenseId: number,
+    tagId: number | null,
+    tag: Tag | null
+  ) => {
+    const next = applyRecurringSeriesTag(
+      { recurringExpenses: yearRecurringExpenses, months: monthsRef.current },
+      yearRecurringExpenseId,
+      tagId,
+      tag
+    );
+    commitMonthsChange(() => next.months, next.recurringExpenses);
+  }, [commitMonthsChange, yearRecurringExpenses]);
+
   const handleExportMonth = useCallback(() => {
     if (readOnly || !month) return;
     window.open(`/api/years/${config.year}/months/${month.month}/export`, "_blank");
@@ -627,6 +644,7 @@ export function MonthOverview({
         month={month}
         onUpdate={handleFixedUpdate}
         onRecurringEntriesChange={handleRecurringExpensesChange}
+        onRecurringSeriesTagChange={handleRecurringSeriesTagChange}
         annualDefaults={config}
         readOnly={readOnly}
         highlightId={highlightId}

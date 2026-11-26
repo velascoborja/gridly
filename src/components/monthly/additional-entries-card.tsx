@@ -2,7 +2,6 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "@/i18n/routing";
 import { CalendarArrowUp, FolderInput, FolderPlus, Loader2, Plus, Repeat, Tag as TagIcon, Trash2, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -97,7 +96,6 @@ export function AdditionalEntriesCard({
   const tOverview = useTranslations("Monthly.overview");
   const common = useTranslations("Common");
   const locale = useLocale();
-  const router = useRouter();
   const [addingFormOpen, setAddingFormOpen] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [savingId, setSavingId] = useState<number | null>(null);
@@ -266,7 +264,6 @@ export function AdditionalEntriesCard({
       };
       onEntriesChange(sortAdditionalEntriesDesc([...entriesRef.current, entry]));
       closeAddForm();
-      router.refresh();
     } catch {
       setNewSaveError(true);
     } finally {
@@ -318,7 +315,6 @@ export function AdditionalEntriesCard({
         )
       );
       setEditingId(null);
-      router.refresh();
     } catch {
       setEditSaveError(true);
     } finally {
@@ -426,7 +422,6 @@ export function AdditionalEntriesCard({
       const group = await res.json();
       const newGroup: AdditionalEntryGroup = { id: group.id, monthId: group.monthId, label: group.label, isCompleted: group.isCompleted ?? false, tagId: group.tagId ?? null, tag: group.tag ?? null, entries: [] };
       onGroupsChange?.([...groups, newGroup]);
-      router.refresh();
       setAddingGroupOpen(false);
       setNewGroupLabel("");
     } finally {

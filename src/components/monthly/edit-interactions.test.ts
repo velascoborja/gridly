@@ -71,12 +71,13 @@ test("entry edit focus follows whether the user clicked label or amount", () => 
   assert.match(recurringSource, /autoFocus=\{editFocusTarget\}/);
 });
 
-test("additional expense group creation refreshes the app router cache after local state updates", () => {
+test("additional entry and group saves publish local state without refreshing the route", () => {
   const source = readFileSync(new URL("./additional-entries-card.tsx", import.meta.url), "utf8");
 
-  assert.match(source, /import \{ useRouter \} from "@\/i18n\/routing"/);
-  assert.match(source, /const router = useRouter\(\)/);
-  assert.match(source, /onGroupsChange\?\.\(\[\.\.\.groups, newGroup\]\);\s*router\.refresh\(\);/);
+  // router.refresh() after an in-year pushState remounts the month segment and shows its skeleton.
+  assert.doesNotMatch(source, /useRouter/);
+  assert.doesNotMatch(source, /router\.refresh\(\)/);
+  assert.match(source, /onGroupsChange\?\.\(\[\.\.\.groups, newGroup\]\);/);
 });
 
 test("grouped and ungrouped expenses render a subtle mixed divider between their lists", () => {

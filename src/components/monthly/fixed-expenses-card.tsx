@@ -19,12 +19,13 @@ interface Props {
   month: MonthData;
   onUpdate: (field: string, value: number, options?: FixedUpdateOptions) => Promise<void>;
   onRecurringEntriesChange: (entries: RecurringExpense[]) => void;
+  onRecurringSeriesTagChange?: (yearRecurringExpenseId: number, tagId: number | null, tag: Tag | null) => void;
   annualDefaults: Pick<YearConfig, "monthlyHomeExpense" | "monthlyPersonalBudget" | "monthlyInvestment">;
   readOnly?: boolean;
   highlightId?: string | null;
 }
 
-export function FixedExpensesCard({ tags, onCreateTag, month, onUpdate, onRecurringEntriesChange, annualDefaults, readOnly = false, highlightId = null }: Props) {
+export function FixedExpensesCard({ tags, onCreateTag, month, onUpdate, onRecurringEntriesChange, onRecurringSeriesTagChange, annualDefaults, readOnly = false, highlightId = null }: Props) {
   const t = useTranslations("Monthly.fixedExpenses");
   const locale = useLocale();
   const recurringTotal = sumRecurringExpenses(month.recurringExpenses);
@@ -86,6 +87,7 @@ export function FixedExpensesCard({ tags, onCreateTag, month, onUpdate, onRecurr
           monthId={month.id}
           entries={month.recurringExpenses}
           onEntriesChange={onRecurringEntriesChange}
+          onSeriesTagChange={onRecurringSeriesTagChange}
           readOnly={readOnly}
           highlightId={highlightId}
         />

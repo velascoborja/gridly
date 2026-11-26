@@ -67,7 +67,7 @@ test("annual config saves serialize the year and month updates in one transactio
 test("year page lets annual summary update shared year data", () => {
   const source = readFileSync(new URL("../year/year-page-client.tsx", import.meta.url), "utf8");
 
-  assert.match(source, /<AnnualView[\s\S]*onYearDataChange=\{setCurrentYearData\}/);
+  assert.match(source, /<AnnualView[\s\S]*onYearDataChange=\{handleYearDataChange\}/);
 });
 
 test("year pages load annual KPI comparison context without loading full evolution data", () => {

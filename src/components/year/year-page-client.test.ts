@@ -25,6 +25,16 @@ test("every deferred year view has immediate accessible loading feedback", () =>
   assert.match(loadingSource, /motion-reduce:/);
 });
 
+test("local year data edits survive back/forward restores of the cached server payload", () => {
+  assert.match(source, /const latestLocalYearData = new WeakMap<YearData, YearData>\(\)/);
+  assert.match(source, /useState<YearData>\(\(\) => getLatestLocalYearData\(yearData\)\)/);
+  assert.match(source, /setCurrentYearData\(getLatestLocalYearData\(yearData\)\)/);
+  assert.match(source, /latestLocalYearData\.set\(yearData, nextYearData\);\s*setCurrentYearData\(nextYearData\);/);
+  assert.match(source, /<MonthOverview[\s\S]*onYearDataChange=\{handleYearDataChange\}/);
+  assert.match(source, /<AnnualView[\s\S]*onYearDataChange=\{handleYearDataChange\}/);
+  assert.doesNotMatch(source, /onYearDataChange=\{setCurrentYearData\}/);
+});
+
 test("local year navigation restores the locale prefix before native pushState", () => {
   assert.match(source, /getPathname\(\{ locale, href: pathname \}\)/);
   assert.match(source, /getYearRoutePrefix\(localizedPathname, currentYearData\.config\.year\)/);

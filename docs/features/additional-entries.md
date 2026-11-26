@@ -21,7 +21,7 @@ Ungrouped expenses expose an investment action in their create/edit form, includ
 
 `POST` and `PATCH` accept a boolean `isInvestment`. Non-boolean values, marked incomes, and marked grouped entries return HTTP `400`; invalid combinations use `investment_requires_ungrouped_expense`. Moving a marked expense into a group is blocked in the menu, drag-and-drop, and API until the investment flag is removed. Month moves preserve it. Guided year creation copies it for annually recurring entries.
 
-Marked amounts remain additional expenses in categories, monthly averages and cash-flow totals, while also contributing to investment metrics. Classification-only changes do not propagate cash balances. Saving updates shared year state immediately, refreshes the route cache, and preserves the draft with a localized error on failure. Apply `drizzle/0006_additional_investments.sql` before deploying code that reads the new column.
+Marked amounts remain additional expenses in categories, monthly averages and cash-flow totals, while also contributing to investment metrics. Classification-only changes do not propagate cash balances. Saving updates shared year state immediately without refreshing the route, and preserves the draft with a localized error on failure. Apply `drizzle/0006_additional_investments.sql` before deploying code that reads the new column.
 
 ## UI & Implementation
 
@@ -78,7 +78,7 @@ The collection and item APIs enforce the same model as the UI: grouped entries m
 - Additional-entry cards stay expanded and interactive in every month. Their temporal context controls presentation only: past months use a faint `month-past` tint and leading edge, the current month uses the standard card surface, and future months use a faint `month-future` tint and leading edge; non-current cards also show their localized status beside the title.
 - Groups render above ungrouped entries in `AdditionalEntriesCard`.
 - Groups can be moved to another month from the group header. Desktop drag-and-drop and the compact month menu both persist through `PATCH /api/months/[monthId]/entry-groups/[groupId]` with a target `monthId`.
-- Creating a group updates the mounted month state immediately, then calls `router.refresh()` to invalidate the App Router client cache for route restores after leaving and returning to the year workspace.
+- Creating a group updates the mounted month state immediately. It does not call `router.refresh()`; route restores after leaving and returning to the year workspace reuse the latest local year state (see [Workspace Restores](internationalization.md#workspace-restores)).
 - Collapsed state resets on reload (UI-only state, not persisted).
 - Group name is editable inline: click the group label to rename, Enter or blur to save, Escape to cancel.
 - Deleting a group opens a confirmation dialog listing the group name and entry count.

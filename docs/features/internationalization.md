@@ -56,15 +56,19 @@ Always use the custom navigation components and hooks exported from `@/i18n/rout
 
 A local state update alone does not prove that a route refresh is redundant: all affected data and route restoration must be covered. In particular, `staleTimes.dynamic = 0` does not disable back/forward caching or force shared layouts to reload. See the [Next.js staleTimes reference](https://nextjs.org/docs/app/api-reference/config/next-config-js/staleTimes).
 
-The following seven refresh calls remain:
+The following five refresh calls remain:
 
 | Operation | Calls | Reason retained |
 | --- | --- | --- |
-| Create an expense group | 1 | Local year state includes the group, but restoring the updated data after leaving and returning to the workspace has not been established without refreshing. |
-| Save annual configuration or recurring templates | 2 | Local year updates do not cover route restoration or server-loaded comparisons involving downstream years affected by carry-over. |
-| Change a recurring expense tag | 1 | The server updates the entire series, while the local callback updates only the visible month. |
+| Save annual configuration or recurring templates | 2 | Local year updates do not cover server-loaded comparisons involving downstream years affected by carry-over. |
 | Delete a tag | 1 | Removing the tag from the local catalog does not update its references throughout the year data. |
 | Save or delete a historical year | 2 | Evolution needs updated server data for its rows and metrics. |
+
+The monthly workspace (additional entries, expense groups, fixed values, recurring expense edits and tags) does not refresh. After an in-year `pushState`, the router URL no longer matches the server-rendered `[month]` segment, so `router.refresh()` would fetch a different segment key, remount `YearPageClient`, and flash `[month]/loading.tsx`. Recurring tag changes mirror the server's series propagation locally with `applyRecurringSeriesTag`.
+
+#### Workspace Restores
+
+Browser back/forward reuses the cached server payload for the page, so a remounted `YearPageClient` would receive the `yearData` object it was first rendered with. `YearPageClient` keeps a module-level `WeakMap<YearData, YearData>` (`latestLocalYearData`) keyed by that server object: every `onYearDataChange` from `MonthOverview` or `AnnualView` records the latest local state, and both the initial state and the prop-sync effect read `latestLocalYearData.get(yearData) ?? yearData`. A restore therefore shows the local edits, while a fresh navigation, refresh, or reload produces a new server object and the server data wins. Entries are released when Next.js drops the cached payload.
 
 #### In-Year Routing & Workspace State
 To provide a fast, app-like experience and preserve locally updated `YearData` across views, Gridly uses a "Workspace" model for in-year navigation:

@@ -54,10 +54,10 @@ test("monthly edits update the shared year data used by the annual summary", asy
   const shellSource = await readSource("src/components/year/year-page-client.tsx");
   const monthSource = await readSource("src/components/monthly/month-overview.tsx");
 
-  assert.match(shellSource, /useState<YearData>\(yearData\)/, "year client shell should own mutable year data");
-  assert.match(shellSource, /setCurrentYearData\(yearData\)/, "year client shell should resync when server year data changes");
+  assert.match(shellSource, /useState<YearData>\(\(\) => getLatestLocalYearData\(yearData\)\)/, "year client shell should own mutable year data");
+  assert.match(shellSource, /setCurrentYearData\(getLatestLocalYearData\(yearData\)\)/, "year client shell should resync when server year data changes");
   assert.match(shellSource, /<AnnualView[\s\S]*yearData=\{currentYearData\}/, "annual summary should read the shared mutable year data");
-  assert.match(shellSource, /<MonthOverview[\s\S]*yearData=\{currentYearData\}[\s\S]*onYearDataChange=\{setCurrentYearData\}/, "month overview should publish edits to the shared year data");
+  assert.match(shellSource, /<MonthOverview[\s\S]*yearData=\{currentYearData\}[\s\S]*onYearDataChange=\{handleYearDataChange\}/, "month overview should publish edits to the shared year data");
   assert.match(monthSource, /onYearDataChange\?: \(yearData: YearData\) => void/, "month overview should expose a shared year data change callback");
   assert.match(monthSource, /onYearDataChange\(\{[\s\S]*config,[\s\S]*months: recomputedMonths,[\s\S]*\}\)/, "month overview should send recomputed months back to the shell");
 });

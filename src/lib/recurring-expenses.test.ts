@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { computeMonthChain, totalExpenses } from "./calculations.ts";
 import {
+  applyRecurringSeriesTag,
   hasInvalidRecurringExpenseAmounts,
   normalizeRecurringExpenseInputs,
   RECURRING_EXPENSE_AMOUNT_ERROR,
@@ -10,7 +11,7 @@ import {
   parseYearRecurringExpense,
   parseMonthlyRecurringExpense,
 } from "./recurring-expenses.ts";
-import type { RecurringExpense } from "./types.ts";
+import type { RecurringExpense, Tag, YearRecurringExpense } from "./types.ts";
 
 const recurringExpenses: RecurringExpense[] = [
   { id: 2, monthId: 1, yearRecurringExpenseId: 2, label: "Gimnasio", amount: 45, sortOrder: 2, tagId: null, tag: null },
@@ -143,4 +144,38 @@ test("parseMonthlyRecurringExpense attaches a resolved tag when passed", () => {
     tag,
   );
   assert.deepEqual(result.tag, tag);
+});
+
+test("retagging a recurring series updates its template and every linked monthly copy only", () => {
+  const tag: Tag = { id: 7, name: "Casa", color: "blue" };
+  const templates: YearRecurringExpense[] = [
+    { id: 1, yearId: 1, label: "Alquiler", amount: 900, sortOrder: 1, tagId: null },
+    { id: 2, yearId: 1, label: "Gimnasio", amount: 45, sortOrder: 2, tagId: null },
+  ];
+  const months = [
+    { month: 1, recurringExpenses },
+    {
+      month: 2,
+      recurringExpenses: [
+        { id: 11, monthId: 2, yearRecurringExpenseId: 1, label: "Alquiler", amount: 900, sortOrder: 1, tagId: null, tag: null },
+      ],
+    },
+    {
+      month: 3,
+      recurringExpenses: [
+        { id: 21, monthId: 3, yearRecurringExpenseId: 2, label: "Gimnasio", amount: 45, sortOrder: 2, tagId: null, tag: null },
+      ],
+    },
+  ];
+  const input = structuredClone({ recurringExpenses: templates, months });
+
+  const result = applyRecurringSeriesTag(input, 1, tag.id, tag);
+
+  assert.deepEqual(result.recurringExpenses.map((template) => template.tagId), [7, null]);
+  assert.deepEqual(
+    result.months.flatMap((month) => month.recurringExpenses.map((entry) => [entry.id, entry.tagId, entry.tag?.id ?? null])),
+    [[2, null, null], [1, 7, 7], [3, null, null], [11, 7, 7], [21, null, null]]
+  );
+  assert.equal(result.months[2], input.months[2], "months without the series keep their identity");
+  assert.deepEqual(input, { recurringExpenses: templates, months }, "input is not mutated");
 });
