@@ -15,6 +15,72 @@ function SheetClose({ ...props }: SheetPrimitive.Close.Props) {
   return <SheetPrimitive.Close data-slot="sheet-close" {...props} />
 }
 
+const KEYBOARD_INSET_VAR = "--sheet-keyboard-inset"
+const VIEWPORT_HEIGHT_VAR = "--sheet-viewport-height"
+const FOCUS_REVEAL_MARGIN = 16
+
+function isTextEntry(element: Element | null): element is HTMLElement {
+  return (
+    element instanceof HTMLTextAreaElement ||
+    element instanceof HTMLSelectElement ||
+    (element instanceof HTMLInputElement &&
+      !["button", "checkbox", "radio", "range", "submit", "reset"].includes(element.type)) ||
+    (element instanceof HTMLElement && element.isContentEditable)
+  )
+}
+
+/** Scrolls only the sheet body so the focused field sits inside the visible part of the sheet. */
+function revealInSheetBody(element: HTMLElement) {
+  const scroller = element.closest<HTMLElement>('[data-slot="sheet-body"]')
+  if (!scroller) return
+  const bounds = scroller.getBoundingClientRect()
+  const target = element.getBoundingClientRect()
+  if (target.bottom > bounds.bottom - FOCUS_REVEAL_MARGIN) {
+    scroller.scrollTop += target.bottom - bounds.bottom + FOCUS_REVEAL_MARGIN
+  } else if (target.top < bounds.top + FOCUS_REVEAL_MARGIN) {
+    scroller.scrollTop -= bounds.top + FOCUS_REVEAL_MARGIN - target.top
+  }
+}
+
+/**
+ * Mobile browsers overlay the on-screen keyboard on the layout viewport, so a sheet pinned to
+ * `bottom: 0` hides its lower fields behind it. This keeps the sheet above the keyboard and
+ * sized to the visible viewport, then scrolls the focused field into view.
+ */
+function followVisualViewport(popup: HTMLElement | null) {
+  const viewport = typeof window === "undefined" ? undefined : window.visualViewport
+  if (!popup || !viewport) return
+
+  let frame = 0
+  const revealFocused = () => {
+    const focused = document.activeElement
+    if (isTextEntry(focused) && popup.contains(focused)) revealInSheetBody(focused)
+  }
+  const sync = () => {
+    const keyboardInset = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop)
+    popup.style.setProperty(KEYBOARD_INSET_VAR, `${keyboardInset}px`)
+    popup.style.setProperty(VIEWPORT_HEIGHT_VAR, `${viewport.height}px`)
+    cancelAnimationFrame(frame)
+    frame = requestAnimationFrame(revealFocused)
+  }
+  const onFocusIn = (event: FocusEvent) => {
+    if (!isTextEntry(event.target as Element | null)) return
+    cancelAnimationFrame(frame)
+    frame = requestAnimationFrame(revealFocused)
+  }
+
+  sync()
+  viewport.addEventListener("resize", sync)
+  viewport.addEventListener("scroll", sync)
+  popup.addEventListener("focusin", onFocusIn)
+  return () => {
+    cancelAnimationFrame(frame)
+    viewport.removeEventListener("resize", sync)
+    viewport.removeEventListener("scroll", sync)
+    popup.removeEventListener("focusin", onFocusIn)
+  }
+}
+
 /** Bottom sheet anchored to the viewport's lower edge, used for mobile-only secondary panels. */
 function SheetContent({
   className,
@@ -30,8 +96,9 @@ function SheetContent({
       />
       <SheetPrimitive.Popup
         data-slot="sheet-content"
+        ref={followVisualViewport}
         className={cn(
-          "fixed inset-x-0 bottom-0 z-50 flex max-h-[88dvh] flex-col rounded-t-2xl border-t border-border/70 bg-background text-sm text-foreground shadow-sheet outline-none translate-y-0 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform data-starting-style:translate-y-full data-ending-style:translate-y-full data-ending-style:duration-200 data-ending-style:ease-in motion-reduce:transition-none",
+          "fixed inset-x-0 bottom-[var(--sheet-keyboard-inset,0px)] z-50 flex max-h-[calc(var(--sheet-viewport-height,100dvh)*0.88)] flex-col rounded-t-2xl border-t border-border/70 bg-background text-sm text-foreground shadow-sheet outline-none translate-y-0 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform data-starting-style:translate-y-full data-ending-style:translate-y-full data-ending-style:duration-200 data-ending-style:ease-in motion-reduce:transition-none",
           className
         )}
         {...props}
