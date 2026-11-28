@@ -16,7 +16,6 @@ function SheetClose({ ...props }: SheetPrimitive.Close.Props) {
 }
 
 const KEYBOARD_INSET_VAR = "--sheet-keyboard-inset"
-const VIEWPORT_HEIGHT_VAR = "--sheet-viewport-height"
 const FOCUS_REVEAL_MARGIN = 16
 
 function isTextEntry(element: Element | null): element is HTMLElement {
@@ -29,23 +28,30 @@ function isTextEntry(element: Element | null): element is HTMLElement {
   )
 }
 
-/** Scrolls only the sheet body so the focused field sits inside the visible part of the sheet. */
-function revealInSheetBody(element: HTMLElement) {
+/**
+ * Scrolls only the sheet body so the focused field sits in the part of the sheet that is still
+ * visible, i.e. between the top of the body and the top edge of the on-screen keyboard.
+ */
+function revealInSheetBody(element: HTMLElement, viewport: VisualViewport) {
   const scroller = element.closest<HTMLElement>('[data-slot="sheet-body"]')
   if (!scroller) return
   const bounds = scroller.getBoundingClientRect()
+  const visibleTop = Math.max(bounds.top, viewport.offsetTop) + FOCUS_REVEAL_MARGIN
+  const visibleBottom =
+    Math.min(bounds.bottom, viewport.offsetTop + viewport.height) - FOCUS_REVEAL_MARGIN
   const target = element.getBoundingClientRect()
-  if (target.bottom > bounds.bottom - FOCUS_REVEAL_MARGIN) {
-    scroller.scrollTop += target.bottom - bounds.bottom + FOCUS_REVEAL_MARGIN
-  } else if (target.top < bounds.top + FOCUS_REVEAL_MARGIN) {
-    scroller.scrollTop -= bounds.top + FOCUS_REVEAL_MARGIN - target.top
+  if (target.bottom > visibleBottom) {
+    scroller.scrollTop += target.bottom - visibleBottom
+  } else if (target.top < visibleTop) {
+    scroller.scrollTop -= visibleTop - target.top
   }
 }
 
 /**
- * Mobile browsers overlay the on-screen keyboard on the layout viewport, so a sheet pinned to
- * `bottom: 0` hides its lower fields behind it. This keeps the sheet above the keyboard and
- * sized to the visible viewport, then scrolls the focused field into view.
+ * Mobile browsers draw the on-screen keyboard over the layout viewport, so the lower part of a
+ * sheet pinned to `bottom: 0` ends up behind it. The sheet stays where it is; instead the body
+ * gets extra bottom padding equal to the covered height, so every field can be scrolled above
+ * the keyboard, and the focused field is scrolled into that visible area.
  */
 function followVisualViewport(popup: HTMLElement | null) {
   const viewport = typeof window === "undefined" ? undefined : window.visualViewport
@@ -54,12 +60,13 @@ function followVisualViewport(popup: HTMLElement | null) {
   let frame = 0
   const revealFocused = () => {
     const focused = document.activeElement
-    if (isTextEntry(focused) && popup.contains(focused)) revealInSheetBody(focused)
+    if (isTextEntry(focused) && popup.contains(focused)) revealInSheetBody(focused, viewport)
   }
   const sync = () => {
-    const keyboardInset = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop)
-    popup.style.setProperty(KEYBOARD_INSET_VAR, `${keyboardInset}px`)
-    popup.style.setProperty(VIEWPORT_HEIGHT_VAR, `${viewport.height}px`)
+    // offsetTop/offsetHeight ignore the enter/exit translate, so this is the sheet's resting bottom.
+    const sheetBottom = popup.offsetTop + popup.offsetHeight
+    const covered = sheetBottom - (viewport.offsetTop + viewport.height)
+    popup.style.setProperty(KEYBOARD_INSET_VAR, `${Math.max(0, Math.round(covered))}px`)
     cancelAnimationFrame(frame)
     frame = requestAnimationFrame(revealFocused)
   }
@@ -98,7 +105,7 @@ function SheetContent({
         data-slot="sheet-content"
         ref={followVisualViewport}
         className={cn(
-          "fixed inset-x-0 bottom-[var(--sheet-keyboard-inset,0px)] z-50 flex max-h-[calc(var(--sheet-viewport-height,100dvh)*0.88)] flex-col rounded-t-2xl border-t border-border/70 bg-background text-sm text-foreground shadow-sheet outline-none translate-y-0 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform data-starting-style:translate-y-full data-ending-style:translate-y-full data-ending-style:duration-200 data-ending-style:ease-in motion-reduce:transition-none",
+          "fixed inset-x-0 bottom-0 z-50 flex max-h-[88dvh] flex-col rounded-t-2xl border-t border-border/70 bg-background text-sm text-foreground shadow-sheet outline-none translate-y-0 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform data-starting-style:translate-y-full data-ending-style:translate-y-full data-ending-style:duration-200 data-ending-style:ease-in motion-reduce:transition-none",
           className
         )}
         {...props}
@@ -138,7 +145,7 @@ function SheetBody({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="sheet-body"
       className={cn(
-        "min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[max(1rem,env(safe-area-inset-bottom))]",
+        "min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[calc(max(1rem,env(safe-area-inset-bottom))+var(--sheet-keyboard-inset,0px))]",
         className
       )}
       {...props}
